@@ -6,7 +6,8 @@ import { EstadisticasPage } from '@/app/pages/Estadisticas/page';
 import { RecursosHumanosPage } from '@/app/pages/RRHH/page';
 import { IAPage } from '@/app/pages/IA/page';
 import { OrganigramaPage } from '@/app/pages/Organigrama/page';
-type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama';
+import EmployeeCV  from '@/app/pages/Cv/Page';
+type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama' | 'Cv';
 
 export default function App() {
   const [page, setPage] = useState<Page>('estadisticas');
@@ -21,6 +22,8 @@ export default function App() {
         return <IAPage />;
       case 'organigrama':
         return <OrganigramaPage />;
+        case 'Cv':
+        return <EmployeeCV />;
       default:
         return <EstadisticasPage />;
     }
@@ -28,7 +31,7 @@ export default function App() {
 
   return (
     <div className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
-      <Header />
+      <Header setPage={setPage} />
       <Sidebar activePage={page} setPage={setPage} />
       <main className="pt-20 md:pl-72 pr-4 md:pr-8 pb-8">
         {renderPage()}

@@ -1,7 +1,7 @@
 
 import {  BarChart2, Users, BrainCircuit, GitMerge, } from 'lucide-react';
 
-export type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama';
+export type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama' | 'Cv';
 
 export const Sidebar = ({ activePage, setPage }: { activePage: Page; setPage: (page: Page) => void }) => {
   const navItems = [

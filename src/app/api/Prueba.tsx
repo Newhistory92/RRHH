@@ -62,3 +62,49 @@ export const mockEmployees: Employee[] = [
     },
   ],
 };
+
+
+export const mockData = {
+  employees: [
+    { id: 1, full_name: 'Ana García', email: 'ana.garcia@example.com', position: 'Desarrolladora Frontend Senior', department_id: 1, manager_id: 3, start_date: '2020-03-15', status: 'activo', role: 'empleado', photo: `https://placehold.co/150x150/E2E8F0/4A5568?text=AG`, dni: '12.345.678', birth_date: '1990-05-20' },
+  ],
+  availableSkills: [ 
+      {id: 1, name: 'React.js'}, {id: 2, name: 'Node.js'}, {id: 3, name: 'Python'}, 
+      {id: 4, name: 'Análisis de Datos con Pandas'}, {id: 5, name: 'Gestión de Proyectos (Agile)'}, {id: 6, name: 'SQL'},
+      {id: 7, name: 'DevOps con Docker'}, {id: 8, name: 'UI/UX Design Fundamentals'}
+  ],
+  softSkills: [
+      { id: 1, name: 'Comunicación Efectiva', description: 'Habilidad para transmitir ideas de forma clara y concisa, tanto verbalmente como por escrito, y escuchar activamente a los demás.' },
+      { id: 2, name: 'Trabajo en Equipo', description: 'Capacidad para colaborar con otros, aportar al grupo y priorizar los objetivos del equipo sobre los individuales.' },
+      { id: 3, name: 'Resolución de Problemas', description: 'Aptitud para identificar problemas, analizar sus causas y encontrar soluciones eficientes y creativas.' },
+      { id: 4, name: 'Liderazgo', description: 'Capacidad para motivar, guiar e inspirar a un equipo hacia la consecución de metas comunes.' },
+      { id: 5, name: 'Adaptabilidad', description: 'Flexibilidad para ajustarse a nuevos entornos, tareas y desafíos, manteniendo una actitud positiva ante el cambio.' },
+      { id: 6, name: 'Pensamiento Crítico', description: 'Habilidad para analizar información de manera objetiva, evaluar argumentos y tomar decisiones fundamentadas.' },
+  ],
+};
+
+
+
+
+export const initialCvData = (employee) => ({
+    personalData: {
+        fullName: employee.full_name, dni: employee.dni, birthDate: employee.birth_date,
+        nationality: 'Argentino/a', gender: 'Femenino', address: 'Av. Libertador 1234',
+        city: 'Buenos Aires', province: 'CABA', phone: '+54 9 11 1234 5678', email: employee.email, 
+        profilePhoto: employee.photo, profilePhotoFile: null,
+    },
+    academicFormation: [ 
+        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null }, 
+        { id: 2, title: 'Bachiller Técnico', institution: 'Escuela Técnica N°5', level: 'Secundario', status: 'Completo', startDate: '2005-03-01', endDate: '2009-12-10', isCurrent: false, attachment: null },
+    ],
+    languages: [ { id: 1, language: 'Inglés', level: 'Avanzado', certification: 'TOEFL iBT', attachment: null }, { id: 2, language: 'Español', level: 'Nativo', certification: '', attachment: null }, ],
+    workExperience: [ 
+        { id: 1, position: 'Desarrolladora Frontend Senior', company: 'Empresa Actual', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2020-03-01', endDate: '', isCurrent: true, contractType: 'Tiempo completo' },
+        { id: 2, position: 'Desarrolladora Frontend', company: 'Tech Solutions S.A.', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2016-03-01', endDate: '2020-02-28', isCurrent: false, contractType: 'Tiempo completo' },
+    ],
+    technicalSkills: [ { id: 1, skill: 'JavaScript (ES6+)', level: 'Avanzado', experienceYears: 5 } ],
+    softSkills: [1, 3], // IDs from mockSoftSkills
+    certifications: [ { id: 1, name: 'Scrum Fundamentals Certified', issuingBody: 'SCRUMstudy', issueDate: '2019-06-10', attachment: null }, ],
+    validation_status: 'Pendiente',
+    skillStatus: [ { skill_id: 6, status: 'locked', unlockDate: new Date(new Date().setMonth(new Date().getMonth() + 1)) } ]
+});
