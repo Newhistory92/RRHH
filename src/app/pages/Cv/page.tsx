@@ -72,7 +72,7 @@ export default function EmployeeCV() {
             {isTestModalOpen && <SkillTestModal skill={skillToTest} onClose={() => setIsTestModalOpen(false)} onTestComplete={handleTestComplete} />}
             <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
                 <div className="flex justify-between items-start mb-6">
-                    <SectionTitle icon={FileText} title="Mi Currículum Vitae" />
+                    <SectionTitle icon={FileText} title="Mis Datos" />
                     <div>
                         <span className="text-sm text-gray-600 mr-2">Estado de Validación:</span>
                         {getValidationStatusPill(cvData.validation_status)}

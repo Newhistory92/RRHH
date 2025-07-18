@@ -4,7 +4,7 @@ import { Bell, LogOut, Edit, Upload, FileText, ChevronDown,  } from 'lucide-reac
 import { useClickOutside } from '@/app/util/useClick';
 import { mockNotifications } from '@/app/api/Prueba';
 
-type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama' | 'Cv' | 'editar-perfil' | 'cargar-datos';
+type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama' | 'Cv' | 'editar-perfil' | 'cargar-datos'| 'licencias';
 export const Header = ({ setPage }: { setPage: (page: Page) => void }) => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -67,8 +67,8 @@ export const Header = ({ setPage }: { setPage: (page: Page) => void }) => {
               </div>
               <ul className="py-2">
                 <li><a href="#" onClick={(e) => { e.preventDefault(); handleProfileLinkClick('editar-perfil'); }} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><Edit size={16} className="mr-3" /> Editar Perfil</a></li>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); handleProfileLinkClick('Cv'); }} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><Upload size={16} className="mr-3" /> CV</a></li>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); handleProfileLinkClick('cargar-datos'); }} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><FileText size={16} className="mr-3" /> Cargar Datos</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); handleProfileLinkClick('licencias'); }} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><Edit size={16} className="mr-3" />Licencias</a></li>
+                {/* <li><a href="#" onClick={(e) => { e.preventDefault(); handleProfileLinkClick('cargar-datos'); }} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><FileText size={16} className="mr-3" /> Cargar Datos</a></li> */}
                 <li className="border-t border-gray-200 dark:border-gray-700 my-1"></li>
                 <li><a href="#" className="flex items-center px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"><LogOut size={16} className="mr-3" /> Cerrar Sesión</a></li>
               </ul>

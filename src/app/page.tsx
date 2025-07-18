@@ -6,8 +6,10 @@ import { EstadisticasPage } from '@/app/pages/Estadisticas/page';
 import { RecursosHumanosPage } from '@/app/pages/RRHH/page';
 import { IAPage } from '@/app/pages/IA/page';
 import { OrganigramaPage } from '@/app/pages/Organigrama/page';
-import EmployeeCV  from '@/app/pages/Cv/Page';
-type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama' | 'Cv';
+import EmployeeCV  from '@/app/pages/Cv/page';
+import LicenciasManage from '@/app/pages/LicenciasManage/page';
+
+type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama' | 'editar-perfil'| 'licencias';
 
 export default function App() {
   const [page, setPage] = useState<Page>('estadisticas');
@@ -22,8 +24,10 @@ export default function App() {
         return <IAPage />;
       case 'organigrama':
         return <OrganigramaPage />;
-        case 'Cv':
+        case 'editar-perfil':
         return <EmployeeCV />;
+      case 'licencias':
+        return <LicenciasManage />;
       default:
         return <EstadisticasPage />;
     }

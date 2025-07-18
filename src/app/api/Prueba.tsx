@@ -108,3 +108,30 @@ export const initialCvData = (employee) => ({
     validation_status: 'Pendiente',
     skillStatus: [ { skill_id: 6, status: 'locked', unlockDate: new Date(new Date().setMonth(new Date().getMonth() + 1)) } ]
 });
+
+
+
+export const getInitialDB = () => {
+    const currentYear = new Date().getFullYear();
+    return {
+      usuarios: {
+        'empleado-1': { id: 'empleado-1', nombreCompleto: 'Juan Pérez', dni: '12.345.678', oficina: 'Contabilidad', rol: 'empleado' },
+        'supervisor-1': { id: 'supervisor-1', nombreCompleto: 'Ana García (Jefa de Área)', dni: '98.765.432', oficina: 'Dirección', rol: 'supervisor' },
+        'supervisor-2': { id: 'supervisor-2', nombreCompleto: 'Carlos Gomez (Director Gral.)', dni: '55.666.777', oficina: 'Gerencia', rol: 'supervisor' },
+      },
+      saldos: {
+        'empleado-1': [
+            { anio: currentYear, Licencias: 21, Particulares: 5, Articulos: 10, Examen: 4 },
+            { anio: currentYear - 1, Licencias: 5, Particulares: 0, Articulos: 0, Examen: 0 },
+            { anio: currentYear - 2, Licencias: 2, Particulares: 0, Articulos: 0, Examen: 0 },
+        ],
+        'supervisor-1': [
+            { anio: currentYear, Licencias: 21, Particulares: 5, Articulos: 10, Examen: 4 },
+        ],
+         'supervisor-2': [
+            { anio: currentYear, Licencias: 21, Particulares: 5, Articulos: 10, Examen: 4 },
+        ],
+      },
+      solicitudes: [],
+    };
+};
