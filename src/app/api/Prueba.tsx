@@ -135,3 +135,33 @@ export const getInitialDB = () => {
       solicitudes: [],
     };
 };
+
+
+
+export const mockEmployeesorg = [
+    { id: 101, nombre: 'Ana María Torres', foto: 'https://placehold.co/100x100/d1d4ff/333333?text=AT' },
+    { id: 102, nombre: 'Juan Pérez', foto: 'https://placehold.co/100x100/c2f0c2/333333?text=JP' },
+    { id: 103, nombre: 'Mónica Díaz', foto: 'https://placehold.co/100x100/f0c2f0/333333?text=MD' },
+    { id: 104, nombre: 'David Ortiz', foto: 'https://placehold.co/100x100/f0f0c2/333333?text=DO' },
+    { id: 105, nombre: 'Luisa Fernández', foto: 'https://placehold.co/100x100/f0d4c2/333333?text=LF' },
+    { id: 106, nombre: 'Carlos Ruiz', foto: 'https://placehold.co/100x100/c2c2f0/333333?text=CR' },
+    { id: 107, nombre: 'Sofía Gómez', foto: 'https://placehold.co/100x100/e6c2f0/333333?text=SG' },
+    { id: 108, nombre: 'Ricardo Morales', foto: 'https://placehold.co/100x100/c2e2f0/333333?text=RM' },
+    { id: 109, nombre: 'Elena Vázquez', foto: 'https://placehold.co/100x100/f0c2c2/333333?text=EV' },
+    { id: 110, nombre: 'Pedro Castillo', foto: 'https://placehold.co/100x100/d3d3d3/333333?text=PC' },
+    { id: 111, nombre: 'Laura Pausini', foto: 'https://placehold.co/100x100/c8d6e5/333333?text=LP' },
+    { id: 112, nombre: 'Marco Antonio Solis', foto: 'https://placehold.co/100x100/f8c291/333333?text=MS' },
+    { id: 113, nombre: 'Beatriz Pinzón', foto: 'https://placehold.co/100x100/ffda79/333333?text=BP' },
+    { id: 114, nombre: 'Armando Mendoza', foto: 'https://placehold.co/100x100/778beb/333333?text=AM' },
+];
+
+export const initialDataOrg = [
+    { id: 1, nombre: 'Dirección General', nivel_jerarquico: 1, descripcion: 'Máxima autoridad de la organización. Define la estrategia y supervisa todas las operaciones.', jefeId: 101, parentId: null, habilidades_requeridas: ['Liderazgo Estratégico'], oficinas: [] },
+    { id: 2, nombre: 'Recursos Humanos', nivel_jerarquico: 2, descripcion: 'Gestión del capital humano, incluyendo contratación, nóminas y clima laboral.', jefeId: 102, parentId: 1, habilidades_requeridas: ['Legislación Laboral'], oficinas: [
+        { id: 201, nombre: 'Selección de Personal', descripcion: 'Atrae, entrevista y selecciona al mejor talento para la organización.', jefeId: 105, empleadosIds: [106, 107], habilidades_requeridas: ['Headhunting'] },
+        { id: 202, nombre: 'Nóminas y Compensaciones', descripcion: 'Administra salarios, beneficios e impuestos de los empleados.', jefeId: 108, empleadosIds: [109], habilidades_requeridas: ['Excel Avanzado'] }
+    ]},
+    { id: 3, nombre: 'Tecnología de la Información', nivel_jerarquico: 2, descripcion: 'Gestiona la infraestructura tecnológica, el software y la seguridad.', jefeId: 103, parentId: 1, habilidades_requeridas: ['Ciberseguridad'], oficinas: [] },
+    { id: 4, nombre: 'Adquisiciones y Compras', nivel_jerarquico: 3, descripcion: 'Se encarga de la compra de materiales y suministros para la empresa.', jefeId: 113, parentId: 2, habilidades_requeridas: ['Negociación'], oficinas: [] },
+    { id: 5, nombre: 'Contratación y Talento', nivel_jerarquico: 3, descripcion: 'Departamento enfocado en la búsqueda y reclutamiento de nuevos empleados.', jefeId: 114, parentId: 2, habilidades_requeridas: ['Reclutamiento'], oficinas: [] }
+];

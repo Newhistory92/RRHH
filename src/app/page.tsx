@@ -5,7 +5,7 @@ import { Sidebar } from '@/app/Componentes/Navbar/Sidebar';
 import { EstadisticasPage } from '@/app/pages/Estadisticas/page';
 import { RecursosHumanosPage } from '@/app/pages/RRHH/page';
 import { IAPage } from '@/app/pages/IA/page';
-import { OrganigramaPage } from '@/app/pages/Organigrama/page';
+import  OrganigramaPage  from '@/app/pages/Organigrama/page';
 import EmployeeCV  from '@/app/pages/Cv/page';
 import LicenciasManage from '@/app/pages/LicenciasManage/page';
 

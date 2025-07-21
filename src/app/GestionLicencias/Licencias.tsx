@@ -70,14 +70,14 @@ const misFechasSolicitudes = useMemo(() => {
                         {fechasPendientes.map(solicitud => (
                             <button key={solicitud.id} onClick={() => setSelectedRequest(solicitud)} className="w-full text-left p-4 border rounded-lg bg-yellow-50 hover:bg-yellow-100 flex justify-between items-center">
                                 <div>
-      <p>
-        <span className="font-bold">{solicitud.solicitanteNombre}</span> solicita <span className="font-bold">{solicitud.diasHabiles} días</span>
-      </p>
-      <p className="text-sm text-gray-600">
-        Del {solicitud.fechaDesdeParsed.toLocaleDateString()} al {solicitud.fechaHastaParsed.toLocaleDateString()}
-      </p>
-    </div>
-    <ChevronsRight/>
+                               <p>
+                               <span className="font-bold">{solicitud.solicitanteNombre}</span> solicita <span className="font-bold">{solicitud.diasHabiles} días</span>
+                              </p>
+                              <p className="text-sm text-gray-600">
+                             Del {solicitud.fechaDesdeParsed.toLocaleDateString()} al {solicitud.fechaHastaParsed.toLocaleDateString()}
+                             </p>
+                             </div>
+                          <ChevronsRight/>
                             </button>
                         ))}
                     </div>

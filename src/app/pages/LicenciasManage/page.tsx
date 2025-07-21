@@ -35,7 +35,6 @@ export default function LicenciasManage() {
   const handleLogout = () => {
     setCurrentUser(null);
     setView('contenedor');
-    setDb(getInitialDB()); // Resetea la DB al salir
   };
   const handleNewRequest = (nuevaSolicitud) => {
     setDb(prevDb => ({...prevDb, solicitudes: [...prevDb.solicitudes, nuevaSolicitud]}));
