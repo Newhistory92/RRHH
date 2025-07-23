@@ -1,48 +1,78 @@
-import React from 'react';
-import { Card } from '@/app/Componentes/Card';
-import { mockEmployees } from '@/app/api/Prueba';
-export const RecursosHumanosPage = () => (
-  <div>
-    <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">Gestión de Recursos Humanos</h2>
-    <Card>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="font-bold text-lg text-gray-700 dark:text-gray-200">Lista de Empleados</h3>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Añadir Empleado</button>
+"use client"
+
+import { useMemo, useState } from "react";
+import {initialEmployees,initialArchivedMessages} from "@/app/api/Prueba"
+import {EmployeeDetailView} from "@/app/Componentes/TablaOperador/Perfildetail"
+import { MessagesView } from "@/app/Componentes/TablaOperador/MensajeDetail";
+import { EmployeeTableView } from "@/app/Componentes/TablaOperador/Table";
+import { LicenseDetailModal, PermissionModal } from "@/app/Componentes/ModalRRHH/LicenseModal";
+
+export default function RecursosHumanosPage() {
+  const [employees, setEmployees] = useState(initialEmployees);
+  const [archivedMessages, setArchivedMessages] = useState(initialArchivedMessages);
+  const [currentView, setCurrentView] = useState({ name: 'table' });
+  const [permissionModalEmployeeId, setPermissionModalEmployeeId] = useState(null);
+  const [selectedLicense, setSelectedLicense] = useState(null);
+
+  const handleApplyLicense = (employeeId, message) => {
+    setEmployees(prev => prev.map(emp => {
+      if (emp.id === employeeId) {
+        const newLicense = { id: `L${Date.now()}`, tipo: 'Vacaciones', inicio: message.fechaInicio, fin: message.fechaFin, estado: 'Aprobada', duracion: message.dias, mensajeOriginal: message.texto, diasSolicitados: message.dias, fechasSolicitadas: `del ${message.fechaInicio} al ${message.fechaFin}`};
+        return { ...emp, estado: 'De licencia', licencias: [...emp.licencias, newLicense], mensajes: emp.mensajes.filter(m => m.id !== message.id) };
+      }
+      return emp;
+    }));
+    setArchivedMessages(prev => [...prev, { ...message, employeeId, processedDate: new Date().toLocaleDateString('es-AR') }]);
+    alert('Licencia aplicada correctamente.');
+  };
+
+  const handleApplyPermission = (employeeId, { salida, retorno }) => {
+    setEmployees(prev => prev.map(emp => {
+      if (emp.id === employeeId) {
+        const exitTime = new Date(`1970-01-01T${salida}:00`);
+        const returnTime = new Date(`1970-01-01T${retorno}:00`);
+        const diffMillis = returnTime - exitTime;
+        const diffHours = diffMillis / (1000 * 60 * 60);
+        const newPermission = { id: `P${Date.now()}`, fecha: new Date().toLocaleDateString('es-AR'), horaSalida: salida, horaRetorno: retorno, horas: -diffHours };
+        return { ...emp, horas: emp.horas - diffHours, permisos: [...emp.permisos, newPermission] };
+      }
+      return emp;
+    }));
+    alert('Permiso guardado correctamente.');
+  };
+
+  const permissionModalEmployee = useMemo(() => employees.find(e => e.id === permissionModalEmployeeId), [employees, permissionModalEmployeeId]);
+
+  const renderContent = () => {
+    switch (currentView.name) {
+        case 'detail':
+            const selectedEmployee = employees.find(e => e.id === currentView.id);
+            return <EmployeeDetailView employee={selectedEmployee} onBack={() => setCurrentView({ name: 'table' })} onLicenseClick={setSelectedLicense} />;
+        case 'messages':
+            return <MessagesView employees={employees} archivedMessages={archivedMessages} onBack={() => setCurrentView({ name: 'table' })} onApplyLicense={handleApplyLicense} />;
+        case 'table':
+        default:
+            return <EmployeeTableView employees={employees} onSelectEmployee={(id) => setCurrentView({ name: 'detail', id })} onShowMessages={() => setCurrentView({ name: 'messages' })} onOpenPermissionModal={setPermissionModalEmployeeId}/>;
+    }
+  };
+
+  return (
+    <>
+      <style>{`
+        @media print {
+          body * { visibility: hidden; }
+          .printable-area, .printable-area * { visibility: visible; }
+          .printable-area { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; }
+          .no-print { display: none !important; }
+        }
+      `}</style>
+      <div className="bg-gray-100 min-h-screen font-sans">
+        <main>
+          {renderContent()}
+          <PermissionModal employee={permissionModalEmployee} onClose={() => setPermissionModalEmployeeId(null)} onSave={handleApplyPermission} />
+          <LicenseDetailModal license={selectedLicense} onClose={() => setSelectedLicense(null)} />
+        </main>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              <th scope="col" className="px-6 py-3">ID</th>
-              <th scope="col" className="px-6 py-3">Nombre</th>
-              <th scope="col" className="px-6 py-3">Cargo</th>
-              <th scope="col" className="px-6 py-3">Departamento</th>
-              <th scope="col" className="px-6 py-3">Email</th>
-              <th scope="col" className="px-6 py-3">Estado</th>
-              <th scope="col" className="px-6 py-3">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {mockEmployees.map(emp => (
-              <tr key={emp.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{emp.id}</td>
-                <td className="px-6 py-4">{emp.name}</td>
-                <td className="px-6 py-4">{emp.position}</td>
-                <td className="px-6 py-4">{emp.department}</td>
-                <td className="px-6 py-4">{emp.email}</td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${emp.status === 'Activo' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'}`}>
-                    {emp.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Editar</a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </Card>
-  </div>
-);
+    </>
+  );
+}

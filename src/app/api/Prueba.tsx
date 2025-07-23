@@ -165,3 +165,110 @@ export const initialDataOrg = [
     { id: 4, nombre: 'Adquisiciones y Compras', nivel_jerarquico: 3, descripcion: 'Se encarga de la compra de materiales y suministros para la empresa.', jefeId: 113, parentId: 2, habilidades_requeridas: ['Negociación'], oficinas: [] },
     { id: 5, nombre: 'Contratación y Talento', nivel_jerarquico: 3, descripcion: 'Departamento enfocado en la búsqueda y reclutamiento de nuevos empleados.', jefeId: 114, parentId: 2, habilidades_requeridas: ['Reclutamiento'], oficinas: [] }
 ];
+
+
+
+export const initialEmployees = [
+  {
+    id: 1,
+    nombre: 'Juan',
+    apellido: 'Pérez',
+    dni: '12345678A',
+    estado: 'Activo',
+    departamento: 'Desarrollo',
+    horas: 8.5,
+    foto: 'https://placehold.co/100x100/EFEFEF/333?text=JP',
+    datosPersonales: {
+        telefono: '11-1234-5678',
+        domicilio: 'Av. Siempre Viva 742'
+    },
+    condicionLaboral: {
+      tipoContrato: 'Planta permanente',
+      fechaIngreso: '2020-01-15',
+      fechaPlanta: '2021-01-15',
+      categoria: 'Senior Developer',
+      ultimaModificacionCategoria: '2023-06-01',
+    },
+    productividad: 95.5,
+    supervisor: 'Ana Gómez',
+    horario: {
+      ingreso: '09:00',
+      salida: '18:00',
+    },
+    licencias: [
+      { id: 'L1', tipo: 'Vacaciones', inicio: '2023-07-10', fin: '2023-07-20', estado: 'Aprobada', duracion: 10, mensajeOriginal: 'Se aprueba la licencia por vacaciones solicitada para julio.', diasSolicitados: 10, fechasSolicitadas: 'del 2023-07-10 al 2023-07-20' },
+      { id: 'L2', tipo: 'Médica', inicio: '2023-03-05', fin: '2023-03-07', estado: 'Aprobada', duracion: 3, mensajeOriginal: 'Licencia médica aprobada por 3 días.', diasSolicitados: 3, fechasSolicitadas: 'del 2023-03-05 al 2023-03-07' },
+    ],
+    mensajes: [
+      { id: 'M1', texto: 'Solicitud de licencia por vacaciones aprobada.', dias: 5, fechaInicio: '2024-08-01', fechaFin: '2024-08-05' },
+    ],
+    permisos: [
+      { id: 'P1', fecha: '2024-06-15', horaSalida: '14:00', horaRetorno: '15:30', horas: -1.5 }
+    ],
+  },
+  {
+    id: 2,
+    nombre: 'Maria',
+    apellido: 'Lopez',
+    dni: '87654321B',
+    estado: 'De licencia',
+    departamento: 'Marketing',
+    horas: -5,
+    foto: 'https://placehold.co/100x100/EFEFEF/333?text=ML',
+    datosPersonales: {
+        telefono: '11-8765-4321',
+        domicilio: 'Calle Falsa 123'
+    },
+    condicionLaboral: {
+      tipoContrato: 'Contratado',
+      fechaIngreso: '2022-05-20',
+      fechaPlanta: null,
+      categoria: 'Marketing Specialist',
+      ultimaModificacionCategoria: '2023-01-10',
+    },
+    productividad: 88.0,
+    supervisor: 'Carlos Ruiz',
+    horario: {
+      ingreso: '08:30',
+      salida: '17:30',
+    },
+    licencias: [
+      { id: 'L3', tipo: 'Médica', inicio: '2024-06-20', fin: '2024-06-30', estado: 'Aprobada', duracion: 11, mensajeOriginal: 'Licencia médica extendida.', diasSolicitados: 11, fechasSolicitadas: 'del 2024-06-20 al 2024-06-30' },
+    ],
+    mensajes: [],
+    permisos: [],
+  },
+  {
+    id: 3,
+    nombre: 'Carlos',
+    apellido: 'García',
+    dni: '11223344C',
+    estado: 'Parte médico',
+    departamento: 'Recursos Humanos',
+    horas: 0,
+    foto: 'https://placehold.co/100x100/EFEFEF/333?text=CG',
+    datosPersonales: {
+        telefono: '11-2233-4455',
+        domicilio: 'Boulevard de los Sueños Rotos'
+    },
+    condicionLaboral: {
+      tipoContrato: 'Planta permanente',
+      fechaIngreso: '2018-09-01',
+      fechaPlanta: '2019-09-01',
+      categoria: 'HR Manager',
+      ultimaModificacionCategoria: '2022-11-15',
+    },
+    productividad: 92.3,
+    supervisor: 'Dirección',
+    horario: {
+      ingreso: '09:00',
+      salida: '18:00',
+    },
+    licencias: [],
+    mensajes: [
+        { id: 'M2', texto: 'Se aprueba su solicitud de licencia por asuntos personales.', dias: 2, fechaInicio: '2024-09-10', fechaFin: '2024-09-11' }
+    ],
+    permisos: [],
+  },
+];
+export const initialArchivedMessages = [];
