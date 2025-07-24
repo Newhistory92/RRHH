@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Header } from '@/app/Componentes/Navbar/Header';
 import { Sidebar } from '@/app/Componentes/Navbar/Sidebar';
-import { EstadisticasPage } from '@/app/pages/Estadisticas/page';
+import  EstadisticasPage  from '@/app/pages/Estadisticas/page';
 import  RecursosHumanosPage  from '@/app/pages/RRHH/page';
 import { IAPage } from '@/app/pages/IA/page';
 import  OrganigramaPage  from '@/app/pages/Organigrama/page';

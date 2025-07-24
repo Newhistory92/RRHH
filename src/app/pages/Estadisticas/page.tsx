@@ -1,54 +1,89 @@
+"use client"
+import React from 'react';
+import {  BarChart2, User } from 'lucide-react';
+import { ProductivityRanking } from '@/app/Componentes/ComponEstadistica/Productivity';
+import { EMPLOYEES_DATA } from '@/app/api/Prueba';
+import { GlobalStats } from '@/app/Componentes/ComponEstadistica/Globalstat';
+import { EmployeeDetailModal } from '@/app/Componentes/ComponEstadistica/DetailModal';
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Card } from '@/app/Componentes/Card';
-import { productivityData, absenceData, delayData, COLORS } from '../../api/Prueba';
 
 
 
+export default function EstadisticasPage() {
+    const [activeTab, setActiveTab] = React.useState('ranking'); // 'ranking' o 'globales'
+    const [selectedEmployee, setSelectedEmployee] = React.useState(null);
+    const [filters, setFilters] = React.useState({
+        department: 'all',
+        activityType: 'all',
+        status: 'all',
+    });
+    const [sortConfig, setSortConfig] = React.useState({ key: 'productivityScore', direction: 'descending' });
+    const [isDarkMode, setIsDarkMode] = React.useState(false);
 
-export const EstadisticasPage = () => (
-  <div>
-    <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">Estadísticas Clave</h2>
-    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-      <Card className="lg:col-span-2">
-        <h3 className="font-bold text-lg mb-4 text-gray-700 dark:text-gray-200">Evolución de Productividad</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={productivityData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#4A5568" />
-            <XAxis dataKey="name" stroke="#A0AEC0" />
-            <YAxis stroke="#A0AEC0" />
-            <Tooltip contentStyle={{ backgroundColor: '#2D3748', border: 'none', color: '#E2E8F0' }} />
-            <Legend />
-            <Line type="monotone" dataKey="Productividad" stroke="#4299E1" strokeWidth={2} activeDot={{ r: 8 }} />
-          </LineChart>
-        </ResponsiveContainer>
-      </Card>
-      <Card>
-        <h3 className="font-bold text-lg mb-4 text-gray-700 dark:text-gray-200">Tardanzas por Departamento</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie data={delayData} cx="50%" cy="50%" labelLine={false} outerRadius={110} fill="#8884d8" dataKey="value" nameKey="name" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-              {delayData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip contentStyle={{ backgroundColor: '#2D3748', border: 'none', color: '#E2E8F0' }}/>
-          </PieChart>
-        </ResponsiveContainer>
-      </Card>
-      <Card className="lg:col-span-3">
-        <h3 className="font-bold text-lg mb-4 text-gray-700 dark:text-gray-200">Reporte Semanal de Ausencias</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={absenceData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#4A5568" />
-            <XAxis dataKey="name" stroke="#A0AEC0" />
-            <YAxis stroke="#A0AEC0" />
-            <Tooltip contentStyle={{ backgroundColor: '#2D3748', border: 'none', color: '#E2E8F0' }} />
-            <Legend />
-            <Bar dataKey="Ausencias" fill="#6366F1" />
-          </BarChart>
-        </ResponsiveContainer>
-      </Card>
-    </div>
-  </div>
-);
+    const handleFilterChange = (key, value) => {
+        setFilters(prev => ({ ...prev, [key]: value }));
+    };
+    
+    React.useEffect(() => {
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, [isDarkMode]);
+
+    return (
+        <div className="bg-gray-100 dark:bg-gray-900 min-h-screen font-sans text-gray-900 dark:text-gray-100">
+            <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+                <header className="mb-8 flex justify-between items-center">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Panel de Personal</h1>
+                        <p className="text-gray-600 dark:text-gray-400">Visualización y análisis de datos de empleados.</p>
+                    </div>
+                     <button
+                        onClick={() => setIsDarkMode(!isDarkMode)}
+                        className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                    >
+                       {isDarkMode ? '☀️' : '🌙'}
+                    </button>
+                </header>
+
+                <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
+                    <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                        <button
+                            onClick={() => setActiveTab('ranking')}
+                            className={`${activeTab === 'ranking' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200'}
+                                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
+                        >
+                            <User className="mr-2 h-5 w-5"/> Ranking de Productividad
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('globales')}
+                            className={`${activeTab === 'globales' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200'}
+                                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
+                        >
+                            <BarChart2 className="mr-2 h-5 w-5"/> Estadísticas Globales
+                        </button>
+                    </nav>
+                </div>
+
+                <main>
+                    {activeTab === 'ranking' ? (
+                        <ProductivityRanking
+                            employees={EMPLOYEES_DATA}
+                            onSelectEmployee={setSelectedEmployee}
+                            filters={filters}
+                            onFilterChange={handleFilterChange}
+                            sortConfig={sortConfig}
+                            onSortChange={setSortConfig}
+                        />
+                    ) : (
+                        <GlobalStats employees={EMPLOYEES_DATA} />
+                    )}
+                </main>
+
+                <EmployeeDetailModal employee={selectedEmployee} onClose={() => setSelectedEmployee(null)} />
+            </div>
+        </div>
+    );
+}
