@@ -1,7 +1,7 @@
-import   Notification from '../Interfas/Interfaces';
+import   Notification, { Profession, Skill } from '../Interfas/Interfaces';
 import   Employee from '../Interfas/Interfaces';
 import   OrgNode from '../Interfas/Interfaces';
-
+import { SoftSkill } from '../Interfas/Interfaces';
 
 // --- DATOS DE PRUEBA ---
 export const mockNotifications: Notification[] = [
@@ -9,23 +9,6 @@ export const mockNotifications: Notification[] = [
   { id: 2, text: 'El reporte de productividad del Q2 está listo.', time: 'hace 2 horas' },
   { id: 3, text: 'Recordatorio: Reunión de equipo a las 3 PM.', time: 'hace 1 día' },
 ];
-
-export const productivityData = [
-  { name: 'Ene', Productividad: 80 }, { name: 'Feb', Productividad: 85 },
-  { name: 'Mar', Productividad: 90 }, { name: 'Abr', Productividad: 88 },
-  { name: 'May', Productividad: 92 }, { name: 'Jun', Productividad: 95 },
-];
-
-export const absenceData = [
-  { name: 'L', Ausencias: 2 }, { name: 'M', Ausencias: 1 }, { name: 'X', Ausencias: 0 },
-  { name: 'J', Ausencias: 3 }, { name: 'V', Ausencias: 1 },
-];
-
-export const delayData = [
-  { name: 'Ingeniería', value: 5 }, { name: 'Ventas', value: 8 },
-  { name: 'Marketing', value: 3 }, { name: 'Soporte', value: 2 },
-];
-export const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 export const mockEmployees: Employee[] = [
   { id: 'EMP001', name: 'Ana García', position: 'Desarrolladora Frontend', department: 'Tecnología', email: 'ana.garcia@example.com', status: 'Activo' },
@@ -418,3 +401,75 @@ export const EMPLOYEES_DATA = [
 export const DEPARTMENTS = [...new Set(EMPLOYEES_DATA.map(e => e.department))];
 export const ACTIVITY_TYPES = [...new Set(EMPLOYEES_DATA.map(e => e.activityType))];
 export const STATUS_TYPES = [...new Set(EMPLOYEES_DATA.map(e => e.status))];
+
+
+
+export const ALL_SOFT_SKILLS: SoftSkill[] = [
+  'Comunicación', 'Trabajo en Equipo', 'Empatía', 'Resolución de Conflictos', 
+  'Adaptabilidad', 'Liderazgo', 'Creatividad', 'Pensamiento Crítico', 
+  'Gestión del Tiempo', 'Toma de Decisiones', 'Orientación al Cliente', 
+  'Inteligencia Emocional', 'Negociación', 'Autocontrol', 'Proactividad'
+];
+
+
+
+
+export const PROFESSIONS_SKILLS: Record<Profession, Skill[]> = {
+  'Contador': [
+    { name: 'Conocimientos Contables', description: 'Evaluación sobre Normas NIIF, liquidación de sueldos y balances.', type: 'multiple-choice' },
+    { name: 'Excel Avanzado', description: 'Uso de tablas dinámicas, fórmulas financieras y macros.', type: 'case-study' },
+    { name: 'Legislación Tributaria Argentina', description: 'Comprensión de normativas de AFIP, IVA e Impuesto a las Ganancias.', type: 'multiple-choice' },
+  ],
+  'Abogado': [
+    { name: 'Redacción Jurídica', description: 'Elaboración de cláusulas, contratos y recursos legales.', type: 'report' },
+    { name: 'Derecho Argentino', description: 'Conocimientos en derecho civil, laboral, penal y comercial.', type: 'multiple-choice' },
+    { name: 'Análisis de Casos y Argumentación', description: 'Resolución de casos prácticos y desarrollo de argumentación lógica.', type: 'case-study' },
+  ],
+  'Administrativo': [
+    { name: 'Test de Mecanografía', description: 'Mide la velocidad (PPM) y precisión al escribir. Objetivo: 200 palabras en 2 minutos.', type: 'typing-test' },
+    { name: 'Excel Intermedio', description: 'Manejo de listas, filtros, fórmulas y funciones básicas.', type: 'case-study' },
+    { name: 'Organización y Atención al Público', description: 'Gestión de agendas, documentos y protocolos de atención.', type: 'case-study' },
+  ],
+  'Trabajador Social': [
+    { name: 'Resolución de Conflictos Sociales', description: 'Análisis y propuesta de soluciones para casos prácticos.', type: 'case-study' },
+    { name: 'Redacción de Informes Sociales', description: 'Elaboración de informes técnicos y sociales estructurados.', type: 'report' },
+    { name: 'Ética y Legislación Social Argentina', description: 'Conocimiento del marco legal y los principios éticos de la profesión.', type: 'multiple-choice' },
+  ],
+  'Administrador de Empresa': [
+    { name: 'Análisis Financiero y Presupuestario', description: 'Interpretación de estados financieros y elaboración de presupuestos.', type: 'case-study' },
+    { name: 'Toma de Decisiones y Resolución de Problemas', description: 'Evaluación de escenarios y elección de la solución más óptima.', type: 'case-study' },
+    { name: 'Liderazgo y Gestión de Equipos', description: 'Conocimientos sobre estilos de liderazgo y manejo de equipos de trabajo.', type: 'multiple-choice' },
+  ],
+  'Sociólogo': [
+    { name: 'Análisis de Datos Estadísticos', description: 'Interpretación de datos, gráficos y tablas estadísticas.', type: 'case-study' },
+    { name: 'Redacción de Informes Académicos', description: 'Elaboración de informes de campo y papers académicos.', type: 'report' },
+    { name: 'Metodologías de Investigación', description: 'Conocimiento sobre metodologías cualitativas y cuantitativas y ética de investigación.', type: 'multiple-choice' },
+  ],
+  'Psicopedagogo': [
+    { name: 'Interpretación de Tests Psicopedagógicos', description: 'Análisis de resultados de tests estandarizados.', type: 'case-study' },
+    { name: 'Planes de Intervención Educativa', description: 'Elaboración de planes de apoyo y adaptaciones curriculares.', type: 'report' },
+    { name: 'Detección de Trastornos del Aprendizaje', description: 'Conocimiento sobre indicadores y criterios diagnósticos de TDAH, dislexia, etc.', type: 'multiple-choice' },
+  ],
+  'Desarrollador Backend': [
+    { name: 'Lógica y Estructuras de Datos', description: 'Resolución de problemas algorítmicos.', type: 'code' },
+    { name: 'Bases de Datos (SQL/NoSQL)', description: 'Diseño de esquemas y escritura de consultas complejas.', type: 'code' },
+    { name: 'Programación Orientada a Objetos', description: 'Aplicación de principios de POO en lenguajes como Java o Python.', type: 'code' },
+    { name: 'Diseño de APIs y Autenticación', description: 'Creación de endpoints RESTful y manejo de seguridad con JWT.', type: 'case-study' },
+  ],
+  'Desarrollador Frontend': [
+    { name: 'HTML, CSS y JavaScript', description: 'Maquetación, estilización y manipulación del DOM.', type: 'code' },
+    { name: 'Frameworks (React/Vue)', description: 'Creación de componentes, manejo de estado y ciclo de vida.', type: 'code' },
+    { name: 'Diseño Responsivo y Accesibilidad', description: 'Uso de media queries, flexbox, grid y principios de WCAG.', type: 'case-study' },
+    { name: 'Consumo de APIs y Estado', description: 'Uso de Fetch/Axios y manejo de estado global (Context/Redux).', type: 'code' },
+  ],
+  'Farmacéutico': [
+    { name: 'Farmacología General', description: 'Conocimiento sobre indicaciones, contraindicaciones e interacciones.', type: 'multiple-choice' },
+    { name: 'Control de Recetas y Normativa ANMAT', description: 'Validación de recetas y conocimiento de la regulación vigente.', type: 'case-study' },
+    { name: 'Cálculos Farmacéuticos', description: 'Resolución de problemas de dosis, diluciones y conversiones.', type: 'multiple-choice' },
+  ],
+  'Recursos Humanos': [
+    { name: 'Entrevista por Competencias', description: 'Diseño de entrevistas y evaluación de candidatos basada en competencias.', type: 'case-study' },
+    { name: 'Legislación Laboral Argentina', description: 'Conocimiento sobre contratos, despidos, y regulaciones laborales.', type: 'multiple-choice' },
+    { name: 'Gestión de Clima y Conflictos', description: 'Estrategias para la medición del clima laboral y la mediación de conflictos.', type: 'case-study' },
+  ]
+};
