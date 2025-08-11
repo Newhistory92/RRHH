@@ -201,7 +201,7 @@ const FeedbackTab = ({ currentUser, usersData, onSaveFeedback }: { currentUser: 
 
 // --- COMPONENTE PRINCIPAL --- //
 
-export default function App() {
+export default function SkillBlandas() {
   const [activeTab, setActiveTab] = useState<'skills' | 'feedback'>('skills');
   const [currentUser, setCurrentUser] = useState<string>('Juan Pérez');
   const [usersData, setUsersData] = useState<Record<string, UserData>>(MOCK_DATA);

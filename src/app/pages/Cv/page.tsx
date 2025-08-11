@@ -8,7 +8,8 @@ import { ProfilePictureUploader } from '@/app/Componentes/Perfil/ProfilePicture'
 import { SkillTestModal } from '@/app/Componentes/Perfil/SkillTest';
 import { initialCvData } from '@/app/api/Prueba';
 import { mockData } from '@/app/api/Prueba';
-
+import SkillTecnico from '@/app/Componentes/Perfil/SkillTecnit';
+import SkillBlandas from '@/app/Componentes/Perfil/SkillBlande';
 export default function EmployeeCV() {
     const loggedInEmployee = mockData.employees.find(e => e.id === 1);
     const [cvData, setCvData] = useState(initialCvData(loggedInEmployee));
@@ -105,7 +106,7 @@ export default function EmployeeCV() {
                             <p className="text-sm text-blue-700">Selecciona una habilidad de la lista para iniciar una breve prueba técnica. Si apruebas, se añadirá a tu perfil con el nivel correspondiente.</p>
                         </div>
                         <h4 className="font-semibold text-gray-700 mb-2">Mis Habilidades Validadas</h4>
-                        {cvData.technicalSkills.length > 0 ? (
+                        {/* {cvData.technicalSkills.length > 0 ? (
                             <div className="space-y-3 mb-6">
                                {cvData.technicalSkills.map(skill => (
                                    <div key={skill.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
@@ -121,7 +122,8 @@ export default function EmployeeCV() {
                                    </div>
                                ))}
                             </div>
-                        ) : <p className="text-sm text-gray-500 text-center py-4 mb-4">Aún no tienes habilidades validadas.</p>}
+                        ) : <p className="text-sm text-gray-500 text-center py-4 mb-4">Aún no tienes habilidades validadas.</p>} */}
+                        <SkillTecnico skills={cvData.technicalSkills} isEditing={isEditing} onRemove={(id) => removeDynamicSectionItem('technicalSkills', id)} onExperienceChange={(id, years) => handleDynamicSectionChange('technicalSkills', id, 'experienceYears', years)} />
                         {isEditing && (
                             <>
                                 <h4 className="font-semibold text-gray-700 mb-3">Añadir Nueva Habilidad</h4>
@@ -150,6 +152,7 @@ export default function EmployeeCV() {
                                 </label>
                             ))}
                         </div>
+                            <SkillBlandas skills={cvData.softSkills} isEditing={isEditing} onRemove={(id) => removeDynamicSectionItem('softSkills', id)} />
                     </Accordion>
                     <Accordion title="7. Certificaciones y Cursos"> <DynamicSection items={cvData.certifications} onChange={(id, field, value) => handleDynamicSectionChange('certifications', id, field, value)} onRemove={(id) => removeDynamicSectionItem('certifications', id)} onAdd={() => addDynamicSectionItem('certifications', { name: '', issuingBody: '', issueDate: '' })} fields={[ { name: 'name', label: 'Nombre del Curso/Certificación', type: 'text', required: true, grid: 'md:col-span-2' }, { name: 'issuingBody', label: 'Institución Emisora', type: 'text', required: true, grid: 'md:col-span-2' }, { name: 'issueDate', label: 'Fecha de Obtención', type: 'date' }, { name: 'attachment', label: 'Adjuntar Certificado (PDF/JPG)', type: 'file', accept: '.pdf, .jpg, .jpeg' }, ]} isEditing={isEditing} /> </Accordion>
                 </div>

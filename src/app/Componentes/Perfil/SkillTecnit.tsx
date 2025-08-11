@@ -397,7 +397,7 @@ const EvaluationModal = ({ skill, profession, onClose, onComplete, isVisible }: 
 
 // --- COMPONENTE PRINCIPAL --- //
 
-export default function App() {
+export default function SkillTecnico() {
   const [selectedProfession, setSelectedProfession] = useState<Profession | null>(null);
   const [results, setResults] = useState<ResultsData>({ profesion: '', habilidades_evaluadas: [] });
   const [currentSkill, setCurrentSkill] = useState<Skill | null>(null);
