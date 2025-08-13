@@ -1,5 +1,5 @@
 "use client"
-import React, { useState,  useMemo, useEffect } from 'react';
+import React, { useState,  useMemo} from 'react';
 import { Users, Calendar, Send,  Briefcase, Award, GraduationCap,  Clock, Code, ChevronsRight, MessageSquare } from 'lucide-react';
 import { Button } from '@/app/Componentes/Buttom';
 import { Card } from '@/app/Componentes/Card';  
@@ -63,7 +63,7 @@ const misFechasSolicitudes = useMemo(() => {
                 </Card>
                 <Card className="flex flex-col justify-center items-center text-center"><h2 className="text-xl font-bold mb-4">Nueva Solicitud</h2><p className="text-gray-600 mb-4">Inicia una nueva solicitud de licencia aquí.</p><Button onClick={onNewRequest}><Send size={18}/> Solicitar Licencia</Button></Card>
             </div>
-            {userData.rol === 'supervisor' && solicitudesPendientes.length > 0 && (
+            {/* {userData.rol === 'supervisor' && solicitudesPendientes.length > 0 && (
                 <Card>
                     <h2 className="text-xl font-bold mb-4 text-red-600 flex items-center gap-2"><Clock/> Solicitudes Pendientes de Mi Aprobación</h2>
                     <div className="space-y-2">
@@ -82,7 +82,7 @@ const misFechasSolicitudes = useMemo(() => {
                         ))}
                     </div>
                 </Card>
-            )}
+            )} */}
             <Card>
                 <h2 className="text-xl font-bold mb-4">Historial de Mis Solicitudes</h2>
                 <div className="space-y-3">
