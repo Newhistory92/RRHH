@@ -8,7 +8,9 @@ import { IAPage } from '@/app/pages/IA/page';
 import  OrganigramaPage  from '@/app/pages/Organigrama/page';
 import EmployeeCV  from '@/app/pages/Cv/page';
 import LicenciasManage from '@/app/pages/LicenciasManage/page';
-
+import { PrimeReactProvider } from 'primereact/api';
+import "primereact/resources/themes/lara-light-cyan/theme.css";
+        
 type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama' | 'editar-perfil'| 'licencias';
 
 export default function App() {
@@ -35,11 +37,13 @@ export default function App() {
 
   return (
     <div className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
-      <Header setPage={setPage} />
-      <Sidebar activePage={page} setPage={setPage} />
-      <main className="pt-20 md:pl-72 pr-4 md:pr-8 pb-8">
-        {renderPage()}
-      </main>
+      <PrimeReactProvider>
+        <Header setPage={setPage} />
+        <Sidebar activePage={page} setPage={setPage} />
+        <main className="pt-20 md:pl-72 pr-4 md:pr-8 pb-8">
+          {renderPage()}
+        </main>
+      </PrimeReactProvider>
     </div>
   );
 }
