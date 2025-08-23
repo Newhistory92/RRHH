@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/google-vertex": "^3.0.10",
+    "@modelcontextprotocol/server-filesystem": "^2025.8.21",
     "ai": "^5.0.17",
     "date-fns": "^2.30.0",
     "ia": "^0.0.1-beta",

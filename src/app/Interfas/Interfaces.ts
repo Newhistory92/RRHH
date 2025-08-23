@@ -89,3 +89,35 @@ export interface EvaluationResult {
     level: 'Malo' | 'Bueno' | 'Avanzado';
     passed: boolean;
 }
+
+
+export interface ChatMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
+export interface ChatRequest {
+  messages: ChatMessage[];
+}
+
+export interface ToolCall {
+  toolName: string;
+  args: Record<string, unknown>;
+}
+
+export interface ToolResult {
+  result: {
+    content?: { text?: string }[];
+  } | string;
+}
+
+export interface ChatResponse {
+  result: string;
+  toolName?: string;
+  success: boolean;
+}
+
+export interface MCPClient {
+  tools: () => Promise<Record<string, unknown>>;
+  close: () => Promise<void>;
+}

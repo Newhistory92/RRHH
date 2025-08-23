@@ -1,170 +1,430 @@
+// import { NextResponse } from "next/server";
+// import { experimental_createMCPClient, generateText } from "ai";
+// import { google } from "@ai-sdk/google";
+// import { Experimental_StdioMCPTransport } from "ai/mcp-stdio";
+// import path from "path";
+// import fs from "fs";
+// import os from "os";
+
+// // Interfaces para las llamadas a herramientas y resultados
+// interface ToolCall {
+//   type: string;
+//   toolCallId: string;
+//   toolName: string;
+//   args: Record<string, unknown>;
+// }
+
+// interface ToolResult {
+//   toolCallId: string;
+//   toolName: string;
+//   result: unknown;
+// }
+
+// // ===== CONFIGURACIÓN DE DIRECTORIOS =====
+// class DirectoryConfig {
+//   private static instance: DirectoryConfig;
+//   private _allowedDirectories: string[] = [];
+//   private _initialized: boolean = false;
+
+//   private constructor() {}
+
+//   public static getInstance(): DirectoryConfig {
+//     if (!DirectoryConfig.instance) {
+//       DirectoryConfig.instance = new DirectoryConfig();
+//     }
+//     return DirectoryConfig.instance;
+//   }
+
+//   /**
+//    * Inicializa los directorios permitidos
+//    */
+//   public initialize(): void {
+//     if (this._initialized) return;
+
+//     // Usar la raíz del proyecto directamente
+//     const projectRootDir = process.cwd(); // D:\Mi Documentos\Documents\RRHH\
+    
+//     console.log(`📂 Usando directorio raíz del proyecto: ${projectRootDir}`);
+
+//     this._allowedDirectories = [projectRootDir];
+//     this._initialized = true;
+    
+//     console.log("📁 Configuración de directorios:");
+//     console.log(`   - Directorio principal: ${projectRootDir}`);
+//     console.log(`   - ¿Existe?: ${fs.existsSync(projectRootDir)}`);
+//   }
+
+//   /**
+//    * Obtiene los directorios permitidos
+//    */
+//   public getAllowedDirectories(): string[] {
+//     if (!this._initialized) {
+//       this.initialize();
+//     }
+//     return [...this._allowedDirectories];
+//   }
+
+//   /**
+//    * Obtiene el directorio principal (public)
+//    */
+//   public getMainDirectory(): string {
+//     if (!this._initialized) {
+//       this.initialize();
+//     }
+//     return this._allowedDirectories[0];
+//   }
+
+//   /**
+//    * Agrega un directorio adicional (opcional)
+//    */
+//   public addDirectory(dirPath: string): boolean {
+//     if (!fs.existsSync(dirPath)) {
+//       console.warn(`⚠️  Directorio no existe: ${dirPath}`);
+//       return false;
+//     }
+    
+//     if (!this._allowedDirectories.includes(dirPath)) {
+//       this._allowedDirectories.push(dirPath);
+//       console.log(`✅ Directorio agregado: ${dirPath}`);
+//       return true;
+//     }
+    
+//     return false;
+//   }
+// }
+
+// // ===== CONFIGURACIÓN DEL SERVIDOR MCP =====
+// class MCPServerConfig {
+//   private serverPath: string;
+  
+//   constructor() {
+//     this.serverPath = path.join(
+//       process.cwd(), 
+//       "node_modules", 
+//       "@modelcontextprotocol", 
+//       "server-filesystem", 
+//       "dist", 
+//       "index.js"
+//     );
+//   }
+
+//   /**
+//    * Verifica si el servidor MCP está instalado
+//    */
+//   public isInstalled(): boolean {
+//     return fs.existsSync(this.serverPath);
+//   }
+
+//   /**
+//    * Obtiene la configuración del transporte
+//    */
+//   public getTransportConfig(allowedDirectories: string[]) {
+//     return new Experimental_StdioMCPTransport({
+//       command: process.execPath,
+//       args: [
+//         this.serverPath,
+//         ...allowedDirectories,
+//       ],
+//       env: {
+//         ...process.env,
+//         NODE_PATH: path.join(process.cwd(), "node_modules"),
+//       },
+//       shell: process.platform === 'win32'
+//     });
+//   }
+
+//   public getServerPath(): string {
+//     return this.serverPath;
+//   }
+// }
+
+// // ===== CLIENTE MCP =====
+// class MCPClientManager {
+//   private static instance: MCPClientManager;
+//   private client: any = null;
+//   private directoryConfig: DirectoryConfig;
+//   private serverConfig: MCPServerConfig;
+
+//   private constructor() {
+//     this.directoryConfig = DirectoryConfig.getInstance();
+//     this.serverConfig = new MCPServerConfig();
+//   }
+
+//   public static getInstance(): MCPClientManager {
+//     if (!MCPClientManager.instance) {
+//       MCPClientManager.instance = new MCPClientManager();
+//     }
+//     return MCPClientManager.instance;
+//   }
+
+//   /**
+//    * Crea el cliente MCP
+//    */
+//   public async createClient(): Promise<any> {
+//     try {
+//       // Verificar servidor
+//       if (!this.serverConfig.isInstalled()) {
+//         console.error(`❌ Servidor MCP no encontrado en: ${this.serverConfig.getServerPath()}`);
+//         console.log("💡 Instala el servidor con: npm install @modelcontextprotocol/server-filesystem");
+//         return null;
+//       }
+
+//       // Inicializar directorios
+//       this.directoryConfig.initialize();
+//       const allowedDirectories = this.directoryConfig.getAllowedDirectories();
+      
+//       console.log("🚀 Configurando cliente MCP...");
+//       console.log(`📂 Directorios permitidos: ${allowedDirectories.length}`);
+//       allowedDirectories.forEach((dir, index) => {
+//         console.log(`   ${index + 1}. ${dir}`);
+//       });
+
+//       // Crear transporte y cliente
+//       const transport = this.serverConfig.getTransportConfig(allowedDirectories);
+      
+//       this.client = await experimental_createMCPClient({ transport });
+      
+//       console.log("✅ Cliente MCP creado exitosamente");
+//       return this.client;
+
+//     } catch (error) {
+//       console.error("❌ Error creando cliente MCP:", error);
+//       return null;
+//     }
+//   }
+
+//   /**
+//    * Obtiene las herramientas disponibles
+//    */
+//   public async getTools(): Promise<Record<string, unknown>> {
+//     if (!this.client) {
+//       throw new Error("Cliente MCP no inicializado");
+//     }
+
+//     try {
+//       const tools = await this.client.tools();
+//       console.log(`🛠️  Herramientas MCP cargadas: ${Object.keys(tools).length} disponibles`);
+//       console.log(`   Herramientas: ${Object.keys(tools).join(', ')}`);
+//       return tools;
+//     } catch (error) {
+//       console.error("❌ Error obteniendo herramientas MCP:", error);
+//       return {};
+//     }
+//   }
+
+//   /**
+//    * Cierra el cliente
+//    */
+//   public async close(): Promise<void> {
+//     if (this.client) {
+//       try {
+//         await this.client.close();
+//         console.log("🔒 Cliente MCP cerrado correctamente");
+//       } catch (error) {
+//         console.error("❌ Error cerrando cliente MCP:", error);
+//       } finally {
+//         this.client = null;
+//       }
+//     }
+//   }
+// }
+
+// // ===== CONFIGURACIÓN DEL MODELO =====
+// class ModelConfig {
+//   public static getSystemMessage(): string {
+//     const directoryConfig = DirectoryConfig.getInstance();
+//     const mainDir = directoryConfig.getMainDirectory();
+    
+//     return `Responde siempre en español.
+
+// 🎯 INSTRUCCIONES PARA ARCHIVOS:
+// IMPORTANTE: Todos los archivos se crearán en la raíz del proyecto: ${mainDir}
+
+// Para write_file usa SOLO el nombre del archivo:
+// - ✅ CORRECTO: "ejemplo.txt", "datos.json", "mi_archivo.pdf"
+// - ❌ INCORRECTO: "./ejemplo.txt", "carpeta/archivo.txt", rutas absolutas
+
+// 📂 UBICACIÓN: Los archivos se guardarán directamente en el directorio del proyecto.
+
+// 🚀 HERRAMIENTAS DISPONIBLES:
+// - write_file: Crear archivos en la raíz del proyecto
+// - read_file: Leer archivos existentes  
+// - list_directory: Ver archivos en el directorio
+// - create_directory: Crear subdirectorios si necesario
+
+// Usa únicamente nombres de archivo simples sin rutas.`;
+//   }
+
+//   public static getModelInstance() {
+//     if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+//       throw new Error("❌ Falta la variable GOOGLE_GENERATIVE_AI_API_KEY");
+//     }
+//     return google("gemini-2.5-flash");
+//   }
+// }
+
+// // ===== PROCESADOR DE RESULTADOS =====
+// class ResultProcessor {
+//   public static formatToolResult(toolCall: any, toolResult: any): string {
+//     try {
+//       console.log(`🔧 Procesando resultado de ${toolCall.toolName}...`);
+
+//       // Verificar si hay error
+//       if (toolResult.output && toolResult.output.isError) {
+//         const errorContent = toolResult.output.content;
+//         if (Array.isArray(errorContent) && errorContent.length > 0) {
+//           const errorText = errorContent[0].text || errorContent[0].toString();
+//           return `❌ Error en ${toolCall.toolName}: ${errorText}`;
+//         } else {
+//           return `❌ Error en ${toolCall.toolName}: Error desconocido`;
+//         }
+//       }
+
+//       // Resultado exitoso
+//       const output = toolResult.output || toolResult.result;
+//       let result = "";
+
+//       if (output && output.content && Array.isArray(output.content)) {
+//         result = output.content
+//           .map((item: any) => item.text || item.toString())
+//           .join('\n') || 'Operación completada exitosamente';
+//       } else if (typeof output === 'string') {
+//         result = output;
+//       } else {
+//         // Mensajes específicos por herramienta
+//         switch (toolCall.toolName) {
+//           case 'write_file':
+//             result = `✅ Archivo '${toolCall.input.path}' creado exitosamente en public/`;
+//             break;
+//           case 'create_directory':
+//             result = `✅ Directorio '${toolCall.input.path}' creado exitosamente`;
+//             break;
+//           case 'read_file':
+//             result = `✅ Archivo '${toolCall.input.path}' leído exitosamente`;
+//             break;
+//           default:
+//             result = `✅ Herramienta ${toolCall.toolName} ejecutada exitosamente`;
+//         }
+//       }
+
+//       console.log(`✅ Resultado procesado: ${result}`);
+//       return result;
+
+//     } catch (error) {
+//       console.error(`❌ Error procesando resultado de ${toolCall.toolName}:`, error);
+//       return `❌ Error al procesar el resultado de ${toolCall.toolName}`;
+//     }
+//   }
+// }
+
+// // ===== API HANDLER PRINCIPAL =====
+// export async function POST(req: Request) {
+//   const mcpManager = MCPClientManager.getInstance();
+  
+//   try {
+//     console.log("🚀 === INICIANDO SOLICITUD CHAT API ===");
+    
+//     const { messages } = await req.json();
+//     console.log(`📨 Mensajes recibidos: ${messages.length}`);
+    
+//     // Crear cliente MCP
+//     console.log("🔧 Creando cliente MCP...");
+//     const mcpClient = await mcpManager.createClient();
+    
+//     if (!mcpClient) {
+//       return NextResponse.json({ 
+//         error: "No se pudo inicializar el cliente MCP" 
+//       }, { status: 500 });
+//     }
+    
+//     // Obtener herramientas
+//     const tools = await mcpManager.getTools();
+    
+//     // Preparar mensajes con configuración del sistema
+//     const messagesWithSystem = [
+//       { role: "system" as const, content: ModelConfig.getSystemMessage() },
+//       ...messages
+//     ];
+
+//     console.log("🤖 Llamando al modelo Gemini...");
+    
+//     // Generar respuesta
+//     const result = await generateText({
+//       model: ModelConfig.getModelInstance(),
+//       messages: messagesWithSystem,
+//       tools,
+//       temperature: 0.7,
+//     });
+    
+//     console.log("✅ Generación completada");
+//     console.log(`🔧 Llamadas a herramientas: ${result.toolCalls?.length || 0}`);
+    
+//     // Procesar resultados
+//     const toolCall = result.toolCalls?.[0] as unknown as any;
+//     const toolResult = result.toolResults?.[0] as unknown as any;
+    
+//     if (toolCall && toolResult) {
+//       console.log(`🔍 DEBUG - Tool Input: ${JSON.stringify(toolCall.input)}`);
+//       console.log(`🔍 DEBUG - Path usado: "${toolCall.input.path}"`);
+//       console.log(`🔍 DEBUG - Directorio permitido: "${DirectoryConfig.getInstance().getMainDirectory()}"`);
+      
+//       const formattedResult = ResultProcessor.formatToolResult(toolCall, toolResult);
+      
+//       return NextResponse.json({
+//         result: formattedResult,
+//         toolName: toolCall.toolName,
+//         success: !toolResult.output?.isError,
+//         toolInput: toolCall.input,
+//         directory: DirectoryConfig.getInstance().getMainDirectory()
+//       });
+//     } else {
+//       console.log("💬 Sin herramientas, devolviendo texto directo");
+//       return NextResponse.json({
+//         result: result.text,
+//         success: true
+//       });
+//     }
+
+//   } catch (error) {
+//     console.error("❌ Error en la API de chat:", error);
+//     return NextResponse.json({ 
+//       error: "Error del servidor", 
+//       details: error instanceof Error ? error.message : String(error)
+//     }, { status: 500 });
+//   } finally {
+//     // Limpiar recursos
+//     await mcpManager.close();
+//     console.log("🏁 === SOLICITUD COMPLETADA ===");
+//   }
+// }
+
+
 import { NextResponse } from "next/server";
-import { streamText, experimental_createMCPClient, generateText } from "ai";
-import { google } from "@ai-sdk/google";
-import { Experimental_StdioMCPTransport } from "ai/mcp-stdio";
-
-// Define las interfaces para las llamadas a herramientas y resultados
-interface ToolCall {
-  type: string;
-  toolCallId: string;
-  toolName: string;
-  args: Record<string, any>;
-}
-
-interface ToolResult {
-  toolCallId: string;
-  toolName: string;
-  result: any;
-}
-
-// Para depuración
-process.env.DEBUG = "ai:*";
-
-// Necesitas configurar esta variable de entorno en .env.local
-// GOOGLE_GENERATIVE_AI_API_KEY=tu_clave_api_de_google
+import { ChatService } from "@/app/lib/chat-service";
+import { ErrorHandler } from "@/app/util/errorHandler";
+import { ChatRequest } from "@/app/Interfas/Interfaces";
 
 /**
- * Crea un cliente MCP para operaciones del sistema de archivos
- * @returns Cliente MCP o null si falla la creación
- */
-async function createFilesystemMCP() {
-  try {
-    const transport = new Experimental_StdioMCPTransport({
-      command: "npx",
-      args: [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-         "/home/irving/webdev/yt/nextjs-vercel-ai-sdk-mcp-tutorial",
-      ],
-    });
-    
-    const client = await experimental_createMCPClient({
-      transport,
-    });
-    
-    return client;
-  } catch (error) {
-    console.error("Error creating MCP client:", error);
-    return null;
-  }
-}
-
-/**
- * POST handler for chat API
+ * POST handler para la API de chat
  */
 export async function POST(req: Request) {
-  let mcpClient: any = null;
-  
   try {
     console.log("Solicitud POST recibida para /api/chat");
     
+    // Validar clave API
     if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-      console.error("Falta la variable de entorno GOOGLE_GENERATIVE_AI_API_KEY");
-      return NextResponse.json({ error: "Falta la configuración de la clave API" }, { status: 500 });
+      return ErrorHandler.handleApiKeyError();
     }
     
-    const {messages} = await req.json();
-    console.log("Mensajes recibidos:", JSON.stringify(messages));
+    // Parsear request
+    const { messages }: ChatRequest = await req.json();
     
-    console.log("Creando cliente MCP para sistema de archivos...");
-    mcpClient = await createFilesystemMCP();
-    console.log("Cliente MCP creado:", mcpClient ? "Éxito" : "Falló");
+    // Procesar chat
+    const response = await ChatService.processChat(messages);
     
-    let tools = {};
-
-    if (mcpClient) {
-      try {
-        console.log("Obteniendo herramientas MCP...");
-        tools = await mcpClient.tools();
-        console.log("Herramientas MCP cargadas:", Object.keys(tools).length, "herramientas disponibles");
-        console.log("Herramientas MCP disponibles:", Object.keys(tools));
-      } catch (error) {
-        console.error("Error al obtener herramientas MCP:", error);
-      }
-    }
-
-    console.log("Preparando para llamar al modelo Gemini...");
-    try {
-      const modelName = "gemini-2.5-flash"; // Usando el modelo especificado
-      console.log(`Usando modelo: ${modelName}`);
-      
-      // Primero generar texto con herramientas habilitadas (sin streaming)
-      console.log("Generando texto con herramientas...");
-      const result = await generateText({
-        model: google(modelName),
-        messages,
-        tools,
-        temperature: 0.7,
-      });
-      
-      console.log("Generación completada, verificando llamadas a herramientas y resultados...");
-      console.log("Llamadas a herramientas:", result.toolCalls);
-      console.log("Resultados de herramientas:", result.toolResults);
-      
-      // Obtener la llamada a herramienta y su resultado de la respuesta
-      const toolCall = result.toolCalls?.[0] as ToolCall | undefined;
-      const toolResult = result.toolResults?.[0] as ToolResult | undefined;
-      
-      if (toolCall && toolResult) {
-        console.log(`Se encontró llamada a herramienta ${toolCall.toolName} y su resultado`);
-        console.log(`Resultado de la herramienta:`, toolResult.result);
-        
-        try {
-          // Formatear el resultado de la herramienta en una respuesta legible
-          const formattedResult = toolResult.result.content?.[0]?.text || JSON.stringify(toolResult.result);
-          console.log("Devolviendo resultado formateado de la herramienta:", formattedResult);
-          
-          // Devolver una respuesta JSON simple con el resultado formateado
-          return NextResponse.json({
-            result: formattedResult,
-            toolName: toolCall.toolName,
-            success: true
-          });
-        } catch (toolError) {
-          console.error(`Error ejecutando la herramienta ${toolCall.toolName}:`, toolError);
-          return NextResponse.json({ 
-            error: "Error al ejecutar la herramienta", 
-            details: toolError instanceof Error ? toolError.message : String(toolError),
-            stack: toolError instanceof Error ? toolError.stack : undefined,
-            toolCall
-          }, { status: 500 });
-        }
-      } else {
-        // No hay llamadas a herramientas, solo devolver el texto
-        console.log("No se detectaron llamadas a herramientas, devolviendo texto directamente:", result.text);
-        
-        // Devolver una respuesta JSON simple con el texto  
-        return NextResponse.json({
-          result: result.text,
-          success: true
-        });
-      }
-    } catch (modelError) {
-      console.error("Error en la llamada al modelo Gemini:", modelError);
-      
-      // Devolver información detallada del error
-      return NextResponse.json({ 
-        error: "Error del modelo", 
-        details: modelError instanceof Error ? modelError.message : String(modelError),
-        stack: modelError instanceof Error ? modelError.stack : undefined
-      }, { status: 500 });
-    }
+    return NextResponse.json(response);
+    
   } catch (error) {
-    console.error("Error en la API de chat:", error);
-    return NextResponse.json({ 
-      error: "Error del servidor", 
-      details: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined
-    }, { status: 500 });
-  } finally {
-    // Limpiar recursos del cliente MCP
-    if (mcpClient) {
-      try {
-        await mcpClient.close();
-        console.log("Cliente MCP cerrado en el bloque finally");
-      } catch (error) {
-        console.error("Error al cerrar el cliente MCP en el bloque finally:", error);
-      }
-    }
+    return ErrorHandler.handleError(error, "Error en la API de chat");
   }
 }
