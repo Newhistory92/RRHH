@@ -1,6 +1,9 @@
 import fs from "fs";
 
 export class PathManager {
+  static getDesktopPath() {
+      throw new Error("Method not implemented.");
+  }
   private static readonly DEFAULT_DIRECTORY = "D:\\Mi Documentos\\Documents\\RRHH\\";
 
   /**
