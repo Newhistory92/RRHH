@@ -1,12 +1,23 @@
 
 "use client"
-import {CardTitle } from '@/app/Componentes/Card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell} from 'recharts';
 import {  BarChart2,  Award, Users, Frown, AlertTriangle, Clock } from 'lucide-react';
 import React from 'react';
 import { Card } from 'primereact/card';
+import { Employee, EmployeeStatus } from '@/app/Interfas/Interfaces';
 
-export const GlobalStats = ({ employees }) => {
+interface DepartmentProductivity {
+  total: number;
+  count: number;
+}
+
+type DepartmentProductivityMap = Record<string, DepartmentProductivity>;
+interface GlobalStatsProps {
+  employees: Employee[];
+}
+
+
+export const GlobalStats: React.FC<GlobalStatsProps> = ({ employees }) => {
     const { bestDepartment, lowEfficiencyActivities, avgAbsences, avgLateness, statusDistribution } = React.useMemo(() => {
         if (employees.length === 0) {
             return {
@@ -18,34 +29,37 @@ export const GlobalStats = ({ employees }) => {
             };
         }
         // Mejor departamento
-        const deptProd = employees.reduce((acc, e) => {
-            acc[e.department] = acc[e.department] || { total: 0, count: 0 };
-            acc[e.department].total += e.productivityScore;
-            acc[e.department].count++;
-            return acc;
-        }, {});
-        const bestDeptName = Object.keys(deptProd).reduce((a, b) => (deptProd[a].total / deptProd[a].count) > (deptProd[b].total / deptProd[b].count) ? a : b);
+      const deptProd = employees.reduce<DepartmentProductivityMap>((acc, e) => {
+      acc[e.department] = acc[e.department] || { total: 0, count: 0 };
+      acc[e.department].total += e.productivityScore;
+      acc[e.department].count++;
+     return acc;
+       }, {});
+
+      const bestDeptName = Object.keys(deptProd).reduce((a, b) => 
+      (deptProd[a].total / deptProd[a].count) > (deptProd[b].total / deptProd[b].count) ? a : b);
 
         // Actividades con baja eficiencia
-        const activityProd = employees.reduce((acc, e) => {
-            acc[e.activityType] = acc[e.activityType] || { total: 0, count: 0 };
-            acc[e.activityType].total += e.productivityScore;
-            acc[e.activityType].count++;
-            return acc;
-        }, {});
-        const lowActivities = Object.entries(activityProd)
-            .map(([name, data]) => ({ name, avg: data.total / data.count }))
-            .filter(item => item.avg < 7.5);
+    const activityProd = employees.reduce<Record<string, { total: number; count: number }>>((acc, e) => {
+  acc[e.activityType] = acc[e.activityType] || { total: 0, count: 0 };
+  acc[e.activityType].total += e.productivityScore;
+  acc[e.activityType].count++;
+  return acc;
+}, {});
+
+const lowActivities = Object.entries(activityProd)
+  .map(([name, data]) => ({ name, avg: data.total / data.count }))
+  .filter(item => item.avg < 7.5);
 
         // Promedio de ausencias y tardanzas (simulado)
         const totalAbsences = employees.reduce((sum, e) => sum + e.absences['2024'], 0);
         const totalLateness = employees.reduce((sum, e) => sum + (e.monthlyHours.filter(m => m.hours < 0).length), 0) * 2; // Simulación
 
         // Distribución por condición laboral
-        const statusDist = employees.reduce((acc, e) => {
-            acc[e.status] = (acc[e.status] || 0) + 1;
-            return acc;
-        }, {});
+        const statusDist = employees.reduce<Record<EmployeeStatus, number>>((acc, e) => {
+        acc[e.status] = (acc[e.status] || 0) + 1;
+        return acc;
+        }, {} as Record<EmployeeStatus, number>);
         
         return {
             bestDepartment: { name: bestDeptName, avg: (deptProd[bestDeptName].total / deptProd[bestDeptName].count).toFixed(1) },
@@ -60,7 +74,7 @@ export const GlobalStats = ({ employees }) => {
     
     // Datos para el gráfico de productividad por departamento
     const departmentProductivityData = React.useMemo(() => {
-         const deptProd = employees.reduce((acc, e) => {
+         const deptProd = employees.reduce<DepartmentProductivityMap>((acc, e) => {
             acc[e.department] = acc[e.department] || { total: 0, count: 0 };
             acc[e.department].total += e.productivityScore;
             acc[e.department].count++;
@@ -145,7 +159,7 @@ return (
             className="md:col-span-2"
             title={
                 <div className="flex items-center gap-2">
-                    <BarChart2 className="h-5 w-5 text-blue-500" />
+                    <BarChart2 className="h-8 w-8 text-blue-500" />
                     <span>Productividad Promedio por Departamento</span>
                 </div>
             }
@@ -175,7 +189,7 @@ return (
             className="md:col-span-2"
             title={
                 <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-green-500" />
+                    <Users className="h-6 w-6 text-green-500" />
                     <span>Distribución por Condición Laboral</span>
                 </div>
             }
@@ -191,13 +205,14 @@ return (
                         fill="#8884d8"
                         dataKey="value"
                         nameKey="name"
-                        label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+                        label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
                             const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-                            const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
-                            const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+                            const safeMidAngle = midAngle ?? 0;
+                            const x = cx + radius * Math.cos(-safeMidAngle * (Math.PI / 180));
+                            const y = cy + radius * Math.sin(-safeMidAngle * (Math.PI / 180));
                             return (
                             <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
-                                {`${(percent * 100).toFixed(0)}%`}
+                                {`${((percent ?? 0) * 100).toFixed(0)}%`}
                             </text>
                             );
                         }}

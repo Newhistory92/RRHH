@@ -37,15 +37,9 @@ export default function EstadisticasPage() {
             <div className="container mx-auto p-4 sm:p-6 lg:p-8">
                 <header className="mb-8 flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Panel de Personal</h1>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Panel Estadístico de Personal</h1>
                         <p className="text-gray-600 dark:text-gray-400">Visualización y análisis de datos de empleados.</p>
                     </div>
-                     <button
-                        onClick={() => setIsDarkMode(!isDarkMode)}
-                        className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
-                    >
-                       {isDarkMode ? '☀️' : '🌙'}
-                    </button>
                 </header>
 
                 <div className="mb-6 border-b border-gray-200 dark:border-gray-700">

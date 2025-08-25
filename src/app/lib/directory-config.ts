@@ -1,7 +1,7 @@
 import fs from "fs";
 
 export class PathManager {
-  private static readonly DEFAULT_DIRECTORY = "D:\\Mi Documentos\\Documents\\RRHH\\";
+  private static readonly DEFAULT_DIRECTORY = "C:\\Users\\Emiliano\\Documents\\RRHH";
 
   /**
    * Obtiene el directorio de trabajo configurado

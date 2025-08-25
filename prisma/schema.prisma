@@ -1,0 +1,408 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  password    String
+  employeeId  Int?      @unique
+
+  // ⚠️ Cambiamos onDelete: Cascade → SetNull (para evitar ciclos)
+  employee    Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  role        Role      @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  approvedLicenses License[] @relation("ApprovedBy")
+  notifications   Notification[]
+
+  roleId      Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([email])
+  @@index([employeeId])
+  @@index([roleId])
+}
+
+model Employee {
+  id              Int       @id @default(autoincrement())
+  dni             String    @unique
+  name            String
+  email           String    @unique
+  birthDate       DateTime?
+  address         String?
+  phone           String?
+  photo           String?
+  status          String    // Activo, Licencia, etc.
+  position        String
+  contractType    String?   // Planta permanente, Contratado, etc.
+  hireDate        DateTime?
+  category          String?   // Senior Developer, HR Manager, etc.
+  fechaPlanta       DateTime?
+  ultimaCategoria   String?
+  ultimaCatChange   DateTime?
+  productivityScore Float?
+  monthlyHours      String   @db.Text    // [{month: "Ene", hours: 5}, ...]
+  workSchedule      String   @db.Text    // { ingreso: "09:00", salida: "18:00" }
+  // Self-relation: jefe/subordinados
+ managerId       Int?
+  manager         Employee? @relation("Manages", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subordinates    Employee[] @relation("Manages")
+
+  // FK de pertenencia a una oficina (OfficeEmployees). FK está en Employee.
+  officeId        Int?
+  office          Office?    @relation("OfficeEmployees", fields: [officeId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  // Relación inversa para cuando el empleado es jefe de alguna oficina (opuesto a Office.head)
+  headOfOffice    Office?    @relation("OfficeHead")
+
+  // Relaciones
+   messages       Message[]
+  permissions    Permission[]
+  certifications Certification[]
+  skillStatuses  SkillStatus[]
+  complaints     Complaint[]
+  tasks          Task[]
+  department      Department @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  departmentId    Int
+  softSkills      EmployeeSoftSkill[]
+  technicalSkills EmployeeTechnicalSkill[]
+  feedbacks       Feedback[]
+  licenses        License[]
+  academicRecords AcademicRecord[]
+  workExperience  WorkExperience[]
+  languages       Language[]
+  cv              Cv?
+  user            User?     // Relación inversa con User
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([dni])
+  @@index([email])
+  @@index([status])
+  @@index([departmentId])
+  @@index([managerId])
+  @@index([hireDate])
+  @@index([ name])
+  Absence Absence[]
+}
+
+model Department {
+  id             Int          @id @default(autoincrement())
+  name           String
+  description    String?
+  hierarchyLevel Int
+  parentId       Int?
+  nivelJerarquico Int?
+  // Self-relation parent/children — aquí agrego onDelete/onUpdate en la parte que define el parent
+  parent         Department?  @relation("Parent", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children       Department[] @relation("Parent")
+  requiredSkills String       // Cambiado a String para SQL Server 2012
+  employees      Employee[]
+  offices        Office[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([name])
+  @@index([parentId])
+  @@index([hierarchyLevel])
+}
+
+model Office {
+  id             Int          @id @default(autoincrement())
+  name           String
+  description    String?
+  department     Department   @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  departmentId   Int
+
+  headId    Int?    @unique
+  head      Employee? @relation("OfficeHead", fields: [headId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+
+  // Relación 1:N: muchos empleados pertenecen a una oficina
+  employees      Employee[]   @relation("OfficeEmployees")
+
+  requiredSkills String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([name])
+  @@index([departmentId])
+  @@index([headId])
+}
+
+model TechnicalSkill {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  testType    String?   // multiple-choice, case-study, etc.
+  profession  String?   // Contador, Abogado, Desarrollador, etc.
+  employees   EmployeeTechnicalSkill[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([name])
+  @@index([profession])
+}
+
+model EmployeeTechnicalSkill {
+  id               Int       @id @default(autoincrement())
+  employeeId       Int
+  technicalSkillId Int
+  level            String?   // "Alto", "Medio", "Bajo" o puntuación
+  score            Int?
+  certified        Boolean   @default(false)
+  certificationDate DateTime?
+  employee         Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  technicalSkill   TechnicalSkill @relation(fields: [technicalSkillId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([employeeId, technicalSkillId])
+  @@index([employeeId])
+  @@index([technicalSkillId])
+  @@index([level])
+  @@index([certified])
+}
+
+model SoftSkill {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  employees   EmployeeSoftSkill[]
+  feedbacks   Feedback[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([name])
+}
+
+model EmployeeSoftSkill {
+  id          Int      @id @default(autoincrement())
+  employeeId  Int
+  softSkillId Int
+  level       String?  // "Alto", "Medio", "Bajo" o puntuación
+  score       Int?
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  softSkill   SoftSkill @relation(fields: [softSkillId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([employeeId, softSkillId])
+  @@index([employeeId])
+  @@index([softSkillId])
+  @@index([level])
+}
+
+model Feedback {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  score       Int       // Ej: 1-5
+  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  employeeId  Int
+  softSkill   SoftSkill? @relation(fields: [softSkillId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  softSkillId Int?
+  givenBy     String    // Nombre del evaluador
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([employeeId])
+  @@index([softSkillId])
+  @@index([score])
+  @@index([createdAt])
+}
+
+model License {
+  id           Int       @id @default(autoincrement())
+  type         String
+  startDate    DateTime
+  endDate      DateTime
+  status       String
+  description  String?
+
+  // Relación directa: mantenemos Cascade (tiene sentido si borrás un empleado y sus licencias también deben borrarse)
+  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete:  NoAction, onUpdate: NoAction)
+  employeeId   Int
+
+  // Relación indirecta: aprobado por un usuario
+  approvedBy   User? @relation("ApprovedBy", fields: [approvedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  approvedById Int?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([type])
+  @@index([startDate, endDate])
+  @@index([approvedById])
+}
+
+
+model Absence {
+  id          Int       @id @default(autoincrement())
+  employee    Employee  @relation(fields: [employeeId], references: [id])
+  employeeId  Int
+  year        Int
+  count       Int
+}
+model Notification {
+  id        Int      @id @default(autoincrement())
+  text      String
+  type      String   // license_approval, system_alert, etc.
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model AcademicRecord {
+  id          Int      @id @default(autoincrement())
+  title       String
+  institution String
+  level       String   // Universitario, Secundario
+  status      String   // Completo, En curso
+  startDate   DateTime
+  endDate     DateTime?
+  isCurrent   Boolean  @default(false)
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  employeeId  Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([employeeId])
+  @@index([level])
+  @@index([status])
+  @@index([institution])
+}
+
+model Language {
+  id           Int      @id @default(autoincrement())
+  language     String
+  level        String
+  certification String?
+  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  employeeId   Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([employeeId])
+  @@index([language])
+  @@index([level])
+}
+
+model WorkExperience {
+  id           Int       @id @default(autoincrement())
+  position     String
+  company      String
+  industry     String?
+  location     String?
+  startDate    DateTime
+  endDate      DateTime?
+  isCurrent    Boolean   @default(false)
+  contractType String?
+  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  employeeId   Int
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([employeeId])
+  @@index([company])
+  @@index([position])
+  @@index([industry])
+  @@index([startDate])
+}
+
+model Cv {
+  id          Int      @id @default(autoincrement())
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  employeeId  Int
+  status      String   // Pendiente, Aprobado
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([employeeId])
+  @@index([status])
+  @@unique([employeeId])
+}
+
+model Message {
+  id          Int       @id @default(autoincrement())
+  employee    Employee  @relation(fields: [employeeId], references: [id])
+  employeeId  Int
+  text        String
+  days        Int?
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model Permission {
+  id          Int       @id @default(autoincrement())
+  employee    Employee  @relation(fields: [employeeId], references: [id])
+  employeeId  Int
+  date        DateTime
+  exitTime    String
+  returnTime  String
+  hours       Float
+}
+
+model Certification {
+  id           Int       @id @default(autoincrement())
+  employee     Employee  @relation(fields: [employeeId], references: [id])
+  employeeId   Int
+  name         String
+  issuingBody  String
+  issueDate    DateTime
+  attachment   String?
+}
+
+model SkillStatus {
+  id         Int       @id @default(autoincrement())
+  employee   Employee  @relation(fields: [employeeId], references: [id])
+  employeeId Int
+  skillId    Int
+  status     String    // locked/unlocked
+  unlockDate DateTime?
+}
+
+
+model Complaint {
+  id          Int       @id @default(autoincrement())
+  employee    Employee  @relation(fields: [employeeId], references: [id])
+  employeeId  Int
+  reason      String
+  createdAt   DateTime @default(now())
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  employee    Employee  @relation(fields: [employeeId], references: [id])
+  employeeId  Int
+  name        String
+  productivity Float
+}
+
