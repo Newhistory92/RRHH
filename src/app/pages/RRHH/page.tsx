@@ -3,12 +3,14 @@
 import { useMemo, useState } from "react";
 import {initialEmployees,initialArchivedMessages} from "@/app/api/Prueba"
 import {EmployeeDetailView} from "@/app/Componentes/TablaOperador/Perfildetail"
+import { EMPLOYEES_DATA } from '@/app/api/prueba2';
 import { MessagesView } from "@/app/Componentes/TablaOperador/MensajeDetail";
 import { EmployeeTableView } from "@/app/Componentes/TablaOperador/Table";
 import { LicenseDetailModal, PermissionModal } from "@/app/Componentes/ModalRRHH/LicenseModal";
+import {  Employee} from '@/app/Interfas/Interfaces';
 
 export default function RecursosHumanosPage() {
-  const [employees, setEmployees] = useState(initialEmployees);
+  const [employees, setEmployees] = useState<Employee[]>(EMPLOYEES_DATA);
   const [archivedMessages, setArchivedMessages] = useState(initialArchivedMessages);
   const [currentView, setCurrentView] = useState({ name: 'table' });
   const [permissionModalEmployeeId, setPermissionModalEmployeeId] = useState(null);
@@ -66,7 +68,7 @@ export default function RecursosHumanosPage() {
           .no-print { display: none !important; }
         }
       `}</style>
-      <div className="bg-gray-100 min-h-screen font-sans">
+      <div className="bg-white min-h-screen font-sans shadow-2xl">
         <main>
           {renderContent()}
           <PermissionModal employee={permissionModalEmployee} onClose={() => setPermissionModalEmployeeId(null)} onSave={handleApplyPermission} />

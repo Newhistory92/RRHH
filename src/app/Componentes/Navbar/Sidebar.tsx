@@ -1,5 +1,5 @@
 
-import {  BarChart2, Users, BrainCircuit, GitMerge, } from 'lucide-react';
+import {  BarChart2, Users, BrainCircuit, GitMerge, ClipboardList, } from 'lucide-react';
 
 export type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama' | 'Cv';
 
@@ -9,6 +9,7 @@ export const Sidebar = ({ activePage, setPage }: { activePage: Page; setPage: (p
     { id: 'recursos-humanos', label: 'Recursos Humanos', icon: Users },
     { id: 'ia', label: 'Inteligencia Artificial', icon: BrainCircuit },
     { id: 'organigrama', label: 'Organigrama', icon: GitMerge },
+     { id: 'test', label: 'Test', icon: ClipboardList },
   ];
 
   return (

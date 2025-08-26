@@ -4,7 +4,7 @@ import {  X,  BarChart2, Star,  Briefcase, Calendar, MessageSquareWarning, } fro
 import { Card } from 'primereact/card';
 import { Employee } from '@/app/Interfas/Interfaces';
 
-export const EmployeeDetailModal: React.FC<{ employee: Employee; onClose: () => void }> = ({ employee, onClose }) => {
+export const EmployeeDetailModal: React.FC<{ employee: Employee | null; onClose: () => void }> = ({ employee, onClose }) => {
     if (!employee) return null;
 
 

@@ -10,8 +10,9 @@ import EmployeeCV  from '@/app/pages/Cv/page';
 import LicenciasManage from '@/app/pages/LicenciasManage/page';
 import { PrimeReactProvider } from 'primereact/api';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
-        
-type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama' | 'editar-perfil'| 'licencias';
+import { TestPage } from './pages/TestConfig/page';
+
+type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama' | 'editar-perfil' | 'test' | 'licencias';
 
 export default function App() {
   const [page, setPage] = useState<Page>('estadisticas');
@@ -30,6 +31,8 @@ export default function App() {
         return <EmployeeCV />;
       case 'licencias':
         return <LicenciasManage />;
+      case 'test':
+        return <TestPage />;
       default:
         return <EstadisticasPage />;
     }

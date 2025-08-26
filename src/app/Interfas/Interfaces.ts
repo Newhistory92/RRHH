@@ -53,31 +53,25 @@ export interface SoftSkills {
 
 // Interface principal del empleado
 export interface Employee {
-  // Información básica (obligatoria)
   id: number | string;
   name: string;
   department: string;
-  
-  // Información laboral
   office: string;
   category: EmployeeCategory;
   status: EmployeeStatus;
   activityType: string;
   
-  // Métricas de rendimiento
   productivityScore: number;
   monthlyHours: MonthlyHour[];
   tasks: Task[];
   
-  // Historial laboral
   licenses: YearlyRecord;
   absences: YearlyRecord;
   complaints: Complaint[];
   
-  // Habilidades
   softSkills: SoftSkills;
-  
-  // Campos opcionales adicionales (para compatibilidad)
+
+  // Campos opcionales
   position?: string;
   email?: string;
   phone?: string;
@@ -101,7 +95,21 @@ export interface Employee {
     phone: string;
     relationship: string;
   };
+
+  // Nuevos opcionales según tus datos
+  dni?: string;
+  employmentStatus?: string;
+  startDate?: string;
+  permanentDate?: string;
+  lastCategoryUpdate?: string;
+  role?: string;
+  schedule?: { startTime: string; endTime: string; workingHours: number };
+  overallProductivity?: number;
+  permits?: Array<{ id: string; date: string; departureTime: string; returnTime: string; hours: number }>;
+  messages?: Array<{ id: string; text: string; days?: number; startDate?: string; endDate?: string; date?: string }>;
+  technicalSkills?: Array<{ id: number; name: string; level: number }>;
 }
+
 
 // Interface simplificada para listas y vistas resumidas
 export interface EmployeeSummary {
@@ -301,8 +309,18 @@ export interface ProductivityRankingProps {
   onFilterChange: (key: keyof Filters, value: string) => void; // Cambiado
   sortConfig: SortConfig;
   onSortChange: (sortConfig: SortConfig) => void;
+   currentPage: number;
+   onPageChange: (page: number) => void;
 }
 
+
+
+export interface PaginationProps {
+    totalItems: number;
+    itemsPerPage: number;
+    currentPage: number;
+    onPageChange: (page: number) => void;
+}
 
 // // --- USERS & ROLES ---
 // export interface Role {

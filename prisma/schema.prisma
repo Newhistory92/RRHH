@@ -14,7 +14,6 @@ model Role {
   users       User[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
   @@index([name])
 }
 
@@ -23,15 +22,10 @@ model User {
   email       String    @unique
   password    String
   employeeId  Int?      @unique
-
-  // ⚠️ Cambiamos onDelete: Cascade → SetNull (para evitar ciclos)
   employee    Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull, onUpdate: NoAction)
-
   role        Role      @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
   approvedLicenses License[] @relation("ApprovedBy")
   notifications   Notification[]
-
   roleId      Int
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -47,22 +41,23 @@ model Employee {
   name            String
   email           String    @unique
   birthDate       DateTime?
+  gender          String
   address         String?
+  city            String?
+  province        String?
   phone           String?
   photo           String?
   status          String    // Activo, Licencia, etc.
   position        String
-  contractType    String?   // Planta permanente, Contratado, etc.
   hireDate        DateTime?
-  category          String?   // Senior Developer, HR Manager, etc.
-  fechaPlanta       DateTime?
-  ultimaCategoria   String?
   ultimaCatChange   DateTime?
   productivityScore Float?
+  horas             Float?
   monthlyHours      String   @db.Text    // [{month: "Ene", hours: 5}, ...]
   workSchedule      String   @db.Text    // { ingreso: "09:00", salida: "18:00" }
+  activo            Boolean  @default(true)
   // Self-relation: jefe/subordinados
- managerId       Int?
+  managerId       Int?
   manager         Employee? @relation("Manages", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   subordinates    Employee[] @relation("Manages")
 
@@ -74,7 +69,8 @@ model Employee {
   headOfOffice    Office?    @relation("OfficeHead")
 
   // Relaciones
-   messages       Message[]
+  condicionesLaborales CondicionLaboral[]
+  messages       Message[]
   permissions    Permission[]
   certifications Certification[]
   skillStatuses  SkillStatus[]
@@ -91,6 +87,7 @@ model Employee {
   languages       Language[]
   cv              Cv?
   user            User?     // Relación inversa con User
+  Absence Absence[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -101,7 +98,6 @@ model Employee {
   @@index([managerId])
   @@index([hireDate])
   @@index([ name])
-  Absence Absence[]
 }
 
 model Department {
@@ -131,14 +127,10 @@ model Office {
   description    String?
   department     Department   @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   departmentId   Int
-
   headId    Int?    @unique
   head      Employee? @relation("OfficeHead", fields: [headId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-
   // Relación 1:N: muchos empleados pertenecen a una oficina
   employees      Employee[]   @relation("OfficeEmployees")
-
   requiredSkills String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
@@ -237,7 +229,9 @@ model License {
   endDate      DateTime
   status       String
   description  String?
-
+  duracion     Int?
+  mensajeOriginal  String   @db.Text
+  fechasSolicitadas String   @db.Text
   // Relación directa: mantenemos Cascade (tiene sentido si borrás un empleado y sus licencias también deben borrarse)
   employee     Employee  @relation(fields: [employeeId], references: [id], onDelete:  NoAction, onUpdate: NoAction)
   employeeId   Int
@@ -281,6 +275,7 @@ model Notification {
 
 model AcademicRecord {
   id          Int      @id @default(autoincrement())
+  profession  String?
   title       String
   institution String
   level       String   // Universitario, Secundario
@@ -294,6 +289,7 @@ model AcademicRecord {
   updatedAt   DateTime @updatedAt
 
   @@index([employeeId])
+  @@index([profession])
   @@index([level])
   @@index([status])
   @@index([institution])
@@ -359,7 +355,6 @@ model Message {
   endDate     DateTime?
   createdAt   DateTime  @default(now())
 }
-
 model Permission {
   id          Int       @id @default(autoincrement())
   employee    Employee  @relation(fields: [employeeId], references: [id])
@@ -406,3 +401,16 @@ model Task {
   productivity Float
 }
 
+
+
+model CondicionLaboral {
+  id                          Int       @id @default(autoincrement())
+  tipoContrato                String
+  fechaIngreso                DateTime
+  fechaPlanta                 DateTime?
+  categoria                   String
+  ultimaModificacionCategoria DateTime
+
+  employeeId Int
+  employee   Employee @relation(fields: [employeeId], references: [id])
+}
