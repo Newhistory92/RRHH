@@ -2,8 +2,9 @@ import {getScoreColor, SoftSkillBar } from '@/app/Componentes/Card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, } from 'recharts';
 import {  X,  BarChart2, Star,  Briefcase, Calendar, MessageSquareWarning, } from 'lucide-react';
 import { Card } from 'primereact/card';
+import { Employee } from '@/app/Interfas/Interfaces';
 
-export const EmployeeDetailModal = ({ employee, onClose }) => {
+export const EmployeeDetailModal: React.FC<{ employee: Employee; onClose: () => void }> = ({ employee, onClose }) => {
     if (!employee) return null;
 
 

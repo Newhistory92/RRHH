@@ -22,6 +22,7 @@ export const CardTitle = ({ children, icon: Icon }) => (
   </h3>
 );
 
+//se mantiene
 export const SoftSkillBar = ({ skill, score }) => (
     <div className="mb-3">
         <div className="flex justify-between items-center mb-1">

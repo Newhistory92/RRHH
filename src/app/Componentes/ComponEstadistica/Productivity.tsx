@@ -2,12 +2,20 @@ import { ACTIVITY_TYPES, DEPARTMENTS, STATUS_TYPES } from '@/app/api/Prueba';
 import { Card,getScoreColor } from '@/app/Componentes/Card';
 import { ChevronDown, ChevronUp,  Filter,  } from 'lucide-react';
 import React from 'react';
+import {  Employee, ProductivityRankingProps, SortableKey, SortDirection  } from '@/app/Interfas/Interfaces';
+import { Pagination} from '@/app/Componentes/Pagination/pagination';
 
-
-
-
-export const ProductivityRanking = ({ employees, onSelectEmployee, filters, onFilterChange, sortConfig, onSortChange }) => {
-    
+export const ProductivityRanking = ({ 
+  employees, 
+  onSelectEmployee, 
+  filters, 
+  onFilterChange, 
+  sortConfig, 
+  onSortChange,
+  currentPage,
+  onPageChange
+}: ProductivityRankingProps) => {
+      const itemsPerPage = 10;
     const filteredEmployees = React.useMemo(() => {
         return employees
             .filter(e => filters.department === 'all' || e.department === filters.department)
@@ -15,31 +23,44 @@ export const ProductivityRanking = ({ employees, onSelectEmployee, filters, onFi
             .filter(e => filters.status === 'all' || e.status === filters.status);
     }, [employees, filters]);
 
-    const sortedEmployees = React.useMemo(() => {
-        let sortableEmployees = [...filteredEmployees];
-        if (sortConfig.key) {
-            sortableEmployees.sort((a, b) => {
-                if (a[sortConfig.key] < b[sortConfig.key]) {
-                    return sortConfig.direction === 'ascending' ? -1 : 1;
-                }
-                if (a[sortConfig.key] > b[sortConfig.key]) {
-                    return sortConfig.direction === 'ascending' ? 1 : -1;
-                }
-                return 0;
-            });
-        }
-        return sortableEmployees;
-    }, [filteredEmployees, sortConfig]);
+   const sortedEmployees = React.useMemo(() => {
+    const sortableEmployees = [...filteredEmployees];
+    
+    if (sortConfig.key) {
+        sortableEmployees.sort((a, b) => {
+            // Manejar campos que pueden ser undefined
+            const valueA = a[sortConfig.key as keyof Employee] ?? 0;
+            const valueB = b[sortConfig.key as keyof Employee] ?? 0;
 
-    const handleSort = (key) => {
-        let direction = 'descending';
-        if (sortConfig.key === key && sortConfig.direction === 'descending') {
-            direction = 'ascending';
-        }
-        onSortChange({ key, direction });
-    };
+            if (valueA < valueB) {
+                return sortConfig.direction === 'ascending' ? -1 : 1;
+            }
+            if (valueA > valueB) {
+                return sortConfig.direction === 'ascending' ? 1 : -1;
+            }
+            return 0;
+        });
+    }
+    return sortableEmployees;
+}, [filteredEmployees, sortConfig]);
 
-    return (
+   const handleSort = (key: SortableKey) => {
+    let direction: SortDirection = 'descending';
+    
+    if (sortConfig.key === key && sortConfig.direction === 'descending') {
+        direction = 'ascending';
+    }
+    
+    onSortChange({ key, direction });
+};
+
+
+ // Lógica de paginación
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentEmployees = sortedEmployees.slice(indexOfFirstItem, indexOfLastItem);
+//    className="w-full h-8 py-1 px-2 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white">
+   return (
         <Card className="col-span-1 lg:col-span-3">
              <div className="mb-6">
                 <div className="flex flex-wrap items-center gap-4">
@@ -48,7 +69,7 @@ export const ProductivityRanking = ({ employees, onSelectEmployee, filters, onFi
                         <select
                             value={filters.department}
                             onChange={(e) => onFilterChange('department', e.target.value)}
-                            className="w-full bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                            className="w-full h-8 py-1 px-2 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
                         >
                             <option value="all">Todos los Departamentos</option>
                             {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
@@ -56,7 +77,7 @@ export const ProductivityRanking = ({ employees, onSelectEmployee, filters, onFi
                         <select
                             value={filters.activityType}
                             onChange={(e) => onFilterChange('activityType', e.target.value)}
-                            className="w-full bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                            className="w-full h-8 py-1 px-2 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
                         >
                             <option value="all">Todas las Actividades</option>
                             {ACTIVITY_TYPES.map(a => <option key={a} value={a}>{a}</option>)}
@@ -64,7 +85,7 @@ export const ProductivityRanking = ({ employees, onSelectEmployee, filters, onFi
                         <select
                             value={filters.status}
                             onChange={(e) => onFilterChange('status', e.target.value)}
-                            className="w-full bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                             className="w-full h-8 py-1 px-2 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
                         >
                             <option value="all">Toda Condición Laboral</option>
                             {STATUS_TYPES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -94,7 +115,7 @@ export const ProductivityRanking = ({ employees, onSelectEmployee, filters, onFi
                         </tr>
                     </thead>
                     <tbody>
-                        {sortedEmployees.map((employee, index) => (
+                        {currentEmployees.map((employee) => (
                             <tr key={employee.id} onClick={() => onSelectEmployee(employee)} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors duration-150">
                                 <td className="p-4">
                                     <div className="flex items-center">
@@ -119,7 +140,7 @@ export const ProductivityRanking = ({ employees, onSelectEmployee, filters, onFi
                         ))}
                     </tbody>
                 </table>
-                 {sortedEmployees.length === 0 && (
+                 {currentEmployees.length === 0 && (
                     <div className="text-center py-12">
                         <Filter className="mx-auto h-12 w-12 text-gray-400" />
                         <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Sin resultados</h3>
@@ -127,6 +148,12 @@ export const ProductivityRanking = ({ employees, onSelectEmployee, filters, onFi
                     </div>
                  )}
             </div>
+            <Pagination 
+                totalItems={sortedEmployees.length}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
+                onPageChange={onPageChange}
+            />
         </Card>
     );
 };

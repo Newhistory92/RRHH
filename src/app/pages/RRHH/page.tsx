@@ -66,7 +66,7 @@ export default function RecursosHumanosPage() {
           .no-print { display: none !important; }
         }
       `}</style>
-      <div className="bg-gray-100 min-h-screen font-sans">
+      <div className="bg-white min-h-screen font-sans shadow-2xl">
         <main>
           {renderContent()}
           <PermissionModal employee={permissionModalEmployee} onClose={() => setPermissionModalEmployeeId(null)} onSave={handleApplyPermission} />
