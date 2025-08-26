@@ -5,32 +5,23 @@ import { ProductivityRanking } from '@/app/Componentes/ComponEstadistica/Product
 import { EMPLOYEES_DATA } from '@/app/api/Prueba';
 import { GlobalStats } from '@/app/Componentes/ComponEstadistica/Globalstat';
 import { EmployeeDetailModal } from '@/app/Componentes/ComponEstadistica/DetailModal';
-
+import {  Employee, ProductivityRankingProps, SortableKey, SortConfig, SortDirection  } from '@/app/Interfas/Interfaces';
 
 
 
 export default function EstadisticasPage() {
     const [activeTab, setActiveTab] = React.useState('ranking'); // 'ranking' o 'globales'
-    const [selectedEmployee, setSelectedEmployee] = React.useState(null);
+       const [selectedEmployee, setSelectedEmployee] = React.useState<Employee | null>(null);
     const [filters, setFilters] = React.useState({
         department: 'all',
         activityType: 'all',
         status: 'all',
     });
-    const [sortConfig, setSortConfig] = React.useState({ key: 'productivityScore', direction: 'descending' });
-    const [isDarkMode, setIsDarkMode] = React.useState(false);
-
-    const handleFilterChange = (key, value) => {
+  const [sortConfig, setSortConfig] = React.useState<SortConfig>({ key: 'productivityScore', direction: 'descending' });
+    const handleFilterChange = (key: string, value: string) => {
         setFilters(prev => ({ ...prev, [key]: value }));
     };
     
-    React.useEffect(() => {
-        if (isDarkMode) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    }, [isDarkMode]);
 
     return (
         <div className="bg-gray-100 dark:bg-gray-900 min-h-screen font-sans text-gray-900 dark:text-gray-100">
