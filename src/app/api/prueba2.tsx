@@ -1,3 +1,5 @@
+import { ComplaintStatus, EmployeeRole, EmployeeStatus, EmploymentStatus, LicenseStatus } from "../Interfas/Interfaces";
+
 // Unified Employee Data Structure
 export const EMPLOYEES_DATA = [
   {
@@ -10,15 +12,15 @@ export const EMPLOYEES_DATA = [
     address: 'Av. Siempre Viva 742',
     birthDate: '1990-05-20',
     photo: 'https://placehold.co/150x150/E2E8F0/4A5568?text=AG',
-    
+    hours: 160, // Total available hours for permissions
     // Employment Details
     position: 'Especialista en Atención al Cliente',
     department: 'Atención al Cliente',
     departmentId: 1,
     office: 'Sede Central',
     category: 'Administrativo',
-    status: 'Activo', // Unified status (Activo, De licencia, Parte médico, Inactivo)
-    employmentStatus: 'Planta permanente', // Contract type
+    status: 'Activo' as EmployeeStatus, // Unified status (Activo, De licencia, Parte médico, Inactivo)
+    employmentStatus: 'Planta permanente' as EmploymentStatus, // Contract type
     activityType: 'Atención al público',
     startDate: '2020-03-15',
     permanentDate: '2021-03-15',
@@ -27,8 +29,8 @@ export const EMPLOYEES_DATA = [
     // Management
     managerId: 3,
     supervisor: 'Ana Gómez',
-    role: 'empleado', // empleado, supervisor, manager, admin
-    
+    role: 'empleado' as EmployeeRole, // empleado, supervisor, manager, admin
+
     // Schedule
     schedule: {
       startTime: '09:00',
@@ -51,6 +53,7 @@ export const EMPLOYEES_DATA = [
       { name: 'Gestión de reclamos', productivity: 8.8 }
     ],
     
+  
     // Absences and Licenses
     licenses: {
       '2024': 5,
@@ -61,7 +64,7 @@ export const EMPLOYEES_DATA = [
           type: 'Vacaciones',
           startDate: '2024-07-10',
           endDate: '2024-07-20',
-          status: 'Aprobada',
+          status: 'Aprobada' as LicenseStatus,
           duration: 10,
           originalMessage: 'Se aprueba la licencia por vacaciones solicitada para julio.',
           requestedDays: 10,
@@ -89,7 +92,7 @@ export const EMPLOYEES_DATA = [
         id: 'C01',
         reason: 'Demora en la respuesta inicial.',
         date: '2024-01-15',
-        status: 'Resuelto'
+        status: 'Resuelto' as ComplaintStatus
       }
     ],
     messages: [
@@ -127,14 +130,14 @@ export const EMPLOYEES_DATA = [
     address: 'Calle Falsa 123',
     birthDate: '1988-03-12',
     photo: 'https://placehold.co/100x100/c2f0c2/333333?text=JP',
-    
+     hours: 120, // Total available hours for permissions
     position: 'Desarrollador de Sistemas',
     department: 'Sistemas',
     departmentId: 2,
     office: 'Anexo Norte',
     category: 'Técnico',
-    status: 'Activo',
-    employmentStatus: 'Contratado',
+    status: 'Activo' as EmployeeStatus,
+    employmentStatus: 'Contratado' as EmploymentStatus,
     activityType: 'Trabajo en sistemas',
     startDate: '2022-05-20',
     permanentDate: null,
@@ -142,8 +145,8 @@ export const EMPLOYEES_DATA = [
     
     managerId: 4,
     supervisor: 'Carlos Ruiz',
-    role: 'empleado',
-    
+    role: 'empleado' as EmployeeRole,
+
     schedule: {
       startTime: '09:00',
       endTime: '18:00',
@@ -202,14 +205,14 @@ export const EMPLOYEES_DATA = [
     address: 'Boulevard de los Sueños Rotos',
     birthDate: '1985-11-08',
     photo: 'https://placehold.co/100x100/f0c2f0/333333?text=MR',
-    
+    hours: 160, // Total available hours for permissions
     position: 'Especialista en Recursos Humanos',
     department: 'Recursos Humanos',
     departmentId: 3,
     office: 'Sede Central',
     category: 'Profesional',
-    status: 'De licencia',
-    employmentStatus: 'Planta permanente',
+    status: 'De licencia' as EmployeeStatus,
+    employmentStatus: 'Planta permanente' as EmploymentStatus,
     activityType: 'Administrativo',
     startDate: '2018-09-01',
     permanentDate: '2019-09-01',
@@ -217,8 +220,7 @@ export const EMPLOYEES_DATA = [
     
     managerId: null,
     supervisor: 'Dirección',
-    role: 'supervisor',
-    
+    role: 'supervisor' as EmployeeRole,
     schedule: {
       startTime: '09:00',
       endTime: '18:00',
@@ -248,7 +250,7 @@ export const EMPLOYEES_DATA = [
           type: 'Médica',
           startDate: '2024-06-20',
           endDate: '2024-06-30',
-          status: 'Aprobada',
+          status: 'Aprobada' as LicenseStatus,
           duration: 11,
           originalMessage: 'Licencia médica extendida.',
           requestedDays: 11,
@@ -297,14 +299,14 @@ export const EMPLOYEES_DATA = [
     address: 'Av. Corrientes 1234',
     birthDate: '1982-07-15',
     photo: 'https://placehold.co/100x100/c2c2f0/333333?text=CS',
-    
+     hours: 140, // Total available hours for permissions
     position: 'Auditor Legal',
     department: 'Legales',
     departmentId: 4,
     office: 'Sede Central',
     category: 'Auditor',
-    status: 'Parte médico',
-    employmentStatus: 'Auditor',
+    status: 'Parte médico' as EmployeeStatus,
+    employmentStatus: 'Auditor' as EmploymentStatus,
     activityType: 'Expedientes',
     startDate: '2019-02-10',
     permanentDate: null,
@@ -312,8 +314,8 @@ export const EMPLOYEES_DATA = [
     
     managerId: null,
     supervisor: 'Dirección Legal',
-    role: 'auditor',
-    
+    role: 'auditor' as EmployeeRole,
+
     schedule: {
       startTime: '08:30',
       endTime: '17:30',
@@ -350,13 +352,13 @@ export const EMPLOYEES_DATA = [
         id: 'C02',
         reason: 'Excesivo formalismo en la comunicación.',
         date: '2024-02-10',
-        status: 'En revisión'
+        status: 'En revisión' as ComplaintStatus
       },
       {
         id: 'C03',
         reason: 'Plazos de entrega no cumplidos.',
         date: '2024-03-15',
-        status: 'Pendiente'
+        status: 'Pendiente' as ComplaintStatus
       }
     ],
     messages: [],
@@ -378,23 +380,20 @@ export const EMPLOYEES_DATA = [
   {
     id: 5,
     name: 'Laura Fernández',
-    lastName: 'Fernández',
-    firstName: 'Laura',
-    fullName: 'Laura Fernández',
     dni: '99887766D',
     email: 'laura.fernandez@example.com',
     phone: '11-9988-7766',
     address: 'San Martín 567',
     birthDate: '1992-01-25',
     photo: 'https://placehold.co/100x100/f0d4c2/333333?text=LF',
-    
+    hours: 0, // Total available hours for permissions
     position: 'Especialista Senior en Atención al Cliente',
     department: 'Atención al Cliente',
     departmentId: 1,
     office: 'Anexo Sur',
     category: 'Administrativo',
-    status: 'Activo',
-    employmentStatus: 'Comisionado',
+    status: 'Activo' as EmployeeStatus,
+    employmentStatus: 'Comisionado' as EmploymentStatus,
     activityType: 'Atención al público',
     startDate: '2021-08-10',
     permanentDate: null,
@@ -402,8 +401,8 @@ export const EMPLOYEES_DATA = [
     
     managerId: 1,
     supervisor: 'Ana García',
-    role: 'empleado',
-    
+    role: 'empleado' as EmployeeRole,
+
     schedule: {
       startTime: '08:00',
       endTime: '17:00',

@@ -1,55 +1,112 @@
 "use client"
 import { useState, useMemo } from 'react';
-import { ChevronDown, ChevronUp, Search, AlertTriangle, Bell, LogOut } from 'lucide-react';
+import { ChevronDown, ChevronUp, Search, AlertTriangle, Bell, LogOut, ChevronUpIcon, ChevronDownIcon } from 'lucide-react';
 import { StatusBadge, HoursDisplay } from "@/app/util/UiRRHH"
 import { Pagination} from '@/app/Componentes/Pagination/pagination';
+import {  Employee, SortDirection, } from '@/app/Interfas/Interfaces';
 
+export interface EmployeeTableViewProps {
+  employees: Employee[];
+  onSelectEmployee: (id: number) => void;
+  onShowMessages: () => void;
+  onOpenPermissionModal: (employeeId: number | null) => void;
+}
 
-export const EmployeeTableView = ({ employees, onSelectEmployee, onShowMessages, onOpenPermissionModal }) => {
+export interface ViewState {
+  name: 'table' | 'detail' | 'messages';
+  id?: number;
+}
+type SortableKeys = keyof Employee | null;
+
+// Interfaz para la configuración de ordenamiento
+interface SortConfig {
+  key: SortableKeys;
+  direction: SortDirection;
+}
+ interface SortableHeaderProps {
+    children: React.ReactNode;
+    columnKey: keyof Employee;
+  }
+export const EmployeeTableView = ({ employees, onSelectEmployee, onShowMessages, onOpenPermissionModal }:EmployeeTableViewProps) => {
     const [filters, setFilters] = useState({ estado: '', departamento: '', searchTerm: '' });
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+     const [sortConfig, setSortConfig] = useState<SortConfig>({ 
+    key: null, 
+    direction: 'ascending' 
+  });
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
-    const handleSort = (key) => { let direction = 'ascending'; if (sortConfig.key === key && sortConfig.direction === 'ascending') { direction = 'descending'; } setSortConfig({ key, direction }); };
+   const handleSort = (key: keyof Employee) => {
+    let direction: SortDirection = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  
     const filteredAndSortedEmployees = useMemo(() => {
-        let filtered = [...employees];
-        if (filters.estado) filtered = filtered.filter(e => e.estado === filters.estado);
-        if (filters.departamento) filtered = filtered.filter(e => e.departamento === filters.departamento);
-        if (filters.searchTerm) {
-            const term = filters.searchTerm.toLowerCase();
-            filtered = filtered.filter(e => e.nombre.toLowerCase().includes(term) || e.apellido.toLowerCase().includes(term) || e.dni.toLowerCase().includes(term) || e.departamento.toLowerCase().includes(term));
-        }
-        if (sortConfig.key) {
-            filtered.sort((a, b) => { if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'ascending' ? -1 : 1; if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'ascending' ? 1 : -1; return 0; });
-        }
-        return filtered;
-    }, [employees, filters, sortConfig]);
-
-
-    const SortableHeader = ({ children, columnKey }) => {
-      const isSorted = sortConfig.key === columnKey;
-      return (
-        <th
-          scope="col"
-          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer"
-          onClick={() => handleSort(columnKey)}
-        >
-          <div className="flex items-center">
-            {children}
-            {isSorted ? (
-              sortConfig.direction === "ascending" ? (
-                <ChevronUp className="ml-2 h-4 w-4" />
-              ) : (
-                <ChevronDown className="ml-2 h-4 w-4" />
-              )
-            ) : null}
-          </div>
-        </th>
+    let filtered = [...employees];
+    
+    if (filters.estado) {
+      filtered = filtered.filter(e => e.status === filters.estado);
+    }
+    
+    if (filters.departamento) {
+      filtered = filtered.filter(e => e.department === filters.departamento);
+    }
+    
+    if (filters.searchTerm) {
+      const term = filters.searchTerm.toLowerCase();
+      filtered = filtered.filter(e => 
+        e.name.toLowerCase().includes(term) || 
+        e.dni.toLowerCase().includes(term) || 
+        e.department.toLowerCase().includes(term)
       );
-    };
+    }
 
-    const totalMessages = employees.reduce((acc, curr) => acc + curr.mensajes.length, 0);
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+        const aValue = a[sortConfig.key!]; // El ! indica que sabemos que key no es null
+        const bValue = b[sortConfig.key!];
+        
+        if (aValue < bValue) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [employees, filters, sortConfig]);
+
+const SortableHeader = ({ children, columnKey }: SortableHeaderProps) => {
+    const isSorted = sortConfig.key === columnKey;
+    
+    return (
+      <th 
+        className="cursor-pointer hover:bg-gray-50"
+        onClick={() => handleSort(columnKey)}
+      >
+        <div className="flex items-center justify-between">
+          {children}
+          {isSorted ? (
+            sortConfig.direction === "ascending" ? (
+              <ChevronUpIcon className="h-4 w-4" />
+            ) : (
+              <ChevronDownIcon className="h-4 w-4" />
+            )
+          ) : null}
+        </div>
+      </th>
+    );
+  };
+
+
+    const totalMessages = employees.reduce((acc, curr) => acc + curr.messages.length, 0);
 
 
     const paginatedEmployees = useMemo(() => {
@@ -57,7 +114,7 @@ export const EmployeeTableView = ({ employees, onSelectEmployee, onShowMessages,
         return filteredAndSortedEmployees.slice(startIndex, startIndex + itemsPerPage);
     }, [filteredAndSortedEmployees, currentPage, itemsPerPage]);
 
-    const handlePageChange = (page) => {
+    const handlePageChange = (page:number) => {
         setCurrentPage(page);
         // Scroll suave hacia arriba al cambiar de página
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -131,7 +188,7 @@ export const EmployeeTableView = ({ employees, onSelectEmployee, onShowMessages,
                         }}
                     >
                         <option value="">Todos los Departamentos</option>
-                        {[...new Set(employees.map((e) => e.departamento))].map((d) => (
+                        {[...new Set(employees.map((e) => e.department))].map((d) => (
                             <option key={d} value={d}>{d}</option>
                         ))}
                     </select>
@@ -169,7 +226,7 @@ export const EmployeeTableView = ({ employees, onSelectEmployee, onShowMessages,
                                                 className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 hover:bg-gray-50 cursor-pointer"
                                                 onClick={() => onSelectEmployee(employee.id)}
                                             >
-                                                {employee.nombre} {employee.apellido}
+                                                {employee.name}
                                             </td>
                                             <td
                                                 className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hover:bg-gray-50 cursor-pointer"
@@ -181,19 +238,19 @@ export const EmployeeTableView = ({ employees, onSelectEmployee, onShowMessages,
                                                 className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hover:bg-gray-50 cursor-pointer"
                                                 onClick={() => onSelectEmployee(employee.id)}
                                             >
-                                                <StatusBadge status={employee.estado} />
+                                                <StatusBadge status={employee.status} />
                                             </td>
                                             <td
                                                 className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hover:bg-gray-50 cursor-pointer"
                                                 onClick={() => onSelectEmployee(employee.id)}
                                             >
-                                                {employee.departamento}
+                                                {employee.department}
                                             </td>
                                             <td
                                                 className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hover:bg-gray-50 cursor-pointer"
                                                 onClick={() => onSelectEmployee(employee.id)}
                                             >
-                                                <HoursDisplay hours={employee.horas} />
+                                                <HoursDisplay hours={employee.hours} />
                                             </td>
                                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                                 <button

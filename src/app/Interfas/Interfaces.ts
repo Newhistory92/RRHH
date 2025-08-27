@@ -5,178 +5,8 @@
 // };
 
 // Tipos auxiliares
-export type EmployeeStatus = 'Planta permanente' | 'Contratado' | 'Pasante' | 'Licencia' | 'Suspendido';
-export type EmployeeCategory = 'Administrativo' | 'Técnico' | 'Directivo' | 'Operativo';
-
-export type SoftSkill = 
-  | 'Comunicación' 
-  | 'Trabajo en equipo' 
-  | 'Empatía' 
-  | 'Resolución de conflictos' 
-  | 'Adaptabilidad' 
-  | 'Liderazgo' 
-  | 'Creatividad' 
-  | 'Pensamiento Crítico' 
-  | 'Gestión del Tiempo' 
-  | 'Toma de Decisiones' 
-  | 'Orientación al Cliente' 
-  | 'Inteligencia Emocional' 
-  | 'Negociación' 
-  | 'Autocontrol' 
-  | 'Proactividad';
-
-// Interfaces para objetos anidados
-export interface MonthlyHour {
-  month: string;
-  hours: number;
-}
-
-export interface Task {
-  name: string;
-  productivity: number;
-}
-
-export interface YearlyRecord {
-  [year: string]: number;
-}
-
-export interface Complaint {
-  id: string;
-  reason: string;
-  date?: string;
-  status?: 'Abierta' | 'En proceso' | 'Resuelta' | 'Cerrada';
-}
-
-export interface SoftSkills {
-  [key: string]: number;
-}
-
-// Interface principal del empleado
-export interface Employee {
-  id: number | string;
-  name: string;
-  department: string;
-  office: string;
-  category: EmployeeCategory;
-  status: EmployeeStatus;
-  activityType: string;
-  
-  productivityScore: number;
-  monthlyHours: MonthlyHour[];
-  tasks: Task[];
-  
-  licenses: YearlyRecord;
-  absences: YearlyRecord;
-  complaints: Complaint[];
-  
-  softSkills: SoftSkills;
-
-  // Campos opcionales
-  position?: string;
-  email?: string;
-  phone?: string;
-  hireDate?: string;
-  birthDate?: string;
-  salary?: number;
-  supervisor?: string;
-  location?: string;
-  workSchedule?: string;
-  contractType?: string;
-  address?: string;
-  photo?: string;
-  managerId?: number;
-  departmentId: number;
-  completedTasks?: number;
-  efficiency?: number;
-  createdAt: string | Date;
-  updatedAt: string | Date;
-  emergencyContact?: {
-    name: string;
-    phone: string;
-    relationship: string;
-  };
-
-  // Nuevos opcionales según tus datos
-  dni?: string;
-  employmentStatus?: string;
-  startDate?: string;
-  permanentDate?: string;
-  lastCategoryUpdate?: string;
-  role?: string;
-  schedule?: { startTime: string; endTime: string; workingHours: number };
-  overallProductivity?: number;
-  permits?: Array<{ id: string; date: string; departureTime: string; returnTime: string; hours: number }>;
-  messages?: Array<{ id: string; text: string; days?: number; startDate?: string; endDate?: string; date?: string }>;
-  technicalSkills?: Array<{ id: number; name: string; level: number }>;
-}
-
-
-// Interface simplificada para listas y vistas resumidas
-export interface EmployeeSummary {
-  id: number | string;
-  name: string;
-  department: string;
-  position?: string;
-  status: EmployeeStatus;
-  productivityScore?: number;
-  email?: string;
-}
-
-// Interface para filtros y búsquedas
-export interface EmployeeFilters {
-  department?: string;
-  office?: string;
-  category?: EmployeeCategory;
-  status?: EmployeeStatus;
-  minProductivity?: number;
-  maxProductivity?: number;
-  hasComplaints?: boolean;
-}
-
-// Interface para estadísticas agregadas
-export interface EmployeeStats {
-  totalEmployees: number;
-  averageProductivity: number;
-  departmentDistribution: { [department: string]: number };
-  statusDistribution: { [status: string]: number };
-  categoryDistribution: { [category: string]: number };
-}
-
-// Tipos para operaciones CRUD
-export type CreateEmployeeData = Omit<Employee, 'id'>;
-export type UpdateEmployeeData = Partial<Omit<Employee, 'id'>>;
-
-// Constantes útiles
-export const DEPARTMENTS = [
-  'Atención al Cliente',
-  'Recursos Humanos',
-  'Tecnología',
-  'Ventas',
-  'Marketing',
-  'Finanzas',
-  'Operaciones',
-  'Legal'
-] as const;
-
-export const OFFICES = [
-  'Sede Central',
-  'Sucursal Norte',
-  'Sucursal Sur',
-  'Sucursal Este',
-  'Sucursal Oeste',
-  'Remoto'
-] as const;
-
-export const ACTIVITY_TYPES = [
-  'Atención al público',
-  'Desarrollo de software',
-  'Análisis de datos',
-  'Gestión de proyectos',
-  'Ventas directas',
-  'Marketing digital',
-  'Contabilidad',
-  'Legal'
-] as const;
+//export type EmployeeStatus = 'Planta permanente' | 'Contratado' | 'Pasante' | 'Licencia' | 'Suspendido';
+//export type EmployeeCategory = 'Administrativo' | 'Técnico' | 'Directivo' | 'Operativo';
 
 // export default interface  OrgNode {
 //   name: string;
@@ -187,66 +17,66 @@ export const ACTIVITY_TYPES = [
 
 
   
-export interface UserData {
-  usuario: string;
-  departamento: string;
-  habilidades_blandas: SoftSkill[];
-  feedback_history: { evaluado: string; habilidad_blanda: SoftSkill }[];
-}
+// export interface UserData {
+//   usuario: string;
+//   departamento: string;
+//   habilidades_blandas: SoftSkill[];
+//   feedback_history: { evaluado: string; habilidad_blanda: SoftSkill }[];
+// }
 
-export interface FeedbackResponse {
-  evaluador: string;
-  evaluado: string;
-  habilidad_blanda: SoftSkill;
-  respuesta: [number, number, number]; // [Mala, Buena, Excelente]
-}
+// export interface FeedbackResponse {
+//   evaluador: string;
+//   evaluado: string;
+//   habilidad_blanda: SoftSkill;
+//   respuesta: [number, number, number]; // [Mala, Buena, Excelente]
+// }
 
-export interface Survey {
-  evaluado: string;
-  habilidad_blanda: SoftSkill;
-}
-
-
+// export interface Survey {
+//   evaluado: string;
+//   habilidad_blanda: SoftSkill;
+// }
 
 
-export type Profession = 
-  | 'Contador' | 'Abogado' | 'Administrativo' | 'Trabajador Social' 
-  | 'Administrador de Empresa' | 'Sociólogo' | 'Psicopedagogo' 
-  | 'Desarrollador Backend' | 'Desarrollador Frontend' | 'Farmacéutico' | 'Recursos Humanos';
 
-export type EvaluationType = 'multiple-choice' | 'case-study' | 'code' | 'report' | 'typing-test';
 
-export interface Skill {
-  name: string;
-  description: string;
-  type: EvaluationType;
-}
+// export type Profession = 
+//   | 'Contador' | 'Abogado' | 'Administrativo' | 'Trabajador Social' 
+//   | 'Administrador de Empresa' | 'Sociólogo' | 'Psicopedagogo' 
+//   | 'Desarrollador Backend' | 'Desarrollador Frontend' | 'Farmacéutico' | 'Recursos Humanos';
 
-export interface Question {
-  question: string;
-  options?: string[];
-  correctAnswer: string;
-}
+// export type EvaluationType = 'multiple-choice' | 'case-study' | 'code' | 'report' | 'typing-test';
 
-export interface EvaluatedSkill {
-  nombre: string;
-  nivel: 'Malo' | 'Bueno' | 'Avanzado';
-  preguntas_correctas?: number;
-  total_preguntas?: number;
-  metricas?: Record<string, string | number>;
-}
+// export interface Skill {
+//   name: string;
+//   description: string;
+//   type: EvaluationType;
+// }
 
-export interface ResultsData {
-  profesion: Profession | string;
-  habilidades_evaluadas: EvaluatedSkill[];
-}
+// export interface Question {
+//   question: string;
+//   options?: string[];
+//   correctAnswer: string;
+// }
 
-export interface EvaluationResult {
-    correct: number;
-    total: number;
-    level: 'Malo' | 'Bueno' | 'Avanzado';
-    passed: boolean;
-}
+// export interface EvaluatedSkill {
+//   nombre: string;
+//   nivel: 'Malo' | 'Bueno' | 'Avanzado';
+//   preguntas_correctas?: number;
+//   total_preguntas?: number;
+//   metricas?: Record<string, string | number>;
+// }
+
+// export interface ResultsData {
+//   profesion: Profession | string;
+//   habilidades_evaluadas: EvaluatedSkill[];
+// }
+
+// export interface EvaluationResult {
+//     correct: number;
+//     total: number;
+//     level: 'Malo' | 'Bueno' | 'Avanzado';
+//     passed: boolean;
+// }
 
 
 export interface ChatMessage {
@@ -322,136 +152,225 @@ export interface PaginationProps {
     onPageChange: (page: number) => void;
 }
 
-// // --- USERS & ROLES ---
-// export interface Role {
-//   id: number;
-//   name: string;
-//   description?: string;
-//   createdAt: Date;
-//   updatedAt: Date;
-// }
+// Basic types for employee data
+export type EmployeeStatus = 'Activo' | 'De licencia' | 'Parte médico' | 'Inactivo' | 'Suspendido';
+export type EmploymentStatus = 'Planta permanente' | 'Contratado' | 'Comisionado' | 'Auditor' | 'Temporal';
+export type EmployeeRole = 'empleado' | 'supervisor' | 'manager' | 'admin' | 'auditor';
+export type LicenseStatus = 'Aprobada' | 'Pendiente' | 'Rechazada';
+export type ComplaintStatus = 'Resuelto' | 'Pendiente' | 'En proceso';
 
-// export interface User {
-//   id: number;
-//   email: string;
-//   password: string;
-//   employeeId?: number;
-//   roleId: number;
-//   approvedLicenses?: License[];
-//   notifications?: Notification[];
-//   createdAt: Date;
-//   updatedAt: Date;
-//   employee?: Employee;
-//   role?: Role;
-// }
 
-// // --- EMPLOYEE ---
-// export interface Employee {
-//   id: number;
-//   full_name: string;
-//   email?: string;
-//   position?: string;
-//   department?: string;
-//   status?: string;
-//   dni?: string;
-//   birthDate?: string;
-//   photo?: string;
-//   supervisorId?: number;
+// Schedule interface
+export interface Schedule {
+  startTime: string;
+  endTime: string;
+  workingHours: number;
+}
 
-//   // Relaciones
-//   messages?: Message[];
-//   permissions?: Permission[];
-//   certifications?: Certification[];
-//   skillStatuses?: SkillStatus[];
-//   complaints?: Complaint[];
-//   tasks?: Task[];
-//   licenses?: License[];
-//   user?: User;
-// }
+// Monthly hours tracking
+export interface MonthlyHours {
+  month: string;
+  hours: number;
+}
 
-// // --- LICENSE ---
-// export interface License {
-//   id: number;
-//   type: string;
-//   startDate: Date;
-//   endDate: Date;
-//   status: string;
-//   description?: string;
+// Task productivity
+export interface Task {
+  name: string;
+  productivity: number;
+}
 
-//   employeeId: number;
-//   approvedById?: number;
-//   userId?: number;
+// License history
+export interface LicenseHistory {
+  id: string;
+  type: string;
+  startDate: string;
+  endDate: string;
+  status: LicenseStatus;
+  duration: number;
+  originalMessage: string;
+  requestedDays: number;
+  requestedDates: string;
+}
 
-//   // Relaciones
-//   employee?: Employee;
-//   approvedBy?: User;
-// }
+// Licenses tracking
+export interface Licenses {
+  '2024': number;
+  '2023': number;
+  history: LicenseHistory[];
+}
 
-// // --- MESSAGE ---
-// export interface Message {
-//   id: number;
-//   employeeId: number;
-//   text: string;
-//   days?: number;
-//   startDate?: Date;
-//   endDate?: Date;
-//   createdAt: Date;
-//   employee?: Employee;
-// }
+// Absences tracking
+export interface Absences {
+  '2024': number;
+  '2023': number;
+}
 
-// // --- PERMISSION ---
-// export interface Permission {
-//   id: number;
-//   employeeId: number;
-//   date: Date;
-//   exitTime: string;
-//   returnTime: string;
-//   hours: number;
-//   employee?: Employee;
-// }
+// Permits
+export interface Permit {
+  id: string;
+  date: string;
+  departureTime: string;
+  returnTime: string;
+  hours: number;
+}
 
-// // --- CERTIFICATION ---
-// export interface Certification {
-//   id: number;
-//   employeeId: number;
-//   name: string;
-//   issuingBody: string;
-//   issueDate: Date;
-//   attachment?: string;
-//   employee?: Employee;
-// }
+// Complaints
+export interface Complaint {
+  id: string;
+  reason: string;
+  date: string;
+  status: ComplaintStatus;
+}
 
-// // --- SKILL STATUS ---
-// export interface SkillStatus {
-//   id: number;
-//   employeeId: number;
-//   skillId: number;
-//   status: 'locked' | 'unlocked';
-//   unlockDate?: Date;
-//   employee?: Employee;
-// }
+// Messages
+export interface Message {
+  id: string;
+  text: string;
+  days: number;
+  startDate: string;
+  endDate: string;
+  date: string;
+}
 
-// // --- COMPLAINT ---
-// export interface Complaint {
-//   id: number;
-//   employeeId: number;
-//   reason: string;
-//   createdAt: Date;
-//   employee?: Employee;
-// }
+// Soft skills (key-value pairs)
+export interface SoftSkills {
+  [skillName: string]: number;
+}
 
-// // --- TASK ---
-// export interface Task {
-//   id: number;
-//   employeeId: number;
-//   name: string;
-//   productivity: number;
-//   employee?: Employee;
-// }
+// Technical skills
+export interface TechnicalSkill {
+  id: number;
+  name: string;
+  level: number;
+}
 
-// // --- NOTIFICATIONS ---
-// export interface Notification {
-//   id: number;
-//   text: string;
-//   time: string;
-// }
+// Main Employee interface
+export interface Employee {
+  // Basic Information
+  id: number;
+  name: string;
+  dni: string;
+  email: string;
+  phone: string;
+  address: string;
+  birthDate: string;
+  photo: string;
+  hours: number; // Total available hours for permissions
+  // Employment Details
+  position: string;
+  department: string;
+  departmentId: number;
+  office: string;
+  category: string;
+  status: EmployeeStatus;
+  employmentStatus: EmploymentStatus;
+  activityType: string;
+  startDate: string;
+  permanentDate: string | null; // Can be null if employee is not permanent yet
+  lastCategoryUpdate: string;
+
+  // Management
+  managerId: number | null; // Can be null if no manager assigned
+  supervisor: string | null; // Can be null if no supervisor assigned
+  role: EmployeeRole;
+
+  // Schedule
+  schedule: Schedule;
+
+  // Performance Metrics
+  productivityScore: number;
+  overallProductivity: number;
+  monthlyHours: MonthlyHours[];
+  tasks: Task[];
+
+  // Absences and Licenses
+  licenses: Licenses;
+  absences: Absences;
+  permits: Permit[];
+
+  // Feedback and Issues
+  complaints: Complaint[];
+  messages: Message[];
+
+  // Skills Assessment
+  softSkills: SoftSkills;
+  technicalSkills: TechnicalSkill[];
+}
+
+// Department interface
+export interface Department {
+  id: number;
+  name: string;
+  description: string;
+}
+
+// Available skills interface
+export interface AvailableSkill {
+  id: number;
+  name: string;
+  category: string;
+}
+
+// Soft skills catalog interface
+export interface SoftSkillCatalog {
+  id: number;
+  name: string;
+  description: string;
+}
+
+// Constants for status options
+export const EMPLOYEE_STATUS: Record<string, EmployeeStatus> = {
+  ACTIVE: 'Activo',
+  ON_LEAVE: 'De licencia',
+  MEDICAL_LEAVE: 'Parte médico',
+  INACTIVE: 'Inactivo',
+  SUSPENDED: 'Suspendido'
+} as const;
+
+export const EMPLOYMENT_STATUS: Record<string, EmploymentStatus> = {
+  PERMANENT: 'Planta permanente',
+  CONTRACT: 'Contratado',
+  COMMISSIONED: 'Comisionado',
+  AUDITOR: 'Auditor',
+  TEMPORARY: 'Temporal'
+} as const;
+
+export const EMPLOYEE_ROLES: Record<string, EmployeeRole> = {
+  EMPLOYEE: 'empleado',
+  SUPERVISOR: 'supervisor',
+  MANAGER: 'manager',
+  ADMIN: 'admin',
+  AUDITOR: 'auditor'
+} as const;
+
+// Array types for collections
+export type EmployeesData = Employee[];
+export type DepartmentsData = Department[];
+export type AvailableSkillsData = AvailableSkill[];
+export type SoftSkillsCatalogData = SoftSkillCatalog[];
+
+// Optional: Utility types for partial updates
+export type EmployeeUpdate = Partial<Employee>;
+export type EmployeeBasicInfo = Pick<Employee, 'id' | 'name' | 'email' | 'position' | 'department' | 'status'>;
+export type EmployeeContactInfo = Pick<Employee, 'email' | 'phone' | 'address'>;
+export type EmployeePerformance = Pick<Employee, 'productivityScore' | 'overallProductivity' | 'monthlyHours' | 'tasks'>;
+
+// Form interfaces for creating/editing
+// export interface CreateEmployeeForm extends Omit<Employee, 'id'> {}
+// export interface UpdateEmployeeForm extends Partial<Omit<Employee, 'id'>> {}
+
+// API Response types (if needed for future API integration)
+export interface EmployeeApiResponse {
+  success: boolean;
+  data: Employee;
+  message?: string;
+}
+
+export interface EmployeesListApiResponse {
+  success: boolean;
+  data: Employee[];
+  total: number;
+  page: number;
+  limit: number;
+  message?: string;
+}
