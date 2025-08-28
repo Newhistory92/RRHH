@@ -6,7 +6,7 @@ import { EMPLOYEES_DATA } from '@/app/api/prueba2';
 import { MessagesView } from "@/app/Componentes/TablaOperador/MensajeDetail";
 import { EmployeeTableView } from "@/app/Componentes/TablaOperador/Table";
 import { LicenseDetailModal, PermissionModal } from "@/app/Componentes/ModalRRHH/LicenseModal";
-import {  Employee, EmployeeStatus, Message,Permit} from '@/app/Interfas/Interfaces';
+import {  Employee, EmployeeStatus, Licenses, Message,Permit} from '@/app/Interfas/Interfaces';
 
 export interface ArchivedMessage extends Message {
   employeeId: number;
@@ -21,7 +21,7 @@ export default function RecursosHumanosPage() {
   const [archivedMessages, setArchivedMessages] = useState<ArchivedMessage[]>([]);
   const [currentView, setCurrentView] = useState<ViewState>({ name: 'table' });
   const [permissionModalEmployeeId, setPermissionModalEmployeeId] = useState<number | null>(null);
-  const [selectedLicense, setSelectedLicense] = useState(null);
+  const [selectedLicense, setSelectedLicense] = useState<Licenses | null>(null);
 
   const handleApplyLicense = (employeeId: number, 
   message:  Message) => {
