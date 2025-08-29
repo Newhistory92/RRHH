@@ -66,8 +66,6 @@ export const EMPLOYEES_DATA = [
           status: 'Aprobada' as LicenseStatus,
           duration: 10,
           originalMessage: 'Se aprueba la licencia por vacaciones solicitada para julio.',
-          requestedDays: 10,
-          requestedDates: 'del 2024-07-10 al 2024-07-20'
         }
       ]
     },
@@ -252,8 +250,7 @@ export const EMPLOYEES_DATA = [
           status: 'Aprobada' as LicenseStatus,
           duration: 11,
           originalMessage: 'Licencia médica extendida.',
-          requestedDays: 11,
-          requestedDates: 'del 2024-06-20 al 2024-06-30'
+
         }
       ]
     },

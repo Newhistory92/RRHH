@@ -127,10 +127,6 @@ export interface SortConfig {
 export type SortableKey = keyof Employee | 'productivityScore' | 'completedTasks' | 'efficiency';
 export type SortDirection = 'ascending' | 'descending';
 
-export interface SortConfig {
-    key: SortableKey;
-    direction: SortDirection;
-}
 
 export interface ProductivityRankingProps {
   employees: Employee[];
@@ -188,8 +184,6 @@ export interface LicenseHistory {
   status: LicenseStatus;
   duration: number;
   originalMessage: string;
-  requestedDays: number;
-  requestedDates: string;
 }
 
 // Licenses tracking

@@ -1,7 +1,8 @@
 import {InfoCard, HoursDisplay} from "@/app/util/UiRRHH"
-import { User, Briefcase, Clock, Building,  Calendar, CheckCircle, Phone, Home } from 'lucide-react';
+import { User, Briefcase, Clock, Building,  Calendar, CheckCircle, Phone, Home,Cake,AtSign,Handshake,CopyCheck,ChartColumnStacked } from 'lucide-react';
 import {  Employee, Licenses,LicenseHistory, Permit} from '@/app/Interfas/Interfaces';
-
+import { Pagination} from '@/app/Componentes/Pagination/pagination';
+import { useState } from "react";
 interface LicenseHistoryTabProps {
   licenses: Licenses;
   onRowClick: (license: LicenseHistory) => void;
@@ -22,10 +23,10 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => (
           <InfoCard icon={Home} title="Domicilio">
             {employee.address}
           </InfoCard>
-          <InfoCard icon={Home} title="Fecha de Nacimiento">
+          <InfoCard icon={Cake} title="Fecha de Nacimiento">
             {employee.birthDate}
           </InfoCard>
-          <InfoCard icon={Home} title="Email">
+          <InfoCard icon={AtSign} title="Email">
             {employee.email}
           </InfoCard>
         </div>
@@ -35,7 +36,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => (
           Condición Laboral
         </h3>
         <div className="space-y-4">
-          <InfoCard icon={Briefcase} title="Tipo de Contrato">
+          <InfoCard icon={Handshake} title="Tipo de Contrato">
             {employee.employmentStatus}
           </InfoCard>
           <InfoCard icon={Calendar} title="Fecha de Ingreso">
@@ -49,7 +50,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => (
           <InfoCard icon={User} title="Categoría">
             {employee.category}
           </InfoCard>
-          <InfoCard icon={User} title="Ultima Recategorización">
+          <InfoCard icon={CopyCheck} title="Ultima Recategorización">
             {employee.lastCategoryUpdate}
           </InfoCard>
         </div>
@@ -70,7 +71,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => (
           <InfoCard icon={Clock} title="Horario Laboral">
             {employee.schedule.startTime} - {employee.schedule.endTime}
           </InfoCard>
-          <InfoCard icon={Briefcase} title="Productividad">
+          <InfoCard icon={ChartColumnStacked} title="Productividad">
             {employee.productivityScore} Promedio
           </InfoCard>
         </div>
@@ -79,98 +80,124 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => (
   </div>
 );
 
-export const LicenseHistoryTab = ({ licenses, onRowClick }: LicenseHistoryTabProps) => (
-  <div className="mt-4 flow-root">
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <table className="min-w-full divide-y divide-gray-300">
-            <thead>
-              <tr>
-                <th
-                  scope="col"
-                  className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
-                >
-                  Tipo
-                </th>
-                <th
-                  scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                >
-                  Inicio
-                </th>
-                <th
-                  scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                >
-                  Fin
-                </th>
-                <th
-                  scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                >
-                  Duración
-                </th>
-                <th
-                  scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                >
-                  Estado
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-           {licenses.history.map((lic: LicenseHistory) => (
-                <tr
-                  key={lic.id}
-                  onClick={() => onRowClick(lic)}
-                  className="cursor-pointer hover:bg-gray-50"
-                >
-                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                    Tipo
-                    {lic.type}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    Desde
-                    {lic.startDate}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    Hasta
-                    {lic.endDate}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {lic.duration} días
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        lic.status === "Aprobada"
-                          ? "bg-green-100 text-green-800"
-                          : lic.status === "Rechazada"
-                          ? "bg-red-100 text-red-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {lic.status}
-                    </span>
-                  </td>
-                </tr>
-                ))}
-              ) : (
+
+export const LicenseHistoryTab = ({ licenses, onRowClick }: LicenseHistoryTabProps) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll suave hacia arriba al cambiar de página
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Cálculos de paginación
+  const totalItems = licenses.history.length;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = licenses.history.slice(startIndex, endIndex);
+
+  return (
+    <div className="mt-4 flow-root">
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <table className="min-w-full divide-y divide-gray-300">
+              <thead>
                 <tr>
-                  <td colSpan={5} className="text-center py-8 text-gray-500">
-                    No hay historial de licencias.
-                  </td>
+                  <th
+                    scope="col"
+                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+                  >
+                    Tipo
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Inicio
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Fin
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Duración
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Estado
+                  </th>
                 </tr>
-              )
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {currentItems.map((lic: LicenseHistory) => (
+                  <tr
+                    key={lic.id}
+                    onClick={() => onRowClick(lic)}
+                    className="cursor-pointer hover:bg-gray-50"
+                  >
+                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                      {lic.type}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {lic.startDate}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {lic.endDate}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {lic.duration} días
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      <span
+                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          lic.status === "Aprobada"
+                            ? "bg-green-100 text-green-800"
+                            : lic.status === "Rechazada"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {lic.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {totalItems === 0 && (
+                  <tr>
+                    <td colSpan={5} className="text-center py-8 text-gray-500">
+                      No hay historial de licencias.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+            
+            {/* Mostrar información de paginación y el componente solo si hay datos */}
+            {totalItems > 0 && (
+              <div className="mt-6 flex flex-col sm:flex-row justify-between items-center">
+                <Pagination
+                  totalItems={totalItems}
+                  itemsPerPage={itemsPerPage}
+                  currentPage={currentPage}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
-
+  );
+};
 
 export const PermissionHistoryTab = ({ permisos }: { permisos: Permit[] }) => (
   <div className="mt-4 flow-root">

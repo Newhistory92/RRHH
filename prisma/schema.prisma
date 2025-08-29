@@ -231,7 +231,6 @@ model License {
   description  String?
   duracion     Int?
   mensajeOriginal  String   @db.Text
-  fechasSolicitadas String   @db.Text
   // Relación directa: mantenemos Cascade (tiene sentido si borrás un empleado y sus licencias también deben borrarse)
   employee     Employee  @relation(fields: [employeeId], references: [id], onDelete:  NoAction, onUpdate: NoAction)
   employeeId   Int

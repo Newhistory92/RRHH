@@ -68,6 +68,7 @@ export const EmployeeDetailView = ({
           </div>
         )}
         <div>
+          <p className="text-gray-800 text-2xl"> {employee.name}</p>
           <p className="text-gray-500 text-lg"> DNI: {employee.dni}</p>
           <div className="mt-2">
             <StatusBadge status={employee.status} />
