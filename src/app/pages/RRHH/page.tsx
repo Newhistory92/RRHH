@@ -1,30 +1,44 @@
-"use client"
+"use client";
 
 import { useMemo, useState } from "react";
-import {EmployeeDetailView} from "@/app/Componentes/TablaOperador/Perfildetail"
-import { EMPLOYEES_DATA } from '@/app/api/prueba2';
+import { EmployeeDetailView } from "@/app/Componentes/TablaOperador/Perfildetail";
+import { EMPLOYEES_DATA } from "@/app/api/prueba2";
 import { MessagesView } from "@/app/Componentes/TablaOperador/MensajeDetail";
 import { EmployeeTableView } from "@/app/Componentes/TablaOperador/Table";
-import { LicenseDetailModal, PermissionModal } from "@/app/Componentes/ModalRRHH/LicenseModal";
-import {  Employee, EmployeeStatus, LicenseHistory, Licenses, Message,Permit} from '@/app/Interfas/Interfaces';
+import {
+  LicenseDetailModal,
+  PermissionModal,
+} from "@/app/Componentes/ModalRRHH/LicenseModal";
+import {
+  Employee,
+  EmployeeStatus,
+  LicenseHistory,
+  Message,
+  Permit,
+} from "@/app/Interfas/Interfaces";
 
 export interface ArchivedMessage extends Message {
   employeeId: number;
   processedDate: string;
 }
 export interface ViewState {
-  name: 'table' | 'detail' | 'messages';
+  name: "table" | "detail" | "messages";
   id?: number;
 }
 export default function RecursosHumanosPage() {
   const [employees, setEmployees] = useState<Employee[]>(EMPLOYEES_DATA);
-  const [archivedMessages, setArchivedMessages] = useState<ArchivedMessage[]>([]);
-  const [currentView, setCurrentView] = useState<ViewState>({ name: 'table' });
-  const [permissionModalEmployeeId, setPermissionModalEmployeeId] = useState<number | null>(null);
-  const [selectedLicense, setSelectedLicense] = useState<LicenseHistory | Licenses | null>(null); 
+  const [archivedMessages, setArchivedMessages] = useState<ArchivedMessage[]>(
+    []
+  );
+  const [currentView, setCurrentView] = useState<ViewState>({ name: "table" });
+  const [permissionModalEmployeeId, setPermissionModalEmployeeId] = useState<
+    number | null
+  >(null);
+  const [selectedLicense, setSelectedLicense] = useState<LicenseHistory | null>(
+    null
+  );
 
-  const handleApplyLicense = (employeeId: number, 
-  message:  Message) => {
+  const handleApplyLicense = (employeeId: number, message: Message) => {
     setEmployees((prev) =>
       prev.map((emp) => {
         if (emp.id === employeeId) {
@@ -41,7 +55,7 @@ export default function RecursosHumanosPage() {
           };
           return {
             ...emp,
-              status: "De licencia" as EmployeeStatus,
+            status: "De licencia" as EmployeeStatus,
             licencias: [...emp.licenses.history, newLicense],
             mensajes: emp.messages.filter((m) => m.id !== message.id),
           };
@@ -49,7 +63,7 @@ export default function RecursosHumanosPage() {
         return emp;
       })
     );
-   setArchivedMessages((prev: ArchivedMessage[]) => [
+    setArchivedMessages((prev: ArchivedMessage[]) => [
       ...prev,
       {
         ...message,
@@ -60,22 +74,40 @@ export default function RecursosHumanosPage() {
     alert("Licencia aplicada correctamente.");
   };
 
-  const handleApplyPermission = (employeeId: number, { departureTime: salida, returnTime: retorno }: Permit) => {
-    setEmployees(prev => prev.map(emp => {
-      if (emp.id === employeeId) {
-        const exitTime = new Date(`1970-01-01T${salida}:00`);
-        const returnTime = new Date(`1970-01-01T${retorno}:00`);
-         const diffMillis = returnTime.getTime() - exitTime.getTime();
-        const diffHours = diffMillis / (1000 * 60 * 60);
-        const newPermission = { id: `P${Date.now()}`, fecha: new Date().toLocaleDateString('es-AR'), horaSalida: salida, horaRetorno: retorno, horas: -diffHours };
-        return { ...emp, horas: emp.hours - diffHours, permisos: [...emp.permits, newPermission] };
-      }
-      return emp;
-    }));
-    alert('Permiso guardado correctamente.');
+  const handleApplyPermission = (
+    employeeId: number,
+    { departureTime: salida, returnTime: retorno }: Permit
+  ) => {
+    setEmployees((prev) =>
+      prev.map((emp) => {
+        if (emp.id === employeeId) {
+          const exitTime = new Date(`1970-01-01T${salida}:00`);
+          const returnTime = new Date(`1970-01-01T${retorno}:00`);
+          const diffMillis = returnTime.getTime() - exitTime.getTime();
+          const diffHours = diffMillis / (1000 * 60 * 60);
+          const newPermission = {
+            id: `P${Date.now()}`,
+            fecha: new Date().toLocaleDateString("es-AR"),
+            horaSalida: salida,
+            horaRetorno: retorno,
+            horas: -diffHours,
+          };
+          return {
+            ...emp,
+            horas: emp.hours - diffHours,
+            permisos: [...emp.permits, newPermission],
+          };
+        }
+        return emp;
+      })
+    );
+    alert("Permiso guardado correctamente.");
   };
 
-  const permissionModalEmployee = useMemo(() => employees.find(e => e.id === permissionModalEmployeeId), [employees, permissionModalEmployeeId]);
+  const permissionModalEmployee = useMemo(() => 
+    employees.find(e => e.id === permissionModalEmployeeId) || null, 
+    [employees, permissionModalEmployeeId]
+  );
 
   const renderContent = () => {
     switch (currentView.name) {
@@ -102,7 +134,9 @@ export default function RecursosHumanosPage() {
         return (
           <EmployeeTableView
             employees={employees}
-            onSelectEmployee={(id: number) => setCurrentView({ name: "detail", id })}
+            onSelectEmployee={(id: number) =>
+              setCurrentView({ name: "detail", id })
+            }
             onShowMessages={() => setCurrentView({ name: "messages" })}
             onOpenPermissionModal={setPermissionModalEmployeeId}
           />
@@ -123,8 +157,15 @@ export default function RecursosHumanosPage() {
       <div className="bg-white min-h-screen font-sans shadow-2xl">
         <main>
           {renderContent()}
-          <PermissionModal employee={permissionModalEmployee} onClose={() => setPermissionModalEmployeeId(null)} onSave={handleApplyPermission} />
-          <LicenseDetailModal license={selectedLicense} onClose={() => setSelectedLicense(null)} />
+          <PermissionModal
+            employee={permissionModalEmployee}
+            onClose={() => setPermissionModalEmployeeId(null)}
+            onSave={handleApplyPermission}
+          />
+          <LicenseDetailModal
+            license={selectedLicense}
+            onClose={() => setSelectedLicense(null)}
+          />
         </main>
       </div>
     </>

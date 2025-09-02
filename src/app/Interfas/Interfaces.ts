@@ -218,7 +218,7 @@ export interface Complaint {
 
 // Messages
 export interface Message {
-  id: string;
+  id: number;
   text: string;
   days: number;
   startDate: string;

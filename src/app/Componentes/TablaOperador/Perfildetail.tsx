@@ -3,13 +3,13 @@ import { ArrowLeft } from "lucide-react";
 import {ProfileTab,LicenseHistoryTab,PermissionHistoryTab} from "./DetailTables"
 import {StatusBadge} from "@/app/util/UiRRHH"
 import { useState } from "react";
-import {  Employee, LicenseHistory, Licenses} from '@/app/Interfas/Interfaces';
+import {  Employee, LicenseHistory} from '@/app/Interfas/Interfaces';
 import Image from "next/image";
 
 export interface EmployeeDetailViewProps {
   employee: Employee | null | undefined;
   onBack: () => void;
- onLicenseClick: (license: LicenseHistory | Licenses | null) => void;
+ onLicenseClick: (license: LicenseHistory | null) => void;
 }
 export const EmployeeDetailView = ({
   employee,

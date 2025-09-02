@@ -1,4 +1,10 @@
+import { ReactNode } from 'react';
 
+interface InfoCardProps {
+  icon: React.ComponentType<{ className?: string; size?: number }>;
+  title: string;
+  children: ReactNode;
+}
 
 export const StatusBadge = ({ status }) => {
   const baseClasses = "px-3 py-1 text-xs font-medium rounded-full inline-block";
@@ -16,7 +22,7 @@ export const HoursDisplay = ({ hours }) => {
   return <span className={`font-semibold ${classes}`}>{sign}{hours.toFixed(2)}hs</span>;
 };
 
-export const InfoCard = ({ icon: Icon, title, children }) => (
+export const InfoCard = ({ icon: Icon, title, children }: InfoCardProps) => (
     <div className="bg-gray-50 rounded-lg p-4 flex items-start space-x-4 h-full">
         <Icon className="text-gray-400 mt-1 flex-shrink-0" size={20}/>
         <div>
