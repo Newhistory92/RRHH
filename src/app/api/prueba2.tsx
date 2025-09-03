@@ -1,3 +1,4 @@
+
 import { ComplaintStatus, EmployeeRole, EmployeeStatus, EmploymentStatus, LicenseStatus } from "../Interfas/Interfaces";
 
 // Unified Employee Data Structure
@@ -17,11 +18,11 @@ export const EMPLOYEES_DATA = [
     position: 'Especialista en Atención al Cliente',
     department: 'Atención al Cliente',
     departmentId: 2,
-    office: 'Atención Telefónica',
+    office: [],
     officeId: 201,
     category: '24',
-    status: 'Activo',
-    employmentStatus: 'Planta permanente',
+    status: 'Activo' as EmployeeStatus,
+    employmentStatus: 'Planta permanente' as EmploymentStatus,
     activityType: 'Atención al público',
     startDate: '2020-03-15',
     permanentDate: '2021-03-15',
@@ -30,7 +31,7 @@ export const EMPLOYEES_DATA = [
     // Jerarquía organizacional
     managerId: 3, // Reporta a María Rodríguez
     supervisor: 'María Rodríguez',
-    role: 'supervisor', // Lidera su oficina
+    role: 'supervisor' as EmployeeRole, // Lidera su oficina
     subordinates: [5], // Supervisa a Laura Fernández
     // Schedule
     schedule: {
@@ -133,7 +134,17 @@ export const EMPLOYEES_DATA = [
     position: 'Desarrollador de Sistemas',
     department: 'Sistemas',
     departmentId: 2,
-    office: 'Anexo Norte',
+    office: [
+      {
+        id: 401,
+        nombre: 'Desarrollo de Aplicaciones',
+        descripcion: 'Desarrollo de nuevas funcionalidades y mantenimiento de sistemas.',
+        jefeId: 2,
+        empleadosIds: [2],
+        departmentId: 4
+      }
+    ],
+    officeId: 401,
     category: '17',
     status: 'Activo' as EmployeeStatus,
     employmentStatus: 'Contratado' as EmploymentStatus,
@@ -208,7 +219,17 @@ export const EMPLOYEES_DATA = [
     position: 'Especialista en Recursos Humanos',
     department: 'Recursos Humanos',
     departmentId: 3,
-    office: 'Sede Central',
+    office: [
+      {
+        id: 301,
+        nombre: 'Administración de Personal',
+        descripcion: 'Gestión de nóminas, licencias y administración del personal.',
+        jefeId: 3,
+        empleadosIds: [3],
+        departmentId: 3
+      }
+    ],
+    officeId: 301,
     category: '12',
     status: 'De licencia' as EmployeeStatus,
     employmentStatus: 'Planta permanente' as EmploymentStatus,
@@ -301,7 +322,17 @@ export const EMPLOYEES_DATA = [
     position: 'Auditor Legal',
     department: 'Legales',
     departmentId: 4,
-    office: 'Sede Central',
+    office: [
+      {
+        id: 501,
+        nombre: 'Auditoría Legal',
+        descripcion: 'Revisión de expedientes y auditorías internas de cumplimiento.',
+        jefeId: 4,
+        empleadosIds: [4],
+        departmentId: 5
+      }
+    ],
+     officeId: 501,
     category: '24',
     status: 'Parte médico' as EmployeeStatus,
     employmentStatus: 'Auditor' as EmploymentStatus,
@@ -388,7 +419,17 @@ export const EMPLOYEES_DATA = [
     position: 'Especialista Senior en Atención al Cliente',
     department: 'Atención al Cliente',
     departmentId: 1,
-    office: 'Anexo Sur',
+    office: [
+      {
+        id: 202,
+        nombre: 'Gestión de Reclamos',
+        descripcion: 'Resolución especializada de quejas y reclamos complejos.',
+        jefeId: 5,
+        empleadosIds: [5],
+        departmentId: 2
+      }
+    ],
+    officeId: 202,
     category: '20',
     status: 'Activo' as EmployeeStatus,
     employmentStatus: 'Comisionado' as EmploymentStatus,
@@ -452,52 +493,6 @@ export const EMPLOYEES_DATA = [
   }
 ];
 
-
-
-export const EMPLOYEE_DEPARTMENT_MAPPING = {
-  1: { // Ana García
-    departmentId: 2,
-    departmentName: 'Atención al Cliente',
-    officeId: 201,
-    officeName: 'Atención Telefónica',
-    isManager: true,
-    reportsTo: 3 // María Rodríguez (supervisora general)
-  },
-  2: { // Juan Pérez
-    departmentId: 4,
-    departmentName: 'Sistemas',
-    officeId: 401,
-    officeName: 'Desarrollo de Aplicaciones',
-    isManager: true,
-    reportsTo: null // Reporta directamente a dirección
-  },
-  3: { // María Rodríguez
-    departmentId: 3,
-    departmentName: 'Recursos Humanos',
-    officeId: 301,
-    officeName: 'Administración de Personal',
-    isManager: true,
-    reportsTo: null // Reporta directamente a dirección
-  },
-  4: { // Carlos Sánchez
-    departmentId: 5,
-    departmentName: 'Legales',
-    officeId: 501,
-    officeName: 'Auditoría Legal',
-    isManager: true,
-    reportsTo: null // Reporta directamente a dirección
-  },
-  5: { // Laura Fernández
-    departmentId: 2,
-    departmentName: 'Atención al Cliente',
-    officeId: 202,
-    officeName: 'Gestión de Reclamos',
-    isManager: false,
-    reportsTo: 1 // Ana García
-  }
-};
-
-
 // Additional reference data for consistency
 export const DEPARTMENTS = [
   { 
@@ -542,55 +537,6 @@ export const DEPARTMENTS = [
   }
 ];
 
-export const AVAILABLE_SKILLS = [
-  { id: 1, name: 'React.js', category: 'Frontend' },
-  { id: 2, name: 'Node.js', category: 'Backend' },
-  { id: 3, name: 'Python', category: 'Programming' },
-  { id: 4, name: 'Análisis de Datos con Pandas', category: 'Data Science' },
-  { id: 5, name: 'Gestión de Proyectos (Agile)', category: 'Management' },
-  { id: 6, name: 'SQL', category: 'Database' },
-  { id: 7, name: 'DevOps con Docker', category: 'Infrastructure' },
-  { id: 8, name: 'UI/UX Design Fundamentals', category: 'Design' },
-  { id: 9, name: 'Sistemas CRM', category: 'Business Tools' },
-  { id: 10, name: 'Derecho Laboral', category: 'Legal' },
-  { id: 11, name: 'Auditoría', category: 'Finance' }
-];
-
-export const SOFT_SKILLS_CATALOG = [
-  { id: 1, name: 'Comunicación', description: 'Habilidad para transmitir ideas de forma clara y concisa' },
-  { id: 2, name: 'Trabajo en equipo', description: 'Capacidad para colaborar efectivamente con otros' },
-  { id: 3, name: 'Resolución de conflictos', description: 'Aptitud para mediar y resolver disputas' },
-  { id: 4, name: 'Adaptabilidad', description: 'Flexibilidad ante cambios y nuevas situaciones' },
-  { id: 5, name: 'Liderazgo', description: 'Capacidad para guiar y motivar equipos' },
-  { id: 6, name: 'Empatía', description: 'Habilidad para comprender y conectar con otros' },
-  { id: 7, name: 'Pensamiento Crítico', description: 'Análisis objetivo de información para tomar decisiones' },
-  { id: 8, name: 'Resolución de Problemas', description: 'Identificación y solución creativa de problemas' }
-];
-
-// Status options for consistency
-export const EMPLOYEE_STATUS = {
-  ACTIVE: 'Activo',
-  ON_LEAVE: 'De licencia',
-  MEDICAL_LEAVE: 'Parte médico',
-  INACTIVE: 'Inactivo',
-  SUSPENDED: 'Suspendido'
-};
-
-export const EMPLOYMENT_STATUS = {
-  PERMANENT: 'Planta permanente',
-  CONTRACT: 'Contratado',
-  COMMISSIONED: 'Comisionado',
-  AUDITOR: 'Auditor',
-  TEMPORARY: 'Temporal'
-};
-
-export const EMPLOYEE_ROLES = {
-  EMPLOYEE: 'empleado',
-  SUPERVISOR: 'supervisor',
-  MANAGER: 'manager',
-  ADMIN: 'admin',
-  AUDITOR: 'auditor'
-};
 
 export const INTEGRATED_ORG_DATA = [
   {
@@ -600,7 +546,15 @@ export const INTEGRATED_ORG_DATA = [
     descripcion: 'Máxima autoridad de la organización. Define la estrategia y supervisa todas las operaciones.',
     jefeId: null, // CEO - sin jefe directo
     parentId: null,
-    habilidades_requeridas: ['Liderazgo Estratégico', 'Visión Empresarial'],
+    habilidades_requeridas: [{
+      id: 1,
+      nombre: 'Liderazgo Estratégico',
+      nivel: 'intermedio'
+    }, {
+      id: 2,
+      nombre: 'Visión Empresarial',
+      nivel: 'intermedio'
+    }],
     oficinas: [
       {
         id: 101,
@@ -608,8 +562,17 @@ export const INTEGRATED_ORG_DATA = [
         descripcion: 'Oficina principal de dirección y toma de decisiones estratégicas.',
         ubicacion: 'Sede Central - Piso 10',
         jefeId: null, // CEO
-        empleadosIds: [], // El CEO no está en nuestros datos de empleados actuales
-        habilidades_requeridas: ['Liderazgo Estratégico', 'Toma de Decisiones']
+        empleadosIds: [1], // El CEO no está en nuestros datos de empleados actuales
+        departmentId: 1,
+        habilidades_requeridas: [{
+          id: 1,
+          nombre: 'Liderazgo Estratégico',
+          nivel: 'intermedio'
+        }, {
+          id: 2,
+          nombre: 'Toma de Decisiones',
+          nivel: 'intermedio'
+        }]
       }
     ]
   },
@@ -620,7 +583,19 @@ export const INTEGRATED_ORG_DATA = [
     descripcion: 'Gestión de relaciones con clientes, soporte y resolución de consultas.',
     jefeId: 3, // María Rodríguez como supervisora general
     parentId: 1,
-    habilidades_requeridas: ['Comunicación', 'Empatía', 'Resolución de conflictos'],
+    habilidades_requeridas: [{
+      id: 1,
+      nombre: 'Comunicación',
+      nivel: 'intermedio'
+    }, {
+      id: 2,
+      nombre: 'Empatía',
+      nivel: 'intermedio'
+    }, {
+      id: 3,
+      nombre: 'Resolución de conflictos',
+      nivel: 'intermedio'
+    }],
     oficinas: [
       {
         id: 201,
@@ -629,7 +604,20 @@ export const INTEGRATED_ORG_DATA = [
         ubicacion: 'Sede Central - Piso 2',
         jefeId: 1, // Ana García
         empleadosIds: [1, 5], // Ana García y Laura Fernández
-        habilidades_requeridas: ['Comunicación telefónica', 'Sistemas CRM', 'Gestión de tickets']
+        departmentId: 2,
+        habilidades_requeridas: [{
+          id: 1,
+          nombre: 'Comunicación telefónica',
+          nivel: 'intermedio'
+        }, {
+          id: 2,
+          nombre: 'Sistemas CRM',
+          nivel: 'intermedio'
+        }, {
+          id: 3,
+          nombre: 'Gestión de tickets',
+          nivel: 'básico'
+        }]
       },
       {
         id: 202,
@@ -638,7 +626,16 @@ export const INTEGRATED_ORG_DATA = [
         ubicacion: 'Anexo Sur - Piso 1',
         jefeId: 5, // Laura Fernández (especialista senior)
         empleadosIds: [5], // Laura Fernández
-        habilidades_requeridas: ['Resolución de conflictos', 'Análisis de satisfacción']
+        departmentId: 2,
+        habilidades_requeridas: [{
+          id: 1,
+          nombre: 'Resolución de conflictos',
+          nivel: 'intermedio'
+        }, {
+          id: 2,
+          nombre: 'Análisis de satisfacción',
+          nivel: 'básico'
+        }]
       }
     ]
   },
@@ -649,7 +646,15 @@ export const INTEGRATED_ORG_DATA = [
     descripcion: 'Gestión del capital humano, incluyendo contratación, nóminas y clima laboral.',
     jefeId: null, // Reporta directamente a dirección
     parentId: 1,
-    habilidades_requeridas: ['Legislación Laboral', 'Gestión de Personal'],
+    habilidades_requeridas: [{
+      id: 1,
+      nombre: 'Legislación Laboral',
+      nivel: 'básico'
+    }, {
+      id: 2,
+      nombre: 'Gestión de Personal',
+      nivel: 'intermedio'
+    }],
     oficinas: [
       {
         id: 301,
@@ -658,7 +663,16 @@ export const INTEGRATED_ORG_DATA = [
         ubicacion: 'Sede Central - Piso 3',
         jefeId: 3, // María Rodríguez
         empleadosIds: [3], // María Rodríguez
-        habilidades_requeridas: ['Sistemas RRHH', 'Gestión de nóminas']
+        departmentId: 3,
+        habilidades_requeridas: [{
+          id: 1,
+          nombre: 'Sistemas RRHH',
+          nivel: 'intermedio'
+        }, {
+          id: 2,
+          nombre: 'Gestión de nóminas',
+          nivel: 'básico'
+        }]
       },
       {
         id: 302,
@@ -667,7 +681,16 @@ export const INTEGRATED_ORG_DATA = [
         ubicacion: 'Sede Central - Piso 3',
         jefeId: 3, // María Rodríguez
         empleadosIds: [3], // María Rodríguez (maneja ambas funciones)
-        habilidades_requeridas: ['Procesos de selección', 'Capacitaciones']
+        departmentId: 3,
+        habilidades_requeridas: [{
+          id: 1,
+          nombre: 'Procesos de selección',
+          nivel: 'intermedio'
+        }, {
+          id: 2,
+          nombre: 'Capacitaciones',
+          nivel: 'básico'
+        }]
       }
     ]
   },
@@ -678,7 +701,15 @@ export const INTEGRATED_ORG_DATA = [
     descripcion: 'Desarrollo y mantenimiento tecnológico, infraestructura y soporte técnico.',
     jefeId: null, // Reporta directamente a dirección
     parentId: 1,
-    habilidades_requeridas: ['Desarrollo de Software', 'Infraestructura TI'],
+    habilidades_requeridas: [{
+      id: 1,
+      nombre: 'Desarrollo de Software',
+      nivel: 'intermedio'
+    }, {
+      id: 2,
+      nombre: 'Infraestructura TI',
+      nivel: 'básico'
+    }],
     oficinas: [
       {
         id: 401,
@@ -687,7 +718,20 @@ export const INTEGRATED_ORG_DATA = [
         ubicacion: 'Anexo Norte - Piso 2',
         jefeId: 2, // Juan Pérez (como desarrollador principal)
         empleadosIds: [2], // Juan Pérez
-        habilidades_requeridas: ['React.js', 'Node.js', 'SQL']
+        departmentId: 4,
+        habilidades_requeridas: [{
+          id: 1,
+          nombre: 'React.js',
+          nivel: 'intermedio'
+        }, {
+          id: 2,
+          nombre: 'Node.js',
+          nivel: 'intermedio'
+        }, {
+          id: 3,
+          nombre: 'SQL',
+          nivel: 'básico'
+        }]
       },
       {
         id: 402,
@@ -696,7 +740,16 @@ export const INTEGRATED_ORG_DATA = [
         ubicacion: 'Anexo Norte - Piso 1',
         jefeId: 2, // Juan Pérez
         empleadosIds: [2], // Juan Pérez (cubre ambas áreas)
-        habilidades_requeridas: ['DevOps con Docker', 'Soporte técnico interno']
+        departmentId: 4,
+        habilidades_requeridas: [{
+          id: 1,
+          nombre: 'DevOps con Docker',
+          nivel: 'intermedio'
+        }, {
+          id: 2,
+          nombre: 'Soporte técnico interno',
+          nivel: 'básico'
+        }]
       }
     ]
   },
@@ -707,7 +760,15 @@ export const INTEGRATED_ORG_DATA = [
     descripcion: 'Asesoría legal, auditoría y cumplimiento normativo.',
     jefeId: null, // Reporta directamente a dirección
     parentId: 1,
-    habilidades_requeridas: ['Derecho Laboral', 'Auditoría Legal'],
+    habilidades_requeridas: [{
+      id: 1,
+      nombre: 'Derecho Laboral',
+      nivel: 'básico'
+    }, {
+      id: 2,
+      nombre: 'Auditoría Legal',
+      nivel: 'avanzado'
+    }],
     oficinas: [
       {
         id: 501,
@@ -716,7 +777,20 @@ export const INTEGRATED_ORG_DATA = [
         ubicacion: 'Sede Central - Piso 4',
         jefeId: 4, // Carlos Sánchez
         empleadosIds: [4], // Carlos Sánchez
-        habilidades_requeridas: ['Auditoría', 'Análisis Legal', 'Derecho Laboral']
+        departmentId: 5,
+        habilidades_requeridas: [{
+          id: 1,
+          nombre: 'Auditoría',
+          nivel: 'avanzado'
+        }, {
+          id: 2,
+          nombre: 'Análisis Legal',
+          nivel: 'intermedio'
+        }, {
+          id: 3,
+          nombre: 'Derecho Laboral',
+          nivel: 'básico'
+        }]
       },
       {
         id: 502,
@@ -725,7 +799,11 @@ export const INTEGRATED_ORG_DATA = [
         ubicacion: 'Sede Central - Piso 4',
         jefeId: 4, // Carlos Sánchez
         empleadosIds: [4], // Carlos Sánchez
-        habilidades_requeridas: ['Dictámenes legales', 'Derecho Laboral']
+        departmentId: 5,
+        habilidades_requeridas: [
+          { id: 1, nombre: 'Dictámenes legales', nivel: 'avanzado' },
+          { id: 2, nombre: 'Derecho Laboral', nivel: 'intermedio' }
+        ]
       }
     ]
   }
@@ -805,3 +883,53 @@ export const OFFICES = [
   { id: 501, name: 'Auditoría Legal', departmentId: 5, location: 'Sede Central - Piso 4' },
   { id: 502, name: 'Asesoría Jurídica', departmentId: 5, location: 'Sede Central - Piso 4' }
 ];
+
+export const AVAILABLE_SKILLS = [
+  { id: 1, name: 'React.js', category: 'Frontend' },
+  { id: 2, name: 'Node.js', category: 'Backend' },
+  { id: 3, name: 'Python', category: 'Programming' },
+  { id: 4, name: 'Análisis de Datos con Pandas', category: 'Data Science' },
+  { id: 5, name: 'Gestión de Proyectos (Agile)', category: 'Management' },
+  { id: 6, name: 'SQL', category: 'Database' },
+  { id: 7, name: 'DevOps con Docker', category: 'Infrastructure' },
+  { id: 8, name: 'UI/UX Design Fundamentals', category: 'Design' },
+  { id: 9, name: 'Sistemas CRM', category: 'Business Tools' },
+  { id: 10, name: 'Derecho Laboral', category: 'Legal' },
+  { id: 11, name: 'Auditoría', category: 'Finance' }
+];
+
+export const SOFT_SKILLS_CATALOG = [
+  { id: 1, name: 'Comunicación', description: 'Habilidad para transmitir ideas de forma clara y concisa' },
+  { id: 2, name: 'Trabajo en equipo', description: 'Capacidad para colaborar efectivamente con otros' },
+  { id: 3, name: 'Resolución de conflictos', description: 'Aptitud para mediar y resolver disputas' },
+  { id: 4, name: 'Adaptabilidad', description: 'Flexibilidad ante cambios y nuevas situaciones' },
+  { id: 5, name: 'Liderazgo', description: 'Capacidad para guiar y motivar equipos' },
+  { id: 6, name: 'Empatía', description: 'Habilidad para comprender y conectar con otros' },
+  { id: 7, name: 'Pensamiento Crítico', description: 'Análisis objetivo de información para tomar decisiones' },
+  { id: 8, name: 'Resolución de Problemas', description: 'Identificación y solución creativa de problemas' }
+];
+
+// Status options for consistency
+export const EMPLOYEE_STATUS = {
+  ACTIVE: 'Activo',
+  ON_LEAVE: 'De licencia',
+  MEDICAL_LEAVE: 'Parte médico',
+  INACTIVE: 'Inactivo',
+  SUSPENDED: 'Suspendido'
+};
+
+export const EMPLOYMENT_STATUS = {
+  PERMANENT: 'Planta permanente',
+  CONTRACT: 'Contratado',
+  COMMISSIONED: 'Comisionado',
+  AUDITOR: 'Auditor',
+  TEMPORARY: 'Temporal'
+};
+
+export const EMPLOYEE_ROLES = {
+  EMPLOYEE: 'empleado',
+  SUPERVISOR: 'supervisor',
+  MANAGER: 'manager',
+  ADMIN: 'admin',
+  AUDITOR: 'auditor'
+};

@@ -254,7 +254,8 @@ export interface Employee {
   position: string;
   department: string;
   departmentId: number;
-  office: Office[] | null; // Can be null if no office assigned
+  office: Office[] | null;
+  officeId: number | null;
   category: string;
   status: EmployeeStatus;
   employmentStatus: EmploymentStatus;
@@ -294,16 +295,17 @@ export interface Employee {
 // Department interface
 export interface Department {
   id: number;
-  name: string;
-  description: string;
+  nombre: string;
+  descripcion: string;
+  nivel_jerarquico: number;
+  jefeId?: number | null;
+  parentId?: number | null;
+  habilidades_requeridas:TechnicalSkill[];
+  oficinas: Office[];
 }
 
-// Available skills interface
-export interface AvailableSkill {
-  id: number;
-  name: string;
-  category: string;
-}
+
+
 
 // Soft skills catalog interface
 export interface SoftSkillCatalog {
@@ -318,7 +320,10 @@ export interface Office {
   jefeId?: number | null;
   empleadosIds?: number[];
   departmentId: number;
+  habilidades_requeridas: TechnicalSkill[];
 }
+
+
 // Constants for status options
 export const EMPLOYEE_STATUS: Record<string, EmployeeStatus> = {
   ACTIVE: 'Activo',
@@ -347,7 +352,6 @@ export const EMPLOYEE_ROLES: Record<string, EmployeeRole> = {
 // Array types for collections
 export type EmployeesData = Employee[];
 export type DepartmentsData = Department[];
-export type AvailableSkillsData = AvailableSkill[];
 export type SoftSkillsCatalogData = SoftSkillCatalog[];
 
 // Optional: Utility types for partial updates
@@ -379,4 +383,26 @@ export interface EmployeesListApiResponse {
 export interface ProcessedMessage extends Message {
   employeeId: number; // o string, debe coincidir con Employee.id
   employeeName: string;
+}
+
+export interface ModalConfig {
+  type: 'department' | 'office';
+  data?: Department | Office;
+  context?: {
+    departmentId?: number;
+  };
+}
+
+export interface EntityFormData {
+  // Campos comunes
+  nombre: string;
+  descripcion: string;
+  jefeId: number | null;
+  habilidades_requeridas: TechnicalSkill[];
+  // Campos específicos de Department
+  nivel_jerarquico?: number;
+  parentId?: number | null;
+  departmentId?: number | null;
+  // Campos específicos de Office
+  empleadosIds?: number[];
 }
