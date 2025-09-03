@@ -191,9 +191,9 @@ export const PermissionModal = ({ employee, onSave, onClose }: PermissionModalPr
           <button
             type="submit"
             className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+             disabled={isLoading}
           >
             <CheckCircle size={18} className="mr-2" />
-             disabled={isLoading}
             Guardar Permiso
           </button>
         </div>

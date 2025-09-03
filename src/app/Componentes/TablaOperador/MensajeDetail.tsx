@@ -5,13 +5,13 @@ import {ApplyLicenseModal} from "@/app/Componentes/ModalRRHH/LicenseModal"
 import {Employee, ProcessedMessage} from '@/app/Interfas/Interfaces';
 
 interface MessagesViewProps {
-  employee: Employee[];
+  employees: Employee[];
   archivedMessages: ProcessedMessage[]; // o Message[] si no necesitas la info del empleado
   onBack: () => void;
   onApplyLicense: (employeeId: number, message: ProcessedMessage) => void;
 }
 export const MessagesView = ({
-  employee,
+  employees,
   archivedMessages,
   onBack,
   onApplyLicense,
@@ -19,11 +19,11 @@ export const MessagesView = ({
   const [selectedMessageData, setSelectedMessageData] = useState<ProcessedMessage | null>(null);
   const [activeTab, setActiveTab] = useState<"pendientes" | "historial">("pendientes");
 
-const pendingMessages: ProcessedMessage[] = employee.flatMap((employee: Employee) =>
-  employee.messages.map((messages) => ({
+const pendingMessages: ProcessedMessage[] = employees.flatMap((employees: Employee) =>
+  employees.messages.map((messages) => ({
     ...messages,
-    employeeId: employee.id, 
-    employeeName: `${employee.name}`,
+    employeeId: employees.id,
+    employeeName: `${employees.name}`,
   }))
 );
 

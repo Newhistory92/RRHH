@@ -12,24 +12,26 @@ export const EMPLOYEES_DATA = [
     address: 'Av. Siempre Viva 742',
     birthDate: '1990-05-20',
     photo: 'https://placehold.co/150x150/E2E8F0/4A5568?text=AG',
-    hours: 160, // Total available hours for permissions
-    // Employment Details
+    hours: 160, 
+    // Información organizacional actualizada
     position: 'Especialista en Atención al Cliente',
     department: 'Atención al Cliente',
-    departmentId: 1,
-    office: 'Sede Central',
+    departmentId: 2,
+    office: 'Atención Telefónica',
+    officeId: 201,
     category: '24',
-    status: 'Activo' as EmployeeStatus, // Unified status (Activo, De licencia, Parte médico, Inactivo)
-    employmentStatus: 'Planta permanente' as EmploymentStatus, // Contract type
+    status: 'Activo',
+    employmentStatus: 'Planta permanente',
     activityType: 'Atención al público',
     startDate: '2020-03-15',
     permanentDate: '2021-03-15',
     lastCategoryUpdate: '2023-06-01',
-    // Management
-    managerId: 3,
-    supervisor: 'Ana Gómez',
-    role: 'empleado' as EmployeeRole, // empleado, supervisor, manager, admin
-
+    
+    // Jerarquía organizacional
+    managerId: 3, // Reporta a María Rodríguez
+    supervisor: 'María Rodríguez',
+    role: 'supervisor', // Lidera su oficina
+    subordinates: [5], // Supervisa a Laura Fernández
     // Schedule
     schedule: {
       startTime: '09:00',
@@ -94,7 +96,7 @@ export const EMPLOYEES_DATA = [
     ],
     messages: [
       {
-        id: 'M1',
+        id: 1,
         text: 'Solicitud de licencia por vacaciones aprobada.',
         days: 5,
         startDate: '2024-08-01',
@@ -263,7 +265,7 @@ export const EMPLOYEES_DATA = [
     complaints: [],
     messages: [
       {
-        id: 'M2',
+        id: 2,
         text: 'Se aprueba su solicitud de licencia por asuntos personales.',
         days: 2,
         startDate: '2024-09-10',
@@ -450,15 +452,94 @@ export const EMPLOYEES_DATA = [
   }
 ];
 
+
+
+export const EMPLOYEE_DEPARTMENT_MAPPING = {
+  1: { // Ana García
+    departmentId: 2,
+    departmentName: 'Atención al Cliente',
+    officeId: 201,
+    officeName: 'Atención Telefónica',
+    isManager: true,
+    reportsTo: 3 // María Rodríguez (supervisora general)
+  },
+  2: { // Juan Pérez
+    departmentId: 4,
+    departmentName: 'Sistemas',
+    officeId: 401,
+    officeName: 'Desarrollo de Aplicaciones',
+    isManager: true,
+    reportsTo: null // Reporta directamente a dirección
+  },
+  3: { // María Rodríguez
+    departmentId: 3,
+    departmentName: 'Recursos Humanos',
+    officeId: 301,
+    officeName: 'Administración de Personal',
+    isManager: true,
+    reportsTo: null // Reporta directamente a dirección
+  },
+  4: { // Carlos Sánchez
+    departmentId: 5,
+    departmentName: 'Legales',
+    officeId: 501,
+    officeName: 'Auditoría Legal',
+    isManager: true,
+    reportsTo: null // Reporta directamente a dirección
+  },
+  5: { // Laura Fernández
+    departmentId: 2,
+    departmentName: 'Atención al Cliente',
+    officeId: 202,
+    officeName: 'Gestión de Reclamos',
+    isManager: false,
+    reportsTo: 1 // Ana García
+  }
+};
+
+
 // Additional reference data for consistency
 export const DEPARTMENTS = [
-  { id: 1, name: 'Atención al Cliente', description: 'Gestión de relaciones con clientes' },
-  { id: 2, name: 'Sistemas', description: 'Desarrollo y mantenimiento tecnológico' },
-  { id: 3, name: 'Recursos Humanos', description: 'Gestión del capital humano' },
-  { id: 4, name: 'Legales', description: 'Asesoría legal y auditoría' },
-  { id: 5, name: 'Marketing', description: 'Promoción y comunicación' },
-  { id: 6, name: 'Tecnología', description: 'Innovación tecnológica' },
-  { id: 7, name: 'Diseño', description: 'Diseño UX/UI y gráfico' }
+  { 
+    id: 1, 
+    name: 'Dirección General', 
+    description: 'Máxima autoridad de la organización',
+    nivel_jerarquico: 1,
+    parentId: null,
+    offices: ['Dirección Ejecutiva']
+  },
+  { 
+    id: 2, 
+    name: 'Atención al Cliente', 
+    description: 'Gestión de relaciones con clientes',
+    nivel_jerarquico: 2,
+    parentId: 1,
+    offices: ['Atención Telefónica', 'Gestión de Reclamos']
+  },
+  { 
+    id: 3, 
+    name: 'Recursos Humanos', 
+    description: 'Gestión del capital humano',
+    nivel_jerarquico: 2,
+    parentId: 1,
+    offices: ['Administración de Personal', 'Selección y Capacitación']
+  },
+  { 
+    id: 4, 
+    name: 'Sistemas', 
+    description: 'Desarrollo y mantenimiento tecnológico',
+    nivel_jerarquico: 2,
+    parentId: 1,
+    offices: ['Desarrollo de Aplicaciones', 'Soporte Técnico']
+  },
+  { 
+    id: 5, 
+    name: 'Legales', 
+    description: 'Asesoría legal y auditoría',
+    nivel_jerarquico: 2,
+    parentId: 1,
+    offices: ['Auditoría Legal', 'Asesoría Jurídica']
+  }
 ];
 
 export const AVAILABLE_SKILLS = [
@@ -510,3 +591,217 @@ export const EMPLOYEE_ROLES = {
   ADMIN: 'admin',
   AUDITOR: 'auditor'
 };
+
+export const INTEGRATED_ORG_DATA = [
+  {
+    id: 1,
+    nombre: 'Dirección General',
+    nivel_jerarquico: 1,
+    descripcion: 'Máxima autoridad de la organización. Define la estrategia y supervisa todas las operaciones.',
+    jefeId: null, // CEO - sin jefe directo
+    parentId: null,
+    habilidades_requeridas: ['Liderazgo Estratégico', 'Visión Empresarial'],
+    oficinas: [
+      {
+        id: 101,
+        nombre: 'Dirección Ejecutiva',
+        descripcion: 'Oficina principal de dirección y toma de decisiones estratégicas.',
+        ubicacion: 'Sede Central - Piso 10',
+        jefeId: null, // CEO
+        empleadosIds: [], // El CEO no está en nuestros datos de empleados actuales
+        habilidades_requeridas: ['Liderazgo Estratégico', 'Toma de Decisiones']
+      }
+    ]
+  },
+  {
+    id: 2,
+    nombre: 'Atención al Cliente',
+    nivel_jerarquico: 2,
+    descripcion: 'Gestión de relaciones con clientes, soporte y resolución de consultas.',
+    jefeId: 3, // María Rodríguez como supervisora general
+    parentId: 1,
+    habilidades_requeridas: ['Comunicación', 'Empatía', 'Resolución de conflictos'],
+    oficinas: [
+      {
+        id: 201,
+        nombre: 'Atención Telefónica',
+        descripcion: 'Atención directa a clientes vía telefónica y chat.',
+        ubicacion: 'Sede Central - Piso 2',
+        jefeId: 1, // Ana García
+        empleadosIds: [1, 5], // Ana García y Laura Fernández
+        habilidades_requeridas: ['Comunicación telefónica', 'Sistemas CRM', 'Gestión de tickets']
+      },
+      {
+        id: 202,
+        nombre: 'Gestión de Reclamos',
+        descripcion: 'Resolución especializada de quejas y reclamos complejos.',
+        ubicacion: 'Anexo Sur - Piso 1',
+        jefeId: 5, // Laura Fernández (especialista senior)
+        empleadosIds: [5], // Laura Fernández
+        habilidades_requeridas: ['Resolución de conflictos', 'Análisis de satisfacción']
+      }
+    ]
+  },
+  {
+    id: 3,
+    nombre: 'Recursos Humanos',
+    nivel_jerarquico: 2,
+    descripcion: 'Gestión del capital humano, incluyendo contratación, nóminas y clima laboral.',
+    jefeId: null, // Reporta directamente a dirección
+    parentId: 1,
+    habilidades_requeridas: ['Legislación Laboral', 'Gestión de Personal'],
+    oficinas: [
+      {
+        id: 301,
+        nombre: 'Administración de Personal',
+        descripcion: 'Gestión de nóminas, licencias y administración del personal.',
+        ubicacion: 'Sede Central - Piso 3',
+        jefeId: 3, // María Rodríguez
+        empleadosIds: [3], // María Rodríguez
+        habilidades_requeridas: ['Sistemas RRHH', 'Gestión de nóminas']
+      },
+      {
+        id: 302,
+        nombre: 'Selección y Capacitación',
+        descripcion: 'Procesos de selección de personal y desarrollo de capacitaciones.',
+        ubicacion: 'Sede Central - Piso 3',
+        jefeId: 3, // María Rodríguez
+        empleadosIds: [3], // María Rodríguez (maneja ambas funciones)
+        habilidades_requeridas: ['Procesos de selección', 'Capacitaciones']
+      }
+    ]
+  },
+  {
+    id: 4,
+    nombre: 'Sistemas',
+    nivel_jerarquico: 2,
+    descripcion: 'Desarrollo y mantenimiento tecnológico, infraestructura y soporte técnico.',
+    jefeId: null, // Reporta directamente a dirección
+    parentId: 1,
+    habilidades_requeridas: ['Desarrollo de Software', 'Infraestructura TI'],
+    oficinas: [
+      {
+        id: 401,
+        nombre: 'Desarrollo de Aplicaciones',
+        descripcion: 'Desarrollo de nuevas funcionalidades y mantenimiento de sistemas.',
+        ubicacion: 'Anexo Norte - Piso 2',
+        jefeId: 2, // Juan Pérez (como desarrollador principal)
+        empleadosIds: [2], // Juan Pérez
+        habilidades_requeridas: ['React.js', 'Node.js', 'SQL']
+      },
+      {
+        id: 402,
+        nombre: 'Soporte Técnico',
+        descripcion: 'Soporte técnico interno y mantenimiento de infraestructura.',
+        ubicacion: 'Anexo Norte - Piso 1',
+        jefeId: 2, // Juan Pérez
+        empleadosIds: [2], // Juan Pérez (cubre ambas áreas)
+        habilidades_requeridas: ['DevOps con Docker', 'Soporte técnico interno']
+      }
+    ]
+  },
+  {
+    id: 5,
+    nombre: 'Legales',
+    nivel_jerarquico: 2,
+    descripcion: 'Asesoría legal, auditoría y cumplimiento normativo.',
+    jefeId: null, // Reporta directamente a dirección
+    parentId: 1,
+    habilidades_requeridas: ['Derecho Laboral', 'Auditoría Legal'],
+    oficinas: [
+      {
+        id: 501,
+        nombre: 'Auditoría Legal',
+        descripcion: 'Revisión de expedientes y auditorías internas de cumplimiento.',
+        ubicacion: 'Sede Central - Piso 4',
+        jefeId: 4, // Carlos Sánchez
+        empleadosIds: [4], // Carlos Sánchez
+        habilidades_requeridas: ['Auditoría', 'Análisis Legal', 'Derecho Laboral']
+      },
+      {
+        id: 502,
+        nombre: 'Asesoría Jurídica',
+        descripcion: 'Consultoría legal y elaboración de dictámenes.',
+        ubicacion: 'Sede Central - Piso 4',
+        jefeId: 4, // Carlos Sánchez
+        empleadosIds: [4], // Carlos Sánchez
+        habilidades_requeridas: ['Dictámenes legales', 'Derecho Laboral']
+      }
+    ]
+  }
+];
+
+// Estructura jerárquica para organigrama (actualizada con empleados reales)
+export const ORG_CHART_DATA = {
+  id: 'CEO',
+  name: 'Dirección General',
+  position: 'CEO',
+  employeeId: null, // No tenemos CEO en nuestros datos de empleados
+  children: [
+    {
+      id: 'RRHH',
+      name: 'María Rodríguez',
+      position: 'Supervisora de Recursos Humanos',
+      employeeId: 3,
+      department: 'Recursos Humanos',
+      children: []
+    },
+    {
+      id: 'ATENCION',
+      name: 'Ana García',
+      position: 'Especialista en Atención al Cliente',
+      employeeId: 1,
+      department: 'Atención al Cliente',
+      children: [
+        {
+          id: 'ATENCION_SENIOR',
+          name: 'Laura Fernández',
+          position: 'Especialista Senior en Atención al Cliente',
+          employeeId: 5,
+          department: 'Atención al Cliente',
+          children: []
+        }
+      ]
+    },
+    {
+      id: 'SISTEMAS',
+      name: 'Juan Pérez',
+      position: 'Desarrollador de Sistemas',
+      employeeId: 2,
+      department: 'Sistemas',
+      children: []
+    },
+    {
+      id: 'LEGALES',
+      name: 'Carlos Sánchez',
+      position: 'Auditor Legal',
+      employeeId: 4,
+      department: 'Legales',
+      children: []
+    }
+  ]
+};
+
+
+
+// Lista completa de oficinas
+export const OFFICES = [
+  // Dirección General
+  { id: 101, name: 'Dirección Ejecutiva', departmentId: 1, location: 'Sede Central - Piso 10' },
+  
+  // Atención al Cliente
+  { id: 201, name: 'Atención Telefónica', departmentId: 2, location: 'Sede Central - Piso 2' },
+  { id: 202, name: 'Gestión de Reclamos', departmentId: 2, location: 'Anexo Sur - Piso 1' },
+  
+  // Recursos Humanos
+  { id: 301, name: 'Administración de Personal', departmentId: 3, location: 'Sede Central - Piso 3' },
+  { id: 302, name: 'Selección y Capacitación', departmentId: 3, location: 'Sede Central - Piso 3' },
+  
+  // Sistemas
+  { id: 401, name: 'Desarrollo de Aplicaciones', departmentId: 4, location: 'Anexo Norte - Piso 2' },
+  { id: 402, name: 'Soporte Técnico', departmentId: 4, location: 'Anexo Norte - Piso 1' },
+  
+  // Legales
+  { id: 501, name: 'Auditoría Legal', departmentId: 5, location: 'Sede Central - Piso 4' },
+  { id: 502, name: 'Asesoría Jurídica', departmentId: 5, location: 'Sede Central - Piso 4' }
+];

@@ -254,7 +254,7 @@ export interface Employee {
   position: string;
   department: string;
   departmentId: number;
-  office: string;
+  office: Office[] | null; // Can be null if no office assigned
   category: string;
   status: EmployeeStatus;
   employmentStatus: EmploymentStatus;
@@ -311,7 +311,14 @@ export interface SoftSkillCatalog {
   name: string;
   description: string;
 }
-
+export interface Office {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  jefeId?: number | null;
+  empleadosIds?: number[];
+  departmentId: number;
+}
 // Constants for status options
 export const EMPLOYEE_STATUS: Record<string, EmployeeStatus> = {
   ACTIVE: 'Activo',
@@ -367,4 +374,9 @@ export interface EmployeesListApiResponse {
   page: number;
   limit: number;
   message?: string;
+}
+
+export interface ProcessedMessage extends Message {
+  employeeId: number; // o string, debe coincidir con Employee.id
+  employeeName: string;
 }

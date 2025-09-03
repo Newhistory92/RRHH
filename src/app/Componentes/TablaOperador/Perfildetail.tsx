@@ -4,7 +4,7 @@ import {ProfileTab,LicenseHistoryTab,PermissionHistoryTab} from "./DetailTables"
 import {StatusBadge} from "@/app/util/UiRRHH"
 import { useState } from "react";
 import {  Employee, LicenseHistory} from '@/app/Interfas/Interfaces';
-import Image from "next/image";
+import { Avatar } from 'primereact/avatar';
 
 export interface EmployeeDetailViewProps {
   employee: Employee | null | undefined;
@@ -17,7 +17,7 @@ export const EmployeeDetailView = ({
   onLicenseClick,
 }: EmployeeDetailViewProps) => {
   const [activeTab, setActiveTab] = useState("perfil");
-  const [imageError, setImageError] = useState(false);
+
 
   if (!employee) {
     return (
@@ -35,10 +35,6 @@ export const EmployeeDetailView = ({
     );
   }
 
-  const handleImageError = () => {
-    console.log('Error loading image:', employee.photo);
-    setImageError(true);
-  };
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -50,23 +46,7 @@ export const EmployeeDetailView = ({
         Volver a la lista
       </button>
       <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-8 p-6 bg-white rounded-lg shadow-md">
-       {!imageError && employee.photo ? (
-          <Image
-            src={employee.photo}
-            alt={`Foto de ${employee.name}`}
-            width={96}
-            height={96}
-            className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
-            onError={handleImageError}
-            priority
-          />
-        ) : (
-          <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center border-4 border-white shadow-lg">
-            <span className="text-gray-600 font-semibold text-lg">
-              {employee.name?.charAt(0)?.toUpperCase() || '?'}
-            </span>
-          </div>
-        )}
+      <Avatar image={employee.photo} size="xlarge" shape="circle" />
         <div>
           <p className="text-gray-800 text-2xl"> {employee.name}</p>
           <p className="text-gray-500 text-lg"> DNI: {employee.dni}</p>

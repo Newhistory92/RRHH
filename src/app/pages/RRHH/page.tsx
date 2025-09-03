@@ -20,6 +20,7 @@ import {
 export interface ArchivedMessage extends Message {
   employeeId: number;
   processedDate: string;
+  employeeName: string;
 }
 export interface ViewState {
   name: "table" | "detail" | "messages";
@@ -69,6 +70,7 @@ export default function RecursosHumanosPage() {
         ...message,
         employeeId,
         processedDate: new Date().toLocaleDateString("es-AR"),
+        employeeName: employees.find(e => e.id === employeeId)?.name || "",
       },
     ]);
     alert("Licencia aplicada correctamente.");
