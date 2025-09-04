@@ -1,8 +1,8 @@
 "use client"
 import {  X, Search, ChevronDown} from 'lucide-react';
 import React, { FormEvent, useState } from "react";
-import {ModalConfig, Department,Employee,EntityFormData} from '@/app/Interfas/Interfaces';
-import { Dropdown } from 'primereact/dropdown';
+import {ModalConfig, Department,Employee,EntityFormData, Office} from '@/app/Interfas/Interfaces';
+import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
         
 interface EntityFormModalProps {
   config: ModalConfig;
@@ -11,6 +11,13 @@ interface EntityFormModalProps {
   departments: Department[];
   employees: Employee[];
 }
+
+
+interface DropdownOption {
+  nombre: string;
+  id?: number;
+}
+
 export const EntityFormModal = ({ config,onClose,onSave,departments,employees,}: EntityFormModalProps) => {
   const { type, data } = config;
     const [formData, setFormData] = useState<EntityFormData>({
@@ -23,6 +30,25 @@ export const EntityFormModal = ({ config,onClose,onSave,departments,employees,}:
     empleadosIds: []
   });
 
+
+   // Opciones para el dropdown de departamentos (para parentId)
+  const nombreOptions: DropdownOption[] = departments.map(dept => ({
+    nombre: dept.nombre,
+    id: dept.id
+  }));
+ const departmentOptions = departments.map(dept => ({
+    nombre: dept.nombre,
+    id: dept.id
+  }));
+
+  // Opciones para el dropdown de jefes (empleados)
+  const jefeOptions = employees.map(emp => ({
+    nombre: `${emp.name} - ${emp.position}`,
+    id: emp.id
+  }));
+
+
+
   React.useEffect(() => {if (!data) {
       if (type === "department") {
         setFormData({
@@ -32,6 +58,7 @@ export const EntityFormModal = ({ config,onClose,onSave,departments,employees,}:
           parentId: null,
           jefeId: null,
           habilidades_requeridas: [],
+          empleadosIds: []
         });
       } else if (type === "office") {
         setFormData({
@@ -43,7 +70,20 @@ export const EntityFormModal = ({ config,onClose,onSave,departments,employees,}:
         });
       }
     } else {
-      setFormData(data);
+      const entityData: EntityFormData = {
+        nombre: data.nombre || '',
+        descripcion: data.descripcion || '',
+        jefeId: data.jefeId || null,
+        habilidades_requeridas: Array.isArray(data.habilidades_requeridas) 
+          ? data.habilidades_requeridas.map((skill: any) => 
+              typeof skill === 'string' ? skill : skill.name
+            )
+          : [],
+        nivel_jerarquico: (data as Department).nivel_jerarquico || 1,
+        parentId: (data as Department).parentId || null,
+        empleadosIds: (data as Office)?.empleadosIds || []
+      };
+      setFormData(entityData);
     }
   }, [data, type]);
 
@@ -58,15 +98,30 @@ export const EntityFormModal = ({ config,onClose,onSave,departments,employees,}:
     }));
   };
   
+   const handleDropdownChange = (field: keyof EntityFormData, value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+    const handleInputChange = (field: keyof EntityFormData, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
   
-  const handleSkillsChange = (newSkills:string[]) => {
+  const handleSkillsChange = (newSkills: string[]) => {
     setFormData((prev) => ({ ...prev, habilidades_requeridas: newSkills }));
   };
-  
-   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSave(formData as EntityFormData);
+    onSave(formData);
   };
+
 
 
 
@@ -85,8 +140,16 @@ export const EntityFormModal = ({ config,onClose,onSave,departments,employees,}:
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <Dropdown value={formData.nombre || ""} onChange={(e) => handleChange(e.value)} options={formData.nombre || ""} optionLabel="nombre" 
-            editable placeholder="Nombre" className="w-full md:w-14rem" />
+           <Dropdown
+                value={formData.nombre}
+                onChange={(e: DropdownChangeEvent) => handleDropdownChange('nombre', e.value)}
+                options={nombreOptions}
+                optionLabel="nombre"
+                editable
+                placeholder="Seleccionar o escribir nombre"
+                className="w-full"
+                required
+              />
             {/* <InputField
               name="nombre"
               label="Nombre"

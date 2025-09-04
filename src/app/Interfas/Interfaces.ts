@@ -234,8 +234,8 @@ export interface SoftSkills {
 // Technical skills
 export interface TechnicalSkill {
   id: number;
-  name: string;
-  level: number;
+  nombre: string;
+  nivel: string;
 }
 
 // Main Employee interface
@@ -300,7 +300,7 @@ export interface Department {
   nivel_jerarquico: number;
   jefeId?: number | null;
   parentId?: number | null;
-  habilidades_requeridas:TechnicalSkill[];
+  habilidades_requeridas?:TechnicalSkill[];
   oficinas: Office[];
 }
 
@@ -320,7 +320,7 @@ export interface Office {
   jefeId?: number | null;
   empleadosIds?: number[];
   departmentId: number;
-  habilidades_requeridas: TechnicalSkill[];
+  habilidades_requeridas?: TechnicalSkill[];
 }
 
 
@@ -402,7 +402,6 @@ export interface EntityFormData {
   // Campos específicos de Department
   nivel_jerarquico?: number;
   parentId?: number | null;
-  departmentId?: number | null;
   // Campos específicos de Office
   empleadosIds?: number[];
 }

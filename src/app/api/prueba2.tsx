@@ -584,15 +584,15 @@ export const INTEGRATED_ORG_DATA = [
     jefeId: 3, // María Rodríguez como supervisora general
     parentId: 1,
     habilidades_requeridas: [{
-      id: 1,
+      id: 3,
       nombre: 'Comunicación',
       nivel: 'intermedio'
     }, {
-      id: 2,
+      id: 4,
       nombre: 'Empatía',
       nivel: 'intermedio'
     }, {
-      id: 3,
+      id: 5,
       nombre: 'Resolución de conflictos',
       nivel: 'intermedio'
     }],
@@ -606,15 +606,15 @@ export const INTEGRATED_ORG_DATA = [
         empleadosIds: [1, 5], // Ana García y Laura Fernández
         departmentId: 2,
         habilidades_requeridas: [{
-          id: 1,
+          id: 6,
           nombre: 'Comunicación telefónica',
           nivel: 'intermedio'
         }, {
-          id: 2,
+          id: 7,
           nombre: 'Sistemas CRM',
           nivel: 'intermedio'
         }, {
-          id: 3,
+          id: 8,
           nombre: 'Gestión de tickets',
           nivel: 'básico'
         }]
@@ -628,11 +628,11 @@ export const INTEGRATED_ORG_DATA = [
         empleadosIds: [5], // Laura Fernández
         departmentId: 2,
         habilidades_requeridas: [{
-          id: 1,
+          id: 9,
           nombre: 'Resolución de conflictos',
           nivel: 'intermedio'
         }, {
-          id: 2,
+          id: 10,
           nombre: 'Análisis de satisfacción',
           nivel: 'básico'
         }]
@@ -647,11 +647,11 @@ export const INTEGRATED_ORG_DATA = [
     jefeId: null, // Reporta directamente a dirección
     parentId: 1,
     habilidades_requeridas: [{
-      id: 1,
+      id: 11,
       nombre: 'Legislación Laboral',
       nivel: 'básico'
     }, {
-      id: 2,
+      id: 12,
       nombre: 'Gestión de Personal',
       nivel: 'intermedio'
     }],
@@ -665,11 +665,11 @@ export const INTEGRATED_ORG_DATA = [
         empleadosIds: [3], // María Rodríguez
         departmentId: 3,
         habilidades_requeridas: [{
-          id: 1,
+          id: 13,
           nombre: 'Sistemas RRHH',
           nivel: 'intermedio'
         }, {
-          id: 2,
+          id: 14,
           nombre: 'Gestión de nóminas',
           nivel: 'básico'
         }]
@@ -683,11 +683,11 @@ export const INTEGRATED_ORG_DATA = [
         empleadosIds: [3], // María Rodríguez (maneja ambas funciones)
         departmentId: 3,
         habilidades_requeridas: [{
-          id: 1,
+          id: 15,
           nombre: 'Procesos de selección',
           nivel: 'intermedio'
         }, {
-          id: 2,
+          id: 16,
           nombre: 'Capacitaciones',
           nivel: 'básico'
         }]
@@ -702,11 +702,11 @@ export const INTEGRATED_ORG_DATA = [
     jefeId: null, // Reporta directamente a dirección
     parentId: 1,
     habilidades_requeridas: [{
-      id: 1,
+      id: 17,
       nombre: 'Desarrollo de Software',
       nivel: 'intermedio'
     }, {
-      id: 2,
+      id: 18,
       nombre: 'Infraestructura TI',
       nivel: 'básico'
     }],
@@ -720,15 +720,15 @@ export const INTEGRATED_ORG_DATA = [
         empleadosIds: [2], // Juan Pérez
         departmentId: 4,
         habilidades_requeridas: [{
-          id: 1,
+          id: 19,
           nombre: 'React.js',
           nivel: 'intermedio'
         }, {
-          id: 2,
+          id: 20,
           nombre: 'Node.js',
           nivel: 'intermedio'
         }, {
-          id: 3,
+          id: 30,
           nombre: 'SQL',
           nivel: 'básico'
         }]
@@ -742,11 +742,11 @@ export const INTEGRATED_ORG_DATA = [
         empleadosIds: [2], // Juan Pérez (cubre ambas áreas)
         departmentId: 4,
         habilidades_requeridas: [{
-          id: 1,
+          id: 21,
           nombre: 'DevOps con Docker',
           nivel: 'intermedio'
         }, {
-          id: 2,
+          id: 22,
           nombre: 'Soporte técnico interno',
           nivel: 'básico'
         }]
@@ -761,11 +761,11 @@ export const INTEGRATED_ORG_DATA = [
     jefeId: null, // Reporta directamente a dirección
     parentId: 1,
     habilidades_requeridas: [{
-      id: 1,
+      id: 23,
       nombre: 'Derecho Laboral',
       nivel: 'básico'
     }, {
-      id: 2,
+      id: 24,
       nombre: 'Auditoría Legal',
       nivel: 'avanzado'
     }],
@@ -779,15 +779,15 @@ export const INTEGRATED_ORG_DATA = [
         empleadosIds: [4], // Carlos Sánchez
         departmentId: 5,
         habilidades_requeridas: [{
-          id: 1,
+          id: 256,
           nombre: 'Auditoría',
           nivel: 'avanzado'
         }, {
-          id: 2,
+          id: 26,
           nombre: 'Análisis Legal',
           nivel: 'intermedio'
         }, {
-          id: 3,
+          id: 33,
           nombre: 'Derecho Laboral',
           nivel: 'básico'
         }]
@@ -801,8 +801,8 @@ export const INTEGRATED_ORG_DATA = [
         empleadosIds: [4], // Carlos Sánchez
         departmentId: 5,
         habilidades_requeridas: [
-          { id: 1, nombre: 'Dictámenes legales', nivel: 'avanzado' },
-          { id: 2, nombre: 'Derecho Laboral', nivel: 'intermedio' }
+          { id: 29, nombre: 'Dictámenes legales', nivel: 'avanzado' },
+          { id: 28, nombre: 'Derecho Laboral', nivel: 'intermedio' }
         ]
       }
     ]

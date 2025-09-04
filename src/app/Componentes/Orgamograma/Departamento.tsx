@@ -1,22 +1,10 @@
-import { useMemo } from 'react';
-import { Building2, Star, Briefcase, ChevronsRight, PlusCircle, Pencil, X } from 'lucide-react';
-import { mockEmployeesorg } from '@/app/api/Prueba';
+import { useEffect, useMemo, useState } from 'react';
+import { Building2, Star, Briefcase, ChevronsRight, PlusCircle, Pencil} from 'lucide-react';
 import {EMPLOYEES_DATA} from '@/app/api/prueba2';
 import Image from 'next/image';
+import { Chips } from 'primereact/chips';
+        
 
-const SkillChip = ({ skill, onRemove }) => (
-  <span className="bg-blue-100 text-blue-800 text-xs font-medium mr-2 mb-2 px-2.5 py-1 rounded-full flex items-center">
-    {skill}
-    {onRemove && (
-      <button
-        onClick={() => onRemove(skill)}
-        className="ml-2 text-blue-600 hover:text-blue-900"
-      >
-        <X className="w-3 h-3" />
-      </button>
-    )}
-  </span>
-);
 const EmployeeAvatar = ({ employeeId }) => {
   const employee = EMPLOYEES_DATA.find((e) => e.id === employeeId);
   if (!employee) return null;
@@ -36,6 +24,21 @@ const EmployeeAvatar = ({ employeeId }) => {
 
 
 export const DepartmentManagementView = ({departmentsData,onSelect,selectedDepartment,onOpenModal,}) => {
+  console.log('departmentsData:', departmentsData);
+  console.log('selectedDepartment:', selectedDepartment);
+const [skillValues, setSkillValues] = useState<string[]>([]);
+
+useEffect(() => {
+  if (selectedDepartment?.habilidades_requeridas) {
+    const skills = selectedDepartment.habilidades_requeridas.map(skill => 
+      `${skill.nombre} (${skill.nivel})`
+    );
+    setSkillValues(skills);
+  } else {
+    setSkillValues([]);
+  }
+}, [selectedDepartment]);
+
   const departmentTree = useMemo(() => {
     const tree = [];
     const map = {};
@@ -207,9 +210,18 @@ export const DepartmentManagementView = ({departmentsData,onSelect,selectedDepar
               <div>
                 <h3 className="font-bold text-lg mb-2">Habilidades Clave</h3>
                 <div className="flex flex-wrap gap-2">
-                  {selectedDepartment.habilidades_requeridas.map((skill) => (
-                    <SkillChip key={skill} skill={skill} onRemove={() => {}} />
-                  ))}
+                {selectedDepartment?.habilidades_requeridas && (
+  <div className="flex flex-wrap gap-2">
+    <Chips 
+      value={skillValues} 
+      onChange={(e) => setSkillValues(e.value)} 
+      separator=","
+      keyfilter="alpha"
+      placeholder="Agregar habilidades..."
+    />
+  </div>
+)}
+
                 </div>
               </div>
             </div>
