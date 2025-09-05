@@ -497,40 +497,40 @@ export const EMPLOYEES_DATA = [
 export const DEPARTMENTS = [
   { 
     id: 1, 
-    name: 'Dirección General', 
-    description: 'Máxima autoridad de la organización',
+    nombre: 'Dirección General', 
+    descripcion: 'Máxima autoridad de la organización',
     nivel_jerarquico: 1,
     parentId: null,
     offices: ['Dirección Ejecutiva']
   },
   { 
     id: 2, 
-    name: 'Atención al Cliente', 
-    description: 'Gestión de relaciones con clientes',
+    nombre: 'Atención al Cliente', 
+    descripcion: 'Gestión de relaciones con clientes',
     nivel_jerarquico: 2,
     parentId: 1,
     offices: ['Atención Telefónica', 'Gestión de Reclamos']
   },
   { 
     id: 3, 
-    name: 'Recursos Humanos', 
-    description: 'Gestión del capital humano',
+    nombre: 'Recursos Humanos', 
+    descripcion: 'Gestión del capital humano',
     nivel_jerarquico: 2,
     parentId: 1,
     offices: ['Administración de Personal', 'Selección y Capacitación']
   },
   { 
     id: 4, 
-    name: 'Sistemas', 
-    description: 'Desarrollo y mantenimiento tecnológico',
+    nombre: 'Sistemas', 
+    descripcion: 'Desarrollo y mantenimiento tecnológico',
     nivel_jerarquico: 2,
     parentId: 1,
     offices: ['Desarrollo de Aplicaciones', 'Soporte Técnico']
   },
   { 
     id: 5, 
-    name: 'Legales', 
-    description: 'Asesoría legal y auditoría',
+    nombre: 'Legales', 
+    descripcion: 'Asesoría legal y auditoría',
     nivel_jerarquico: 2,
     parentId: 1,
     offices: ['Auditoría Legal', 'Asesoría Jurídica']

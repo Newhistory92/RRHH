@@ -164,9 +164,7 @@ export const EntityFormModal = ({ config,onClose,onSave,departments,employees,}:
                 <Dropdown
                  value={formData.parentId || ""}
                 onChange={(e: DropdownChangeEvent) => handleDropdownChange('parentId', e.value)}
-                options={departments
-                    .filter((d) => d.id !== data?.id)
-                    .map((d) => ({ value: d.id, label: d.nombre }))}
+                options={departmentOptions}
                 optionLabel="Depende de (Dpto. Padre)"
                 editable
                 placeholder="Ninguno (Nivel Principal)"
