@@ -3,7 +3,9 @@ import {  X, Search, ChevronDown} from 'lucide-react';
 import React, { FormEvent, useState } from "react";
 import {ModalConfig, Department,Employee,EntityFormData, Office} from '@/app/Interfas/Interfaces';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
-        
+import { InputTextarea } from "primereact/inputtextarea";     
+import { FloatLabel } from "primereact/floatlabel";   
+import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber';
 interface EntityFormModalProps {
   config: ModalConfig;
   onClose: () => void;
@@ -147,35 +149,31 @@ export const EntityFormModal = ({ config,onClose,onSave,departments,employees,}:
                 optionLabel="nombre"
                 editable
                 placeholder="Seleccionar o escribir nombre"
-                className="w-full"
+                className="w-full mb-8"
                 required
               />
-            {/* <InputField
-              name="nombre"
-              label="Nombre"
-              value={formData.nombre || ""}
-              onChange={handleChange}
-              required
-            /> */}
-            <TextAreaField
-              name="descripcion"
-              label="Descripción"
-              value={formData.descripcion || ""}
-              onChange={handleChange}
-            />
+              <FloatLabel className="w-full">
+            <InputTextarea  id="descripcion" autoResize value={formData.descripcion} onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })} rows={5} cols={65} />
+              <label htmlFor="description">Description</label>
+           </FloatLabel>
             {type === "department" && (
               <>
-                {" "}
-                <InputField
-                  name="nivel_jerarquico"
-                  label="Nivel Jerárquico"
-                  type="number"
-                  value={formData.nivel_jerarquico || ""}
-                  onChange={handleChange}
-                  min="1"
-                  required
-                />{" "}
-                <SelectField
+                <label htmlFor="minmax-buttons" className="font-bold block mb-2">Nivel Jerárquico</label>
+               <InputNumber value={formData.nivel_jerarquico } onValueChange={(e: InputNumberValueChangeEvent) =>  handleChange(e)} mode="decimal" showButtons min={1} max={5} className="w-full" />
+                
+                <Dropdown
+                 value={formData.parentId || ""}
+                onChange={(e: DropdownChangeEvent) => handleDropdownChange('parentId', e.value)}
+                options={departments
+                    .filter((d) => d.id !== data?.id)
+                    .map((d) => ({ value: d.id, label: d.nombre }))}
+                optionLabel="Depende de (Dpto. Padre)"
+                editable
+                placeholder="Ninguno (Nivel Principal)"
+                className="w-full mb-8"
+                required
+              />
+                {/* <SelectField
                   name="parentId"
                   label="Depende de (Dpto. Padre)"
                   value={formData.parentId || ""}
@@ -184,19 +182,19 @@ export const EntityFormModal = ({ config,onClose,onSave,departments,employees,}:
                     .filter((d) => d.id !== data?.id)
                     .map((d) => ({ value: d.id, label: d.nombre }))}
                   placeholder="Ninguno (Nivel Principal)"
-                />{" "}
-                <EmployeeSelector
+                />{" "} */}
+                {/* <EmployeeSelector
                   label="Jefe de Área"
                   employees={employees}
                   selectedId={formData.jefeId}
                   onSelect={(id) => setFormData((p) => ({ ...p, jefeId: id }))}
-                />
+                /> */}
               </>
             )}
             {type === "office" && (
               <>
                 {" "}
-                <EmployeeSelector
+                {/* <EmployeeSelector
                   label="Jefe de Oficina"
                   employees={employees}
                   selectedId={formData.jefeId}
@@ -210,7 +208,7 @@ export const EntityFormModal = ({ config,onClose,onSave,departments,employees,}:
                     setFormData((p) => ({ ...p, empleadosIds: ids }))
                   }
                   multiple
-                />
+                /> */}
               </>
             )}
             <SkillEditor
@@ -347,106 +345,106 @@ const SkillEditor = ({ skills, setSkills }) => {
     </div>
   );
 };
-const EmployeeSelector = ({
-  label,
-  employees,
-  selectedId,
-  selectedIds,
-  onSelect,
-  multiple = false,
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const filteredEmployees = employees.filter((emp) =>
-    emp.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  const handleSelect = (employee) => {
-    if (multiple) {
-      const newIds = selectedIds.includes(employee.id)
-        ? selectedIds.filter((id) => id !== employee.id)
-        : [...selectedIds, employee.id];
-      onSelect(newIds);
-    } else {
-      onSelect(employee.id);
-      setIsOpen(false);
-    }
-  };
-  const getSelectionDisplay = () => {
-    if (multiple) {
-      if (!selectedIds || selectedIds.length === 0)
-        return <span className="text-gray-500">Seleccionar empleados...</span>;
-      return (
-        <span className="text-gray-800">
-          {selectedIds.length} empleado(s) seleccionado(s)
-        </span>
-      );
-    }
-    const selectedEmployee = employees.find((e) => e.id === selectedId);
-    return selectedEmployee ? (
-      <div className="flex items-center">
-        <img
-          src={selectedEmployee.foto}
-          className="w-6 h-6 rounded-full mr-2"
-        />
-        {selectedEmployee.nombre}
-      </div>
-    ) : (
-      <span className="text-gray-500">Seleccionar jefe...</span>
-    );
-  };
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label}
-      </label>
-      <div className="relative">
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-left flex items-center justify-between"
-        >
-          {getSelectionDisplay()}
-          <ChevronDown className="w-5 h-5 text-gray-400" />
-        </button>
-        {isOpen && (
-          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-            <div className="p-2">
-              <div className="relative">
-                <Search className="w-5 h-5 text-gray-400 absolute top-1/2 left-2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Buscar empleado..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-8 pr-2 py-1 border border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-            <ul>
-              {filteredEmployees.map((emp) => (
-                <li
-                  key={emp.id}
-                  onClick={() => handleSelect(emp)}
-                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-                >
-                  <div className="flex items-center">
-                    <img src={emp.foto} className="w-6 h-6 rounded-full mr-2" />{" "}
-                    {emp.nombre}
-                  </div>
-                  {multiple && (
-                    <input
-                      type="checkbox"
-                      readOnly
-                      checked={selectedIds.includes(emp.id)}
-                      className="form-checkbox h-4 w-4 text-blue-600"
-                    />
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+// const EmployeeSelector = ({
+//   label,
+//   employees,
+//   selectedId,
+//   selectedIds,
+//   onSelect,
+//   multiple = false,
+// }) => {
+//   const [isOpen, setIsOpen] = useState(false);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const filteredEmployees = employees.filter((emp) =>
+//     emp.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+//   );
+//   const handleSelect = (employee) => {
+//     if (multiple) {
+//       const newIds = selectedIds.includes(employee.id)
+//         ? selectedIds.filter((id) => id !== employee.id)
+//         : [...selectedIds, employee.id];
+//       onSelect(newIds);
+//     } else {
+//       onSelect(employee.id);
+//       setIsOpen(false);
+//     }
+//   };
+//   const getSelectionDisplay = () => {
+//     if (multiple) {
+//       if (!selectedIds || selectedIds.length === 0)
+//         return <span className="text-gray-500">Seleccionar empleados...</span>;
+//       return (
+//         <span className="text-gray-800">
+//           {selectedIds.length} empleado(s) seleccionado(s)
+//         </span>
+//       );
+//     }
+//     const selectedEmployee = employees.find((e) => e.id === selectedId);
+//     return selectedEmployee ? (
+//       <div className="flex items-center">
+//         <img
+//           src={selectedEmployee.foto}
+//           className="w-6 h-6 rounded-full mr-2"
+//         />
+//         {selectedEmployee.nombre}
+//       </div>
+//     ) : (
+//       <span className="text-gray-500">Seleccionar jefe...</span>
+//     );
+//   };
+//   return (
+//     <div>
+//       <label className="block text-sm font-medium text-gray-700 mb-1">
+//         {label}
+//       </label>
+//       <div className="relative">
+//         <button
+//           type="button"
+//           onClick={() => setIsOpen(!isOpen)}
+//           className="w-full bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-left flex items-center justify-between"
+//         >
+//           {getSelectionDisplay()}
+//           <ChevronDown className="w-5 h-5 text-gray-400" />
+//         </button>
+//         {isOpen && (
+//           <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+//             <div className="p-2">
+//               <div className="relative">
+//                 <Search className="w-5 h-5 text-gray-400 absolute top-1/2 left-2 -translate-y-1/2" />
+//                 <input
+//                   type="text"
+//                   placeholder="Buscar empleado..."
+//                   value={searchTerm}
+//                   onChange={(e) => setSearchTerm(e.target.value)}
+//                   className="w-full pl-8 pr-2 py-1 border border-gray-300 rounded-md"
+//                 />
+//               </div>
+//             </div>
+//             <ul>
+//               {filteredEmployees.map((emp) => (
+//                 <li
+//                   key={emp.id}
+//                   onClick={() => handleSelect(emp)}
+//                   className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+//                 >
+//                   <div className="flex items-center">
+//                     <img src={emp.foto} className="w-6 h-6 rounded-full mr-2" />{" "}
+//                     {emp.nombre}
+//                   </div>
+//                   {multiple && (
+//                     <input
+//                       type="checkbox"
+//                       readOnly
+//                       checked={selectedIds.includes(emp.id)}
+//                       className="form-checkbox h-4 w-4 text-blue-600"
+//                     />
+//                   )}
+//                 </li>
+//               ))}
+//             </ul>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };

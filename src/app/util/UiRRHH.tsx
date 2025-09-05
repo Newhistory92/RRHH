@@ -1,9 +1,22 @@
 import { ReactNode } from 'react';
-//import Image from "next/image";
+import Image from "next/image";
+import { Tag } from 'primereact/tag';        
+import {TechnicalSkill,Employee} from '@/app/Interfas/Interfaces';
+
+interface Department {
+  habilidades_requeridas?: TechnicalSkill[];
+}
 interface InfoCardProps {
   icon: React.ComponentType<{ className?: string; size?: number }>;
   title: string;
   children: ReactNode;
+}
+
+interface EmployeeAvatarProps {
+  employeeId: number;
+  employees: Employee[];
+  showName?: boolean;
+  size?: 'sm' | 'md' | 'lg';
 }
 
 export const StatusBadge = ({ status }: { status: string }) => {
@@ -33,6 +46,23 @@ export const InfoCard = ({ icon: Icon, title, children }: InfoCardProps) => (
 );
 
 
+
+export const SkillsDisplay = ({ selectedDepartment }: { selectedDepartment?: Department }) => {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {selectedDepartment?.habilidades_requeridas?.map((skill: TechnicalSkill) => (
+        <Tag 
+          key={skill.id} 
+          value={`${skill.nombre} (${skill.nivel})`} 
+          severity="info"
+        />
+      ))}
+    </div>
+  );
+};
+
+
+
 // export const EmployeeAvatar = ({ employeeId }) => {
 //   const employee = EMPLOYEES_DATA.find((e) => e.id === employeeId);
 //   if (!employee) return null;
@@ -47,12 +77,58 @@ export const InfoCard = ({ icon: Icon, title, children }: InfoCardProps) => (
 
 //                   priority
 //                 />
-//       {/* <img
-//          src={employee.photo}
-//        alt={`Foto de ${employee.name}`}
-//         className="w-8 h-8 rounded-full mr-2 border-2 border-white"
-//       /> */}
 //       <span className="text-gray-700 hidden sm:inline">{employee.name}</span>
 //     </div>
 //   );
 // };
+
+export const EmployeeAvatar = ({ 
+  employeeId, 
+  employees, 
+  showName = true, 
+  size = 'md' 
+}: EmployeeAvatarProps) => {
+  const employee = employees.find((e) => e.id === employeeId);
+  
+  if (!employee) return null;
+
+  const sizeClasses = {
+    sm: 'w-12 h-12',
+    md: 'w-16 h-16',
+    lg: 'w-24 h-24'
+  };
+
+  const textSizeClasses = {
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-base'
+  };
+
+  return (
+    <div className="flex items-center gap-2" title={employee.name}>
+      <div className={`relative ${sizeClasses[size]} rounded-full overflow-hidden border-2 border-white shadow-md`}>
+        <Image
+          src={employee.photo || '/default-avatar.png'}
+          alt={`Foto de ${employee.name}`}
+          fill
+          className="object-cover"
+          sizes={`${size === 'sm' ? '48px' : size === 'md' ? '64px' : '96px'}`}
+        />
+      </div>
+      {showName && (
+        <span className={`text-gray-700 ${textSizeClasses[size]} font-medium`}>
+          {employee.name}
+        </span>
+      )}
+    </div>
+  );
+};
+
+// Versión simplificada si solo necesitas el avatar sin nombre
+export const EmployeeAvatarIcon = ({ 
+  employeeId, 
+  employees,
+  size = 'md'
+}: Omit<EmployeeAvatarProps, 'showName'>) => {
+  return <EmployeeAvatar employeeId={employeeId} employees={employees} showName={false} size={size} />;
+};

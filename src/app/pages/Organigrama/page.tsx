@@ -4,10 +4,13 @@ import {  Sparkles, LayoutGrid,  } from 'lucide-react';
 import { OrgChartNode } from '@/app/Componentes/OrganigramaGraf/organigrama';
 import { DepartmentManagementView } from '@/app/Componentes/Orgamograma/Departamento';
 import { EntityFormModal } from '@/app/util/UiOrganigrama';
-import {INTEGRATED_ORG_DATA, EMPLOYEES_DATA,ORG_CHART_DATA} from '@/app/api/prueba2';
+import {INTEGRATED_ORG_DATA, EMPLOYEES_DATA,ORG_CHART_DATA,} from '@/app/api/prueba2';
 import {ModalConfig, Department, Office, EntityFormData,Employee  } from '@/app/Interfas/Interfaces';
 
-
+interface ModalContext {
+  departmentId?: number;
+  [key: string]: unknown; // Para permitir propiedades adicionales
+}
 
 
 export default function OrganigramaPage() {
@@ -23,10 +26,18 @@ export default function OrganigramaPage() {
     setSelectedDepartment(departmentsData.find((d) => d.id === department.id) || null);
   };
 
-  const handleOpenModal = (type: 'department' | 'office', data: Department | Office | undefined, context: unknown = {}) => {
-    setModalConfig({ type, data, context: context as { departmentId?: number } });
-    setIsModalOpen(true);
-  };
+  const handleOpenModal = (
+  type: 'department' | 'office', 
+  data?: Department | Office | null | undefined, 
+  context: ModalContext = {} 
+) => {
+  setModalConfig({ 
+    type, 
+    data: data ?? undefined, 
+    context: context as { departmentId?: number } 
+  });
+  setIsModalOpen(true);
+};
 
   const handleCloseModal = () => setIsModalOpen(false);
 
@@ -178,6 +189,7 @@ const handleSave = (formData: EntityFormData): void => {
             onSelect={handleSelectDepartment}
             selectedDepartment={selectedDepartment}
             onOpenModal={handleOpenModal}
+            employees={EMPLOYEES_DATA as unknown as Employee[]}
           />
         )}
         {activeTab === "organigrama" && <OrgChartNode node={ORG_CHART_DATA} />}
