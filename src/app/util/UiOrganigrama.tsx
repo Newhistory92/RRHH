@@ -45,60 +45,68 @@ export const EntityFormModal = ({
   const [newSkillName, setNewSkillName] = useState('');
   const [availableSkills, setAvailableSkills] = useState<TechnicalSkill[]>(AVAILABLE_SKILLS);
 
-  // Opciones para departamentos padre
+  // Opciones para departamentos padre (simplificado)
   const departmentOptions = departments
     .filter((d) => d.id !== data?.id)
-    .map((d) => ({ label: d.nombre, value: d.id, nombre: d.nombre }));
+    .map((d) => ({ label: d.nombre, value: d.id }));
 
-  // Opciones para empleados (solo ID y nombre para el dropdown)
-  const employeeOptions = employees.map(emp => ({
-    label: emp.name,
-    value: emp.id
+  // Opciones para empleados (simplificado)
+   const employeeOptions = employees.map(emp => ({
+    name: emp.name,
+    id: emp.id,
+    photo: emp.photo,
+    label: emp.name, // Para el filter
+    value: emp.id    // Para el value
   }));
 
   // Template personalizado para mostrar empleados en dropdown con avatar
-  const employeeOptionTemplate = (option: any) => {
-    const employee = employees.find(emp => emp.id === option.value);
-    if (!employee) return null;
-
+   const employeeOptionTemplate = (option: any) => {
     return (
       <div className="flex items-center gap-2">
         <Avatar 
-          image={employee.photo} 
-          label={employee.name.charAt(0)} 
+          image={option.photo} 
+          label={option.name.charAt(0)} 
           size="normal" 
           shape="circle"
           className="w-8 h-8"
         />
-        <span>{employee.name}</span>
+        <span>{option.name}</span>
       </div>
     );
   };
 
   // Template para el valor seleccionado en dropdown de empleado
-  const selectedEmployeeTemplate = (option: any) => {
+   const selectedEmployeeTemplate = (option: any) => {
     if (!option) return <span>Seleccionar empleado</span>;
     
-    const employee = employees.find(emp => emp.id === option);
-    if (!employee) return <span>Empleado no encontrado</span>;
+    // Buscar el empleado por ID en la lista de empleados
+    const selectedEmployee = employees.find(emp => emp.id === option);
+    
+    if (!selectedEmployee) return <span>Seleccionar empleado</span>;
     
     return (
       <div className="flex items-center gap-2">
         <Avatar 
-          image={employee.photo} 
-          label={employee.name.charAt(0)} 
+          image={selectedEmployee.photo} 
+          label={selectedEmployee.name.charAt(0)} 
           size="normal" 
           shape="circle"
           className="w-6 h-6"
         />
-        <span>{employee.name}</span>
+        <span>{selectedEmployee.name}</span>
       </div>
     );
   };
 
+
+  const handleJefeChange = (e: DropdownChangeEvent) => {
+    console.log('Jefe seleccionado:', e.value);
+    setFormData(prev => ({ ...prev, jefeId: e.value }));
+  };
+
   // Template para empleados en MultiSelect
   const employeeMultiSelectTemplate = (option: any) => {
-    const employee = employees.find(emp => emp.id === option);
+    const employee = employees.find(emp => emp.id === option.value);
     if (!employee) return null;
 
     return (
@@ -116,6 +124,9 @@ export const EntityFormModal = ({
   };
 
   React.useEffect(() => {
+    console.log('useEffect ejecutado:', { data, type });
+    console.log('Empleados disponibles:', employees);
+    
     if (!data) {
       if (type === "department") {
         setFormData({
@@ -147,12 +158,14 @@ export const EntityFormModal = ({
         empleadosIds: (data as Office)?.empleadosIds || 
                      (data as Department)?.oficinas?.flatMap(office => office.empleadosIds || []) || []
       };
+      console.log('Datos de entidad cargados:', entityData);
       setFormData(entityData);
     }
-  }, [data, type]);
+  }, [data, type, employees]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('Formulario enviado:', formData);
     onSave(formData);
   };
 
@@ -184,12 +197,12 @@ export const EntityFormModal = ({
       setNewSkillName('');
       setShowSkillDialog(false);
       
-      // TODO: Aquí iría la llamada a la API real para guardar en la base de datos
-      console.log('Nueva habilidad agregada (mock):', newSkill);
+      console.log('Nueva habilidad agregada:', newSkill);
     }
   };
 
-    return (
+
+  return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
         <button
@@ -206,19 +219,20 @@ export const EntityFormModal = ({
         
         <form onSubmit={handleSubmit}>
           <div className="space-y-6">
-            {/* Nombre - Editable Dropdown */}
+            {/* Nombre - Editable Dropdown simplificado */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Nombre
               </label>
               <Dropdown
                 value={formData.nombre}
-                onChange={(e: DropdownChangeEvent) => 
-                  setFormData(prev => ({ ...prev, nombre: e.value }))
-                }
+                onChange={(e: DropdownChangeEvent) => {
+                  console.log('Nombre cambiado:', e.value);
+                  setFormData(prev => ({ ...prev, nombre: e.value }));
+                }}
                 options={departmentOptions}
-                optionLabel="nombre"
-                optionValue="nombre"
+                optionLabel="label"
+                optionValue="label"
                 editable
                 placeholder="Seleccionar o escribir nombre"
                 className="w-full mb-8"
@@ -260,16 +274,17 @@ export const EntityFormModal = ({
                   />
                 </div>
 
-                {/* Departamento Padre */}
+                {/* Departamento Padre - Simplificado */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Depende de (Dpto. Padre)
                   </label>
                   <Dropdown
                     value={formData.parentId}
-                    onChange={(e: DropdownChangeEvent) => 
-                      setFormData(prev => ({ ...prev, parentId: e.value }))
-                    }
+                    onChange={(e: DropdownChangeEvent) => {
+                      console.log('Parent ID cambiado:', e.value);
+                      setFormData(prev => ({ ...prev, parentId: e.value }));
+                    }}
                     options={departmentOptions}
                     optionLabel="label"
                     optionValue="value"
@@ -279,27 +294,26 @@ export const EntityFormModal = ({
                   />
                 </div>
 
-                {/* Jefe de Área */}
+                {/* Jefe de Área - Simplificado */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Jefe de Área
                   </label>
-                  <Dropdown
-                    value={formData.jefeId}
-                    onChange={(e: DropdownChangeEvent) => 
-                      setFormData(prev => ({ ...prev, jefeId: e.value }))
-                    }
-                    options={employeeOptions}
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder="Seleccionar jefe de área"
-                    itemTemplate={employeeOptionTemplate}
-                    valueTemplate={selectedEmployeeTemplate}
-                    className="w-full"
-                    showClear
-                    filter
-                    filterBy="label"
-                  />
+                 <Dropdown
+  value={formData.jefeId}
+  onChange={(e: DropdownChangeEvent) => {
+    console.log('Jefe seleccionado:', e.value);
+    setFormData(prev => ({ ...prev, jefeId: e.value }));
+  }}
+  options={employees}  // Pasar el array directo de empleados
+  optionLabel="name"   // Usar la propiedad name directamente
+  optionValue="id"     // Usar la propiedad id como valor
+  placeholder="Seleccionar jefe de área"
+  className="w-full"
+  showClear
+  filter
+  filterBy="name"
+/>
                 </div>
 
                 {/* Empleados Asignados al Departamento */}
@@ -310,8 +324,7 @@ export const EntityFormModal = ({
                   <MultiSelect
                     value={formData.empleadosIds || []}
                     onChange={(e: MultiSelectChangeEvent) => {
-                      console.log("📋 Office MultiSelect onChange - e.value:", e.value);
-                      console.log("📋 Office MultiSelect onChange - e:", e);
+                      console.log('Empleados seleccionados:', e.value);
                       setFormData(prev => ({ 
                         ...prev, 
                         empleadosIds: e.value
@@ -322,7 +335,6 @@ export const EntityFormModal = ({
                     optionValue="value"
                     placeholder="Seleccionar empleados"
                     itemTemplate={employeeMultiSelectTemplate}
-                    selectedItemTemplate={selectedEmployeeTemplate}
                     className="w-full"
                     filter
                     filterBy="label"
@@ -365,9 +377,10 @@ export const EntityFormModal = ({
                   </label>
                   <Dropdown
                     value={formData.jefeId}
-                    onChange={(e: DropdownChangeEvent) => 
-                      setFormData(prev => ({ ...prev, jefeId: e.value }))
-                    }
+                    onChange={(e: DropdownChangeEvent) => {
+                      console.log('Jefe de oficina cambiado:', e.value);
+                      setFormData(prev => ({ ...prev, jefeId: e.value }));
+                    }}
                     options={employeeOptions}
                     optionLabel="label"
                     optionValue="value"
@@ -388,12 +401,13 @@ export const EntityFormModal = ({
                   </label>
                   <MultiSelect
                     value={formData.empleadosIds || []}
-                    onChange={(e: MultiSelectChangeEvent) => 
+                    onChange={(e: MultiSelectChangeEvent) => {
+                      console.log('Empleados oficina seleccionados:', e.value);
                       setFormData(prev => ({ 
                         ...prev, 
                         empleadosIds: e.value
-                      }))
-                    }
+                      }));
+                    }}
                     options={employeeOptions}
                     optionLabel="label"
                     optionValue="value"
@@ -447,15 +461,16 @@ export const EntityFormModal = ({
               </div>
               <MultiSelect
                 value={formData.habilidades_requeridas}
-                onChange={(e: MultiSelectChangeEvent) => 
-                  setFormData(prev => ({ ...prev, habilidades_requeridas: e.value }))
-                }
+                onChange={(e: MultiSelectChangeEvent) => {
+                  console.log('Habilidades cambiadas:', e.value);
+                  setFormData(prev => ({ ...prev, habilidades_requeridas: e.value }));
+                }}
                 options={availableSkills}
-                optionLabel="name"
+                optionLabel="nombre"
                 placeholder="Seleccionar habilidades"
                 className="w-full"
                 filter
-                filterBy="name"
+                filterBy="nombre"
                 maxSelectedLabels={5}
                 selectedItemsLabel="{0} habilidades seleccionadas"
               />

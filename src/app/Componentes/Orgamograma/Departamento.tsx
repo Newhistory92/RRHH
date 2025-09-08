@@ -6,6 +6,8 @@ import type {Department, Employee, Office} from '@/app/Interfas/Interfaces';
 import { Button } from 'primereact/button';
 import { Card } from '../Card';
 import { Tag } from 'primereact/tag';
+import { Tree } from 'primereact/tree';
+import { TreeNode } from 'primereact/treenode';
 
 interface ModalContext {
   departmentId?: number;
