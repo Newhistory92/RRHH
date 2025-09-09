@@ -62,26 +62,6 @@ export const SkillsDisplay = ({ selectedDepartment }: { selectedDepartment?: Dep
 };
 
 
-
-// export const EmployeeAvatar = ({ employeeId }) => {
-//   const employee = EMPLOYEES_DATA.find((e) => e.id === employeeId);
-//   if (!employee) return null;
-//   return (
-//     <div className="flex items-center" title={employee.name}>
-//        <Image
-//                   src={employee.photo}
-//                   alt={`Foto de ${employee.name}`}
-//                   width={96}
-//                   height={96}
-//                   className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
-
-//                   priority
-//                 />
-//       <span className="text-gray-700 hidden sm:inline">{employee.name}</span>
-//     </div>
-//   );
-// };
-
 export const EmployeeAvatar = ({ 
   employeeId, 
   employees, 

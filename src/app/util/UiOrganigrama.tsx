@@ -13,6 +13,7 @@ import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
 import { AVAILABLE_SKILLS } from "@/app/api/prueba2";
 
+        
 interface EntityFormModalProps {
   config: ModalConfig;
   onClose: () => void;
@@ -30,6 +31,22 @@ export const EntityFormModal = ({
 }: EntityFormModalProps) => {
   const { type, data } = config;
   
+
+  interface DropdownOption {
+  value: number;
+  label: string;
+  name: string;
+  photo?: string;
+}
+interface EmployeeTemplateProps {
+  option: DropdownOption;
+}
+
+interface SelectedEmployeeTemplateProps {
+  option: number | null; // Recibe el ID del empleado
+}
+
+
   const [formData, setFormData] = useState<EntityFormData>({
     nombre: '',
     descripcion: '',
@@ -60,7 +77,7 @@ export const EntityFormModal = ({
   }));
 
   // Template personalizado para mostrar empleados en dropdown con avatar
-   const employeeOptionTemplate = (option: any) => {
+const employeeOptionTemplate = ({ option }: EmployeeTemplateProps) => {
     return (
       <div className="flex items-center gap-2">
         <Avatar 
@@ -76,7 +93,7 @@ export const EntityFormModal = ({
   };
 
   // Template para el valor seleccionado en dropdown de empleado
-   const selectedEmployeeTemplate = (option: any) => {
+  const selectedEmployeeTemplate = ({ option }: SelectedEmployeeTemplateProps) => {
     if (!option) return <span>Seleccionar empleado</span>;
     
     // Buscar el empleado por ID en la lista de empleados
@@ -99,13 +116,9 @@ export const EntityFormModal = ({
   };
 
 
-  const handleJefeChange = (e: DropdownChangeEvent) => {
-    console.log('Jefe seleccionado:', e.value);
-    setFormData(prev => ({ ...prev, jefeId: e.value }));
-  };
 
   // Template para empleados en MultiSelect
-  const employeeMultiSelectTemplate = (option: any) => {
+const employeeMultiSelectTemplate = ({ option }:EmployeeTemplateProps) => {
     const employee = employees.find(emp => emp.id === option.value);
     if (!employee) return null;
 

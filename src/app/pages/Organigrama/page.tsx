@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import {  Sparkles, LayoutGrid,  } from 'lucide-react';
 import { OrgChartNode } from '@/app/Componentes/OrganigramaGraf/organigrama';
 import { DepartmentManagementView } from '@/app/Componentes/Orgamograma/Departamento';
-import { EntityFormModal } from '@/app/util/UiOrganigrama';
+import { EntityFormModal } from '@/app/Componentes/Orgamograma/Componente/EntityFormModal';
 import {INTEGRATED_ORG_DATA, EMPLOYEES_DATA,ORG_CHART_DATA,} from '@/app/api/prueba2';
 import {ModalConfig, Department, Office, EntityFormData,Employee  } from '@/app/Interfas/Interfaces';
 

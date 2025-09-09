@@ -395,6 +395,7 @@ export interface ModalConfig {
 
 export interface EntityFormData {
   // Campos comunes
+  id?: number;
   nombre: string;
   descripcion: string;
   jefeId: number | null;
@@ -404,4 +405,33 @@ export interface EntityFormData {
   parentId?: number | null;
   // Campos específicos de Office
   empleadosIds?: number[];
+}
+
+export interface ModalContext {
+  departmentId?: number;
+  [key: string]: unknown; // Para permitir propiedades adicionales
+}
+
+export interface DropdownOption {
+  value: number;
+  label: string;
+  name: string;
+  photo?: string;
+}
+
+export interface EntityFormModalProps {
+  config: ModalConfig;
+  onClose: () => void;
+  onSave: (formData: EntityFormData) => void;
+  departments: Department[];
+  employees: Employee[];
+}
+
+export interface FormFieldProps {
+  formData: EntityFormData;
+  setFormData: React.Dispatch<React.SetStateAction<EntityFormData>>;
+  employees: Employee[];
+  departments: Department[];
+  availableSkills?: TechnicalSkill[];
+  setAvailableSkills?: React.Dispatch<React.SetStateAction<TechnicalSkill[]>>;
 }
