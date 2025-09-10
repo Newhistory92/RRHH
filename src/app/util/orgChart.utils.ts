@@ -1,5 +1,5 @@
-import { OrgData, OrgNode, OrgStats, NodeColors } from '@/app/Interfas/Interfaces';
-import { NODE_COLORS, DEFAULT_NODE_COLOR, LEVEL_LABELS } from '@/app/Componentes/OrganigramaGraf/orgChart.constants';
+import { OrgData, OrgNode, OrgStatsType, NodeColors } from '@/app/Interfas/Interfaces';
+import { NODE_COLORS, DEFAULT_NODE_COLOR, LEVEL_LABELS, NODE_COLORS2, DEFAULT_NODE_COLOR2 } from '@/app/Componentes/OrganigramaGraf/orgChart.constants';
 
 export class OrgChartUtils {
   static buildHierarchy(data: OrgData[]): OrgNode[] {
@@ -46,7 +46,7 @@ export class OrgChartUtils {
     });
   }
 
-  static calculateStats(data: OrgData[]): OrgStats {
+  static calculateStats(data: OrgData[]): OrgStatsType {
     const niveles = new Set(data.map(item => item.nivel_jerarquico));
     return {
       totalNodos: data.length,
@@ -55,7 +55,10 @@ export class OrgChartUtils {
     };
   }
 
-  static getNodeColors(nivel: number): NodeColors {
+ static getNodeColors(nivel: number, colorTheme: string = 'Oscuro'): NodeColors {
+    if (colorTheme === 'Claro') {
+      return NODE_COLORS2[nivel] || DEFAULT_NODE_COLOR2;
+    }
     return NODE_COLORS[nivel] || DEFAULT_NODE_COLOR;
   }
 

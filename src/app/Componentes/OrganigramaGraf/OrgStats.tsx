@@ -1,6 +1,6 @@
 import React from 'react';
 import { Users, TrendingUp, Building2 } from 'lucide-react';
-import { OrgStats as OrgStatsType }  from '@/app/Interfas/Interfaces';
+import { OrgStatsType }  from '@/app/Interfas/Interfaces';
 
 interface OrgStatsProps {
   stats: OrgStatsType;

@@ -40,15 +40,21 @@ const handleFilterChange: ProductivityRankingProps["onFilterChange"] = (key, val
                     <nav className="-mb-px flex space-x-6" aria-label="Tabs">
                         <button
                             onClick={() => setActiveTab('ranking')}
-                            className={`${activeTab === 'ranking' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200'}
-                                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
+                            className={`flex items-center px-4 py-2 font-semibold transition-colors duration-200 ${
+    activeTab === "ranking"
+      ? "border-b-2 border-[#2ecbe7] text-[#1ABCD7] text-shadow-md"
+      : "text-gray-500 hover:text-blue-500 text-shadow-md"
+  }`}
                         >
                             <User className="mr-2 h-5 w-5"/> Ranking de Productividad
                         </button>
                         <button
                             onClick={() => setActiveTab('globales')}
-                            className={`${activeTab === 'globales' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200'}
-                                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
+                           className={`flex items-center px-4 py-2 font-semibold transition-colors duration-200 ${
+    activeTab === "globales"
+      ? "border-b-2 border-[#2ecbe7] text-[#1ABCD7] text-shadow-md"
+      : "text-gray-500 hover:text-blue-500 text-shadow-md"
+  }`}
                         >
                             <BarChart2 className="mr-2 h-5 w-5"/> Estadísticas Globales
                         </button>

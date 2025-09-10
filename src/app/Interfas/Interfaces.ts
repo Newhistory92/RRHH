@@ -435,3 +435,34 @@ export interface FormFieldProps {
   availableSkills?: TechnicalSkill[];
   setAvailableSkills?: React.Dispatch<React.SetStateAction<TechnicalSkill[]>>;
 }
+
+export interface OrgData {
+  id: number;
+  nombre: string;
+  nivel_jerarquico: number;
+  jefeId: number | null;
+}
+
+export interface OrgNode extends OrgData {
+  children?: OrgNode[];
+}
+
+export interface OrgStatsType {
+  totalNodos: number;
+  maxNivel: number;
+  nivelesUnicos: number[];
+}
+
+export interface NodeColors {
+  bg: string;
+  text: string;
+  border: string;
+}
+
+export interface OrgChartProps {
+  data: OrgData[];
+  title?: string;
+  showLegend?: boolean;
+  showStats?: boolean;
+  className?: string;
+}

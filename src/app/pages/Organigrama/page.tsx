@@ -1,10 +1,10 @@
 "use client"
 import React, { useState } from 'react';
 import {  Sparkles, LayoutGrid,  } from 'lucide-react';
-import { OrgChartNode } from '@/app/Componentes/OrganigramaGraf/organigrama';
+import { OrgChart } from '@/app/Componentes/OrganigramaGraf/OrgChart';
 import { DepartmentManagementView } from '@/app/Componentes/Orgamograma/Departamento';
 import { EntityFormModal } from '@/app/Componentes/Orgamograma/Componente/EntityFormModal';
-import {INTEGRATED_ORG_DATA, EMPLOYEES_DATA,ORG_CHART_DATA,} from '@/app/api/prueba2';
+import {INTEGRATED_ORG_DATA, EMPLOYEES_DATA,} from '@/app/api/prueba2';
 import {ModalConfig, Department, Office, EntityFormData,Employee  } from '@/app/Interfas/Interfaces';
 
 interface ModalContext {
@@ -160,23 +160,23 @@ const handleSave = (formData: EntityFormData): void => {
         <div className="mb-6 border-b border-gray-200">
           <nav className="-mb-px flex space-x-6">
             <button
-              onClick={() => setActiveTab("gestion")}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
-                activeTab === "gestion"
-                  ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200"
-              }`}
-            >
-              <LayoutGrid className="mr-2 h-5 w-5" />
-              Gestión de Departamentos
-            </button>
+  onClick={() => setActiveTab("gestion")}
+  className={`flex items-center px-4 py-2 font-semibold transition-colors duration-200 ${
+    activeTab === "gestion"
+      ? "border-b-2 border-[#2ecbe7] text-[#1ABCD7] text-shadow-md"
+      : "text-gray-500 hover:text-blue-500 text-shadow-md"
+  }`}
+>
+  <LayoutGrid className="h-5 w-5 mr-2" />
+  Gestión de Departamentos
+</button>
             <button
               onClick={() => setActiveTab("organigrama")}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
-                activeTab === "organigrama"
-                  ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200"
-              }`}
+              className={`flex items-center px-4 py-2 font-semibold transition-colors duration-200 ${
+    activeTab === "organigrama"
+      ? "border-b-2 border-[#2ecbe7] text-[#1ABCD7] text-shadow-md"
+      : "text-gray-500 hover:text-blue-500 text-shadow-md"
+  }`}
             >
               <Sparkles className="mr-2 h-5 w-5" />
               Organigrama
@@ -192,7 +192,16 @@ const handleSave = (formData: EntityFormData): void => {
             employees={EMPLOYEES_DATA as unknown as Employee[]}
           />
         )}
-        {activeTab === "organigrama" && <OrgChartNode node={ORG_CHART_DATA} />}
+          {activeTab === "organigrama" &&
+          <div className="animate-fade-in">
+            
+        <OrgChart
+        data={INTEGRATED_ORG_DATA}
+        title="Mi Organigrama Empresarial"
+        showLegend={true}
+        showStats={true}
+      />
+      </div>}
       </div>
       {isModalOpen && (
         <EntityFormModal

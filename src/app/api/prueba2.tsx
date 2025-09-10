@@ -809,56 +809,6 @@ export const INTEGRATED_ORG_DATA = [
   }
 ];
 
-// Estructura jerárquica para organigrama (actualizada con empleados reales)
-export const ORG_CHART_DATA = {
-  id: 'CEO',
-  name: 'Dirección General',
-  position: 'CEO',
-  employeeId: null, // No tenemos CEO en nuestros datos de empleados
-  children: [
-    {
-      id: 'RRHH',
-      name: 'María Rodríguez',
-      position: 'Supervisora de Recursos Humanos',
-      employeeId: 3,
-      department: 'Recursos Humanos',
-      children: []
-    },
-    {
-      id: 'ATENCION',
-      name: 'Ana García',
-      position: 'Especialista en Atención al Cliente',
-      employeeId: 1,
-      department: 'Atención al Cliente',
-      children: [
-        {
-          id: 'ATENCION_SENIOR',
-          name: 'Laura Fernández',
-          position: 'Especialista Senior en Atención al Cliente',
-          employeeId: 5,
-          department: 'Atención al Cliente',
-          children: []
-        }
-      ]
-    },
-    {
-      id: 'SISTEMAS',
-      name: 'Juan Pérez',
-      position: 'Desarrollador de Sistemas',
-      employeeId: 2,
-      department: 'Sistemas',
-      children: []
-    },
-    {
-      id: 'LEGALES',
-      name: 'Carlos Sánchez',
-      position: 'Auditor Legal',
-      employeeId: 4,
-      department: 'Legales',
-      children: []
-    }
-  ]
-};
 
 
 
@@ -933,3 +883,5 @@ export const EMPLOYEE_ROLES = {
   ADMIN: 'admin',
   AUDITOR: 'auditor'
 };
+
+

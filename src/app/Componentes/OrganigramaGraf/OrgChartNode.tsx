@@ -6,16 +6,17 @@ import { NodeConnections } from '@/app/util/useOrgChart';
 
 interface OrgChartNodeProps {
   node: OrgNode;
+  colorTheme: string;
 }
 
-export const OrgChartNode: React.FC<OrgChartNodeProps> = ({ node }) => {
+export const OrgChartNode: React.FC<OrgChartNodeProps> = ({ node, colorTheme }) => {
   const [isOpen, setIsOpen] = useState(true);
   const hasChildren = !!(node.children && node.children.length > 0);
 
   return (
     <div className="flex flex-col items-center">
       <div className="relative flex flex-col items-center">
-        <NodeCard node={node} />
+        <NodeCard node={node} colorTheme={colorTheme} />
         <ExpandButton 
           isOpen={isOpen} 
           onToggle={() => setIsOpen(!isOpen)} 
@@ -32,7 +33,7 @@ export const OrgChartNode: React.FC<OrgChartNodeProps> = ({ node }) => {
               <div key={child.id} className="relative">
                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-4 bg-gray-400 dark:bg-gray-500"></div>
                 <div className="pt-4">
-                  <OrgChartNode node={child} />
+                  <OrgChartNode node={child} colorTheme={colorTheme} />
                 </div>
               </div>
             ))}

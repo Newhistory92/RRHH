@@ -6,13 +6,14 @@ import { DynamicSection } from '@/app/Componentes/Perfil/DynamicSectionCv';
 import { Accordion, Input, Select,  SectionTitle,formatDate } from '@/app/util/UiCv';
 import { ProfilePictureUploader } from '@/app/Componentes/Perfil/ProfilePicture';
 import { SkillTestModal } from '@/app/Componentes/Perfil/SkillTest';
-import { initialCvData } from '@/app/api/Prueba';
-import { mockData } from '@/app/api/Prueba';
+import { AVAILABLE_SKILLS, SOFT_SKILLS_CATALOG} from '@/app/api/prueba2';
+ import {  EMPLOYEES_DATA } from '@/app/api/prueba2';
 import SkillTecnico from '@/app/Componentes/Perfil/SkillTecnit';
 import SkillBlandas from '@/app/Componentes/Perfil/SkillBlande';
+
 export default function EmployeeCV() {
-  const loggedInEmployee = mockData.employees.find((e) => e.id === 1);
-  const [cvData, setCvData] = useState(initialCvData(loggedInEmployee));
+  const loggedInEmployee =  SOFT_SKILLS_CATALOG.find((e) => e.id === 1);
+  const [cvData, setCvData] = useState( EMPLOYEES_DATA.find((e) => e.id === 1));
   const [originalCvData, setOriginalCvData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
@@ -142,7 +143,7 @@ export default function EmployeeCV() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-3 flex justify-center">
                 <ProfilePictureUploader
-                  photo={cvData.personalData.profilePhoto}
+                  photo={cvData.photo}
                   setPhoto={(photo) =>
                     handlePersonalDataChange("profilePhoto", photo)
                   }
@@ -151,26 +152,19 @@ export default function EmployeeCV() {
               </div>
               <Input
                 label="Nombre Completo"
-                value={cvData.personalData.fullName}
+                value={cvData.name}
                 disabled
               />
-              <Input label="DNI" value={cvData.personalData.dni} disabled />
+              <Input label="DNI" value={cvData.dni} disabled />
               <Input
                 label="Fecha de Nacimiento"
-                value={cvData.personalData.birthDate}
+                value={cvData.birthDate}
                 disabled
               />
-              <Input
-                label="Nacionalidad"
-                value={cvData.personalData.nationality}
-                onChange={(e) =>
-                  handlePersonalDataChange("nationality", e.target.value)
-                }
-                disabled={!isEditing}
-              />
+              
               <Select
                 label="Género (opcional)"
-                value={cvData.personalData.gender}
+                value={cvData.gender}
                 onChange={(e) =>
                   handlePersonalDataChange("gender", e.target.value)
                 }
@@ -465,7 +459,7 @@ export default function EmployeeCV() {
                   Añadir Nueva Habilidad
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {mockData.availableSkills.map((skill) => {
+                  { AVAILABLE_SKILLS.map((skill) => {
                     const passedSkill = cvData.technicalSkills.find(
                       (s) => s.skill === skill.name
                     );
@@ -532,7 +526,7 @@ export default function EmployeeCV() {
           </Accordion>
           <Accordion title="6. Habilidades Blandas">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {mockData.softSkills.map((skill) => (
+              {SOFT_SKILLS_CATALOG.map((skill) => (
                 <label
                   key={skill.id}
                   className={`flex items-start p-3 border rounded-lg ${
