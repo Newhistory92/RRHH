@@ -1,67 +1,104 @@
 import React from 'react';
 import { Avatar } from 'primereact/avatar';
-import type { DropdownOption} from '@/app/Interfas/Interfaces';
-import type { Employee } from '@/app/Interfas/Interfaces';
+import type { DropdownOption,Employee } from '@/app/Interfas/Interfaces';
+
 
 export interface EmployeeTemplateProps {
   option: DropdownOption;
-}
-
-export interface SelectedEmployeeTemplateProps {
-  option?: number | null; // Made optional and nullable
 }
 
 interface EmployeeTemplatesProps {
   employees: Employee[];
 }
 
+export interface SelectedEmployeeTemplateProps {
+  option?: number | null;
+}
+export interface DropdownChangeEvent {
+  value: number | number[] | null;
+  target: {
+    name?: string;
+    value: number | number[] | null;
+  };
+}
+
+export type SelectedEmployeeOptionParam = number | EmployeeOptionParam | null;
+export interface EmployeeOptionParam {
+  value: number;
+  label?: string;
+  name?: string;
+}
 export const useEmployeeTemplates = ({ employees }: EmployeeTemplatesProps) => {
-  console.log('Empleados recibidos en useEmployeeTemplates:', employees);
+
    
-  const employeeOptionTemplate = ({ option }: EmployeeTemplateProps) => {
+
+  const employeeOptionTemplate = (option: EmployeeOptionParam) => {
+    if (!option) return null;
+    
+    const employee = employees.find(emp => emp.id === option.value);
+    if (!employee) return null;
+
     return (
       <div className="flex items-center gap-2">
         <Avatar 
-          image={option.photo}
-          label={option.name.charAt(0)}
+          image={employee.photo}
+          label={employee.name.charAt(0)}
           size="normal"
           shape="circle"
           className="w-8 h-8"
         />
-        <span>{option.name}</span>
+        <span>{employee.name}</span>
       </div>
     );
   };
 
-  // Fixed: Handle the case where the entire parameter might be null/undefined
-  const selectedEmployeeTemplate = (param: SelectedEmployeeTemplateProps | null | undefined) => {
-    // Handle cases where param is null/undefined or option is null/undefined
-    if (!param || !param.option) {
-      return <span>Seleccionar empleado</span>;
-    }
-        
-    // Buscar el empleado por ID en la lista de empleados
-    const selectedEmployee = employees.find(emp => emp.id === param.option);
-        
-    if (!selectedEmployee) {
-      return <span>Seleccionar empleado</span>;
-    }
-        
+
+ const selectedEmployeeTemplate = (option: SelectedEmployeeOptionParam) => {
+
+    if (!option) return <span>Seleccionar empleado</span>;
+    const employeeId = typeof option === 'object' ? option.value : option;
+      
+    const employee = employees.find(emp => emp.id === employeeId); 
+    if (!employee) return <span>{`Empleado no encontrado (ID: ${employeeId})`}</span>;
+    
     return (
       <div className="flex items-center gap-2">
         <Avatar 
-          image={selectedEmployee.photo}
-          label={selectedEmployee.name.charAt(0)}
+          image={employee.photo}
+          label={employee.name.charAt(0)}
           size="normal"
           shape="circle"
           className="w-6 h-6"
         />
-        <span>{selectedEmployee.name}</span>
+        <span>{employee.name}</span>
       </div>
     );
   };
 
-  const employeeMultiSelectTemplate = ({ option }: EmployeeTemplateProps) => {
+  const selectedMultiSelectEmployeeTemplate = (option: SelectedEmployeeTemplateProps) => {
+    if (!option) return null;
+    
+    const employee = employees.find(emp => emp.id === option);
+    if (!employee) return null;
+
+    return (
+      <div className="flex items-center gap-2">
+        <Avatar 
+          image={employee.photo}
+          label={employee.name.charAt(0)}
+          size="normal"
+          shape="circle"
+          className="w-6 h-6"
+        />
+        <span>{employee.name}</span>
+      </div>
+    );
+  };
+
+
+  const employeeMultiSelectTemplate = (option: DropdownChangeEvent) => {
+    if (!option) return null;
+    
     const employee = employees.find(emp => emp.id === option.value);
     if (!employee) return null;
 
@@ -82,6 +119,7 @@ export const useEmployeeTemplates = ({ employees }: EmployeeTemplatesProps) => {
   return {
     employeeOptionTemplate,
     selectedEmployeeTemplate,
+    selectedMultiSelectEmployeeTemplate,
     employeeMultiSelectTemplate
   };
 };
