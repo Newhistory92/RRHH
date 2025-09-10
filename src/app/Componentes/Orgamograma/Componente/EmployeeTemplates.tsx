@@ -16,9 +16,10 @@ interface EmployeeTemplatesProps {
 }
 
 export const useEmployeeTemplates = ({ employees }: EmployeeTemplatesProps) => {
-  console.log('Empleados recibidos en useEmployeeTemplates:', employees);
+
    
   const employeeOptionTemplate = ({ option }: EmployeeTemplateProps) => {
+    console.log('Opción recibida en employeeOptionTemplate:', option);
     return (
       <div className="flex items-center gap-2">
         <Avatar 
@@ -35,6 +36,8 @@ export const useEmployeeTemplates = ({ employees }: EmployeeTemplatesProps) => {
 
   // Fixed: Handle the case where the entire parameter might be null/undefined
   const selectedEmployeeTemplate = (param: SelectedEmployeeTemplateProps | null | undefined) => {
+    console.log('Parámetro recibido en selectedEmployeeTemplate:', param);
+        
     // Handle cases where param is null/undefined or option is null/undefined
     if (!param || !param.option) {
       return <span>Seleccionar empleado</span>;
@@ -62,6 +65,7 @@ export const useEmployeeTemplates = ({ employees }: EmployeeTemplatesProps) => {
   };
 
   const employeeMultiSelectTemplate = ({ option }: EmployeeTemplateProps) => {
+    console.log('Opción recibida en employeeMultiSelectTemplate:', option);
     const employee = employees.find(emp => emp.id === option.value);
     if (!employee) return null;
 
