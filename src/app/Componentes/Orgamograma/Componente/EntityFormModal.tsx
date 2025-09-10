@@ -19,14 +19,7 @@ export const EntityFormModal: React.FC<EntityFormModalProps> = ({
 }) => {
   const { type, data } = config;
   const { formData, setFormData } = useFormData(config, employees);
-  const {
-    showSkillDialog,
-    setShowSkillDialog,
-    newSkillName,
-    setNewSkillName,
-    availableSkills,
-    handleAddSkill
-  } = useSkillManagement(formData, setFormData);
+  const { showSkillDialog, setShowSkillDialog, newSkillName, setNewSkillName, availableSkills, handleAddSkill } = useSkillManagement(formData, setFormData);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

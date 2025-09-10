@@ -15,6 +15,7 @@ export const SkillsField: React.FC<SkillsFieldProps> = ({
   availableSkills,
   setShowSkillDialog
 }) => {
+  console.log('Renderizando SkillsField con formData:', formData);
   return (
     <div>
       <div className="flex justify-between items-center mb-2">
@@ -37,11 +38,11 @@ export const SkillsField: React.FC<SkillsFieldProps> = ({
           setFormData(prev => ({ ...prev, habilidades_requeridas: e.value }));
         }}
         options={availableSkills}
-        optionLabel="nombre"
+        optionLabel="name"
         placeholder="Seleccionar habilidades"
         className="w-full"
         filter
-        filterBy="nombre"
+        filterBy="name"
         maxSelectedLabels={5}
         selectedItemsLabel="{0} habilidades seleccionadas"
       />
