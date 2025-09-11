@@ -1,5 +1,5 @@
 
-import { ComplaintStatus, EmployeeRole, EmployeeStatus, EmploymentStatus, LicenseStatus } from "../Interfas/Interfaces";
+import { ComplaintStatus, EmployeeRole, EmployeeStatus, EmploymentStatus, LicenseStatus, TestsByProfession } from "../Interfas/Interfaces";
 
 // Unified Employee Data Structure
 export const EMPLOYEES_DATA = [
@@ -885,3 +885,59 @@ export const EMPLOYEE_ROLES = {
 };
 
 
+export const initialProfessions: string[] = [
+  "Contador",
+  "Desarrollador",
+  "Diseñador UX/UI",
+  "Marketing Digital",
+  "Recursos Humanos",
+];
+
+export const initialTestsByProfession: TestsByProfession = {
+  "Contador": [
+    {
+      id: "1",
+      name: "Fundamentos de Contabilidad",
+      description: "Test básico sobre principios contables y estados financieros",
+      type: "multiple-choice",
+      questions: [
+        {
+          id: "q1",
+          text: "¿Cuál es la ecuación fundamental de la contabilidad?",
+          answers: [
+            { id: "a1", text: "Activo = Pasivo + Patrimonio", isCorrect: true },
+            { id: "a2", text: "Activo + Pasivo = Patrimonio", isCorrect: false },
+            { id: "a3", text: "Patrimonio = Activo - Pasivo", isCorrect: false },
+            { id: "a4", text: "Activo = Patrimonio - Pasivo", isCorrect: false },
+          ]
+        }
+      ]
+    },
+    {
+      id: "2",
+      name: "Análisis de Estados Financieros",
+      description: "Caso práctico de análisis financiero empresarial",
+      type: "case-study",
+      scenario: "Una empresa presenta los siguientes estados financieros... Analice la situación financiera y proponga mejoras."
+    }
+  ],
+  "Desarrollador": [
+    {
+      id: "3",
+      name: "JavaScript Avanzado",
+      description: "Test sobre conceptos avanzados de JavaScript",
+      type: "multiple-choice",
+      questions: [
+        {
+          id: "q2",
+          text: "¿Qué es el 'hoisting' en JavaScript?",
+          answers: [
+            { id: "a5", text: "Elevación de declaraciones al inicio del scope", isCorrect: true },
+            { id: "a6", text: "Un método para optimizar código", isCorrect: false },
+            { id: "a7", text: "Una forma de declarar variables", isCorrect: false },
+          ]
+        }
+      ]
+    }
+  ]
+};
