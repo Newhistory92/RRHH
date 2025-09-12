@@ -28,6 +28,7 @@ const SkillCard = ({ skill, onStart, isEvaluated }: { skill: Skill; onStart: () 
     >
       {isEvaluated ? 'Evaluada' : 'Comenzar Evaluación'}
     </button>
+    
   </div>
 );
 

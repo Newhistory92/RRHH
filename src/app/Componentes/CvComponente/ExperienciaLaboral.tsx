@@ -1,0 +1,91 @@
+import React from 'react';
+import { DynamicSection } from '@/app/Componentes/Perfil/DynamicSectionCv';
+import {CvProps, Employee} from "@/app/Interfas/Interfaces"
+import { Accordion, AccordionTab } from 'primereact/accordion';
+
+
+export default function ExperienciaLaboral({ data, updateData, isEditing }: CvProps) {
+    const handleChange = (id:number,field: keyof Employee, value: string) => {
+    const newData = data.map((item) =>
+      item.id === id ? { ...item, [field]: value } : item
+    );
+    updateData(newData);
+  };
+
+  const handleRemove = (id) => {
+    const newData = data.filter((item) => item.id !== id);
+    updateData(newData);
+  };
+
+  const handleAdd = () => {
+    const newItem = {
+      id: Date.now(),
+      position: "",
+      company: "",
+      industry: "",
+      location: "",
+      startDate: "",
+      endDate: "",
+      isCurrent: false,
+      contractType: "Tiempo completo",
+    };
+    updateData([...data, newItem]);
+  };
+
+  return (
+   
+<Accordion activeIndex={0}>
+<AccordionTab header="3. Experiencia Laboral">
+      <DynamicSection
+        sectionName="workExperience"
+        items={data}
+        onChange={handleChange}
+        onRemove={handleRemove}
+        onAdd={handleAdd}
+        fields={[
+          {
+            name: "position",
+            label: "Puesto",
+            type: "text",
+            required: true,
+            grid: "md:col-span-1",
+          },
+          {
+            name: "company",
+            label: "Empresa",
+            type: "text",
+            required: true,
+            grid: "md:col-span-1",
+          },
+          {
+            name: "industry",
+            label: "Industria",
+            type: "text",
+            required: true,
+          },
+          {
+            name: "location",
+            label: "Ubicación",
+            type: "text",
+            required: true,
+          },
+          { name: "startDate", label: "Fecha de Inicio", type: "date" },
+          { name: "endDate", label: "Fecha de Fin", type: "date" },
+          { name: "isCurrent", label: "Actualmente", type: "checkbox" },
+          {
+            name: "contractType",
+            label: "Tipo de Contrato",
+            type: "select",
+            options: [
+              { value: "Tiempo completo", label: "Tiempo completo" },
+              { value: "Medio tiempo", label: "Medio tiempo" },
+              { value: "Freelance", label: "Freelance" },
+            ],
+          },
+        ]}
+        isEditing={isEditing}
+      />
+      </AccordionTab>
+    </Accordion>
+  );
+}

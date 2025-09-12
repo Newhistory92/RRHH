@@ -248,6 +248,7 @@ export interface Employee {
   phone: string;
   address: string;
   birthDate: string;
+  gender?: string;
   photo: string;
   hours: number; // Total available hours for permissions
   // Employment Details
@@ -263,7 +264,10 @@ export interface Employee {
   startDate: string;
   permanentDate: string | null; // Can be null if employee is not permanent yet
   lastCategoryUpdate: string;
-
+ academicFormation: AcademicFormation[];
+  languages: Language[];
+  workExperience: WorkExperience[];
+  certifications: string[];
   // Management
   managerId: number | null; // Can be null if no manager assigned
   supervisor: string | null; // Can be null if no supervisor assigned
@@ -304,7 +308,41 @@ export interface Department {
   oficinas: Office[];
 }
 
+export interface AcademicFormation {
+  id: number;
+  title: string;
+  institution: string;
+  level: 'Secundario' | 'Terciario' | 'Universitario' | 'Posgrado' | 'Maestría' | 'Doctorado' | 'Otro';
+  status: 'Completo' | 'En curso' | 'Abandonado' | 'Pendiente';
+  startDate: string; // ISO format: YYYY-MM-DD
+  endDate: string | null; // ISO format: YYYY-MM-DD o null si está en curso
+  isCurrent: boolean;
+  attachment: File | string | null; // Puede ser un File object, URL string o null
+}
 
+// Interfaces para Languages (Idiomas)
+export interface Language {
+  id: number;
+  language: string;
+  level: 'Básico' | 'Intermedio' | 'Avanzado' | 'Nativo' | 'Bilingüe';
+  certification: string; // Nombre de la certificación (ej: TOEFL, DELE)
+  attachment: File | string | null; // Certificado o comprobante
+}
+
+// Interfaces para Work Experience (Experiencia Laboral)
+export interface WorkExperience {
+  id: number;
+  position: string; // Cargo o puesto
+  company: string; // Nombre de la empresa
+  industry: string; // Industria o rubro
+  location: string; // Ubicación (ciudad, país)
+  startDate: string; // ISO format: YYYY-MM-DD
+  endDate: string | null; // ISO format: YYYY-MM-DD o null si es trabajo actual
+  isCurrent: boolean;
+  contractType: 'Tiempo completo' | 'Medio tiempo' | 'Por contrato' | 'Freelance' | 'Pasantía' | 'Otro';
+  description?: string; // Opcional: descripción de responsabilidades
+  achievements?: string[]; // Opcional: logros o proyectos destacados
+}
 
 
 // Soft skills catalog interface
@@ -465,4 +503,51 @@ export interface OrgChartProps {
   showLegend?: boolean;
   showStats?: boolean;
   className?: string;
+}
+
+export type Answer = {
+  id: string;
+  text: string;
+  isCorrect: boolean;
+};
+
+export type Question = {
+  id: string;
+  text: string;
+  answers: Answer[];
+};
+
+export type BaseTest = {
+  id: string;
+  name: string;
+  description: string;
+};
+
+export type MultipleChoiceTest = BaseTest & {
+  type: 'multiple-choice';
+  questions: Question[];
+};
+
+export type CaseStudyTest = BaseTest & {
+  type: 'case-study';
+  scenario: string;
+};
+
+export type Test = MultipleChoiceTest | CaseStudyTest;
+
+export type TestsByProfession = {
+  [key: string]: Test[];
+};
+
+export type SoftSkill = {
+  name: string;
+  description: string;
+};
+
+
+
+export interface CvProps {
+  data: Employee;
+  updateData: (updates: Partial<Employee>) => void;
+  isEditing: boolean;
 }

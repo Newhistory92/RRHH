@@ -11,11 +11,12 @@ export const EMPLOYEES_DATA = [
     email: 'ana.garcia@example.com',
     phone: '11-1234-5678',
     address: 'Av. Siempre Viva 742',
+    gender: 'Femenino',
     birthDate: '1990-05-20',
     photo: 'https://placehold.co/150x150/E2E8F0/4A5568?text=AG',
     hours: 160, 
     // Información organizacional actualizada
-    position: 'Especialista en Atención al Cliente',
+    position: 'Abogado',
     department: 'Atención al Cliente',
     departmentId: 2,
     office: [],
@@ -119,13 +120,23 @@ export const EMPLOYEES_DATA = [
       { id: 1, name: 'Sistemas CRM', level: 8 },
       { id: 2, name: 'Gestión de tickets', level: 9 },
       { id: 3, name: 'Comunicación telefónica', level: 9 }
-    ]
+    ],
+    academicFormation: [ 
+        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null }, 
+        { id: 2, title: 'Bachiller Técnico', institution: 'Escuela Técnica N°5', level: 'Secundario', status: 'Completo', startDate: '2005-03-01', endDate: '2009-12-10', isCurrent: false, attachment: null },
+    ],
+    languages: [ { id: 1, language: 'Inglés', level: 'Avanzado', certification: 'TOEFL iBT', attachment: null }, { id: 2, language: 'Español', level: 'Nativo', certification: '', attachment: null }, ],
+    workExperience: [ 
+        { id: 1, position: 'Desarrolladora Frontend Senior', company: 'Empresa Actual', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2020-03-01', endDate: '', isCurrent: true, contractType: 'Tiempo completo' },
+        { id: 2, position: 'Desarrolladora Frontend', company: 'Tech Solutions S.A.', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2016-03-01', endDate: '2020-02-28', isCurrent: false, contractType: 'Tiempo completo' },
+    ],
   },
   {
     id: 2,
     name: 'Juan Pérez',
     dni: '12345678A',
     email: 'juan.perez@example.com',
+    gender: 'Masculino',
     phone: '11-8765-4321',
     address: 'Calle Falsa 123',
     birthDate: '1988-03-12',
@@ -204,13 +215,22 @@ export const EMPLOYEES_DATA = [
       { id: 2, name: 'Node.js', level: 8 },
       { id: 3, name: 'SQL', level: 8 },
       { id: 4, name: 'DevOps con Docker', level: 7 }
-    ]
+    ],academicFormation: [ 
+        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null }, 
+        { id: 2, title: 'Bachiller Técnico', institution: 'Escuela Técnica N°5', level: 'Secundario', status: 'Completo', startDate: '2005-03-01', endDate: '2009-12-10', isCurrent: false, attachment: null },
+    ],
+    languages: [ { id: 1, language: 'Inglés', level: 'Avanzado', certification: 'TOEFL iBT', attachment: null }, { id: 2, language: 'Español', level: 'Nativo', certification: '', attachment: null }, ],
+    workExperience: [ 
+        { id: 1, position: 'Desarrolladora Frontend Senior', company: 'Empresa Actual', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2020-03-01', endDate: '', isCurrent: true, contractType: 'Tiempo completo' },
+        { id: 2, position: 'Desarrolladora Frontend', company: 'Tech Solutions S.A.', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2016-03-01', endDate: '2020-02-28', isCurrent: false, contractType: 'Tiempo completo' },
+    ],
   },
   {
     id: 3,
     name: 'María Rodríguez',
     dni: '87654321B',
     email: 'maria.rodriguez@example.com',
+    gender: 'Femenino',
     phone: '11-2233-4455',
     address: 'Boulevard de los Sueños Rotos',
     birthDate: '1985-11-08',
@@ -307,13 +327,22 @@ export const EMPLOYEES_DATA = [
       { id: 1, name: 'Gestión de Proyectos (Agile)', level: 8 },
       { id: 2, name: 'Análisis de Datos con Pandas', level: 6 },
       { id: 3, name: 'Sistemas RRHH', level: 9 }
-    ]
+    ],academicFormation: [ 
+        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null }, 
+        { id: 2, title: 'Bachiller Técnico', institution: 'Escuela Técnica N°5', level: 'Secundario', status: 'Completo', startDate: '2005-03-01', endDate: '2009-12-10', isCurrent: false, attachment: null },
+    ],
+    languages: [ { id: 1, language: 'Inglés', level: 'Avanzado', certification: 'TOEFL iBT', attachment: null }, { id: 2, language: 'Español', level: 'Nativo', certification: '', attachment: null }, ],
+    workExperience: [ 
+        { id: 1, position: 'Desarrolladora Frontend Senior', company: 'Empresa Actual', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2020-03-01', endDate: '', isCurrent: true, contractType: 'Tiempo completo' },
+        { id: 2, position: 'Desarrolladora Frontend', company: 'Tech Solutions S.A.', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2016-03-01', endDate: '2020-02-28', isCurrent: false, contractType: 'Tiempo completo' },
+    ],
   },
   {
     id: 4,
     name: 'Carlos Sánchez',
     dni: '11223344C',
     email: 'carlos.sanchez@example.com',
+    gender: 'Masculino',
     phone: '11-5566-7788',
     address: 'Av. Corrientes 1234',
     birthDate: '1982-07-15',
@@ -404,13 +433,22 @@ export const EMPLOYEES_DATA = [
       { id: 1, name: 'Derecho Laboral', level: 9 },
       { id: 2, name: 'Auditoría', level: 8 },
       { id: 3, name: 'Análisis Legal', level: 8 }
-    ]
+    ],academicFormation: [ 
+        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null }, 
+        { id: 2, title: 'Bachiller Técnico', institution: 'Escuela Técnica N°5', level: 'Secundario', status: 'Completo', startDate: '2005-03-01', endDate: '2009-12-10', isCurrent: false, attachment: null },
+    ],
+    languages: [ { id: 1, language: 'Inglés', level: 'Avanzado', certification: 'TOEFL iBT', attachment: null }, { id: 2, language: 'Español', level: 'Nativo', certification: '', attachment: null }, ],
+    workExperience: [ 
+        { id: 1, position: 'Desarrolladora Frontend Senior', company: 'Empresa Actual', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2020-03-01', endDate: '', isCurrent: true, contractType: 'Tiempo completo' },
+        { id: 2, position: 'Desarrolladora Frontend', company: 'Tech Solutions S.A.', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2016-03-01', endDate: '2020-02-28', isCurrent: false, contractType: 'Tiempo completo' },
+    ],
   },
   {
     id: 5,
     name: 'Laura Fernández',
     dni: '99887766D',
     email: 'laura.fernandez@example.com',
+    gender: 'Femenino',
     phone: '11-9988-7766',
     address: 'San Martín 567',
     birthDate: '1992-01-25',
@@ -489,7 +527,15 @@ export const EMPLOYEES_DATA = [
       { id: 2, name: 'Gestión de tickets', level: 10 },
       { id: 3, name: 'Comunicación multicanal', level: 9 },
       { id: 4, name: 'Análisis de satisfacción', level: 8 }
-    ]
+    ],academicFormation: [ 
+        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null }, 
+        { id: 2, title: 'Bachiller Técnico', institution: 'Escuela Técnica N°5', level: 'Secundario', status: 'Completo', startDate: '2005-03-01', endDate: '2009-12-10', isCurrent: false, attachment: null },
+    ],
+    languages: [ { id: 1, language: 'Inglés', level: 'Avanzado', certification: 'TOEFL iBT', attachment: null }, { id: 2, language: 'Español', level: 'Nativo', certification: '', attachment: null }, ],
+    workExperience: [ 
+        { id: 1, position: 'Desarrolladora Frontend Senior', company: 'Empresa Actual', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2020-03-01', endDate: '', isCurrent: true, contractType: 'Tiempo completo' },
+        { id: 2, position: 'Desarrolladora Frontend', company: 'Tech Solutions S.A.', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2016-03-01', endDate: '2020-02-28', isCurrent: false, contractType: 'Tiempo completo' },
+    ],
   }
 ];
 
@@ -835,17 +881,17 @@ export const OFFICES = [
 ];
 
 export const AVAILABLE_SKILLS = [
-  { id: 1, name: 'React.js', category: 'Frontend' },
-  { id: 2, name: 'Node.js', category: 'Backend' },
-  { id: 3, name: 'Python', category: 'Programming' },
-  { id: 4, name: 'Análisis de Datos con Pandas', category: 'Data Science' },
-  { id: 5, name: 'Gestión de Proyectos (Agile)', category: 'Management' },
-  { id: 6, name: 'SQL', category: 'Database' },
-  { id: 7, name: 'DevOps con Docker', category: 'Infrastructure' },
-  { id: 8, name: 'UI/UX Design Fundamentals', category: 'Design' },
-  { id: 9, name: 'Sistemas CRM', category: 'Business Tools' },
-  { id: 10, name: 'Derecho Laboral', category: 'Legal' },
-  { id: 11, name: 'Auditoría', category: 'Finance' }
+  { id: 1, name: 'React.js', level: 8 },
+  { id: 2, name: 'Node.js', level: 7 },
+  { id: 3, name: 'Python', level: 6 },
+  { id: 4, name: 'Análisis de Datos con Pandas', level: 5 },
+  { id: 5, name: 'Gestión de Proyectos (Agile)', level: 4 },
+  { id: 6, name: 'SQL', level: 3 },
+  { id: 7, name: 'DevOps con Docker', level: 2 },
+  { id: 8, name: 'UI/UX Design Fundamentals', level: 1 },
+  { id: 9, name: 'Sistemas CRM', level: 1 },
+  { id: 10, name: 'Derecho Laboral', level: 1 },
+  { id: 11, name: 'Auditoría', level: 1 }
 ];
 
 export const SOFT_SKILLS_CATALOG = [
@@ -893,7 +939,7 @@ export const initialProfessions: string[] = [
   "Recursos Humanos",
 ];
 
-export const initialTestsByProfession: TestsByProfession = {
+export const initialTestsByProfession:TestsByProfession = {
   "Contador": [
     {
       id: "1",
