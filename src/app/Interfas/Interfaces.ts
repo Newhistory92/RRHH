@@ -1,83 +1,3 @@
-// export default interface  Notification {
-//   id: number;
-//   text: string;
-//   time: string;
-// };
-
-// Tipos auxiliares
-//export type EmployeeStatus = 'Planta permanente' | 'Contratado' | 'Pasante' | 'Licencia' | 'Suspendido';
-//export type EmployeeCategory = 'Administrativo' | 'Técnico' | 'Directivo' | 'Operativo';
-
-// export default interface  OrgNode {
-//   name: string;
-//   position: string;
-//   children?: OrgNode[];
-// };
-
-
-
-  
-// export interface UserData {
-//   usuario: string;
-//   departamento: string;
-//   habilidades_blandas: SoftSkill[];
-//   feedback_history: { evaluado: string; habilidad_blanda: SoftSkill }[];
-// }
-
-// export interface FeedbackResponse {
-//   evaluador: string;
-//   evaluado: string;
-//   habilidad_blanda: SoftSkill;
-//   respuesta: [number, number, number]; // [Mala, Buena, Excelente]
-// }
-
-// export interface Survey {
-//   evaluado: string;
-//   habilidad_blanda: SoftSkill;
-// }
-
-
-
-
-// export type Profession = 
-//   | 'Contador' | 'Abogado' | 'Administrativo' | 'Trabajador Social' 
-//   | 'Administrador de Empresa' | 'Sociólogo' | 'Psicopedagogo' 
-//   | 'Desarrollador Backend' | 'Desarrollador Frontend' | 'Farmacéutico' | 'Recursos Humanos';
-
-// export type EvaluationType = 'multiple-choice' | 'case-study' | 'code' | 'report' | 'typing-test';
-
-// export interface Skill {
-//   name: string;
-//   description: string;
-//   type: EvaluationType;
-// }
-
-// export interface Question {
-//   question: string;
-//   options?: string[];
-//   correctAnswer: string;
-// }
-
-// export interface EvaluatedSkill {
-//   nombre: string;
-//   nivel: 'Malo' | 'Bueno' | 'Avanzado';
-//   preguntas_correctas?: number;
-//   total_preguntas?: number;
-//   metricas?: Record<string, string | number>;
-// }
-
-// export interface ResultsData {
-//   profesion: Profession | string;
-//   habilidades_evaluadas: EvaluatedSkill[];
-// }
-
-// export interface EvaluationResult {
-//     correct: number;
-//     total: number;
-//     level: 'Malo' | 'Bueno' | 'Avanzado';
-//     passed: boolean;
-// }
-
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -436,6 +356,10 @@ export interface FormFieldProps {
   setAvailableSkills?: React.Dispatch<React.SetStateAction<TechnicalSkill[]>>;
 }
 
+
+
+
+
 export interface OrgData {
   id: number;
   nombre: string;
@@ -447,7 +371,7 @@ export interface OrgNode extends OrgData {
   children?: OrgNode[];
 }
 
-export interface OrgStatsType {
+export interface OrgStats {
   totalNodos: number;
   maxNivel: number;
   nivelesUnicos: number[];
@@ -466,3 +390,43 @@ export interface OrgChartProps {
   showStats?: boolean;
   className?: string;
 }
+
+
+export type Answer = {
+  id: string;
+  text: string;
+  isCorrect: boolean;
+};
+
+export type Question = {
+  id: string;
+  text: string;
+  answers: Answer[];
+};
+
+export type BaseTest = {
+  id: string;
+  name: string;
+  description: string;
+};
+
+export type MultipleChoiceTest = BaseTest & {
+  type: 'multiple-choice';
+  questions: Question[];
+};
+
+export type CaseStudyTest = BaseTest & {
+  type: 'case-study';
+  scenario: string;
+};
+
+export type Test = MultipleChoiceTest | CaseStudyTest;
+
+export type TestsByProfession = {
+  [key: string]: Test[];
+};
+
+export type SoftSkill = {
+  name: string;
+  description: string;
+};
