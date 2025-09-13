@@ -128,35 +128,66 @@ export const EmployeeAvatarIcon = ({
 
 
 
-export const SkillCard = ({ skill, onStartTest }: { skill: Skill, onStartTest: (skill: Skill) => void }) => {
-    const isLocked = skill.status === 'locked' && skill.unlockDate && new Date() < new Date(skill.unlockDate);
-    const isValidated = skill.status === 'validated';
+export const SkillCard = ({
+  skill,
+  onStartTest,
+}: {
+  skill: Skill;
+  onStartTest: (skill: Skill) => void;
+}) => {
+  const isLocked =
+    skill.status === "locked" &&
+    skill.unlockDate &&
+    new Date() < new Date(skill.unlockDate);
+  const isValidated = skill.status === "validated";
 
-    const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
 
-    const footer = (
-        <div className="flex justify-end mt-2">
-            {!isValidated && (
-                <Button label="Comenzar Prueba" icon="pi pi-bolt" onClick={() => onStartTest(skill)} disabled={isLocked} className="p-button-sm" />
-            )}
-        </div>
-    );
+  const footer = (
+    <div className="flex justify-end mt-2">
+      {!isValidated && (
+        <Button
+          label="Comenzar Prueba"
+          icon="pi pi-bolt"
+          onClick={() => onStartTest(skill)}
+          disabled={isLocked}
+          className="p-button-sm"
+        />
+      )}
+    </div>
+  );
 
-    return (
-        <Card title={skill.name} footer={footer} className="h-full flex flex-col">
-            <div className="flex-grow">
-                <p className="text-gray-600 text-sm mb-4">{skill.description}</p>
-                {isValidated && (
-                    <div>
-                        <Tag severity="success" value="Validado" icon="pi pi-check-circle" className="mb-2" />
-                        <ProgressBar value={skill.level * 10} style={{ height: '8px' }} showValue={false}></ProgressBar>
-                        <small>Nivel: {skill.level}/10</small>
-                    </div>
-                )}
-                {isLocked && skill.unlockDate && (
-                    <Tag severity="danger" icon="pi pi-lock">Bloqueado hasta: {formatDate(skill.unlockDate)}</Tag>
-                )}
-            </div>
-        </Card>
-    );
+  return (
+    <Card title={skill.name} footer={footer} className="h-full flex flex-col">
+      <div className="flex-grow">
+        <p className="text-gray-600 text-sm mb-4">{skill.description}</p>
+        {isValidated && (
+          <div>
+            <Tag
+              severity="success"
+              value="Validado"
+              icon="pi pi-check-circle"
+              className="mb-2"
+            />
+            <ProgressBar
+              value={skill.level * 10}
+              style={{ height: "8px" }}
+              showValue={false}
+            ></ProgressBar>
+            <small>Nivel: {skill.level}/10</small>
+          </div>
+        )}
+        {isLocked && skill.unlockDate && (
+          <Tag severity="danger" icon="pi pi-lock">
+            Bloqueado hasta: {formatDate(skill.unlockDate)}
+          </Tag>
+        )}
+      </div>
+    </Card>
+  );
 };

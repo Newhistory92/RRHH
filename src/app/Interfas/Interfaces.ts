@@ -475,3 +475,12 @@ export interface CvProps {
   updateData: (updates: Partial<Employee>) => void;
   isEditing: boolean;
 }
+
+export type Skill = {
+    id: number;
+    name: string;
+    description: string;
+    status: 'validated' | 'pending' | 'locked';
+    level: number;
+    unlockDate: string | null;
+};
