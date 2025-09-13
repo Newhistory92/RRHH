@@ -1,7 +1,10 @@
 import { ReactNode } from 'react';
 import Image from "next/image";
-import { Tag } from 'primereact/tag';        
+import { Tag} from 'primereact/tag';        
 import {TechnicalSkill,Employee} from '@/app/Interfas/Interfaces';
+import { Card } from 'primereact/card';
+import { ProgressBar } from 'primereact/progressbar';
+import { Button } from 'primereact/button';
 
 interface Department {
   habilidades_requeridas?: TechnicalSkill[];
@@ -19,6 +22,15 @@ interface EmployeeAvatarProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
+
+type Skill = {
+    id: number;
+    name: string;
+    description: string;
+    status: 'validated' | 'pending' | 'locked';
+    level: number;
+    unlockDate: string | null;
+};
 export const StatusBadge = ({ status }: { status: string }) => {
   const baseClasses = "px-3 py-1 text-xs font-medium rounded-full inline-block";
   const statusClasses: Record<string, string> = {
@@ -111,4 +123,40 @@ export const EmployeeAvatarIcon = ({
   size = 'md'
 }: Omit<EmployeeAvatarProps, 'showName'>) => {
   return <EmployeeAvatar employeeId={employeeId} employees={employees} showName={false} size={size} />;
+};
+
+
+
+
+export const SkillCard = ({ skill, onStartTest }: { skill: Skill, onStartTest: (skill: Skill) => void }) => {
+    const isLocked = skill.status === 'locked' && skill.unlockDate && new Date() < new Date(skill.unlockDate);
+    const isValidated = skill.status === 'validated';
+
+    const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    const footer = (
+        <div className="flex justify-end mt-2">
+            {!isValidated && (
+                <Button label="Comenzar Prueba" icon="pi pi-bolt" onClick={() => onStartTest(skill)} disabled={isLocked} className="p-button-sm" />
+            )}
+        </div>
+    );
+
+    return (
+        <Card title={skill.name} footer={footer} className="h-full flex flex-col">
+            <div className="flex-grow">
+                <p className="text-gray-600 text-sm mb-4">{skill.description}</p>
+                {isValidated && (
+                    <div>
+                        <Tag severity="success" value="Validado" icon="pi pi-check-circle" className="mb-2" />
+                        <ProgressBar value={skill.level * 10} style={{ height: '8px' }} showValue={false}></ProgressBar>
+                        <small>Nivel: {skill.level}/10</small>
+                    </div>
+                )}
+                {isLocked && skill.unlockDate && (
+                    <Tag severity="danger" icon="pi pi-lock">Bloqueado hasta: {formatDate(skill.unlockDate)}</Tag>
+                )}
+            </div>
+        </Card>
+    );
 };

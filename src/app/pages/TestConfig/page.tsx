@@ -1,4 +1,4 @@
-// pages/TestPage.tsx
+
 import React, { useState } from 'react';
 import { TechnicalTests } from '@/app/Componentes/TestComponent/TechnicalTests';
 import { SoftSkills } from '@/app/Componentes/TestComponent/SoftSkills';
