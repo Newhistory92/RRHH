@@ -1,12 +1,16 @@
 import React from 'react';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { DynamicSection } from '@/app/Componentes/Perfil/DynamicSectionCv';
-import {CvProps, Employee} from "@/app/Interfas/Interfaces"
+import { Employee, AcademicFormation} from "@/app/Interfas/Interfaces"
+
+export interface CvFormacionProps {
+  data: AcademicFormation[];
+  updateData: (updates:  AcademicFormation[]) => void;
+  isEditing: boolean;
+}
 
 
-
-
-export default function FormacionAcademica({ data, updateData, isEditing }: CvProps) {
+export default function FormacionAcademica({ data, updateData, isEditing }: CvFormacionProps) {
 
    const handleChange = (id:number,field: keyof Employee, value: string) => {
     const newData = data.map((item) =>

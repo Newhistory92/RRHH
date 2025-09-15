@@ -1,10 +1,16 @@
 import React from 'react';
 import { SOFT_SKILLS_CATALOG } from '@/app/api/prueba2';
 import SkillBlandas from '@/app/Componentes/Perfil/SkillBlande';
-import {Employee,CvProps} from "@/app/Interfas/Interfaces"
+import {SoftSkill} from "@/app/Interfas/Interfaces"
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
-export default function HabilidadesBlandas({ data, selectedSkills, updateData, isEditing }: CvProps) {
+export interface CvFormacionProps {
+  data: SoftSkill[];
+   selectedSkills: number[];
+  updateData: (updates: SoftSkill[], selectedSkills: number[]) => void;
+  isEditing: boolean;
+}
+export default function HabilidadesBlandas({ data, selectedSkills, updateData, isEditing }: CvFormacionProps) {
   const handleSoftSkillChange = (skillId) => {
     if (!isEditing) return;
     

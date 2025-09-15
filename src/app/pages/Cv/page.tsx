@@ -643,43 +643,44 @@ import CertificacionesCursos from '@/app/Componentes/CvComponente/Certificacione
 import {Employee} from "@/app/Interfas/Interfaces"
 
 export default function EmployeeCV() {
-  // Buscar el empleado logueado (usando id 1 como ejemplo)
   const loggedInEmployee = EMPLOYEES_DATA.find((e) => e.id === 1);
-  
   // Inicializar cvData con la estructura completa, agregando campos faltantes
-  const [cvData, setCvData] = useState <Employee>({
+ const [cvData, setCvData] = useState<Employee | null>(
+  loggedInEmployee ? {
     ...loggedInEmployee,
-    // Agregar campos que no existen en EMPLOYEES_DATA pero son necesarios para el CV
+    // Asegurar que todos los campos opcionales estén definidos
     gender: loggedInEmployee.gender || '',
     academicFormation: loggedInEmployee.academicFormation || [],
     workExperience: loggedInEmployee.workExperience || [],
     languages: loggedInEmployee.languages || [],
     certifications: loggedInEmployee.certifications || [],
-    skillStatus: loggedInEmployee.skillStatus || [],
-    // Convertir softSkills de objeto a array de IDs si es necesario
-    softSkillsArray: Object.keys(loggedInEmployee.softSkills || {}).map(skillName => {
-      const skillCatalog = SOFT_SKILLS_CATALOG.find(s => s.name === skillName);
-      return skillCatalog ? skillCatalog.id : null;
-    }).filter(id => id !== null)
-  });
-console.log(cvData);
-  const [originalCvData, setOriginalCvData] = useState(null);
+    skillStatus: [], // Inicializar como array vacío
+     softSkillsArray: (loggedInEmployee.softSkills || [])
+          .map(skill => {
+            const skillCatalog = SOFT_SKILLS_CATALOG.find(
+              s => s.name === skill.name
+            );
+            return skillCatalog ? skillCatalog.id : null;
+          })
+          .filter((id): id is number => id !== null) // Type guard
+      }
+    : null
+);
+
+  const [originalCvData, setOriginalCvData] = useState<Employee | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const getValidationStatusPill = (status) => {
-    const styles = {
-      Pendiente: "bg-yellow-100 text-yellow-800",
-      Validado: "bg-green-100 text-green-800",
-      Rechazado: "bg-red-100 text-red-800",
-    };
+  // Manejar el caso donde el empleado no se encuentra
+  if (!cvData) {
     return (
-      <span
-        className={`px-3 py-1 text-sm font-semibold rounded-full ${styles[status]}`}
-      >
-        {status}
-      </span>
+      <div className="bg-gray-100 font-sans min-h-screen flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
+          <p className="text-gray-700">No se pudo encontrar la información del empleado.</p>
+        </div>
+      </div>
     );
-  };
+  }
 
   const handleEdit = () => {
     setOriginalCvData(JSON.parse(JSON.stringify(cvData)));
@@ -690,20 +691,21 @@ console.log(cvData);
     // In a real app, you'd send `cvData` to your backend here.
     setIsEditing(false);
     setOriginalCvData(null); // Clear backup
-    console.log("Datos guardados:", cvData);
   };
 
   const handleCancel = () => {
-    setCvData(originalCvData);
+    if (originalCvData) {
+      setCvData(originalCvData);
+    }
     setIsEditing(false);
     setOriginalCvData(null);
   };
 
-  const updateCvData = (newData) => {
-    setCvData(prev => ({ ...prev, ...newData }));
+  const updateCvData = (newData: Partial<Employee>) => {
+    setCvData(prev => prev ? ({ ...prev, ...newData }) : null);
   };
 
-  return (
+ return (
     <div className="bg-gray-100 font-sans min-h-screen">
       <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
         <div className="flex justify-between items-start mb-6">
@@ -718,39 +720,40 @@ console.log(cvData);
           />
           
           <FormacionAcademica 
-            data={cvData.academicFormation || []} 
+            data={cvData.academicFormation} 
             updateData={(academicFormation) => updateCvData({ academicFormation })} 
             isEditing={isEditing} 
           />
           
           <ExperienciaLaboral 
-            data={cvData.workExperience || []} 
+            data={cvData.workExperience} 
             updateData={(workExperience) => updateCvData({ workExperience })} 
             isEditing={isEditing} 
           />
           
           <Idiomas 
-            data={cvData.languages || []} 
+            data={cvData.languages} 
             updateData={(languages) => updateCvData({ languages })} 
             isEditing={isEditing} 
           />
           
           <HabilidadesTecnicas 
-            data={cvData.technicalSkills || []} 
+            data={cvData.technicalSkills} 
             skillStatus={cvData.skillStatus || []}
+            position={cvData.position}
             updateData={(technicalSkills, skillStatus) => updateCvData({ technicalSkills, skillStatus })} 
             isEditing={isEditing} 
           />
           
           <HabilidadesBlandas 
-            data={cvData.softSkills || {}} 
+            data={cvData.softSkills} 
             selectedSkills={cvData.softSkillsArray || []}
             updateData={(softSkills, softSkillsArray) => updateCvData({ softSkills, softSkillsArray })} 
             isEditing={isEditing} 
           />
           
           <CertificacionesCursos 
-            data={cvData.certifications || []} 
+            data={cvData.certifications} 
             updateData={(certifications) => updateCvData({ certifications })} 
             isEditing={isEditing} 
           />
@@ -761,13 +764,13 @@ console.log(cvData);
             <>
               <button
                 onClick={handleCancel}
-                className="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSave}
-                className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+                className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 flex items-center gap-2 transition-colors"
               >
                 <Save className="w-4 h-4" /> Guardar Cambios
               </button>
@@ -775,7 +778,7 @@ console.log(cvData);
           ) : (
             <button
               onClick={handleEdit}
-              className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-700 hover:bg-gray-800 flex items-center gap-2"
+              className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-700 hover:bg-gray-800 flex items-center gap-2 transition-colors"
             >
               <Edit className="w-4 h-4" /> Editar CV
             </button>

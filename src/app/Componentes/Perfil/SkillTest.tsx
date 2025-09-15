@@ -230,244 +230,394 @@
 // };
 
 
-
 import React, { useState, useEffect } from 'react';
-
 import { Button } from 'primereact/button';
-
 import { Dialog } from 'primereact/dialog';
-
 import { ProgressBar } from 'primereact/progressbar';
-
 import { RadioButton } from 'primereact/radiobutton';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { CheckCircle, XCircle } from 'lucide-react';
-import { initialTestsByProfession} from '@/app/api/prueba2';
+import { initialTestsByProfession } from '@/app/api/prueba2';
+import { Skill } from "@/app/Interfas/Interfaces";
 
-import { Skill} from "@/app/Interfas/Interfaces"
+type TestQuestion = {
+    id?: string;
+    text?: string;
+    question?: string;
+    answers?: Array<{ id: string; text: string; isCorrect: boolean }>;
+    options?: string[];
+    correctAnswerIndex?: number;
+};
 
-export const SkillTestDialog = ({
-  isVisible,
-  skill,
-  position,
-  onClose,
-  onTestComplete,
-}: {
-  isVisible: boolean;
-  skill: Skill | null;
-  position: string;
-  onClose: () => void;
-  onTestComplete: (skill: Skill, score: number) => void;
+type SkillTestDialogProps = {
+    isVisible: boolean;
+    skill: Skill | null;
+    position: string;
+    onClose: () => void;
+    onTestComplete: (skill: Skill, score: number) => void;
+};
+
+export const SkillTestDialog: React.FC<SkillTestDialogProps> = ({ 
+    isVisible, 
+    skill, 
+    position, 
+    onClose, 
+    onTestComplete 
 }) => {
-  const [testState, setTestState] = useState<
-    "loading" | "testing" | "finished"
-  >("loading");
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState<Record<number, number>>({});
-  const [score, setScore] = useState(0);
+    const [testState, setTestState] = useState<'loading' | 'testing' | 'finished'>('loading');
+    const [questions, setQuestions] = useState<TestQuestion[]>([]);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [userAnswers, setUserAnswers] = useState<Record<number, number>>({});
+    const [score, setScore] = useState(0);
+    const [testResult, setTestResult] = useState<'Malo' | 'Bueno' | 'Avanzado' | null>(null);
 
-  useEffect(() => {
-    if (isVisible && skill) {
-      // Reset state for new test
-      setTestState("loading");
-      setQuestions([]);
-      setCurrentQuestionIndex(0);
-      setUserAnswers({});
-      setScore(0);
-
-      // Lógica para decidir qué prueba usar
-      const predefinedTest = initialTestsByProfession[position]?.find(
-        (t) => t.name === skill.name
-      );
-      if (predefinedTest && predefinedTest.questions) {
-        // Mapear a la estructura que espera el componente de Gemini para unificar
-        const formattedQuestions = predefinedTest.questions.map((q) => ({
-          question: q.text,
-          options: q.answers!.map((a) => a.text),
-          correctAnswerIndex: q.answers!.findIndex((a) => a.isCorrect),
-        }));
-        setQuestions(formattedQuestions);
-        setTestState("testing");
-      } else {
-        generateTestWithGemini();
-      }
-    }
-  }, [isVisible, skill, position]);
-
-  const generateTestWithGemini = async () => {
-    if (!skill) return;
-    const prompt = `Crea una prueba técnica de 5 preguntas de opción múltiple para la habilidad "${skill.name}". Cada pregunta debe tener 4 opciones y solo una respuesta correcta. Devuelve el resultado como un array de objetos JSON con la estructura: [{"question": "...", "options": ["...", "...", "...", "..."], "correctAnswerIndex": N}]`;
-    const payload = {
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "ARRAY",
-          items: {
-            type: "OBJECT",
-            properties: {
-              question: { type: "STRING" },
-              options: { type: "ARRAY", items: { type: "STRING" } },
-              correctAnswerIndex: { type: "NUMBER" },
-            },
-          },
-        },
-      },
-    };
-    const apiKey = "";
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-    try {
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!response.ok)
-        throw new Error(`API call failed with status: ${response.status}`);
-      const result = await response.json();
-      if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
-        const parsedQuestions = JSON.parse(
-          result.candidates[0].content.parts[0].text
-        );
-        setQuestions(parsedQuestions);
-        setTestState("testing");
-      } else {
-        throw new Error("No questions generated.");
-      }
-    } catch (error) {
-      console.error("Error generating test:", error);
-      // Fallback a preguntas de ejemplo en caso de error
-      setQuestions([
-        {
-          question: `Pregunta de prueba para ${skill.name}?`,
-          options: ["Opción A", "Opción B", "Opción C", "Opción D"],
-          correctAnswerIndex: 0,
-        },
-      ]);
-      setTestState("testing");
-    }
-  };
-
-  const handleAnswerSelect = (questionIndex: number, answerIndex: number) => {
-    setUserAnswers((prev) => ({ ...prev, [questionIndex]: answerIndex }));
-  };
-
-  const handleNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
-    } else {
-      // Finalizar prueba
-      let correctAnswers = 0;
-      questions.forEach((q, index) => {
-        if (q.correctAnswerIndex === userAnswers[index]) {
-          correctAnswers++;
+    useEffect(() => {
+        if (isVisible && skill) {
+            resetTestState();
+            loadTest();
         }
-      });
-      const finalScore = (correctAnswers / questions.length) * 100;
-      setScore(finalScore);
-      setTestState("finished");
-    }
-  };
+    }, [isVisible, skill, position]);
 
-  const handleCloseAndComplete = () => {
-    if (skill) {
-      onTestComplete(skill, score);
-    }
-    onClose();
-  };
+    const resetTestState = () => {
+        setTestState('loading');
+        setQuestions([]);
+        setCurrentQuestionIndex(0);
+        setUserAnswers({});
+        setScore(0);
+        setTestResult(null);
+    };
 
-  const currentQuestion = questions[currentQuestionIndex];
+    const loadTest = async () => {
+        if (!skill) return;
 
-  return (
-    <Dialog
-      header={`Prueba Técnica: ${skill?.name}`}
-      visible={isVisible}
-      style={{ width: "90%", maxWidth: "650px" }}
-      onHide={onClose}
-      modal
-    >
-      {testState === "loading" && (
-        <div className="flex justify-center items-center p-8">
-          <ProgressSpinner />
-        </div>
-      )}
+        // Buscar test predefinido primero
+        const predefinedTest = initialTestsByProfession[position]?.find(
+            test => test.name.toLowerCase().includes(skill.name.toLowerCase()) ||
+                   skill.name.toLowerCase().includes(test.name.toLowerCase())
+        );
 
-      {testState === "testing" && currentQuestion && (
-        <div>
-          <div className="mb-4">
-            <p className="text-sm text-gray-500">
-              Pregunta {currentQuestionIndex + 1} de {questions.length}
-            </p>
-            <ProgressBar
-              value={((currentQuestionIndex + 1) / questions.length) * 100}
-              style={{ height: "6px" }}
-            />
-          </div>
-          <p className="font-semibold text-lg mb-4">
-            {currentQuestion.question}
-          </p>
-          <div className="flex flex-col gap-3">
-            {currentQuestion.options.map((option: string, index: number) => (
-              <div key={index} className="flex items-center">
-                <RadioButton
-                  inputId={`option${index}`}
-                  name={`question${currentQuestionIndex}`}
-                  value={index}
-                  onChange={(e) =>
-                    handleAnswerSelect(currentQuestionIndex, e.value)
-                  }
-                  checked={userAnswers[currentQuestionIndex] === index}
-                />
-                <label htmlFor={`option${index}`} className="ml-2">
-                  {option}
-                </label>
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-end mt-6">
-            <Button
-              label={
-                currentQuestionIndex < questions.length - 1
-                  ? "Siguiente"
-                  : "Finalizar Prueba"
-              }
-              onClick={handleNext}
-              disabled={userAnswers[currentQuestionIndex] === undefined}
-            />
-          </div>
-        </div>
-      )}
+        if (predefinedTest && predefinedTest.questions && predefinedTest.questions.length > 0) {
+            console.log('Usando test predefinido:', predefinedTest.name);
+            
+            // Convertir formato predefinido al formato esperado
+            const formattedQuestions: TestQuestion[] = predefinedTest.questions.map((q, index) => ({
+                id: q.id || `q${index}`,
+                question: q.text,
+                options: q.answers?.map(a => a.text) || [],
+                correctAnswerIndex: q.answers?.findIndex(a => a.isCorrect) || 0
+            }));
 
-      {testState === "finished" && (
-        <div className="text-center p-4">
-          {score >= 70 ? (
-            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          ) : (
-            <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          )}
-          <h3 className="text-2xl font-bold mb-2">Prueba Finalizada</h3>
-          <p className="text-lg">
-            Tu puntuación:{" "}
-            <span className="font-bold">{score.toFixed(0)}%</span>
-          </p>
-          {score >= 70 ? (
-            <p className="text-green-600 mt-2">
-              ¡Felicitaciones! Has aprobado.
-            </p>
-          ) : (
-            <p className="text-red-600 mt-2">
-              No has alcanzado el mínimo. Podrás reintentar en 3 meses.
-            </p>
-          )}
-          <Button
-            label="Cerrar"
-            onClick={handleCloseAndComplete}
-            className="mt-6"
-          />
-        </div>
-      )}
-    </Dialog>
-  );
+            setQuestions(formattedQuestions);
+            setTestState('testing');
+        } else {
+            console.log('Generando test con Gemini para:', skill.name);
+            await generateTestWithGemini();
+        }
+    };
+
+    const generateTestWithGemini = async () => {
+        if (!skill) return;
+
+        const prompt = `Crea una prueba técnica de 5 preguntas de opción múltiple en español para evaluar la habilidad "${skill.name}" en el contexto de la profesión "${position}".
+
+Cada pregunta debe:
+- Ser relevante y práctica para la profesión ${position}
+- Tener exactamente 4 opciones de respuesta
+- Tener una sola respuesta correcta
+- Ser de dificultad progresiva (fácil a difícil)
+
+Devuelve el resultado como un array JSON con esta estructura exacta:
+[
+  {
+    "question": "Texto de la pregunta",
+    "options": ["Opción A", "Opción B", "Opción C", "Opción D"],
+    "correctAnswerIndex": 0
+  }
+]
+
+IMPORTANTE: 
+- correctAnswerIndex debe ser un número del 0 al 3
+- Las opciones deben estar en español
+- Las preguntas deben ser específicas para ${skill.name} en ${position}`;
+
+        const payload = {
+            contents: [{ 
+                role: "user", 
+                parts: [{ text: prompt }] 
+            }],
+            generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: "ARRAY",
+                    items: {
+                        type: "OBJECT",
+                        properties: {
+                            question: { type: "STRING" },
+                            options: { 
+                                type: "ARRAY", 
+                                items: { type: "STRING" },
+                                minItems: 4,
+                                maxItems: 4
+                            },
+                            correctAnswerIndex: { 
+                                type: "NUMBER",
+                                minimum: 0,
+                                maximum: 3
+                            }
+                        },
+                        required: ["question", "options", "correctAnswerIndex"]
+                    }
+                }
+            }
+        };
+
+        const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`;
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            
+            if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                const generatedQuestions = JSON.parse(result.candidates[0].content.parts[0].text);
+                
+                if (Array.isArray(generatedQuestions) && generatedQuestions.length > 0) {
+                    console.log('Test generado exitosamente con Gemini');
+                    setQuestions(generatedQuestions);
+                    setTestState("testing");
+                    return;
+                }
+            }
+            
+            throw new Error("La respuesta de Gemini no contiene preguntas válidas");
+        } catch (error) {
+            console.error("Error generando test con Gemini:", error);
+            
+            // Fallback: crear preguntas de ejemplo
+            const fallbackQuestions: TestQuestion[] = [
+                {
+                    question: `¿Cuál es el aspecto más importante de ${skill.name} en el contexto de ${position}?`,
+                    options: [
+                        "La aplicación práctica de conocimientos técnicos",
+                        "La memorización de conceptos teóricos",
+                        "La velocidad de ejecución únicamente",
+                        "La presentación visual del trabajo"
+                    ],
+                    correctAnswerIndex: 0
+                },
+                {
+                    question: `¿Qué competencia complementa mejor a ${skill.name}?`,
+                    options: [
+                        "Habilidades de comunicación",
+                        "Conocimiento de redes sociales",
+                        "Habilidades gastronómicas",
+                        "Conocimientos de jardinería"
+                    ],
+                    correctAnswerIndex: 0
+                }
+            ];
+
+            setQuestions(fallbackQuestions);
+            setTestState("testing");
+        }
+    };
+
+    const handleAnswerSelect = (questionIndex: number, answerIndex: number) => {
+        setUserAnswers(prev => ({ ...prev, [questionIndex]: answerIndex }));
+    };
+
+    const handleNext = () => {
+        if (currentQuestionIndex < questions.length - 1) {
+            setCurrentQuestionIndex(prev => prev + 1);
+        } else {
+            finishTest();
+        }
+    };
+
+    const finishTest = () => {
+        let correctAnswers = 0;
+        
+        questions.forEach((question, index) => {
+            if (question.correctAnswerIndex === userAnswers[index]) {
+                correctAnswers++;
+            }
+        });
+
+        const finalScore = questions.length > 0 ? (correctAnswers / questions.length) * 100 : 0;
+        
+        // Determinar nivel según el score
+        let result: 'Malo' | 'Bueno' | 'Avanzado';
+        if (finalScore >= 90) {
+            result = 'Avanzado';
+        } else if (finalScore >= 70) {
+            result = 'Bueno';
+        } else {
+            result = 'Malo';
+        }
+
+        setScore(finalScore);
+        setTestResult(result);
+        setTestState("finished");
+    };
+
+    const handleCloseAndComplete = () => {
+        if (skill && testResult) {
+            onTestComplete(skill, score);
+        }
+        onClose();
+    };
+
+    const currentQuestion = questions[currentQuestionIndex];
+    const progress = questions.length > 0 ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
+
+    return (
+        <Dialog 
+            header={`Prueba Técnica: ${skill?.name || 'Cargando...'}`} 
+            visible={isVisible} 
+            style={{ width: '90%', maxWidth: '700px' }} 
+            onHide={onClose} 
+            modal
+            closable={testState !== 'testing'} // No permitir cerrar durante el test
+        >
+            {/* Estado de carga */}
+            {testState === 'loading' && (
+                <div className="flex flex-col justify-center items-center p-8">
+                    <ProgressSpinner />
+                    <p className="mt-4 text-gray-600">
+                        Preparando tu evaluación de {skill?.name}...
+                    </p>
+                </div>
+            )}
+            
+            {/* Estado de testing */}
+            {testState === 'testing' && currentQuestion && (
+                <div className="space-y-6">
+                    {/* Progreso */}
+                    <div>
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium text-gray-600">
+                                Pregunta {currentQuestionIndex + 1} de {questions.length}
+                            </span>
+                            <span className="text-sm font-medium text-gray-600">
+                                {Math.round(progress)}% completado
+                            </span>
+                        </div>
+                        <ProgressBar 
+                            value={progress} 
+                            style={{ height: '8px' }}
+                            className="mb-4"
+                        />
+                    </div>
+
+                    {/* Pregunta */}
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                            {currentQuestion.question}
+                        </h3>
+
+                        {/* Opciones */}
+                        <div className="space-y-3">
+                            {currentQuestion.options?.map((option, index) => (
+                                <div key={index} className="flex items-center p-3 rounded-lg hover:bg-gray-50 border border-gray-200">
+                                    <RadioButton 
+                                        inputId={`option${index}`} 
+                                        name={`question${currentQuestionIndex}`} 
+                                        value={index}
+                                        onChange={(e) => handleAnswerSelect(currentQuestionIndex, e.value)}
+                                        checked={userAnswers[currentQuestionIndex] === index} 
+                                    />
+                                    <label 
+                                        htmlFor={`option${index}`} 
+                                        className="ml-3 cursor-pointer flex-1 text-gray-700"
+                                    >
+                                        {option}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Botón siguiente */}
+                    <div className="flex justify-end pt-4">
+                        <Button 
+                            label={currentQuestionIndex < questions.length - 1 ? "Siguiente" : "Finalizar Prueba"}
+                            onClick={handleNext} 
+                            disabled={userAnswers[currentQuestionIndex] === undefined}
+                            className="px-6 py-2"
+                        />
+                    </div>
+                </div>
+            )}
+            
+            {/* Estado de finalizado */}
+            {testState === 'finished' && (
+                <div className="text-center space-y-6 p-6">
+                    {/* Icono de resultado */}
+                    {score >= 70 ? (
+                        <CheckCircle className="w-20 h-20 text-green-500 mx-auto" />
+                    ) : (
+                        <XCircle className="w-20 h-20 text-red-500 mx-auto" />
+                    )}
+
+                    {/* Título */}
+                    <h3 className="text-2xl font-bold text-gray-800">
+                        ¡Evaluación Completada!
+                    </h3>
+
+                    {/* Puntuación */}
+                    <div className="space-y-2">
+                        <p className="text-3xl font-bold text-gray-900">
+                            {Math.round(score)}%
+                        </p>
+                        <p className="text-lg text-gray-600">
+                            Nivel obtenido: <span className={`font-semibold ${
+                                testResult === 'Avanzado' ? 'text-green-600' :
+                                testResult === 'Bueno' ? 'text-blue-600' :
+                                'text-red-600'
+                            }`}>
+                                {testResult}
+                            </span>
+                        </p>
+                    </div>
+
+                    {/* Mensaje de resultado */}
+                    {score >= 70 ? (
+                        <div className="p-4 bg-green-50 rounded-lg">
+                            <p className="text-green-800 font-medium">
+                                ¡Felicitaciones! Has aprobado la evaluación.
+                            </p>
+                            <p className="text-green-700 text-sm mt-1">
+                                Esta habilidad será validada en tu perfil.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="p-4 bg-red-50 rounded-lg">
+                            <p className="text-red-800 font-medium">
+                                No has alcanzado el puntaje mínimo para aprobar.
+                            </p>
+                            <p className="text-red-700 text-sm mt-1">
+                                Podrás intentar nuevamente en 3 meses.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Botón cerrar */}
+                    <Button 
+                        label="Cerrar" 
+                        onClick={handleCloseAndComplete} 
+                        className="w-full py-3 text-lg font-semibold"
+                    />
+                </div>
+            )}
+        </Dialog>
+    );
 };

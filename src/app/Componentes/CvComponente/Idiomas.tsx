@@ -1,9 +1,14 @@
 import React from 'react';
 import { DynamicSection } from '@/app/Componentes/Perfil/DynamicSectionCv';
 import { Accordion, AccordionTab } from 'primereact/accordion';
-import {Employee,CvProps} from "@/app/Interfas/Interfaces"
+import {Employee,Language } from "@/app/Interfas/Interfaces"
 
-export default function Idiomas({ data, updateData, isEditing }: CvProps) {
+export interface CvFormacionProps {
+  data: Language[];
+  updateData: (updates: Language[]) => void;
+  isEditing: boolean;
+}
+export default function Idiomas({ data, updateData, isEditing }: CvFormacionProps) {
 const handleChange = (id:number,field: keyof Employee, value: string) => {
     const newData = data.map((item) =>
       item.id === id ? { ...item, [field]: value } : item

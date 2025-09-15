@@ -55,7 +55,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
 
   // Validar que items sea un array válido
   if (!items || !Array.isArray(items)) {
-    console.warn('DynamicSection: items is not a valid array, defaulting to empty array');
+    // console.warn('DynamicSection: items is not a valid array, defaulting to empty array');
     return (
       <div className="space-y-6">
         {isEditing && (
@@ -73,7 +73,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
   return (
     <div className="space-y-6">
       {items.map((item: DynamicItem) => {
-        console.log('Processing item:', item);
+        // console.log('Processing item:', item);
         
         return (
           <div key={item.id} className="p-4 border rounded-lg relative">

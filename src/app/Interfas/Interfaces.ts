@@ -147,17 +147,29 @@ export interface Message {
 }
 
 // Soft skills (key-value pairs)
-export interface SoftSkills {
-  [skillName: string]: number;
+export interface SoftSkill {
+  nombre: string;
+  level:number;
+  SkillStatus?: SkillStatus;
 }
+
 
 // Technical skills
 export interface TechnicalSkill {
   id: number;
   nombre: string;
-  nivel: string;
+  level:number;
+  SkillStatus?: SkillStatus;
 }
 
+interface certifications {
+  id: number;
+  name: string;
+  institution: string;
+  date: string; // Fecha de obtención en formato ISO (YYYY-MM-DD)
+  validUntil: string | null; // Fecha de expiración en formato ISO o null si no expira
+  attachment: File | string | null; // Puede ser un File object, URL string o null
+}
 // Main Employee interface
 export interface Employee {
   // Basic Information
@@ -187,7 +199,7 @@ export interface Employee {
  academicFormation: AcademicFormation[];
   languages: Language[];
   workExperience: WorkExperience[];
-  certifications: string[];
+  certifications: certifications[];
   // Management
   managerId: number | null; // Can be null if no manager assigned
   supervisor: string | null; // Can be null if no supervisor assigned
@@ -211,11 +223,12 @@ export interface Employee {
   complaints: Complaint[];
   messages: Message[];
 
-  // Skills Assessment
-  softSkills: SoftSkills;
+
+ softSkills: SoftSkill[];
+ skillStatus?: SkillStatus[];
+  softSkillsArray?: number[]; 
   technicalSkills: TechnicalSkill[];
 }
-
 // Department interface
 export interface Department {
   id: number;
@@ -232,8 +245,8 @@ export interface AcademicFormation {
   id: number;
   title: string;
   institution: string;
-  level: 'Secundario' | 'Terciario' | 'Universitario' | 'Posgrado' | 'Maestría' | 'Doctorado' | 'Otro';
-  status: 'Completo' | 'En curso' | 'Abandonado' | 'Pendiente';
+  level: string; // Ej: 'Licenciatura', 'Maestría', 'Doctorado', etc.
+  status: string; // Ej: 'Completado', 'En curso', 'Abandonado';
   startDate: string; // ISO format: YYYY-MM-DD
   endDate: string | null; // ISO format: YYYY-MM-DD o null si está en curso
   isCurrent: boolean;
@@ -244,7 +257,7 @@ export interface AcademicFormation {
 export interface Language {
   id: number;
   language: string;
-  level: 'Básico' | 'Intermedio' | 'Avanzado' | 'Nativo' | 'Bilingüe';
+  level: string;
   certification: string; // Nombre de la certificación (ej: TOEFL, DELE)
   attachment: File | string | null; // Certificado o comprobante
 }
@@ -259,7 +272,7 @@ export interface WorkExperience {
   startDate: string; // ISO format: YYYY-MM-DD
   endDate: string | null; // ISO format: YYYY-MM-DD o null si es trabajo actual
   isCurrent: boolean;
-  contractType: 'Tiempo completo' | 'Medio tiempo' | 'Por contrato' | 'Freelance' | 'Pasantía' | 'Otro';
+  contractType: string
   description?: string; // Opcional: descripción de responsabilidades
   achievements?: string[]; // Opcional: logros o proyectos destacados
 }
@@ -463,10 +476,6 @@ export type TestsByProfession = {
   [key: string]: Test[];
 };
 
-export type SoftSkill = {
-  name: string;
-  description: string;
-};
 
 
 
@@ -484,3 +493,11 @@ export type Skill = {
     level: number;
     unlockDate: string | null;
 };
+
+export interface SkillStatus {
+  id: number;
+  employee_id: number;
+  skill_id: number;
+  status: 'locked' | 'unlocked' ;
+  unlockDate?: string;
+}

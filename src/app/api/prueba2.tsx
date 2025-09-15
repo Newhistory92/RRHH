@@ -1,5 +1,6 @@
 
-import { ComplaintStatus, EmployeeRole, EmployeeStatus, EmploymentStatus, LicenseStatus, TestsByProfession } from "../Interfas/Interfaces";
+
+import { ComplaintStatus, EmployeeRole, EmployeeStatus, EmploymentStatus, LicenseStatus, TestsByProfession,SkillStatus } from "../Interfas/Interfaces";
 
 // Unified Employee Data Structure
 export const EMPLOYEES_DATA = [
@@ -108,18 +109,36 @@ export const EMPLOYEES_DATA = [
     ],
     
     // Skills Assessment
-    softSkills: {
-      'Comunicación': 9,
-      'Trabajo en equipo': 8,
-      'Resolución de conflictos': 9,
-      'Adaptabilidad': 10,
-      'Liderazgo': 7,
-      'Empatía': 9
-    },
+    softSkills: [
+      {
+        nombre: 'Comunicación',
+        level: 9
+      },
+      {
+        nombre: 'Trabajo en equipo',
+        level: 8
+      },
+      {
+        nombre: 'Resolución de conflictos',
+        level: 9
+      },
+      {
+        nombre: 'Adaptabilidad',
+        level: 10
+      },
+      {
+        nombre: 'Liderazgo',
+        level: 7
+      },
+      {
+        nombre: 'Empatía',
+        level: 9
+      }
+    ],
     technicalSkills: [
-      { id: 1, name: 'Sistemas CRM', level: 8 },
-      { id: 2, name: 'Gestión de tickets', level: 9 },
-      { id: 3, name: 'Comunicación telefónica', level: 9 }
+      { id: 1, nombre: 'Sistemas CRM', level: 8 },
+      { id: 2, nombre: 'Gestión de tickets', level: 9 },
+      { id: 3, nombre: 'Comunicación telefónica', level: 9 }
     ],
     academicFormation: [ 
         { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null }, 
@@ -129,6 +148,10 @@ export const EMPLOYEES_DATA = [
     workExperience: [ 
         { id: 1, position: 'Desarrolladora Frontend Senior', company: 'Empresa Actual', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2020-03-01', endDate: '', isCurrent: true, contractType: 'Tiempo completo' },
         { id: 2, position: 'Desarrolladora Frontend', company: 'Tech Solutions S.A.', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2016-03-01', endDate: '2020-02-28', isCurrent: false, contractType: 'Tiempo completo' },
+    ],
+    certifications: [
+      { id: 1, name: 'Certificación en Gestión de Proyectos', institution: 'PMI', date: '2022-05-15', validUntil: '2025-05-15', attachment: null },
+      { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
   },
   {
@@ -202,27 +225,49 @@ export const EMPLOYEES_DATA = [
     complaints: [],
     messages: [],
     
-    softSkills: {
-      'Comunicación': 7,
-      'Trabajo en equipo': 9,
-      'Resolución de conflictos': 8,
-      'Adaptabilidad': 9,
-      'Liderazgo': 6,
-      'Empatía': 7
-    },
+      softSkills: [
+      {
+        nombre: 'Comunicación',
+        level: 9
+      },
+      {
+        nombre: 'Trabajo en equipo',
+        level: 8
+      },
+      {
+        nombre: 'Resolución de conflictos',
+        level: 9
+      },
+      {
+        nombre: 'Adaptabilidad',
+        level: 10
+      },
+      {
+        nombre: 'Liderazgo',
+        level: 7
+      },
+      {
+        nombre: 'Empatía',
+        level: 9
+      }
+    ],
     technicalSkills: [
-      { id: 1, name: 'React.js', level: 9 },
-      { id: 2, name: 'Node.js', level: 8 },
-      { id: 3, name: 'SQL', level: 8 },
-      { id: 4, name: 'DevOps con Docker', level: 7 }
-    ],academicFormation: [ 
-        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null }, 
+      { id: 1, nombre: 'React.js', level: 9 },
+      { id: 2, nombre: 'Node.js', level: 8 },
+      { id: 3, nombre: 'SQL', level: 8 },
+      { id: 4, nombre: 'DevOps con Docker', level: 7 }
+    ],academicFormation: [
+        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null },
         { id: 2, title: 'Bachiller Técnico', institution: 'Escuela Técnica N°5', level: 'Secundario', status: 'Completo', startDate: '2005-03-01', endDate: '2009-12-10', isCurrent: false, attachment: null },
     ],
     languages: [ { id: 1, language: 'Inglés', level: 'Avanzado', certification: 'TOEFL iBT', attachment: null }, { id: 2, language: 'Español', level: 'Nativo', certification: '', attachment: null }, ],
     workExperience: [ 
         { id: 1, position: 'Desarrolladora Frontend Senior', company: 'Empresa Actual', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2020-03-01', endDate: '', isCurrent: true, contractType: 'Tiempo completo' },
         { id: 2, position: 'Desarrolladora Frontend', company: 'Tech Solutions S.A.', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2016-03-01', endDate: '2020-02-28', isCurrent: false, contractType: 'Tiempo completo' },
+    ],
+     certifications: [
+      { id: 1, name: 'Certificación en Gestión de Proyectos', institution: 'PMI', date: '2022-05-15', validUntil: '2025-05-15', attachment: null },
+      { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
   },
   {
@@ -314,27 +359,48 @@ export const EMPLOYEES_DATA = [
         date: '2024-09-08'
       }
     ],
-    
-    softSkills: {
-      'Comunicación': 8,
-      'Trabajo en equipo': 7,
-      'Resolución de conflictos': 8,
-      'Adaptabilidad': 7,
-      'Liderazgo': 8,
-      'Empatía': 9
-    },
+      softSkills: [
+      {
+        nombre: 'Comunicación',
+        level: 9
+      },
+      {
+        nombre: 'Trabajo en equipo',
+        level: 8
+      },
+      {
+        nombre: 'Resolución de conflictos',
+        level: 9
+      },
+      {
+        nombre: 'Adaptabilidad',
+        level: 10
+      },
+      {
+        nombre: 'Liderazgo',
+        level: 7
+      },
+      {
+        nombre: 'Empatía',
+        level: 9
+      }
+    ],
     technicalSkills: [
-      { id: 1, name: 'Gestión de Proyectos (Agile)', level: 8 },
-      { id: 2, name: 'Análisis de Datos con Pandas', level: 6 },
-      { id: 3, name: 'Sistemas RRHH', level: 9 }
-    ],academicFormation: [ 
-        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null }, 
+      { id: 1, nombre: 'Gestión de Proyectos (Agile)', level: 8 },
+      { id: 2, nombre: 'Análisis de Datos con Pandas', level: 6 },
+      { id: 3, nombre: 'Sistemas RRHH', level: 9 }
+    ],academicFormation: [
+        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null },
         { id: 2, title: 'Bachiller Técnico', institution: 'Escuela Técnica N°5', level: 'Secundario', status: 'Completo', startDate: '2005-03-01', endDate: '2009-12-10', isCurrent: false, attachment: null },
     ],
     languages: [ { id: 1, language: 'Inglés', level: 'Avanzado', certification: 'TOEFL iBT', attachment: null }, { id: 2, language: 'Español', level: 'Nativo', certification: '', attachment: null }, ],
     workExperience: [ 
         { id: 1, position: 'Desarrolladora Frontend Senior', company: 'Empresa Actual', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2020-03-01', endDate: '', isCurrent: true, contractType: 'Tiempo completo' },
         { id: 2, position: 'Desarrolladora Frontend', company: 'Tech Solutions S.A.', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2016-03-01', endDate: '2020-02-28', isCurrent: false, contractType: 'Tiempo completo' },
+    ],
+     certifications: [
+      { id: 1, name: 'Certificación en Gestión de Proyectos', institution: 'PMI', date: '2022-05-15', validUntil: '2025-05-15', attachment: null },
+      { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
   },
   {
@@ -421,26 +487,48 @@ export const EMPLOYEES_DATA = [
     ],
     messages: [],
     
-    softSkills: {
-      'Comunicación': 5,
-      'Trabajo en equipo': 6,
-      'Resolución de conflictos': 5,
-      'Adaptabilidad': 7,
-      'Liderazgo': 5,
-      'Empatía': 4
-    },
+     softSkills: [
+      {
+        nombre: 'Comunicación',
+        level: 9
+      },
+      {
+        nombre: 'Trabajo en equipo',
+        level: 8
+      },
+      {
+        nombre: 'Resolución de conflictos',
+        level: 9
+      },
+      {
+        nombre: 'Adaptabilidad',
+        level: 10
+      },
+      {
+        nombre: 'Liderazgo',
+        level: 7
+      },
+      {
+        nombre: 'Empatía',
+        level: 9
+      }
+    ],
     technicalSkills: [
-      { id: 1, name: 'Derecho Laboral', level: 9 },
-      { id: 2, name: 'Auditoría', level: 8 },
-      { id: 3, name: 'Análisis Legal', level: 8 }
-    ],academicFormation: [ 
-        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null }, 
+      { id: 1,nombre: 'Derecho Laboral', level: 9 },
+      { id: 2, nombre: 'Auditoría', level: 8 },
+      { id: 3, nombre: 'Análisis Legal', level: 8 }
+    ],academicFormation: [
+        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null },
         { id: 2, title: 'Bachiller Técnico', institution: 'Escuela Técnica N°5', level: 'Secundario', status: 'Completo', startDate: '2005-03-01', endDate: '2009-12-10', isCurrent: false, attachment: null },
     ],
     languages: [ { id: 1, language: 'Inglés', level: 'Avanzado', certification: 'TOEFL iBT', attachment: null }, { id: 2, language: 'Español', level: 'Nativo', certification: '', attachment: null }, ],
     workExperience: [ 
         { id: 1, position: 'Desarrolladora Frontend Senior', company: 'Empresa Actual', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2020-03-01', endDate: '', isCurrent: true, contractType: 'Tiempo completo' },
         { id: 2, position: 'Desarrolladora Frontend', company: 'Tech Solutions S.A.', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2016-03-01', endDate: '2020-02-28', isCurrent: false, contractType: 'Tiempo completo' },
+    ],
+     certifications: [
+      { id: 1, name: 'Certificación en Gestión de Proyectos', institution: 'PMI', date: '2022-05-15', validUntil: '2025-05-15', attachment: null },
+      { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
   },
   {
@@ -513,28 +601,49 @@ export const EMPLOYEES_DATA = [
     
     complaints: [],
     messages: [],
-    
-    softSkills: {
-      'Comunicación': 10,
-      'Trabajo en equipo': 9,
-      'Resolución de conflictos': 10,
-      'Adaptabilidad': 9,
-      'Liderazgo': 8,
-      'Empatía': 10
-    },
+      softSkills: [
+      {
+        nombre: 'Comunicación',
+        level: 9
+      },
+      {
+        nombre: 'Trabajo en equipo',
+        level: 8
+      },
+      {
+        nombre: 'Resolución de conflictos',
+        level: 9
+      },
+      {
+        nombre: 'Adaptabilidad',
+        level: 10
+      },
+      {
+        nombre: 'Liderazgo',
+        level: 7
+      },
+      {
+        nombre: 'Empatía',
+        level: 9
+      }
+    ],
     technicalSkills: [
-      { id: 1, name: 'Sistemas CRM Avanzado', level: 10 },
-      { id: 2, name: 'Gestión de tickets', level: 10 },
-      { id: 3, name: 'Comunicación multicanal', level: 9 },
-      { id: 4, name: 'Análisis de satisfacción', level: 8 }
-    ],academicFormation: [ 
-        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null }, 
+      { id: 1, nombre: 'Sistemas CRM Avanzado', level: 10 },
+      { id: 2, nombre: 'Gestión de tickets', level: 10 },
+      { id: 3, nombre: 'Comunicación multicanal', level: 9 },
+      { id: 4, nombre: 'Análisis de satisfacción', level: 8 }
+    ],academicFormation: [
+        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null },
         { id: 2, title: 'Bachiller Técnico', institution: 'Escuela Técnica N°5', level: 'Secundario', status: 'Completo', startDate: '2005-03-01', endDate: '2009-12-10', isCurrent: false, attachment: null },
     ],
     languages: [ { id: 1, language: 'Inglés', level: 'Avanzado', certification: 'TOEFL iBT', attachment: null }, { id: 2, language: 'Español', level: 'Nativo', certification: '', attachment: null }, ],
     workExperience: [ 
         { id: 1, position: 'Desarrolladora Frontend Senior', company: 'Empresa Actual', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2020-03-01', endDate: '', isCurrent: true, contractType: 'Tiempo completo' },
         { id: 2, position: 'Desarrolladora Frontend', company: 'Tech Solutions S.A.', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2016-03-01', endDate: '2020-02-28', isCurrent: false, contractType: 'Tiempo completo' },
+    ],
+     certifications: [
+      { id: 1, name: 'Certificación en Gestión de Proyectos', institution: 'PMI', date: '2022-05-15', validUntil: '2025-05-15', attachment: null },
+      { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
   }
 ];
@@ -895,14 +1004,14 @@ export const AVAILABLE_SKILLS = [
 ];
 
 export const SOFT_SKILLS_CATALOG = [
-  { id: 1, name: 'Comunicación', description: 'Habilidad para transmitir ideas de forma clara y concisa' },
-  { id: 2, name: 'Trabajo en equipo', description: 'Capacidad para colaborar efectivamente con otros' },
-  { id: 3, name: 'Resolución de conflictos', description: 'Aptitud para mediar y resolver disputas' },
-  { id: 4, name: 'Adaptabilidad', description: 'Flexibilidad ante cambios y nuevas situaciones' },
-  { id: 5, name: 'Liderazgo', description: 'Capacidad para guiar y motivar equipos' },
-  { id: 6, name: 'Empatía', description: 'Habilidad para comprender y conectar con otros' },
-  { id: 7, name: 'Pensamiento Crítico', description: 'Análisis objetivo de información para tomar decisiones' },
-  { id: 8, name: 'Resolución de Problemas', description: 'Identificación y solución creativa de problemas' }
+  { id: 1, nombre: 'Comunicación', description: 'Habilidad para transmitir ideas de forma clara y concisa' },
+  { id: 2, nombre: 'Trabajo en equipo', description: 'Capacidad para colaborar efectivamente con otros' },
+  { id: 3, nombre: 'Resolución de conflictos', description: 'Aptitud para mediar y resolver disputas' },
+  { id: 4, nombre: 'Adaptabilidad', description: 'Flexibilidad ante cambios y nuevas situaciones' },
+  { id: 5, nombre: 'Liderazgo', description: 'Capacidad para guiar y motivar equipos' },
+  { id: 6, nombre: 'Empatía', description: 'Habilidad para comprender y conectar con otros' },
+  { id: 7, nombre: 'Pensamiento Crítico', description: 'Análisis objetivo de información para tomar decisiones' },
+  { id: 8, nombre: 'Resolución de Problemas', description: 'Identificación y solución creativa de problemas' }
 ];
 
 // Status options for consistency
@@ -932,8 +1041,8 @@ export const EMPLOYEE_ROLES = {
 
 
 export const initialProfessions: { [key: string]: number[] } = {
-  'Abogado': [1, 2], // Derecho Laboral, Sistemas CRM
-  "Contador" : [2, 11], // Sistemas CRM, Auditoría
+  "Abogado": [9, 10, 11],
+  "Contador" : [1, 2], // Sistemas CRM, Auditoría
   "Desarrollador": [1, 2, 6, 7], // React.js, Node.js, SQL, DevOps con Docker
   "Diseñador UX/UI": [1, 2, 6], // React.js, Node.js, SQL
   "Marketing Digital": [1, 2, 6], // React.js, Node.js, SQL
@@ -941,7 +1050,7 @@ export const initialProfessions: { [key: string]: number[] } = {
 };
 
 export const initialTestsByProfession:TestsByProfession = {
-  "Abogado": [
+  "Contador": [
     {
       id: "1",
       name: "Fundamentos de Contabilidad",
@@ -988,3 +1097,84 @@ export const initialTestsByProfession:TestsByProfession = {
     }
   ]
 };
+
+
+
+export const SKILL_STATUS_DATA: SkillStatus[] = [
+  // Habilidades para Ana García (ID: 1)
+  {
+    id:1,
+    skill_id: 1, // Sistemas CRM
+    employee_id: 1,
+    status: 'unlocked',
+    unlockDate: '2024-01-15T10:30:00.000Z',
+  },
+  {
+    id:2,
+    skill_id: 2, // Gestión de tickets
+    employee_id: 1,
+    status: 'unlocked',
+    unlockDate: '2024-02-20T14:45:00.000Z',
+  },
+  {
+    id:3,
+    skill_id: 3, // Comunicación telefónica
+    employee_id: 1,
+    status: 'unlocked',
+    unlockDate: '2024-01-10T09:00:00.000Z',
+
+  },
+
+  // Habilidades bloqueadas para Ana García
+  {
+    id:4,
+    skill_id: 10,
+    employee_id: 1,
+    status: 'locked',
+    unlockDate: '2025-12-15T13:02:42.683Z',
+  },
+  {
+    id:5,
+    skill_id: 11,
+    employee_id: 1,
+    status: 'locked',
+    unlockDate: '2025-06-01T08:00:00.000Z',
+ 
+  },
+
+  // Habilidades para María Rodríguez (ID: 3) - Gerente de Atención al Cliente
+  {
+    id:6,
+    skill_id: 4, // Liderazgo de equipos
+    employee_id: 3,
+    status: 'locked',
+    unlockDate: '2023-05-10T11:20:00.000Z',
+ 
+  },
+  {
+    id:7,
+    skill_id: 5, // Gestión de recursos
+    employee_id: 3,
+    status: 'locked',
+    unlockDate: '2023-08-15T09:30:00.000Z',
+   
+  },
+  {
+    id:8,
+    skill_id: 6, // Análisis de métricas
+    employee_id: 3,
+    status: 'locked',
+    unlockDate: '2024-09-01T08:00:00.000Z',
+   
+  },
+
+  // Habilidades para Laura Fernández (ID: 5) - Representante de Atención al Cliente
+  {
+    id:9,
+    skill_id: 1, // Sistemas CRM
+    employee_id: 5,
+    status: 'locked',
+    unlockDate: '2024-10-15T13:30:00.000Z',
+    
+  },
+];
