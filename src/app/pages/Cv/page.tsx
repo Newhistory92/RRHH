@@ -658,7 +658,7 @@ export default function EmployeeCV() {
      softSkillsArray: (loggedInEmployee.softSkills || [])
           .map(skill => {
             const skillCatalog = SOFT_SKILLS_CATALOG.find(
-              s => s.name === skill.name
+              s => s.nombre === skill.nombre
             );
             return skillCatalog ? skillCatalog.id : null;
           })

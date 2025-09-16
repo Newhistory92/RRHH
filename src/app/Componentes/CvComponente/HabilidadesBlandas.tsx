@@ -1,6 +1,5 @@
 import React from 'react';
 import { SOFT_SKILLS_CATALOG } from '@/app/api/prueba2';
-import SkillBlandas from '@/app/Componentes/Perfil/SkillBlande';
 import {SoftSkill} from "@/app/Interfas/Interfaces"
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
@@ -11,7 +10,7 @@ export interface CvFormacionProps {
   isEditing: boolean;
 }
 export default function HabilidadesBlandas({ data, selectedSkills, updateData, isEditing }: CvFormacionProps) {
-  const handleSoftSkillChange = (skillId) => {
+  const handleSoftSkillChange = (skillId:number) => {
     if (!isEditing) return;
     
     const newSelectedSkills = selectedSkills.includes(skillId)
@@ -19,19 +18,6 @@ export default function HabilidadesBlandas({ data, selectedSkills, updateData, i
       : [...selectedSkills, skillId];
     
     updateData(data, newSelectedSkills);
-  };
-
-  const handleRemove = (skillName) => {
-    const newData = { ...data };
-    delete newData[skillName];
-    
-    // También remover de selectedSkills si existe
-    const skillCatalog = SOFT_SKILLS_CATALOG.find(s => s.name === skillName);
-    const newSelectedSkills = skillCatalog 
-      ? selectedSkills.filter(id => id !== skillCatalog.id)
-      : selectedSkills;
-    
-    updateData(newData, newSelectedSkills);
   };
 
   return (
@@ -59,19 +45,14 @@ export default function HabilidadesBlandas({ data, selectedSkills, updateData, i
             />
             <div className="ml-3 text-sm">
               <span className="font-medium text-gray-900">
-                {skill.name}
+                {skill.nombre}
               </span>
               <p className="text-gray-500">{skill.description}</p>
             </div>
           </label>
         ))}
       </div>
-      
-      <SkillBlandas
-        skills={data}
-        isEditing={isEditing}
-        onRemove={handleRemove}
-      />
+    
       </AccordionTab>
     </Accordion>
   );

@@ -31,7 +31,7 @@ interface Field {
 
 interface DynamicSectionProps {
   items: DynamicItem[];
-  onChange: (id: string | number, field: string, value: any) => void;
+  onChange: (id: string | number, field: string, value: number | string | boolean | File | null) => void;
   onRemove: (id: string | number) => void;
   onAdd: () => void;
   fields: Field[];

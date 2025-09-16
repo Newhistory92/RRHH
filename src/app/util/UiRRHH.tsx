@@ -1,11 +1,12 @@
 import { ReactNode } from 'react';
 import Image from "next/image";
 import { Tag} from 'primereact/tag';        
-import {TechnicalSkill,Employee} from '@/app/Interfas/Interfaces';
+import {TechnicalSkill,Employee,Skill} from '@/app/Interfas/Interfaces';
 import { Card } from 'primereact/card';
 import { ProgressBar } from 'primereact/progressbar';
 import { Button } from 'primereact/button';
-
+import { Camera } from "lucide-react";
+import { useRef, ChangeEvent } from "react";
 interface Department {
   habilidades_requeridas?: TechnicalSkill[];
 }
@@ -22,15 +23,12 @@ interface EmployeeAvatarProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
+export interface ProfilePictureUploaderProps {
+    photo: string;
+    setPhoto: (photo: string) => void;
+    isEditing: boolean;
+}
 
-type Skill = {
-    id: number;
-    name: string;
-    description: string;
-    status: 'validated' | 'pending' | 'locked';
-    level: number;
-    unlockDate: string | null;
-};
 export const StatusBadge = ({ status }: { status: string }) => {
   const baseClasses = "px-3 py-1 text-xs font-medium rounded-full inline-block";
   const statusClasses: Record<string, string> = {
@@ -65,7 +63,7 @@ export const SkillsDisplay = ({ selectedDepartment }: { selectedDepartment?: Dep
       {selectedDepartment?.habilidades_requeridas?.map((skill: TechnicalSkill) => (
         <Tag 
           key={skill.id} 
-          value={`${skill.nombre} (${skill.nivel})`} 
+          value={`${skill.nombre} (${skill.level})`} 
           severity="info"
         />
       ))}
@@ -155,7 +153,7 @@ export const SkillCard = ({
           label="Comenzar Prueba"
           icon="pi pi-bolt"
           onClick={() => onStartTest(skill)}
-          disabled={isLocked}
+           disabled={isLocked === true}
           className="p-button-sm"
         />
       )}
@@ -190,4 +188,68 @@ export const SkillCard = ({
       </div>
     </Card>
   );
+};
+
+
+
+
+
+export const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ 
+    photo, 
+    setPhoto, 
+    isEditing 
+}) => {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                if (reader.result && typeof reader.result === 'string') {
+                    setPhoto(reader.result);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+    
+    const handleClick = () => {
+        if (!isEditing) return;
+        fileInputRef.current?.click();
+    };
+
+    return (
+        <div className="flex flex-col items-center">
+            <div className="relative group w-36 h-36">
+                <Image
+                    src={photo} 
+                    alt="Foto de Perfil" 
+                    width={360} 
+                    height={360} 
+                    className="w-full h-full rounded-full object-cover border-4 border-white shadow-lg" 
+                />
+                {isEditing && (
+                    <button 
+                        onClick={handleClick} 
+                        className="absolute inset-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center rounded-full transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                        type="button"
+                        aria-label="Cambiar foto de perfil"
+                    >
+                        <div className="text-white text-center">
+                            <Camera className="w-8 h-8 mx-auto" />
+                            <span className="text-sm font-semibold">Cambiar foto</span>
+                        </div>
+                    </button>
+                )}
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleFileChange} 
+                    accept="image/jpeg, image/png, image/jpg, image/webp" 
+                    className="hidden"
+                />
+            </div>
+        </div>
+    );
 };

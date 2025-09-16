@@ -990,17 +990,17 @@ export const OFFICES = [
 ];
 
 export const AVAILABLE_SKILLS = [
-  { id: 1, name: 'React.js', level: 8 },
-  { id: 2, name: 'Node.js', level: 7 },
-  { id: 3, name: 'Python', level: 6 },
-  { id: 4, name: 'Análisis de Datos con Pandas', level: 5 },
-  { id: 5, name: 'Gestión de Proyectos (Agile)', level: 4 },
-  { id: 6, name: 'SQL', level: 3 },
-  { id: 7, name: 'DevOps con Docker', level: 2 },
-  { id: 8, name: 'UI/UX Design Fundamentals', level: 1 },
-  { id: 9, name: 'Sistemas CRM', level: 1 },
-  { id: 10, name: 'Derecho Laboral', level: 1 },
-  { id: 11, name: 'Auditoría', level: 1 }
+  { id: 1, nombre: 'React.js', level: 8 },
+  { id: 2, nombre: 'Node.js', level: 7 },
+  { id: 3, nombre: 'Python', level: 6 },
+  { id: 4, nombre: 'Análisis de Datos con Pandas', level: 5 },
+  { id: 5, nombre: 'Gestión de Proyectos (Agile)', level: 4 },
+  { id: 6, nombre: 'SQL', level: 3 },
+  { id: 7, nombre: 'DevOps con Docker', level: 2 },
+  { id: 8, nombre: 'UI/UX Design Fundamentals', level: 1 },
+  { id: 9, nombre: 'Sistemas CRM', level: 1 },
+  { id: 10, nombre: 'Derecho Laboral', level: 1 },
+  { id: 11, nombre: 'Auditoría', level: 1 }
 ];
 
 export const SOFT_SKILLS_CATALOG = [

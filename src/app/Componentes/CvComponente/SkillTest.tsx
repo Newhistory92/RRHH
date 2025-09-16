@@ -230,7 +230,7 @@
 // };
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { ProgressBar } from 'primereact/progressbar';
@@ -238,7 +238,7 @@ import { RadioButton } from 'primereact/radiobutton';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { initialTestsByProfession } from '@/app/api/prueba2';
-import { Skill } from "@/app/Interfas/Interfaces";
+import {SkillTestDialogProps,Test,MultipleChoiceTest,TestsByProfession } from "@/app/Interfas/Interfaces";
 
 type TestQuestion = {
     id?: string;
@@ -249,12 +249,9 @@ type TestQuestion = {
     correctAnswerIndex?: number;
 };
 
-type SkillTestDialogProps = {
-    isVisible: boolean;
-    skill: Skill | null;
-    position: string;
-    onClose: () => void;
-    onTestComplete: (skill: Skill, score: number) => void;
+
+const isMultipleChoiceTest = (test: Test): test is MultipleChoiceTest => {
+    return test.type === 'multiple-choice';
 };
 
 export const SkillTestDialog: React.FC<SkillTestDialogProps> = ({ 
@@ -271,12 +268,7 @@ export const SkillTestDialog: React.FC<SkillTestDialogProps> = ({
     const [score, setScore] = useState(0);
     const [testResult, setTestResult] = useState<'Malo' | 'Bueno' | 'Avanzado' | null>(null);
 
-    useEffect(() => {
-        if (isVisible && skill) {
-            resetTestState();
-            loadTest();
-        }
-    }, [isVisible, skill, position]);
+ 
 
     const resetTestState = () => {
         setTestState('loading');
@@ -287,33 +279,51 @@ export const SkillTestDialog: React.FC<SkillTestDialogProps> = ({
         setTestResult(null);
     };
 
-    const loadTest = async () => {
+    const loadTest = useCallback(async () => {
         if (!skill) return;
 
-        // Buscar test predefinido primero
-        const predefinedTest = initialTestsByProfession[position]?.find(
+        // Tipado correcto para initialTestsByProfession
+        const professionTests = (initialTestsByProfession as TestsByProfession)[position];
+        
+        if (!professionTests) {
+            console.log('No se encontraron tests para la profesión:', position);
+            await generateTestWithGemini();
+            return;
+        }
+
+        // Buscar test predefinido
+        const predefinedTest = professionTests.find(
             test => test.name.toLowerCase().includes(skill.name.toLowerCase()) ||
                    skill.name.toLowerCase().includes(test.name.toLowerCase())
         );
 
-        if (predefinedTest && predefinedTest.questions && predefinedTest.questions.length > 0) {
-            console.log('Usando test predefinido:', predefinedTest.name);
-            
-            // Convertir formato predefinido al formato esperado
-            const formattedQuestions: TestQuestion[] = predefinedTest.questions.map((q, index) => ({
-                id: q.id || `q${index}`,
-                question: q.text,
-                options: q.answers?.map(a => a.text) || [],
-                correctAnswerIndex: q.answers?.findIndex(a => a.isCorrect) || 0
-            }));
-
-            setQuestions(formattedQuestions);
-            setTestState('testing');
+        if (predefinedTest) {
+            // Verificar que sea un test de múltiple opción antes de acceder a questions
+            if (isMultipleChoiceTest(predefinedTest) && predefinedTest.questions.length > 0) {
+                console.log('Usando test predefinido:', predefinedTest.name);
+                setQuestions(predefinedTest.questions); // Ya no necesitamos conversión
+                setTestState('testing');
+            } else if (predefinedTest.type === 'case-study') {
+                console.log('Test de caso de estudio encontrado, generando preguntas con Gemini');
+                await generateTestWithGemini();
+            } else {
+                console.log('Test sin preguntas válidas, generando con Gemini');
+                await generateTestWithGemini();
+            }
         } else {
             console.log('Generando test con Gemini para:', skill.name);
             await generateTestWithGemini();
         }
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [skill, position])
+
+
+       useEffect(() => {
+        if (isVisible && skill) {
+            resetTestState();
+            loadTest();
+        }
+    }, [isVisible, skill, loadTest]);
 
     const generateTestWithGemini = async () => {
         if (!skill) return;

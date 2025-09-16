@@ -2,9 +2,14 @@ import React from 'react';
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from 'primereact/dropdown';
 import { Accordion, AccordionTab } from 'primereact/accordion';
-import { ProfilePictureUploader } from '@/app/Componentes/Perfil/ProfilePicture';
-import {Employee,CvProps} from "@/app/Interfas/Interfaces"
+import { ProfilePictureUploader } from '@/app/util/UiRRHH';
+import {Employee} from "@/app/Interfas/Interfaces"
 
+export interface CvProps {
+  data: Employee;
+  updateData: (updates: Partial<Employee>) => void;
+  isEditing: boolean;
+}
 interface GenderOption {
   value: string;
   label: string;
