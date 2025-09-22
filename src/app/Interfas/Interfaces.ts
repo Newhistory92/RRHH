@@ -281,8 +281,8 @@ export interface WorkExperience {
 // Soft skills catalog interface
 export interface SoftSkillCatalog {
   id: number;
-  name: string;
-  description: string;
+  nombre: string;
+  description?: string;
 }
 export interface Office {
   id: number;
@@ -478,26 +478,27 @@ export type TestsByProfession = {
 
 
 
-
-export interface CvProps {
-  data: Employee;
-  updateData: (updates: Partial<Employee>) => void;
-  isEditing: boolean;
+export interface Skill {
+  id: number;
+  name: string;
+  description: string;
+  status: 'validated'|'pending'|'locked';
+  level: number;
+  unlockDate: string | null;
 }
-
-export type Skill = {
-    id: number;
-    name: string;
-    description: string;
-    status: 'validated' | 'pending' | 'locked';
-    level: number;
-    unlockDate: string | null;
-};
 
 export interface SkillStatus {
   id: number;
   employee_id: number;
   skill_id: number;
-  status: 'locked' | 'unlocked' ;
+  status: 'locked' | 'unlocked' | 'passed';
   unlockDate?: string;
+}
+
+export interface SkillTestDialogProps {
+  isVisible: boolean;
+  skill: Skill | null;
+  position: string;
+  onClose: () => void;
+  onTestComplete: (skill: Skill, score: number) => void;
 }

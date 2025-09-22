@@ -175,28 +175,27 @@ import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Message } from 'primereact/message';
 import { AVAILABLE_SKILLS, initialProfessions} from '@/app/api/prueba2';
 import { SkillCard } from '@/app/util/UiRRHH';
-import { TechnicalSkill, SkillStatus} from "@/app/Interfas/Interfaces"
-import { SkillTestDialog } from '../Perfil/SkillTest';
+import { TechnicalSkill, SkillStatus,Skill,SoftSkillCatalog} from "@/app/Interfas/Interfaces"
+import { SkillTestDialog} from './SkillTest';
 
 
 
-
-type Skill = {
-    id: number;
-    name: string;
-    description: string;
-    status: 'validated' | 'pending' | 'locked';
-    level: number;
-    unlockDate: string | null;
+// Props del componente HabilidadesTecnicas
+export type HabilidadesTecnicasProps = {
+  data: TechnicalSkill[];
+  skillStatus: SkillStatus[];
+  updateData: (technicalSkills: TechnicalSkill[], skillStatus: SkillStatus[]) => void;
+  isEditing: boolean;
+  position: string;
 };
 
-type HabilidadesTecnicasProps = {
-    data: TechnicalSkill[];
-    skillStatus: SkillStatus[];
-    updateData: (technicalSkills: TechnicalSkill[], skillStatus: SkillStatus[]) => void;
-    isEditing: boolean;
-    position: string; // Posición del empleado para filtrar habilidades relevantes
-};
+// Props para el SkillCard component
+export interface SkillCardProps {
+  skill: Skill;
+  onStartTest: (skill: Skill) => void;
+}
+
+
 
 export default function HabilidadesTecnicas({ 
     data, 
@@ -208,7 +207,10 @@ export default function HabilidadesTecnicas({
     const [skills, setSkills] = useState<Skill[]>([]);
     const [isTestModalVisible, setIsTestModalVisible] = useState(false);
     const [selectedSkillForTest, setSelectedSkillForTest] = useState<Skill | null>(null);
-console.log (skillStatus)
+    
+    console.log('skillStatus:', skillStatus);
+    console.log('data:', data);
+
     useEffect(() => {
         if (!position) {
             setSkills([]);
@@ -225,8 +227,8 @@ console.log (skillStatus)
         }
 
         // Mapear cada ID a la información completa de la habilidad
-        const processedSkills = relevantSkillIds.map(skillId => {
-            const skillDetail = AVAILABLE_SKILLS.find(s => s.id === skillId);
+        const processedSkills: Skill[] = relevantSkillIds.map((skillId: number) => {
+            const skillDetail = (AVAILABLE_SKILLS as SoftSkillCatalog[]).find(s => s.id === skillId);
             
             if (!skillDetail) {
                 console.warn(`Habilidad con ID ${skillId} no encontrada en AVAILABLE_SKILLS`);
@@ -238,7 +240,7 @@ console.log (skillStatus)
             if (validatedSkill) {
                 return {
                     id: skillId,
-                    name: skillDetail.name,
+                    name: skillDetail.nombre,
                     description: `Habilidad técnica para ${position}`,
                     status: 'validated' as const,
                     level: validatedSkill.level,
@@ -253,7 +255,7 @@ console.log (skillStatus)
                 if (new Date() < unlockDate) {
                     return {
                         id: skillId,
-                        name: skillDetail.name,
+                        name: skillDetail.nombre,
                         description: `Habilidad técnica para ${position}`,
                         status: 'locked' as const,
                         level: 0,
@@ -263,16 +265,15 @@ console.log (skillStatus)
             }
 
             // Habilidad disponible para evaluar
-            return {
-                id: skillId,
-                name: skillDetail.name,
-                description: `Habilidad técnica para ${position}`,
-                status: 'pending' as const,
-                level: 0,
-                unlockDate: null
-            };
-        }).filter(Boolean) as Skill[];
-
+           return {
+        id: skillId,
+        name: skillDetail.nombre,
+        description: `Habilidad técnica para ${position}`,
+        status: 'pending' as const,
+        level: 0,
+        unlockDate: null
+         } as Skill; 
+        }).filter((skill): skill is Skill => skill !== null); 
         console.log(`Habilidades procesadas para ${position}:`, processedSkills);
         setSkills(processedSkills);
     }, [position, data, skillStatus]);
@@ -287,8 +288,8 @@ console.log (skillStatus)
     };
 
     const handleTestComplete = (skill: Skill, score: number) => {
-        let newTechnicalSkills = [...data];
-        let newSkillStatus = skillStatus.filter(ss => ss.skill_id !== skill.id);
+        const newTechnicalSkills = [...data];
+        const newSkillStatus = skillStatus.filter(ss => ss.skill_id !== skill.id);
         
         // Determinar si aprobó (score >= 70 equivale a "Bueno" o "Avanzado")
         const success = score >= 70;
@@ -308,7 +309,7 @@ console.log (skillStatus)
             const existingSkillIndex = newTechnicalSkills.findIndex(ts => ts.id === skill.id);
             const newSkill: TechnicalSkill = { 
                 id: skill.id, 
-                name: skill.name, 
+                nombre: skill.name, 
                 level: level 
             };
 
@@ -321,20 +322,30 @@ console.log (skillStatus)
             // Marcar como aprobada y bloquear por 3 meses
             const unlockDate = new Date();
             unlockDate.setMonth(unlockDate.getMonth() + 3);
-            newSkillStatus.push({ 
+            
+            const newStatus: SkillStatus = {
+                id: Date.now(), // Generar un ID temporal
+                employee_id: 1, // Debería venir del contexto del empleado actual
                 skill_id: skill.id, 
-                status: 'passed',
+                status: 'passed', // Agregamos 'passed' al tipo SkillStatus
                 unlockDate: unlockDate.toISOString()
-            });
+            };
+            
+            newSkillStatus.push(newStatus);
         } else {
             // Falló el test, bloquear por 3 meses sin validar
             const unlockDate = new Date();
             unlockDate.setMonth(unlockDate.getMonth() + 3);
-            newSkillStatus.push({ 
+            
+            const newStatus: SkillStatus = {
+                id: Date.now(), // Generar un ID temporal
+                employee_id: 1, // Debería venir del contexto del empleado actual
                 skill_id: skill.id, 
                 status: 'locked', 
                 unlockDate: unlockDate.toISOString() 
-            });
+            };
+            
+            newSkillStatus.push(newStatus);
         }
 
         updateData(newTechnicalSkills, newSkillStatus);
