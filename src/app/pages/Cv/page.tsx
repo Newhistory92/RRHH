@@ -646,26 +646,28 @@ export default function EmployeeCV() {
   const loggedInEmployee = EMPLOYEES_DATA.find((e) => e.id === 1);
   // Inicializar cvData con la estructura completa, agregando campos faltantes
  const [cvData, setCvData] = useState<Employee | null>(
-  loggedInEmployee ? {
-    ...loggedInEmployee,
-    // Asegurar que todos los campos opcionales estén definidos
-    gender: loggedInEmployee.gender || '',
-    academicFormation: loggedInEmployee.academicFormation || [],
-    workExperience: loggedInEmployee.workExperience || [],
-    languages: loggedInEmployee.languages || [],
-    certifications: loggedInEmployee.certifications || [],
-    skillStatus: [], // Inicializar como array vacío
-     softSkillsArray: (loggedInEmployee.softSkills || [])
+  loggedInEmployee
+    ? {
+        ...loggedInEmployee,
+        gender: loggedInEmployee.gender || '',
+        academicFormation: loggedInEmployee.academicFormation || [],
+        workExperience: loggedInEmployee.workExperience || [],
+        languages: loggedInEmployee.languages || [],
+        certifications: loggedInEmployee.certifications || [],
+        skillStatus: [], // Inicializar como array vacío
+        softSkillsArray: (loggedInEmployee.softSkills || [])
           .map(skill => {
             const skillCatalog = SOFT_SKILLS_CATALOG.find(
-              s => s.name === skill.name
+              s => s.nombre === skill.nombre
             );
             return skillCatalog ? skillCatalog.id : null;
           })
-          .filter((id): id is number => id !== null) // Type guard
+          .filter((id): id is number => id !== null), // Type guard para filtrar nulls
       }
     : null
 );
+
+
 
   const [originalCvData, setOriginalCvData] = useState<Employee | null>(null);
   const [isEditing, setIsEditing] = useState(false);
