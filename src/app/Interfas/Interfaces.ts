@@ -72,7 +72,7 @@ export interface PaginationProps {
 export type EmployeeStatus = 'Activo' | 'De licencia' | 'Parte médico' | 'Inactivo' | 'Suspendido';
 export type EmploymentStatus = 'Planta permanente' | 'Contratado' | 'Comisionado' | 'Auditor' | 'Temporal';
 export type EmployeeRole = 'empleado' | 'supervisor' | 'manager' | 'admin' | 'auditor';
-export type LicenseStatus = 'Aprobada' | 'Pendiente' | 'Rechazada';
+export type LicenseStatus = 'Aprobada' | 'Pendiente' | 'Rechazada' |'Pendiente Siguiente Aprobación';
 export type ComplaintStatus = 'Resuelto' | 'Pendiente' | 'En proceso';
 
 
@@ -99,13 +99,14 @@ export interface Task {
 export interface LicenseHistory {
   id: string;
   type: string;
+  solicitanteNombre: string;
   supervisorId: string | null
   startDate: string;
   endDate: string;
   status: LicenseStatus;
   duration: number;
   originalMessage: string;
-  createdAt: number
+  createdAt: string;
   aprobaciones?: Aprobacion[]
   tiposLicencia: TiposLicencia
   observacion?: string
@@ -121,8 +122,11 @@ export interface Licenses {
 }
 
 export interface Saldo {
-  anio: number
-  [tipo: string]: number | string // string solo para la propiedad 'anio'
+   anio: number;
+   Licencias: number;
+  Particulares: number;
+   Articulos: number;
+   Examen: number;
 }
 
 

@@ -93,9 +93,7 @@ export const EMPLOYEES_DATA = [
         Articulos: 0,
         Examen: 0
       }
-    },
-      solicitudes: [],
-    
+    }, 
       history: [
         {
           id: 'L1',
