@@ -2,6 +2,12 @@
 
 import { ComplaintStatus, EmployeeRole, EmployeeStatus, EmploymentStatus, LicenseStatus, TestsByProfession,SkillStatus } from "../Interfas/Interfaces";
 
+
+  // const TIPOS_LICENCIA = [
+  //   'Licencia', 'Parte_Medico', 'Profilactica', 'Particular',
+  //   'Matrimonio', 'Matrimonio_Hijo', 'Paternidad', 'Paternidad_Especial',
+  //   'Maternidad', 'Fallecimiento', 'Enfermedad', 'Guarda_Tenencia','Articulo'
+  // ];
 // Unified Employee Data Structure
 export const EMPLOYEES_DATA = [
   {
@@ -60,8 +66,36 @@ export const EMPLOYEES_DATA = [
   
     // Absences and Licenses
     licenses: {
-      '2024': 5,
-      '2023': 12,
+      '2024': 21, // Licencias del año actual
+      '2023': 5,  // Licencias del año anterior
+      '2022': 2,  // Licencias de hace 2 años
+      usuarios: {
+        'empleado-1': { id: 'empleado-1', name: 'Juan Pérez', dni: '12.345.678', oficina: 'Contabilidad', },
+        'supervisor-1': { id: 'supervisor-1', name: 'Ana García (Jefa de Área)', dni: '98.765.432', department: 'Dirección'  },
+        'supervisor-2': { id: 'supervisor-2', name: 'Carlos Gomez (Director Gral.)', dni: '55.666.777', department: 'Gerencia'},
+      },
+      saldos: {
+      '2024': {
+        Licencias: 21,
+        Particulares: 5,
+        Articulos: 10,
+        Examen: 4
+      },
+      '2023': {
+        Licencias: 5,
+        Particulares: 0,
+        Articulos: 0,
+        Examen: 0
+      },
+      '2022': {
+        Licencias: 2,
+        Particulares: 0,
+        Articulos: 0,
+        Examen: 0
+      }
+    },
+      solicitudes: [],
+    
       history: [
         {
           id: 'L1',
@@ -153,6 +187,7 @@ export const EMPLOYEES_DATA = [
       { id: 1, name: 'Certificación en Gestión de Proyectos', institution: 'PMI', date: '2022-05-15', validUntil: '2025-05-15', attachment: null },
       { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
+    feedback_history: [],
   },
   {
     id: 2,
@@ -269,6 +304,7 @@ export const EMPLOYEES_DATA = [
       { id: 1, name: 'Certificación en Gestión de Proyectos', institution: 'PMI', date: '2022-05-15', validUntil: '2025-05-15', attachment: null },
       { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
+    feedback_history: [],
   },
   {
     id: 3,
@@ -402,6 +438,7 @@ export const EMPLOYEES_DATA = [
       { id: 1, name: 'Certificación en Gestión de Proyectos', institution: 'PMI', date: '2022-05-15', validUntil: '2025-05-15', attachment: null },
       { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
+    feedback_history: [],
   },
   {
     id: 4,
@@ -530,6 +567,7 @@ export const EMPLOYEES_DATA = [
       { id: 1, name: 'Certificación en Gestión de Proyectos', institution: 'PMI', date: '2022-05-15', validUntil: '2025-05-15', attachment: null },
       { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
+    feedback_history: [],
   },
   {
     id: 5,
@@ -645,6 +683,7 @@ export const EMPLOYEES_DATA = [
       { id: 1, name: 'Certificación en Gestión de Proyectos', institution: 'PMI', date: '2022-05-15', validUntil: '2025-05-15', attachment: null },
       { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
+    feedback_history: [],
   }
 ];
 
@@ -1178,3 +1217,167 @@ export const SKILL_STATUS_DATA: SkillStatus[] = [
     
   },
 ];
+
+
+
+// [
+//   {
+//     "evaluador": "Ana García",
+//     "evaluado": "Laura Fernández",
+//     "softSkills": {
+//       "nombre": "Resolución de conflictos",
+//       "level": 9
+//     },
+//     "respuesta": [
+//       0,
+//       1,
+//       0
+//     ]
+//   },
+//   {
+//     "evaluador": "Ana García",
+//     "evaluado": "Laura Fernández",
+//     "softSkills": {
+//       "nombre": "Trabajo en equipo",
+//       "level": 8
+//     },
+//     "respuesta": [
+//       0,
+//       1,
+//       0
+//     ]
+//   },
+//   {
+//     "evaluador": "Ana García",
+//     "evaluado": "Laura Fernández",
+//     "softSkills": {
+//       "nombre": "Empatía",
+//       "level": 9
+//     },
+//     "respuesta": [
+//       0,
+//       0,
+//       1
+//     ]
+//   },
+//   {
+//     "evaluador": "Ana García",
+//     "evaluado": "Laura Fernández",
+//     "softSkills": {
+//       "nombre": "Liderazgo",
+//       "level": 7
+//     },
+//     "respuesta": [
+//       1,
+//       0,
+//       0
+//     ]
+//   },
+//   {
+//     "evaluador": "Ana García",
+//     "evaluado": "Laura Fernández",
+//     "softSkills": {
+//       "nombre": "Adaptabilidad",
+//       "level": 10
+//     },
+//     "respuesta": [
+//       0,
+//       0,
+//       1
+//     ]
+//   },
+//   {
+//     "evaluador": "Ana García",
+//     "evaluado": "Laura Fernández",
+//     "softSkills": {
+//       "nombre": "Comunicación",
+//       "level": 9
+//     },
+//     "respuesta": [
+//       1,
+//       0,
+//       0
+//     ]
+//   }
+// ]
+
+
+
+// export const getInitialDB = () => {
+//   const currentYear = new Date().getFullYear();
+  
+//   // Convertir EMPLOYEES_DATA al formato del mockup original manteniendo jerarquía
+//   const usuarios = {};
+//   const saldos = {};
+  
+//   EMPLOYEES_DATA.forEach(employee => {
+//     let userId;
+    
+//     // Generar ID según jerarquía específica
+//     if (employee.role === 'empleado') {
+//       userId = `empleado-${employee.id}`;
+//     } else if (employee.role === 'supervisor') {
+//       if (employee.supervisorLevel === 1) {
+//         userId = 'supervisor-1'; // Supervisor directo
+//       } else if (employee.supervisorLevel === 2) {
+//         userId = 'supervisor-2'; // Supervisor del supervisor
+//       }
+//     }
+    
+//     usuarios[userId] = {
+//       id: userId,
+//       name: employee.name,
+//       dni: employee.dni, // null para supervisores
+//       oficina: employee.role === 'empleado' ? employee.office[0] : undefined,
+//       department: employee.role === 'supervisor' ? employee.department : undefined,
+//       rol: employee.role
+//     };
+    
+//     saldos[userId] = Object.keys(employee.licenseBalances).map(year => ({
+//       anio: parseInt(year),
+//       ...employee.licenseBalances[year]
+//     }));
+//   });
+  
+//   return {
+//     usuarios,
+//     saldos,
+//     solicitudes: []
+//   };
+// };
+
+// // Función helper para obtener la cadena de supervisión
+// export const getSupervisionChain = (employeeId) => {
+//   const employee = getEmployeeById(employeeId);
+//   if (!employee) return [];
+  
+//   const chain = [];
+//   let current = employee;
+  
+//   while (current && current.managerId) {
+//     const supervisor = getEmployeeById(current.managerId);
+//     if (supervisor) {
+//       chain.push({
+//         id: supervisor.id,
+//         name: supervisor.name,
+//         role: supervisor.role,
+//         level: supervisor.supervisorLevel
+//       });
+//       current = supervisor;
+//     } else {
+//       break;
+//     }
+//   }
+  
+//   return chain;
+// };
+
+// // Función helper para obtener empleado por ID
+// export const getEmployeeById = (id) => {
+//   return EMPLOYEES_DATA.find(emp => emp.id === id);
+// };
+
+// // Función helper para obtener empleados por rol
+// export const getEmployeesByRole = (role) => {
+//   return EMPLOYEES_DATA.filter(emp => emp.role === role);
+// };

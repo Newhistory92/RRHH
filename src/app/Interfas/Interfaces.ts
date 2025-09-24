@@ -99,20 +99,55 @@ export interface Task {
 export interface LicenseHistory {
   id: string;
   type: string;
+  supervisorId: string | null
   startDate: string;
   endDate: string;
   status: LicenseStatus;
   duration: number;
   originalMessage: string;
+  createdAt: number
+  aprobaciones?: Aprobacion[]
+  tiposLicencia: TiposLicencia
+  observacion?: string
 }
 
 // Licenses tracking
 export interface Licenses {
   '2024': number;
   '2023': number;
+   usuarios: Record<string, Usuario>
+   saldos: Record<string, Saldo[]>
   history: LicenseHistory[];
 }
 
+export interface Saldo {
+  anio: number
+  [tipo: string]: number | string // string solo para la propiedad 'anio'
+}
+
+
+export interface Usuario {
+  id: string
+  name: string
+  dni: string
+  oficina?: string
+  department?: string
+  role: string
+}
+
+export interface Aprobacion {
+  supervisorId: string
+  nombre: string
+  fecha: string           
+  accion: "aprobar" | "rechazar"
+  observacion?: string
+}
+
+export interface TiposLicencia {
+  [anio: string]: {
+  [tipo: string]: number
+  }
+}
 // Absences tracking
 export interface Absences {
   '2024': number;
