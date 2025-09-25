@@ -122,13 +122,13 @@ export interface Licenses {
 }
 
 export interface Saldo {
-   anio: number;
-   Licencias: number;
-  Particulares: number;
-   Articulos: number;
-   Examen: number;
+  [anio: string]: {
+    Licencias: number;
+    Particulares: number;
+    Articulos: number;
+    Examen: number;// string solo para la propiedad 'anio'
 }
-
+}
 
 export interface Usuario {
   id: string
