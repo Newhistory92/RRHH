@@ -1,12 +1,14 @@
 "use client";
-import { Button } from '../Componentes/Buttom';
-import { Card } from '../Componentes/Card';
+import { Button } from 'primereact/button';
+import { Card } from 'primereact/card'; 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Send } from 'lucide-react';
 import ReactDatePicker, { registerLocale } from 'react-datepicker';
 import { es } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
 import {Employee,LicenseHistory, Saldo, Usuario,LicenseStatus,TiposLicencia } from "@/app/Interfas/Interfaces"
+import DateRangePicker from './Calendario';
+import Calendario from './Calendario';
 
 // ✅ Registrar idioma español solo en el cliente
 if (typeof window !== 'undefined') {
@@ -14,13 +16,12 @@ if (typeof window !== 'undefined') {
 }
 
 export interface RequestFormProps {
-  saldos:  Saldo[];
+  saldos:  Saldo;
   supervisores: Usuario[];
   userData: Employee;
   onCancel: () => void;
   onSubmit: (data: LicenseHistory) => void;
 }
-
 const RequestForm: React.FC<RequestFormProps> = ({ 
   saldos, 
   supervisores, 
@@ -29,32 +30,42 @@ const RequestForm: React.FC<RequestFormProps> = ({
   onSubmit 
 }) => {
   const [isClient, setIsClient] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [fecha, setFecha] = useState('');
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [supervisorId, setSupervisorId] = useState('');
   const [error, setError] = useState('');
-
-  // ✅ Inicializar días de forma segura
+   const [dateRange, setDateRange] = useState({
+      startDate: null,
+      endDate: null,
+    });
+  // ✅ Inicializar días de forma segura con la nueva estructura
   const initializeDias = (): TiposLicencia => {
-    if (!saldos || !Array.isArray(saldos)) return {};
-    
-    return saldos.reduce((acc, saldo) => {
-      const year = Object.keys(saldo)[0]; // El primer key será el año
-      return {
-        ...acc,
-        [year]: { 
-          Licencias: 0, 
-          Particulares: 0, 
-          Articulos: 0, 
-          Examen: 0 
+    const result: TiposLicencia = {};
+    if (saldos && typeof saldos === 'object') {
+      for (const anio in saldos) {
+        if (anio !== 'anio') { // Excluir la propiedad 'anio'
+          result[anio] = { Licencias: 0, Particulares: 0, Articulos: 0, Examen: 0 };
         }
-      };
-    }, {});
+      }
+    }
+    return result;
   };
 
   const [solicitudDias, setSolicitudDias] = useState<TiposLicencia>(initializeDias);
   const [selectedType, setSelectedType] = useState<'Licencias' | 'Particulares' | 'Articulos' | 'Examen'>('Licencias');
+
+
+
+ const handleDateChange = (startDate, endDate) => {
+    setDateRange({ startDate, endDate });
+  };
+
+
+
+
+
 
   // ✅ Control de hidratación
   useEffect(() => {
@@ -66,9 +77,10 @@ const RequestForm: React.FC<RequestFormProps> = ({
 
   // ✅ Reinicializar días cuando cambien los saldos
   useEffect(() => {
-    if (saldos && Array.isArray(saldos)) {
+    if (saldos && typeof saldos === 'object') {
       setSolicitudDias(initializeDias());
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [saldos]);
 
   const diasHabilesSeleccionados = useMemo(() => {
@@ -115,29 +127,28 @@ const RequestForm: React.FC<RequestFormProps> = ({
 
     if (!startDate || !endDate || !supervisor) return '';
 
-    return `Estimado/a ${supervisor.name || ''},\n\nSolicito autorización para tomar licencia desde el ${startDate.toLocaleDateString('es-AR')} hasta el ${endDate.toLocaleDateString('es-AR')}, por un total de ${diasHabilesSeleccionados} días hábiles.\n\n${tiposDetalle}\n\nAtentamente,\n${userData?.name || userData?.name || ''}`;
+    return `Estimado/a ${supervisor.name || ''},\n\nQuien suscribe ${userData.name}, DNI: ${userData.dni}, que se desempeña en el departamento/oficina ${userData.department || userData.office},Solicito autorización para tomar licencia desde el ${startDate.toLocaleDateString('es-AR')} hasta el ${endDate.toLocaleDateString('es-AR')}, por un total de ${diasHabilesSeleccionados} días hábiles.\n\n${tiposDetalle}\n\nAtentamente,\n${userData?.name || userData?.name || ''}`;
   }, [diasHabilesSeleccionados, totalDiasSolicitados, supervisorId, startDate, endDate, solicitudDias, userData, supervisores, isClient]);
 
   const handleDiasChange = (anio: string, tipo: 'Licencias' | 'Particulares' | 'Articulos' | 'Examen', valor: string) => {
     const numValor = Number(valor);
     
-    if (!saldos || !Array.isArray(saldos)) return;
+    if (!saldos || typeof saldos !== 'object') return;
     
-    // Buscar el saldo correspondiente al año
-    const saldoAnual = saldos.find(s => s[anio]);
-    if (!saldoAnual || numValor < 0) return;
+    // ✅ Acceder directamente al año en el objeto saldos
+    const yearData = saldos[anio];
+    if (!yearData || numValor < 0) return;
 
-    const yearData = saldoAnual[anio];
-    if (!yearData || !(tipo in yearData) || typeof yearData[tipo] !== 'number') return;
-    
-    if (numValor <= yearData[tipo]) {
-      setSolicitudDias(prev => ({
-        ...prev,
-        [anio]: { 
-          ...prev[anio], 
-          [tipo]: numValor 
-        }
-      }));
+    if (typeof yearData === 'object' && tipo in yearData && typeof yearData[tipo] === 'number') {
+      if (numValor <= yearData[tipo]) {
+        setSolicitudDias(prev => ({
+          ...prev,
+          [anio]: { 
+            ...prev[anio], 
+            [tipo]: numValor 
+          }
+        }));
+      }
     }
   };
 
@@ -162,7 +173,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
     onSubmit({
       id: `sol-${Date.now()}`,
       solicitanteNombre: userData?.name || userData?.name || '',
-      type: selectedType, // El tipo principal de licencia seleccionado
+      type: selectedType,
       supervisorId,
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
@@ -170,7 +181,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
       tiposLicencia: JSON.parse(JSON.stringify(solicitudDias)),
       originalMessage: mensaje,
       status: 'Pendiente' as LicenseStatus,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().getTime()
     });
   };
 
@@ -187,7 +198,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
             </div>
             <div className="space-y-6">
               <div className="h-10 bg-gray-300 rounded"></div>
-              <div className="h-64 bg-gray-300 rounded"></div>
+              <div className="h-264 bg-gray-300 rounded"></div>
             </div>
           </div>
         </div>
@@ -195,8 +206,8 @@ const RequestForm: React.FC<RequestFormProps> = ({
     );
   }
 
-  // ✅ Validación de props
-  if (!saldos || !Array.isArray(saldos) || saldos.length === 0) {
+  // ✅ Validación de props actualizada
+   if (!saldos || typeof saldos !== 'object' || Object.keys(saldos).length === 0) {
     return (
       <Card className="max-w-4xl mx-auto">
         <div className="text-center py-8">
@@ -217,14 +228,15 @@ const RequestForm: React.FC<RequestFormProps> = ({
   }
 
   return (
-    <Card className="max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Crear Nueva Solicitud</h2>
+    <Card title="Crear Nueva Solicitud" >
+     
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
         <div className="space-y-6">
           <div>
             <h3 className="font-bold text-lg mb-2">1. Selecciona el rango de fechas</h3>
-            <ReactDatePicker
+            < Calendario  />
+            {/* <ReactDatePicker
               selected={startDate}
               onChange={(dates) => {
                 if (Array.isArray(dates)) {
@@ -248,7 +260,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
               <p className="mt-2 text-center font-semibold text-blue-600">
                 Días hábiles seleccionados: {diasHabilesSeleccionados}
               </p>
-            )}
+            )} */}
           </div>
 
           <div>
@@ -272,65 +284,94 @@ const RequestForm: React.FC<RequestFormProps> = ({
             </div>
 
             <div className="space-y-4">
-              {saldos.map((saldo, index) => {
-                const year = Object.keys(saldo)[0];
-                const yearData = saldo[year];
-                
-                if (!yearData) return null;
-                
-                return (
-                  <details key={year || index} open>
-                    <summary className="font-semibold cursor-pointer">Año {year}</summary>
-                    <div className="pl-4 pt-2 space-y-4">
-                      {Object.entries(yearData)
-                        .map(([tipo, total]) => {
-                          if (typeof total !== 'number') return null;
-                          
-                          const consumidos = solicitudDias[year]?.[tipo as keyof typeof yearData] ?? 0;
-                          const porcentaje = total > 0 ? (consumidos / total) * 100 : 0;
-                          
-                          return (
-                            <div key={tipo}>
-                              <div className="flex justify-between items-center mb-1">
-                                <label htmlFor={`${tipo}-${year}`} className="font-semibold">
-                                  {tipo}
-                                </label>
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="number"
-                                    id={`${tipo}-${year}`}
-                                    value={consumidos}
-                                    onChange={(e) => handleDiasChange(
-                                      year, 
-                                      tipo as 'Licencias' | 'Particulares' | 'Articulos' | 'Examen', 
-                                      e.target.value
-                                    )}
-                                    className="w-16 p-1 border rounded text-center"
-                                    min="0"
-                                    max={total}
-                                  />
-                                  <span className="text-sm text-gray-600 font-medium w-12 text-right">
-                                    {consumidos}/{total}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                <div 
-                                  className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" 
-                                  style={{ width: `${porcentaje}%` }}
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
+              {/* ✅ Mostrar solo el tipo seleccionado, limitado a 3 años */}
+              {Object.entries(saldos)
+                .filter(([anio, yearData]) => 
+                  anio !== 'anio' && 
+                  typeof yearData === 'object' && 
+                  yearData !== null &&
+                  selectedType in yearData &&
+                  typeof yearData[selectedType] === 'number' &&
+                  (yearData[selectedType] as number) > 0
+                )
+                .slice(0, 3) // Limitar a 3 años
+                .map(([anio, yearData]) => {
+                  if (typeof yearData !== 'object' || yearData === null || !(selectedType in yearData)) {
+                    return null;
+                  }
+                  const total = yearData[selectedType] as number;
+                  const consumidos = solicitudDias[anio]?.[selectedType] ?? 0;
+                  const porcentaje = total > 0 ? (consumidos / total) * 100 : 0;
+
+                  return (
+                    <div key={anio} className="border rounded-lg p-4 bg-white">
+                      <h4 className="font-semibold text-lg mb-3 text-gray-800">
+                        Año {anio} - {selectedType}
+                      </h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <label htmlFor={`${selectedType}-${anio}`} className="font-medium text-gray-700">
+                            Días a solicitar:
+                          </label>
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="number"
+                              id={`${selectedType}-${anio}`}
+                              value={consumidos}
+                              onChange={(e) => handleDiasChange(
+                                anio,
+                                selectedType,
+                                e.target.value
+                              )}
+                              className={`w-20 p-2 border rounded text-center font-medium ${
+                                totalDiasSolicitados >= diasHabilesSeleccionados && diasHabilesSeleccionados > 0
+                                  ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
+                                  : 'bg-white'
+                              }`}
+                              min="0"
+                              max={Math.min(total, diasHabilesSeleccionados - (totalDiasSolicitados - consumidos))}
+                              disabled={totalDiasSolicitados >= diasHabilesSeleccionados && diasHabilesSeleccionados > 0 && consumidos === 0}
+                            />
+                            <span className="text-sm text-gray-600 font-medium min-w-[3rem] text-right">
+                              {consumidos}/{total}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div
+                            className="bg-blue-600 h-3 rounded-full transition-all duration-300 flex items-center justify-end pr-2"
+                            style={{ width: `${porcentaje}%` }}
+                          >
+                            {porcentaje > 20 && (
+                              <span className="text-xs text-white font-medium">
+                                {Math.round(porcentaje)}%
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500 text-right">
+                          Disponible: {total - consumidos} días
+                        </div>
+                      </div>
                     </div>
-                  </details>
-                );
-              })}
+                  );
+                })
+              }
+              
+              {/* Mensaje si no hay días disponibles del tipo seleccionado */}
+              {Object.entries(saldos)
+                .filter(([anio, yearData]) => 
+                  anio !== 'anio' && 
+                  typeof yearData === 'object' && 
+                  yearData[selectedType] !== undefined && 
+                  yearData[selectedType] > 0
+                ).length === 0 && (
+                <div className="text-center py-6 text-gray-500 border-2 border-dashed border-gray-300 rounded-lg">
+                  <p className="font-medium">No tienes días disponibles de tipo &quot;{selectedType}&quot;</p>
+                  <p className="text-sm">Selecciona otro tipo de licencia</p>
+                </div>
+              )}
             </div>
-            <p className="mt-2 text-center font-semibold text-blue-600">
-              Total de días asignados: {totalDiasSolicitados}
-            </p>
           </div>
         </div>
 
@@ -372,7 +413,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
         <Button onClick={onCancel} variant="secondary">
           Cancelar
         </Button>
-        <Button onClick={handleSubmit} disabled={!mensaje}>
+        <Button onClick={handleSubmit} disabled={!mensaje || totalDiasSolicitados !== diasHabilesSeleccionados}>
           <Send size={18} /> Enviar Solicitud
         </Button>
       </div>

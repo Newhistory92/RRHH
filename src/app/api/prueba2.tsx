@@ -69,11 +69,11 @@ export const EMPLOYEES_DATA = [
       '2024': 21, // Licencias del año actual
       '2023': 5,  // Licencias del año anterior
       '2022': 2,  // Licencias de hace 2 años
-      usuarios: {
-        'empleado-1': { id: 'empleado-1', name: 'Juan Pérez', dni: '12.345.678', oficina: 'Contabilidad', },
-        'supervisor-1': { id: 'supervisor-1', name: 'Ana García (Jefa de Área)', dni: '98.765.432', department: 'Dirección'  },
-        'supervisor-2': { id: 'supervisor-2', name: 'Carlos Gomez (Director Gral.)', dni: '55.666.777', department: 'Gerencia'},
-      },
+     usuarios: {
+  'empleado-1': { id: 'empleado-1', name: 'Juan Pérez', dni: '12.345.678',  office: 'Contabilidad', role: 'empleado' },
+  'supervisor-1': { id: 'supervisor-1', name: 'Ana García (Jefa de Área)', dni: '98.765.432', department: 'Dirección', role: 'supervisor' },
+  'supervisor-2': { id: 'supervisor-2', name: 'Carlos Gomez (Director Gral.)', dni: '55.666.777', department: 'Gerencia', role: 'supervisor' },
+},
       saldos: {
       '2024': {
         Licencias: 21,

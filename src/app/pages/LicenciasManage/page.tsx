@@ -1,11 +1,11 @@
 
-import { Spinner } from "@/app/Componentes/Loading";
 import { useEffect, useState } from "react";
 import { FileText, } from 'lucide-react';
 import dynamic from "next/dynamic";
 import {EMPLOYEES_DATA} from "@/app/api/prueba2";
 import {Employee,Usuario,LicenseHistory} from "@/app/Interfas/Interfaces"
-
+import { ProgressSpinner } from 'primereact/progressspinner';
+        
 const RequestForm = dynamic(() => import("@/app/GestionLicencias/FormularioLicencia"), {
   ssr: false,
 });
@@ -41,7 +41,7 @@ export default function LicenciasManage() {
 const supervisores: Usuario[] = Object.values(db.licenses.usuarios).filter(
   (u) => u.role === "supervisor"
 );
-  const misSaldos = currentUser ? db.licenses.saldos[currentUser.id] : null;
+  const misSaldos =db.licenses?.saldos;
 
   useEffect(() => {
     if (userId) {
@@ -52,11 +52,7 @@ const supervisores: Usuario[] = Object.values(db.licenses.usuarios).filter(
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
-  console.log("Licenses:", db.licenses);
-  console.log("Mis solicitudes:", misSolicitudes);
-  console.log("Solicitudes pendientes:", solicitudesPendientes);
-  console.log("Supervisores:", supervisores);
-  console.log("Mis saldos:", misSaldos);
+
 
  const handleNewRequest = (nuevaSolicitud:LicenseHistory) => {
   setDb((prevDb) => ({
@@ -129,14 +125,14 @@ const handleManageRequest = (
   if (isLoading)
     return (
       <div className="bg-gray-100 min-h-screen flex items-center justify-center">
-        <Spinner />
+         <ProgressSpinner />
       </div>
     );
 
   return (
     <div className="bg-gray-50 min-h-screen font-sans">
       <div className="flex items-center gap-3 py-4 px-4">
-        <FileText className="text-blue-600" size={32} />
+        <FileText className=" text-[#1ABCD7] text-shadow-md" size={32} />
         <h1 className="text-2xl font-bold text-gray-800">
           Gestión de Licencias
         </h1>
@@ -150,7 +146,6 @@ const handleManageRequest = (
             solicitudesPendientes={solicitudesPendientes}
             onNewRequest={() => setView("new_request")}
             onManageRequest={handleManageRequest}
-            db={db}
             supervisores={supervisores}
           />
         )}

@@ -1,13 +1,11 @@
 "use client"
 import React, { useState,  useMemo} from 'react';
-import { Users, Calendar, Send,  Briefcase, Award, GraduationCap,  Clock, Code, ChevronsRight, MessageSquare } from 'lucide-react';
-import { Button } from '@/app/Componentes/Buttom';
-import { Card } from '@/app/Componentes/Card';  
-import { Modal } from '@/app/Componentes/Modal';
+import { Users,  Send,  Briefcase, Award, GraduationCap,  Clock, ChevronsRight, MessageSquare } from 'lucide-react';
+import { Button } from 'primereact/button';
+import { Card } from 'primereact/card';
 import { ApprovalModal } from './ModalProval';
-import { Spinner } from '../Componentes/Loading';
 import {Employee,LicenseHistory, Saldo,  LicenseStatus } from "@/app/Interfas/Interfaces"
-
+import { ProgressSpinner } from 'primereact/progressspinner';
 type SolicitudParsed = LicenseHistory & {
   fechaDesdeParsed: Date;
   fechaHastaParsed: Date;
@@ -21,13 +19,11 @@ interface ConteinerLicenciaProps {
   solicitudesPendientes: LicenseHistory[];
   onNewRequest: () => void;
   onManageRequest: (solicitud: LicenseHistory) => void;
-  db:  Employee[]; // si tenés un tipo más específico, ponelo acá
   supervisores: Employee[];
 }
-export default function ConteinerLicencia({ userData, saldos, misSolicitudes, solicitudesPendientes, onNewRequest, onManageRequest, db, supervisores }: ConteinerLicenciaProps) {
-    const [isJsonModalOpen, setIsJsonModalOpen] = useState(false);
+export default function ConteinerLicencia({ userData, saldos, misSolicitudes, solicitudesPendientes, onNewRequest, onManageRequest, supervisores }: ConteinerLicenciaProps) {
     const [selectedRequest, setSelectedRequest] = useState<LicenseHistory | null>(null);
-    const solicitante = db[0]?.licenses.usuarios[selectedRequest?.id || ''] || { name: 'Desconocido' };
+    const solicitante =  userData.name;
    const fechasPendientes: SolicitudParsed[] = useMemo(
     () =>
       solicitudesPendientes.map((solicitud) => ({
@@ -37,6 +33,7 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
       })),
     [solicitudesPendientes]
   );
+
 
 //   const misFechasSolicitudes: SolicitudParsed[] = useMemo(
 //     () =>
@@ -70,12 +67,11 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
 };
 
         const licenciaIconos = {
-         Licencias: <Briefcase />,
-         Particulares: <Users />,
-         Articulos: <Award />,
-         Examen: <GraduationCap />,
+         Licencias: <Briefcase className='text-[#1ABCD7] text-shadow-md' />,
+         Particulares: <Users className='text-[#1ABCD7] text-shadow-md'/>,
+         Articulos: <Award className='text-[#1ABCD7] text-shadow-md'/>,
+         Examen: <GraduationCap className='text-[#1ABCD7] text-shadow-md' />,
          };
-        const jsonDataString = useMemo(() => JSON.stringify({ "Base de Datos Completa": db }, null, 2), [db]);
 
         return (
             <div className="space-y-8">
@@ -83,48 +79,49 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
                 <ApprovalModal request={selectedRequest}
                  supervisores={supervisores.filter(s => s.id !== userData.id && !selectedRequest.aprobaciones?.some(a => a.supervisorId === s.id))} 
                  onManage={onManageRequest} onClose={() => setSelectedRequest(null)} />}
-                <Modal show={isJsonModalOpen} onClose={() => setIsJsonModalOpen(false)} 
-                title="Datos Locales en Vivo (JSON)">
-                    <pre className="bg-gray-900 text-green-300 font-mono p-4 rounded-lg text-xs overflow-auto max-h-[60vh]"><code>{jsonDataString}</code></pre>
-                </Modal>
-                <div className="flex justify-end"><Button onClick={() => setIsJsonModalOpen(true)} variant="secondary"><Code size={18} /> Visualizar JSON</Button></div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <Card className="lg:col-span-2">
-                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Calendar className="text-blue-600" /> Mis Saldos</h2>
-                        {!saldos ? <Spinner /> : (
+                    <Card title="Mis Licencias" className="lg:col-span-2">
+                       
+                        {!saldos ? <ProgressSpinner /> : (
                             <div className="space-y-4">
-                                {saldos.map(saldo => (
-                                    <details key={saldo.anio} className="bg-gray-50 p-2 rounded-lg">
-                                        <summary className="font-semibold text-lg cursor-pointer">Año {saldo.anio}</summary>
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center pt-3">
-                                            {Object.entries(saldo)
-  .filter(([k]) => k !== 'anio')
-  .map(([tipo, dias]) => (
-    <div key={tipo}>
-      <p className="font-semibold text-gray-700 flex items-center justify-center gap-1">
-        {licenciaIconos[tipo as keyof typeof licenciaIconos]} {tipo}
-      </p>
-      <p className="text-2xl font-bold text-blue-600">{dias as number}</p>
+                             {Object.entries(saldos).map(([anio, valores]) => (
+  <details key={anio} className="bg-gray-50 p-2 rounded-lg">
+    <summary className="font-semibold text-lg cursor-pointer">Año {anio}</summary>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center pt-3">
+      {Object.entries(valores).map(([tipo, dias]) => (
+        <div key={tipo}>
+          <p className="font-semibold text-gray-700 flex items-center justify-center gap-1">
+            {licenciaIconos[tipo as keyof typeof licenciaIconos]} {tipo}
+          </p>
+          <p className="text-2xl font-bold text-blue-500 text-shadow-md ">{dias as number}</p>
+        </div>
+      ))}
     </div>
+  </details>
 ))}
 
-                                        </div>
-                                    </details>
-                                ))}
                             </div>
                         )}
                     </Card>
-                    <Card className="flex flex-col justify-center items-center text-center"><h2 className="text-xl font-bold mb-4">Nueva Solicitud</h2><p className="text-gray-600 mb-4">Inicia una nueva solicitud de licencia aquí.</p><Button onClick={onNewRequest}><Send size={18} /> Solicitar Licencia</Button></Card>
+                    <Card  title="Nueva Solicitud" className="flex flex-col justify-center items-center text-center">
+                      <p className="text-gray-600 mb-4">Inicia una nueva solicitud de licencia aquí.</p>
+                      <Button raised 
+                      label="Solicitar Licencia"
+                       onClick={onNewRequest}>
+                        <Send size={18} className='ml-2' /> 
+                       </Button>
+                      </Card>
                 </div>
                 {userData.role === 'supervisor' && solicitudesPendientes.length > 0 && (
                     <Card>
-                        <h2 className="text-xl font-bold mb-4 text-red-600 flex items-center gap-2"><Clock /> Solicitudes Pendientes de Mi Aprobación</h2>
+                        <h2 className="text-xl font-bold mb-4 text-red-600 flex items-center gap-2">
+                        <Clock /> Solicitudes Pendientes de Mi Aprobación</h2>
                         <div className="space-y-2">
                             {fechasPendientes.map(solicitud => (
                                 <button key={solicitud.id} onClick={() => setSelectedRequest(solicitud)} className="w-full text-left p-4 border rounded-lg bg-yellow-50 hover:bg-yellow-100 flex justify-between items-center">
                                     <div>
                                         <p>
-                                            <span className="font-bold">{ solicitante.name}</span> solicita <span className="font-bold">{solicitud.duration} días</span>
+                                            <span className="font-bold">{ solicitante}</span> solicita <span className="font-bold">{solicitud.duration} días</span>
                                         </p>
                                         <p className="text-sm text-gray-600">
                                             Del {solicitud.fechaDesdeParsed.toLocaleDateString()} al {solicitud.fechaHastaParsed.toLocaleDateString()}
