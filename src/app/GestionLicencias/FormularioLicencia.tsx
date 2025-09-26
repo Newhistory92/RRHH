@@ -3,17 +3,9 @@ import { Button } from 'primereact/button';
 import { Card } from 'primereact/card'; 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Send } from 'lucide-react';
-import ReactDatePicker, { registerLocale } from 'react-datepicker';
-import { es } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
 import {Employee,LicenseHistory, Saldo, Usuario,LicenseStatus,TiposLicencia } from "@/app/Interfas/Interfaces"
-import DateRangePicker from './Calendario';
 import Calendario from './Calendario';
-
-// ✅ Registrar idioma español solo en el cliente
-if (typeof window !== 'undefined') {
-  registerLocale('es', es);
-}
 
 export interface RequestFormProps {
   saldos:  Saldo;
@@ -22,6 +14,7 @@ export interface RequestFormProps {
   onCancel: () => void;
   onSubmit: (data: LicenseHistory) => void;
 }
+
 const RequestForm: React.FC<RequestFormProps> = ({ 
   saldos, 
   supervisores, 
@@ -30,16 +23,15 @@ const RequestForm: React.FC<RequestFormProps> = ({
   onSubmit 
 }) => {
   const [isClient, setIsClient] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [fecha, setFecha] = useState('');
+  
+  // Estados principales para fechas (conectados al calendario)
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [diasHabilesSeleccionados, setDiasHabilesSeleccionados] = useState<number>(0);
+  
   const [supervisorId, setSupervisorId] = useState('');
   const [error, setError] = useState('');
-   const [dateRange, setDateRange] = useState({
-      startDate: null,
-      endDate: null,
-    });
+  
   // ✅ Inicializar días de forma segura con la nueva estructura
   const initializeDias = (): TiposLicencia => {
     const result: TiposLicencia = {};
@@ -56,23 +48,43 @@ const RequestForm: React.FC<RequestFormProps> = ({
   const [solicitudDias, setSolicitudDias] = useState<TiposLicencia>(initializeDias);
   const [selectedType, setSelectedType] = useState<'Licencias' | 'Particulares' | 'Articulos' | 'Examen'>('Licencias');
 
-
-
- const handleDateChange = (startDate, endDate) => {
-    setDateRange({ startDate, endDate });
+  // 🔥 Handler actualizado para recibir las fechas del calendario personalizado
+  const handleDateChange = (newStartDate: Date | null, newEndDate: Date | null) => {
+    console.log('📅 Fechas recibidas del calendario:', newStartDate, newEndDate);
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
+    
+    // 🔥 NUEVO: Calcular días hábiles cuando tenemos ambas fechas
+    if (newStartDate && newEndDate) {
+      // Aquí podríamos calcular los días hábiles si fuera necesario
+      // pero el componente Calendario ya lo hace y lo muestra
+      const timeDiff = newEndDate.getTime() - newStartDate.getTime();
+      const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+      
+      // Estimación básica de días hábiles (el calendario ya hace el cálculo preciso)
+      let businessDays = 0;
+      const currentDate = new Date(newStartDate.getTime());
+      while (currentDate <= newEndDate) {
+        const dayOfWeek = currentDate.getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) { // No sábado ni domingo
+          businessDays++;
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      setDiasHabilesSeleccionados(businessDays);
+    } else {
+      setDiasHabilesSeleccionados(0);
+    }
+    
+    // Limpiar error si había uno
+    if (error) {
+      setError('');
+    }
   };
-
-
-
-
-
 
   // ✅ Control de hidratación
   useEffect(() => {
     setIsClient(true);
-    const currentDate = new Date();
-    const formattedDate = currentDate.toLocaleDateString('es-AR');
-    setFecha(formattedDate);
   }, []);
 
   // ✅ Reinicializar días cuando cambien los saldos
@@ -83,24 +95,6 @@ const RequestForm: React.FC<RequestFormProps> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [saldos]);
 
-  const diasHabilesSeleccionados = useMemo(() => {
-    if (!startDate || !endDate || !isClient) return 0;
-    
-    let count = 0;
-    const d = new Date(startDate);
-    const end = new Date(endDate);
-    
-    while (d <= end) {
-      // Solo contar días hábiles (lunes a viernes)
-      const dayOfWeek = d.getDay();
-      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-        count++;
-      }
-      d.setDate(d.getDate() + 1);
-    }
-    return count;
-  }, [startDate, endDate, isClient]);
-
   const totalDiasSolicitados = useMemo(() => {
     return Object.values(solicitudDias)
       .flatMap(yearData => Object.values(yearData))
@@ -108,7 +102,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
   }, [solicitudDias]);
 
   const mensaje = useMemo(() => {
-    if (!isClient || diasHabilesSeleccionados <= 0 || totalDiasSolicitados !== diasHabilesSeleccionados || !supervisorId) {
+    if (!isClient || !startDate || !endDate || !supervisorId || totalDiasSolicitados <= 0) {
       return '';
     }
 
@@ -125,10 +119,10 @@ const RequestForm: React.FC<RequestFormProps> = ({
       .filter(Boolean)
       .join('\n');
 
-    if (!startDate || !endDate || !supervisor) return '';
+    if (!supervisor) return '';
 
-    return `Estimado/a ${supervisor.name || ''},\n\nQuien suscribe ${userData.name}, DNI: ${userData.dni}, que se desempeña en el departamento/oficina ${userData.department || userData.office},Solicito autorización para tomar licencia desde el ${startDate.toLocaleDateString('es-AR')} hasta el ${endDate.toLocaleDateString('es-AR')}, por un total de ${diasHabilesSeleccionados} días hábiles.\n\n${tiposDetalle}\n\nAtentamente,\n${userData?.name || userData?.name || ''}`;
-  }, [diasHabilesSeleccionados, totalDiasSolicitados, supervisorId, startDate, endDate, solicitudDias, userData, supervisores, isClient]);
+    return `Estimado/a ${supervisor.name || ''},\n\nQuien suscribe ${userData.name}, DNI: ${userData.dni}, que se desempeña en el departamento/oficina ${userData.department || userData.office}, solicito autorización para tomar licencia desde el ${startDate.toLocaleDateString('es-AR')} hasta el ${endDate.toLocaleDateString('es-AR')}, por un total de ${totalDiasSolicitados} días hábiles.\n\n${tiposDetalle}\n\nAtentamente,\n${userData?.name || ''}`;
+  }, [totalDiasSolicitados, supervisorId, startDate, endDate, solicitudDias, userData, supervisores, isClient]);
 
   const handleDiasChange = (anio: string, tipo: 'Licencias' | 'Particulares' | 'Articulos' | 'Examen', valor: string) => {
     const numValor = Number(valor);
@@ -155,29 +149,36 @@ const RequestForm: React.FC<RequestFormProps> = ({
   const handleSubmit = () => {
     if (!isClient) return;
 
-    if (totalDiasSolicitados !== diasHabilesSeleccionados) {
-      setError(`El total de días asignados (${totalDiasSolicitados}) no coincide con los días hábiles del calendario (${diasHabilesSeleccionados}).`);
-      return;
-    }
-    
-    if (!supervisorId) {
-      setError('Debes seleccionar un supervisor.');
-      return;
-    }
-
+    // 🔥 Validaciones actualizadas
     if (!startDate || !endDate) {
       setError('Debes seleccionar las fechas de inicio y fin.');
       return;
     }
 
+    if (!supervisorId) {
+      setError('Debes seleccionar un supervisor.');
+      return;
+    }
+
+    if (totalDiasSolicitados <= 0) {
+      setError('Debes asignar al menos un día de licencia.');
+      return;
+    }
+
+    // 🔥 Validación: total de días debe coincidir con días hábiles
+    if (totalDiasSolicitados !== diasHabilesSeleccionados) {
+      setError(`El total de días asignados (${totalDiasSolicitados}) no coincide con los días hábiles del calendario (${diasHabilesSeleccionados}).`);
+      return;
+    }
+
     onSubmit({
       id: `sol-${Date.now()}`,
-      solicitanteNombre: userData?.name || userData?.name || '',
+      solicitanteNombre: userData?.name || '',
       type: selectedType,
       supervisorId,
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
-      duration: diasHabilesSeleccionados,
+      duration: totalDiasSolicitados,
       tiposLicencia: JSON.parse(JSON.stringify(solicitudDias)),
       originalMessage: mensaje,
       status: 'Pendiente' as LicenseStatus,
@@ -228,39 +229,18 @@ const RequestForm: React.FC<RequestFormProps> = ({
   }
 
   return (
-    <Card title="Crear Nueva Solicitud" >
-     
+    <Card title="Crear Nueva Solicitud">
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700">{error}</p>
+        </div>
+      )}
       
       <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
         <div className="space-y-6">
           <div>
             <h3 className="font-bold text-lg mb-2">1. Selecciona el rango de fechas</h3>
-            < Calendario  />
-            {/* <ReactDatePicker
-              selected={startDate}
-              onChange={(dates) => {
-                if (Array.isArray(dates)) {
-                  const [start, end] = dates;
-                  setStartDate(start);
-                  setEndDate(end);
-                }
-              }}
-              startDate={startDate}
-              endDate={endDate}
-              selectsRange
-              inline
-              minDate={new Date()}
-              filterDate={(date) => {
-                const day = date.getDay();
-                return day !== 0 && day !== 6; // Excluir fines de semana
-              }}
-              locale="es"
-            />
-            {diasHabilesSeleccionados > 0 && (
-              <p className="mt-2 text-center font-semibold text-blue-600">
-                Días hábiles seleccionados: {diasHabilesSeleccionados}
-              </p>
-            )} */}
+            <Calendario onDateChange={handleDateChange} />
           </div>
 
           <div>
@@ -363,8 +343,10 @@ const RequestForm: React.FC<RequestFormProps> = ({
                 .filter(([anio, yearData]) => 
                   anio !== 'anio' && 
                   typeof yearData === 'object' && 
-                  yearData[selectedType] !== undefined && 
-                  yearData[selectedType] > 0
+                  yearData !== null &&
+                  selectedType in yearData &&
+                  typeof yearData[selectedType] === 'number' &&
+                  (yearData[selectedType] as number) > 0
                 ).length === 0 && (
                 <div className="text-center py-6 text-gray-500 border-2 border-dashed border-gray-300 rounded-lg">
                   <p className="font-medium">No tienes días disponibles de tipo &quot;{selectedType}&quot;</p>
