@@ -4,7 +4,7 @@ import { Users,  Send,  Briefcase, Award, GraduationCap,  Clock, ChevronsRight, 
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { ApprovalModal } from './ModalProval';
-import {Employee,LicenseHistory, Saldo,  LicenseStatus } from "@/app/Interfas/Interfaces"
+import {LicenseHistory, Saldo,  LicenseStatus, Usuario } from "@/app/Interfas/Interfaces"
 import { ProgressSpinner } from 'primereact/progressspinner';
 type SolicitudParsed = LicenseHistory & {
   fechaDesdeParsed: Date;
@@ -13,13 +13,17 @@ type SolicitudParsed = LicenseHistory & {
 
 // ---- Props del componente ----
 interface ConteinerLicenciaProps {
-  userData: Employee;
-  saldos: Saldo[];
+  userData: Usuario;      
+  saldos: Saldo[];        
   misSolicitudes: LicenseHistory[];
   solicitudesPendientes: LicenseHistory[];
   onNewRequest: () => void;
-  onManageRequest: (solicitud: LicenseHistory) => void;
-  supervisores: Employee[];
+  onManageRequest: (      
+    solicitudId: string,
+    accion: "aprobar" | "rechazar",
+    data: { siguienteSupervisorId?: string; observacion?: string }
+  ) => void;
+  supervisores: Usuario[]; // ✅ Correcto
 }
 export default function ConteinerLicencia({ userData, saldos, misSolicitudes, solicitudesPendientes, onNewRequest, onManageRequest, supervisores }: ConteinerLicenciaProps) {
     const [selectedRequest, setSelectedRequest] = useState<LicenseHistory | null>(null);

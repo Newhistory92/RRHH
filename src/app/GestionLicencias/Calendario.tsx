@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar } from 'primereact/calendar';
 import { addLocale, LocaleOptions } from 'primereact/api';
-
+import { Button } from 'primereact/button';
+import { Badge } from 'primereact/badge';
 // --- INTERFACES DE TYPESCRIPT ---
 interface HolidayApi {
   fecha: string;
@@ -14,11 +15,6 @@ interface Holiday {
   date: Date;
   name: string;
   type: string;
-}
-
-interface DateRange {
-  startDate: Date | null;
-  endDate: Date | null;
 }
 
 interface DateRangePickerProps {
@@ -34,61 +30,7 @@ const moveableDatesConfig: MoveableDatesConfig = {
   '2025-10-12': '2025-10-13',
 };
 
-// Componente principal que utiliza el DateRangePicker
-export default function Calendario({ onDateChange }: DateRangePickerProps) {
-  const [dateRange, setDateRange] = useState<DateRange>({
-    startDate: null,
-    endDate: null,
-  });
-const [diasHabiles, setDiasHabiles] = useState<number>(0);
-
-  // 🔥 NUEVO: Pasar datos al componente padre cuando cambien
-  const handleDateChange = (startDate: Date | null, endDate: Date | null, businessDays: number) => {
-    setDateRange({ startDate, endDate });
-    setDiasHabiles(businessDays);
-    
-    // Notificar al componente padre
-    onDateChange(startDate, endDate);
-  };
-
-  const formatDate = (date: Date | null): string => {
-    if (!date) return 'N/A';
-    return date.toLocaleDateString('es-ES', { timeZone: 'UTC' });
-  };
-
-  return (
-    <div className="w-full">
-      <div className="bg-white rounded-2xl shadow-lg p-6">
-        <DateRangePicker onDateChange={handleDateChange} />
-        
-        {/* 🔥 Información de fechas seleccionadas */}
-        {dateRange.startDate && dateRange.endDate && (
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="text-lg font-semibold text-blue-800 mb-2">Período Seleccionado:</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-blue-700">
-              <p>
-                <span className="font-medium">Inicio:</span><br />
-                {formatDate(dateRange.startDate)}
-              </p>
-              <p>
-                <span className="font-medium">Fin:</span><br />
-                {formatDate(dateRange.endDate)}
-              </p>
-              <p>
-                <span className="font-medium">Días Hábiles:</span><br />
-                <span className="text-2xl font-bold text-green-600">{diasHabiles}</span>
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-
-// --- COMPONENTE ESPECIALIZADO DE CALENDARIO ---
-const DateRangePicker = ({ onDateChange }: DateRangePickerProps) => {
+export default function DateRangePicker({ onDateChange }: DateRangePickerProps) {
   // Cambiado: Definir correctamente el tipo para selección de rango
   const [dates, setDates] = useState<[Date | null, Date | null] | null>(null);
   const [holidays, setHolidays] = useState<Holiday[]>([]);
@@ -152,26 +94,21 @@ const DateRangePicker = ({ onDateChange }: DateRangePickerProps) => {
   }, []);
 
   useEffect(() => {
-    console.log('🔄 useEffect ejecutándose - dates:', dates, 'holidays length:', holidays.length);
-    
     if (dates && dates.length === 2 && dates[0] && dates[1]) {
       const [startDate, endDate] = dates;
-      console.log('📅 Calculando días hábiles para:', startDate, 'a', endDate);
       
       const holidaySet = new Set(holidays.map(h => {
         const dateStr = h.date.getFullYear() + '-' + 
           String(h.date.getMonth() + 1).padStart(2, '0') + '-' + 
           String(h.date.getDate()).padStart(2, '0');
-        console.log('🚫 Feriado para bloquear:', h.name, dateStr);
         return dateStr;
       }));
-      console.log('🚫 Feriados bloqueados:', Array.from(holidaySet));
       
       let count = 0;
       const currentDate = new Date(startDate.getTime());
 
       while (currentDate <= endDate) {
-        const dayOfWeek = currentDate.getDay(); // Cambiado de getUTCDay() a getDay()
+        const dayOfWeek = currentDate.getDay();
         const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
         
         const currentDateStr = currentDate.getFullYear() + '-' + 
@@ -179,33 +116,25 @@ const DateRangePicker = ({ onDateChange }: DateRangePickerProps) => {
           String(currentDate.getDate()).padStart(2, '0');
         
         const isHoliday = holidaySet.has(currentDateStr);
-        
-        console.log('📆 Evaluando:', currentDateStr, 'Weekend:', isWeekend, 'Holiday:', isHoliday);
 
         if (!isWeekend && !isHoliday) {
           count++;
         }
-        currentDate.setDate(currentDate.getDate() + 1); // Cambiado de setUTCDate() a setDate()
+        currentDate.setDate(currentDate.getDate() + 1);
       }
       
-      console.log('💼 Días hábiles calculados:', count);
       setBusinessDays(count);
-      
-      // 🔥 NUEVO: Notificar al componente padre con días hábiles
-      onDateChange(startDate, endDate, count);
+      onDateChange(startDate, endDate);
     } else {
-      console.log('❌ Limpiando selección - dates válidas:', !!dates);
       setBusinessDays(0);
-      
-      // 🔥 NUEVO: Notificar al componente padre
-      onDateChange(null, null, 0);
+      onDateChange(null, null);
     }
-  }, [dates, holidays]);
+  }, [dates, holidays, onDateChange]);
 
   const disabledDates = holidays.map(h => h.date);
   
   const dateTemplate = (dateMeta: { year: number, month: number, day: number, today: boolean, selectable: boolean }) => {
-    const currentRenderDate = new Date(dateMeta.year, dateMeta.month, dateMeta.day); // Cambiado a fecha local
+    const currentRenderDate = new Date(dateMeta.year, dateMeta.month, dateMeta.day);
     const dateString = currentRenderDate.getFullYear() + '-' + 
       String(currentRenderDate.getMonth() + 1).padStart(2, '0') + '-' + 
       String(currentRenderDate.getDate()).padStart(2, '0');
@@ -218,7 +147,6 @@ const DateRangePicker = ({ onDateChange }: DateRangePickerProps) => {
     });
 
     if (holiday) {
-      console.log('🎨 Renderizando feriado:', dateString, holiday.name);
       return (
         <strong style={{ textDecoration: 'line-through', color: 'red' }} title={holiday.name}>
           {dateMeta.day}
@@ -229,18 +157,15 @@ const DateRangePicker = ({ onDateChange }: DateRangePickerProps) => {
   };
   
   const today = new Date();
-  const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // Fecha local
-  const maxDate = new Date(today.getFullYear(), 11, 31); // Fecha local
+  const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const maxDate = new Date(today.getFullYear(), 11, 31);
   
   const handleClearSelection = () => {
-    console.log('🧹 Limpiando selección');
     setDates(null);
   };
 
-  // Corregido: Handler para el evento del calendario
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleCalendarChange = (e: any) => {
-    console.log('🎯 Calendar change event:', e.value);
-    console.log('📊 Tipo de valor:', typeof e.value, 'Es array:', Array.isArray(e.value));
     setDates(e.value);
   };
 
@@ -263,19 +188,18 @@ const DateRangePicker = ({ onDateChange }: DateRangePickerProps) => {
         panelClassName="rounded-lg shadow-md"
       />
       <div className="mt-6 text-center w-full flex justify-center items-center gap-4">
-        <button
+        <Button label="Limpiar selección" text raised
           onClick={handleClearSelection}
           className="px-6 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           disabled={!dates}
         >
-          Limpiar selección
-        </button>
+        </Button>
       </div>
       {businessDays > 0 && (
         <div className="mt-4 text-center">
-          <p className="text-xl font-semibold text-green-700 bg-green-100 p-3 rounded-lg">
-            Días hábiles seleccionados: <span className="text-2xl">{businessDays}</span>
-          </p>
+            <Button text label=" Días hábiles seleccionados:" >
+                <Badge severity="success" value={businessDays}></Badge>
+            </Button>
         </div>
       )}
     </div>

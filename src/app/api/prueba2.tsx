@@ -70,9 +70,9 @@ export const EMPLOYEES_DATA = [
       '2023': 5,  // Licencias del año anterior
       '2022': 2,  // Licencias de hace 2 años
      usuarios: {
-  'empleado-1': { id: 'empleado-1', name: 'Juan Pérez', dni: '12.345.678',  office: 'Contabilidad', role: 'empleado' },
-  'supervisor-1': { id: 'supervisor-1', name: 'Ana García (Jefa de Área)', dni: '98.765.432', department: 'Dirección', role: 'supervisor' },
-  'supervisor-2': { id: 'supervisor-2', name: 'Carlos Gomez (Director Gral.)', dni: '55.666.777', department: 'Gerencia', role: 'supervisor' },
+  'empleado-1': { id: 1, name: 'Juan Pérez', dni: '12.345.678',  office: 'Contabilidad', role: 'empleado' },
+  'supervisor-1': { id: 2, name: 'Ana García (Jefa de Área)', dni: '98.765.432', department: 'Dirección', role: 'supervisor' },
+  'supervisor-2': { id: 3, name: 'Carlos Gomez (Director Gral.)', dni: '55.666.777', department: 'Gerencia', role: 'supervisor' },
 },
       saldos: {
       '2024': {
@@ -96,13 +96,16 @@ export const EMPLOYEES_DATA = [
     }, 
       history: [
         {
-          id: 'L1',
+          id: 1,
+          solicitanteId:1,
+          supervisorId :1,
           type: 'Vacaciones',
           startDate: '2024-07-10',
           endDate: '2024-07-20',
-          status: 'Aprobada' as LicenseStatus,
+          status: 'Pendiente' as LicenseStatus,
           duration: 10,
           originalMessage: 'Se aprueba la licencia por vacaciones solicitada para julio.',
+          createdAt:'2024-07-10'
         }
       ]
     },

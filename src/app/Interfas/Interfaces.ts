@@ -97,7 +97,9 @@ export interface Task {
 
 // License history
 export interface LicenseHistory {
-  id: string;
+  id: number;
+  solicitanteId: number;
+  name: string;
   type: string;
   solicitanteNombre: string;
   supervisorId: string | null
@@ -106,7 +108,7 @@ export interface LicenseHistory {
   status: LicenseStatus;
   duration: number;
   originalMessage: string;
-  createdAt: number
+  createdAt: string
   aprobaciones?: Aprobacion[]
   tiposLicencia: TiposLicencia
   observacion?: string
@@ -116,8 +118,8 @@ export interface LicenseHistory {
 export interface Licenses {
   '2024': number;
   '2023': number;
-   usuarios: Record<string, Usuario>
-   saldos: Record<string, Saldo[]>
+   usuarios:Usuario
+   saldos: Saldo[]
   history: LicenseHistory[];
 }
 
@@ -128,16 +130,16 @@ export interface Saldo {
 
 
 export interface Usuario {
-  id: string
+  id: number
   name: string
   dni: string
-  oficina?: string
+  office?: string
   department?: string
   role: string
 }
 
 export interface Aprobacion {
-  supervisorId: string
+  supervisorId: number
   nombre: string
   fecha: string           
   accion: "aprobar" | "rechazar"
