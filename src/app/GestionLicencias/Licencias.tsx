@@ -4,24 +4,24 @@ import { Users,  Send,  Briefcase, Award, GraduationCap,  Clock, ChevronsRight, 
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { ApprovalModal } from './ModalProval';
-import {LicenseHistory, Saldo,  LicenseStatus, Usuario } from "@/app/Interfas/Interfaces"
+import {LicenseHistory, Saldo,  LicenseStatus, Usuario,Employee } from "@/app/Interfas/Interfaces"
 import { ProgressSpinner } from 'primereact/progressspinner';
 type SolicitudParsed = LicenseHistory & {
   fechaDesdeParsed: Date;
   fechaHastaParsed: Date;
 };
 
-// ---- Props del componente ----
+
 interface ConteinerLicenciaProps {
-  userData: Usuario;      
+  userData:Employee ;      
   saldos: Saldo[];        
   misSolicitudes: LicenseHistory[];
   solicitudesPendientes: LicenseHistory[];
   onNewRequest: () => void;
   onManageRequest: (      
-    solicitudId: string,
+    solicitudId: number,
     accion: "aprobar" | "rechazar",
-    data: { siguienteSupervisorId?: string; observacion?: string }
+    data: { siguienteSupervisorId?: number; observacion?: string }
   ) => void;
   supervisores: Usuario[]; // ✅ Correcto
 }
@@ -37,17 +37,6 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
       })),
     [solicitudesPendientes]
   );
-
-
-//   const misFechasSolicitudes: SolicitudParsed[] = useMemo(
-//     () =>
-//       misSolicitudes.map((solicitud) => ({
-//         ...solicitud,
-//          fechaDesdeParsed: new Date(solicitud.startDate),
-//         fechaHastaParsed: new Date(solicitud.endDate),
-//       })),
-//     [misSolicitudes]
-//   );
 
 
   const getStatusChip = (
@@ -83,6 +72,7 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
                 <ApprovalModal request={selectedRequest}
                  supervisores={supervisores.filter(s => s.id !== userData.id && !selectedRequest.aprobaciones?.some(a => a.supervisorId === s.id))} 
                  onManage={onManageRequest} onClose={() => setSelectedRequest(null)} />}
+
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <Card title="Mis Licencias" className="lg:col-span-2">
                        
@@ -118,11 +108,11 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
                 </div>
                 {userData.role === 'supervisor' && solicitudesPendientes.length > 0 && (
                     <Card>
-                        <h2 className="text-xl font-bold mb-4 text-red-600 flex items-center gap-2">
-                        <Clock /> Solicitudes Pendientes de Mi Aprobación</h2>
-                        <div className="space-y-2">
+                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                        <Clock className='text-[#1ABCD7] text-shadow-md'/> Solicitudes Pendientes de Mi Aprobación</h2>
+                        <div className="space-y-2 shadow-lg">
                             {fechasPendientes.map(solicitud => (
-                                <button key={solicitud.id} onClick={() => setSelectedRequest(solicitud)} className="w-full text-left p-4 border rounded-lg bg-yellow-50 hover:bg-yellow-100 flex justify-between items-center">
+                                <button key={solicitud.id} onClick={() => setSelectedRequest(solicitud)} className="w-full text-left p-4 border rounded-lg bg-gray-50 hover:bg-[#c4e3e9] flex justify-between items-center">
                                     <div>
                                         <p>
                                             <span className="font-bold">{ solicitante}</span> solicita <span className="font-bold">{solicitud.duration} días</span>
@@ -139,7 +129,7 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
                 )}
                 <Card>
                     <h2 className="text-xl font-bold mb-4">Historial de Mis Solicitudes</h2>
-                    <div className="space-y-3">
+                    <div className="space-y-3 shadow-lg">
                        {misSolicitudes.length > 0 ? misSolicitudes.map(solicitud => (
   <div key={solicitud.id} className="p-4 border rounded-lg flex flex-col md:flex-row justify-between items-center gap-4">
     <div>

@@ -22,7 +22,7 @@ type SectionTitleProps = {
 
 export const SectionTitle = ({ icon, title }: SectionTitleProps) => (
   <div className="flex items-center space-x-3 mb-6">
-    {React.createElement(icon, { className: "w-7 h-7 text-blue-500" })}
+    {React.createElement(icon, { className: "w-7 h-7 text-[#1ABCD7] text-shadow-md" })}
     <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
   </div>
 );

@@ -10,6 +10,7 @@ import EmployeeCV  from '@/app/pages/Cv/page';
 import LicenciasManage from '@/app/pages/LicenciasManage/page';
 import { PrimeReactProvider } from 'primereact/api';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
+import 'primeicons/primeicons.css';
 import { TestPage } from './pages/TestConfig/page';
 import FeedbackTab from './pages/Feedback/page';
 

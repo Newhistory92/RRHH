@@ -99,6 +99,7 @@ export const EMPLOYEES_DATA = [
           id: 1,
           solicitanteId:1,
           supervisorId :1,
+          name: 'Ana García',
           type: 'Vacaciones',
           startDate: '2024-07-10',
           endDate: '2024-07-20',
@@ -189,7 +190,13 @@ export const EMPLOYEES_DATA = [
       { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
     feedback_history: [],
+    notificaciones: [
+  { id: 1, text: 'Nueva solicitud de vacaciones de Juan Pérez.', time: 'hace 5 minutos',status:'nueva' },
+  { id: 2, text: 'El reporte de productividad del Q2 está listo.', time: 'hace 2 horas',status:'leida' },
+  { id: 3, text: 'Recordatorio: Reunión de equipo a las 3 PM.', time: 'hace 1 día',status:'leida' },
+    ],
   },
+
   {
     id: 2,
     name: 'Juan Pérez',

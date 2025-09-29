@@ -97,12 +97,11 @@ export interface Task {
 
 // License history
 export interface LicenseHistory {
-  id: number;
+  id?: number;
   solicitanteId: number;
   name: string;
   type: string;
-  solicitanteNombre: string;
-  supervisorId: string | null
+  supervisorId: number
   startDate: string;
   endDate: string;
   status: LicenseStatus;
@@ -112,13 +111,14 @@ export interface LicenseHistory {
   aprobaciones?: Aprobacion[]
   tiposLicencia: TiposLicencia
   observacion?: string
+  
 }
 
 // Licenses tracking
 export interface Licenses {
   '2024': number;
   '2023': number;
-   usuarios:Usuario
+  usuarios: Record<number, Usuario>
    saldos: Saldo[]
   history: LicenseHistory[];
 }
@@ -208,6 +208,14 @@ interface certifications {
   validUntil: string | null; // Fecha de expiración en formato ISO o null si no expira
   attachment: File | string | null; // Puede ser un File object, URL string o null
 }
+
+export interface Notification {
+  id: number;
+  text: string;
+  time: string;
+  status: 'nueva' | 'leida';
+}
+
 // Main Employee interface
 export interface Employee {
   // Basic Information
@@ -242,6 +250,7 @@ export interface Employee {
   managerId: number | null; // Can be null if no manager assigned
   supervisor: string | null; // Can be null if no supervisor assigned
   role: EmployeeRole;
+  subordinates: number[];
 
   // Schedule
   schedule: Schedule;
@@ -266,6 +275,7 @@ export interface Employee {
  skillStatus?: SkillStatus[];
   softSkillsArray?: number[]; 
   technicalSkills: TechnicalSkill[];
+  notificaciones: Notification[];
 }
 // Department interface
 export interface Department {

@@ -1,11 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useEffect, useState } from "react";
+import {  useRef, useState } from "react";
 import { FileText, } from 'lucide-react';
 import dynamic from "next/dynamic";
 import {EMPLOYEES_DATA} from "@/app/api/prueba2";
-import {Employee,Usuario,LicenseHistory, Saldo} from "@/app/Interfas/Interfaces"
-import { ProgressSpinner } from 'primereact/progressspinner';
-        
+import {Employee,Usuario,LicenseHistory} from "@/app/Interfas/Interfaces"
+import { Toast } from 'primereact/toast';            
 const RequestForm = dynamic(() => import("@/app/GestionLicencias/FormularioLicencia"), {
   ssr: false,
 });
@@ -16,11 +16,9 @@ const  ConteinerLicencia = dynamic(() => import("@/app/GestionLicencias/Licencia
 
 
 export default function LicenciasManage() {
-  //const [db, setDb] = useState<Employee>(EMPLOYEES_DATA[0]);
   const [currentUser, setCurrentUser] = useState<Employee>(EMPLOYEES_DATA[0]);
-  const [isLoading, setIsLoading] = useState(false);
   const [view, setView] = useState("contenedor");
-  const userId = 1; 
+   const toast = useRef<Toast>(null);
   console.log(currentUser);
 
 const misSolicitudes: LicenseHistory[] = currentUser
@@ -50,95 +48,152 @@ const solicitudesPendientes: LicenseHistory[] =
         )
     : [];
 console.log(solicitudesPendientes)
+
   const supervisores: Usuario[] = Object.values(currentUser.licenses.usuarios).filter(
     (u) => u.role === "supervisor"
   );
   
 
-     const misSaldos = currentUser.licenses?.saldos;
-  useEffect(() => {
-    if (userId) {
-      setIsLoading(true);
-      setCurrentUser(currentUser.licenses.usuarios[userId] || null);
-    }
-    setIsLoading(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+const misSaldos = currentUser.licenses?.saldos;
 
   const handleNewRequest = (nuevaSolicitud:LicenseHistory) => {
-    setDb((prevDb) => ({
-      ...prevDb,
-      licenses: {
-        ...prevDb.licenses,
-       history: [...prevDb.licenses.history, nuevaSolicitud],
-      },
-    }));
+    setCurrentUser(prev => ({
+  ...prev,
+  licenses: {
+    ...prev.licenses,
+    history: [...prev.licenses.history, nuevaSolicitud]
+  }
+}));
     setView("contenedor");
   };
 
   const handleManageRequest = (
-    solicitudId: string,
+    solicitudId: number,
     accion: "aprobar" | "rechazar",
-    data: { siguienteSupervisorId?: string; observacion?: string }
+    data: { siguienteSupervisorId?: number; observacion?: string }
   ) => {
-    setDb((prevDb) => {
-      const dbCopy: Employee = structuredClone(prevDb);
+    setCurrentUser((prev) => {
+      if (!prev) {
+        toast.current?.show({
+          severity: "warn",
+          summary: "Error",
+          detail: "No hay usuario logueado.",
+          life: 3000,
+        });
+        return prev;
+      }
 
-      const solicitud = dbCopy.licenses.history.find(
-        (s: LicenseHistory) => s.id === solicitudId
+      // Clonar para no mutar estado
+      const next =
+        typeof structuredClone === "function"
+          ? structuredClone(prev)
+          : (JSON.parse(JSON.stringify(prev)) as Employee);
+
+      // Buscar la solicitud
+      const solicitud = next.licenses?.history?.find(
+        (s) => String(s.id) === String(solicitudId)
       );
-      if (!solicitud) return dbCopy;
+      if (!solicitud) {
+        toast.current?.show({
+          severity: "warn",
+          summary: "No encontrado",
+          detail: "Solicitud no encontrada.",
+          life: 3000,
+        });
+        return prev;
+      }
 
-      const aprobadorActual = dbCopy.licenses.usuarios[currentUser!.id];
+      // Aprobador actual: el usuario logueado
+    const aprobadorActual = next.licenses.usuarios[prev.id]
+      if (!aprobadorActual) {
+        toast.current?.show({
+          severity: "warn",
+          summary: "No autorizado",
+          detail: "El usuario actual no es un supervisor válido.",
+          life: 3000,
+        });
+        return prev;
+      }
+
+      // Registrar aprobación / rechazo
       solicitud.aprobaciones = solicitud.aprobaciones || [];
       solicitud.aprobaciones.push({
         supervisorId: aprobadorActual.id,
-        nombre: aprobadorActual.name ?? aprobadorActual.name,
+        nombre: aprobadorActual.name,
         fecha: new Date().toISOString(),
         accion,
+        observacion: data.observacion,
       });
 
+      // Lógica de gestión
       if (accion === "aprobar") {
         if (data.siguienteSupervisorId) {
-          solicitud.status = 'Pendiente Siguiente Aprobación';
+          solicitud.status = "Pendiente Siguiente Aprobación";
           solicitud.supervisorId = data.siguienteSupervisorId;
         } else {
-          solicitud.status = 'Aprobada';
-          solicitud.supervisorId = null;
+          solicitud.status = "Aprobada";
+          (solicitud as any).supervisorId = null;
 
-          const saldosUsuario = dbCopy.licenses.saldos[solicitud.id];
-          Object.entries(solicitud.tiposLicencia).forEach(
-            ([anio, tipos]: [string, Record<string, number>]) => {
-              const saldoAnual = saldosUsuario.find(
-                (s) => s.anio === parseInt(anio)
-              );
-              if (saldoAnual) {
-                Object.entries(tipos).forEach(
-                  ([tipo, dias]: [string, number]) => {
-                    saldoAnual[tipo] = (saldoAnual[tipo] as number) - dias;
-                  }
+          // --- Actualizar saldos ---
+          const solicitanteKey = String(solicitud.solicitanteId ?? prev.id);
+          const perUserSaldos = (next.licenses?.saldos as any)?.[solicitanteKey];
+
+          if (Array.isArray(perUserSaldos)) {
+            // Estructura: Saldo[] por usuario
+            Object.entries(solicitud.tiposLicencia || {}).forEach(
+              ([anio, tipos]) => {
+                const saldoAnual = perUserSaldos.find(
+                  (s: any) => String(s.anio) === String(anio)
                 );
+                if (saldoAnual) {
+                  Object.entries(tipos).forEach(([tipo, dias]) => {
+                    if (typeof saldoAnual[tipo] === "number") {
+                      saldoAnual[tipo] =
+                        (saldoAnual[tipo] as number) - Number(dias);
+                    }
+                  });
+                }
               }
-            }
-          );
+            );
+          } else {
+            // Estructura: saldos globales por año
+            Object.entries(solicitud.tiposLicencia || {}).forEach(
+              ([anio, tipos]) => {
+                const globalYear = (next.licenses?.saldos as any)?.[anio];
+                if (globalYear && typeof globalYear === "object") {
+                  Object.entries(tipos).forEach(([tipo, dias]) => {
+                    if (typeof globalYear[tipo] === "number") {
+                      globalYear[tipo] =
+                        (globalYear[tipo] as number) - Number(dias);
+                    }
+                  });
+                }
+              }
+            );
+          }
         }
       } else {
-        solicitud.status = "Rechazada"; 
-        solicitud.observacion = data.observacion;
-        solicitud.supervisorId = null;
+        // Rechazo
+        solicitud.status = "Rechazada";
+        solicitud.observacion = data.observacion || solicitud.observacion;
+        (solicitud as any).supervisorId = null;
       }
 
-      return dbCopy;
+      // Feedback con toast
+      toast.current?.show({
+        severity: "success",
+        summary: "Solicitud gestionada",
+        detail:
+          accion === "aprobar"
+            ? "Solicitud aprobada correctamente."
+            : "Solicitud rechazada correctamente.",
+        life: 3000,
+      });
+
+      return next;
     });
   };
 
-  if (isLoading) {
-    return (
-      <div className="bg-gray-100 min-h-screen flex items-center justify-center">
-         <ProgressSpinner />
-      </div>
-    );
-  }
 
   // Verificación de que currentUser no sea null antes de renderizar
   if (!currentUser) {

@@ -7,13 +7,13 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import React, { useState, useEffect, useMemo } from 'react';
 import { Send,ArrowLeft} from 'lucide-react';
 import 'react-datepicker/dist/react-datepicker.css';
-import {Employee,LicenseHistory, Saldo, Usuario,LicenseStatus,TiposLicencia } from "@/app/Interfas/Interfaces"
+import {LicenseHistory, Saldo, Usuario,LicenseStatus,TiposLicencia, Employee } from "@/app/Interfas/Interfaces"
 import DateRangePicker from './Calendario';
 
 export interface RequestFormProps {
-  saldos:  Saldo;
+  saldos:  Saldo[];
   supervisores: Usuario[];
-  userData: Employee;
+  userData: Employee ;
   onCancel: () => void;
   onSubmit: (data: LicenseHistory) => void;
 }
@@ -29,7 +29,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [diasHabilesSeleccionados, setDiasHabilesSeleccionados] = useState<number>(0);
-  const [supervisorId, setSupervisorId] = useState('');
+  const [supervisorId, setSupervisorId] = useState();
   const [error, setError] = useState('');
   
 
@@ -124,7 +124,7 @@ const [selectedType, setSelectedType] = useState<{ name: string } | null>(null);
     if (!saldos || typeof saldos !== 'object') return;
     
     // ✅ Acceder directamente al año en el objeto saldos
-    const yearData = saldos[anio];
+const yearData = saldos[Number(anio)];
     if (!yearData || numValor < 0) return;
 
     if (typeof yearData === 'object' && tipo in yearData && typeof yearData[tipo] === 'number') {
@@ -166,17 +166,17 @@ const [selectedType, setSelectedType] = useState<{ name: string } | null>(null);
     }
 
     onSubmit({
-      id: `sol-${Date.now()}`,
-      solicitanteNombre: userData?.name || '',
+      name: userData?.name || '',
       type: selectedType?.name ?? '',
       supervisorId,
+      solicitanteId: userData.id,
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
       duration: totalDiasSolicitados,
       tiposLicencia: JSON.parse(JSON.stringify(solicitudDias)),
       originalMessage: mensaje,
       status: 'Pendiente' as LicenseStatus,
-      createdAt: new Date().getTime()
+      createdAt: new Date().toISOString(),
     });
   };
 

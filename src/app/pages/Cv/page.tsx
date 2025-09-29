@@ -641,10 +641,11 @@ import HabilidadesTecnicas from '@/app/Componentes/CvComponente/HabilidadesTecni
 import HabilidadesBlandas from '@/app/Componentes/CvComponente/HabilidadesBlandas';
 import CertificacionesCursos from '@/app/Componentes/CvComponente/CertificacionesCursos';
 import {Employee} from "@/app/Interfas/Interfaces"
-
+import { Button } from 'primereact/button';
 export default function EmployeeCV() {
   const loggedInEmployee = EMPLOYEES_DATA.find((e) => e.id === 1);
   // Inicializar cvData con la estructura completa, agregando campos faltantes
+  
  const [cvData, setCvData] = useState<Employee | null>(
   loggedInEmployee
     ? {
@@ -764,26 +765,31 @@ export default function EmployeeCV() {
         <div className="mt-8 flex justify-end gap-4">
           {isEditing ? (
             <>
-              <button
+              <Button
                 onClick={handleCancel}
-                className="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                label="Cancelar"
+                severity="info" 
+                text raised
               >
-                Cancelar
-              </button>
-              <button
+              
+              </Button>
+              <Button
                 onClick={handleSave}
-                className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 flex items-center gap-2 transition-colors"
+                label="Guardar Cambios"
+                icon={<Save className="w-4 h-4 mr-1" />}
+                raised
               >
-                <Save className="w-4 h-4" /> Guardar Cambios
-              </button>
+              </Button>
             </>
           ) : (
-            <button
+            <Button
               onClick={handleEdit}
-              className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-700 hover:bg-gray-800 flex items-center gap-2 transition-colors"
+              label="Editar CV"
+              icon={<Edit className="w-4 h-4 mr-1" />}
+              severity="secondary"
+              raised
             >
-              <Edit className="w-4 h-4" /> Editar CV
-            </button>
+            </Button>
           )}
         </div>
       </main>
