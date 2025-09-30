@@ -43,10 +43,11 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
 
   const currentTests = testsByProfession[selectedProfession] || [];
 
-  const professionOptions = professions.map(profession => ({
-    name: profession,
-    value: profession
-  }));
+ const professionOptions = Object.keys(professions).map(profession => ({
+  name: profession,
+  value: profession
+}));
+
 
   return (
     <div>
