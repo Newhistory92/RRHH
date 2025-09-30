@@ -13,8 +13,7 @@ import "primereact/resources/themes/lara-light-cyan/theme.css";
 import 'primeicons/primeicons.css';
 import { TestPage } from './pages/TestConfig/page';
 import FeedbackTab from './pages/Feedback/page';
-
-type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama' | 'editar-perfil' | 'test' | 'licencias'| 'feedback';
+import { Page} from "@/app/Interfas/Interfaces";
 
 export default function App() {
   const [page, setPage] = useState<Page>('estadisticas');

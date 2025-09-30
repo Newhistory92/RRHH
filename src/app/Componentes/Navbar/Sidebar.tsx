@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { BarChart2, Users, BrainCircuit, GitMerge, ClipboardList, ChevronLeft, ChevronRight } from 'lucide-react';
-
-export type Page = 'estadisticas' | 'recursos-humanos' | 'ia' | 'organigrama' | 'test' | 'editar-perfil' | 'licencias' | 'feedback';
+import { Page} from "@/app/Interfas/Interfaces";
 
 interface SidebarProps {
   activePage: Page;

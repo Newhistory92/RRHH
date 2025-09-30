@@ -67,10 +67,13 @@ return (
                             Feedback del Equipo
                         </div>
                     }>
-                         {Object.entries(employee.softSkills).map(([skill, score]) => (
-                            <SoftSkillBar key={skill} skill={skill} score={score} />
-                            
-                         ))}
+                        {employee.softSkills.map((skill, index) => (
+  <SoftSkillBar 
+    key={index} 
+    skill={skill.nombre} 
+    score={skill.level} 
+  />
+))}
                     </Card>
                     
                     <Card title={

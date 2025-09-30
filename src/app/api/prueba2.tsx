@@ -3,12 +3,7 @@
 import { ComplaintStatus, EmployeeRole, EmployeeStatus, EmploymentStatus, LicenseStatus, TestsByProfession,SkillStatus } from "../Interfas/Interfaces";
 
 
-  // const TIPOS_LICENCIA = [
-  //   'Licencia', 'Parte_Medico', 'Profilactica', 'Particular',
-  //   'Matrimonio', 'Matrimonio_Hijo', 'Paternidad', 'Paternidad_Especial',
-  //   'Maternidad', 'Fallecimiento', 'Enfermedad', 'Guarda_Tenencia','Articulo'
-  // ];
-// Unified Employee Data Structure
+
 export const EMPLOYEES_DATA = [
   {
     // Basic Information
@@ -26,8 +21,8 @@ export const EMPLOYEES_DATA = [
     position: 'Abogado',
     department: 'Atención al Cliente',
     departmentId: 2,
-    office: [],
-    officeId: 201,
+    office: '',
+    officeId: 0,
     category: '24',
     status: 'Activo' as EmployeeStatus,
     employmentStatus: 'Planta permanente' as EmploymentStatus,
@@ -211,16 +206,7 @@ export const EMPLOYEES_DATA = [
     position: 'Desarrollador de Sistemas',
     department: 'Sistemas',
     departmentId: 2,
-    office: [
-      {
-        id: 401,
-        nombre: 'Desarrollo de Aplicaciones',
-        descripcion: 'Desarrollo de nuevas funcionalidades y mantenimiento de sistemas.',
-        jefeId: 2,
-        empleadosIds: [2],
-        departmentId: 4
-      }
-    ],
+    office: 'Desarrollo de Aplicaciones',
     officeId: 401,
     category: '17',
     status: 'Activo' as EmployeeStatus,
@@ -328,16 +314,7 @@ export const EMPLOYEES_DATA = [
     position: 'Especialista en Recursos Humanos',
     department: 'Recursos Humanos',
     departmentId: 3,
-    office: [
-      {
-        id: 301,
-        nombre: 'Administración de Personal',
-        descripcion: 'Gestión de nóminas, licencias y administración del personal.',
-        jefeId: 3,
-        empleadosIds: [3],
-        departmentId: 3
-      }
-    ],
+    office: 'Administración de Personal',
     officeId: 301,
     category: '12',
     status: 'De licencia' as EmployeeStatus,
@@ -462,16 +439,7 @@ export const EMPLOYEES_DATA = [
     position: 'Auditor Legal',
     department: 'Legales',
     departmentId: 4,
-    office: [
-      {
-        id: 501,
-        nombre: 'Auditoría Legal',
-        descripcion: 'Revisión de expedientes y auditorías internas de cumplimiento.',
-        jefeId: 4,
-        empleadosIds: [4],
-        departmentId: 5
-      }
-    ],
+    office: 'Auditoría Legal',
      officeId: 501,
     category: '24',
     status: 'Parte médico' as EmployeeStatus,
@@ -591,16 +559,7 @@ export const EMPLOYEES_DATA = [
     position: 'Especialista Senior en Atención al Cliente',
     department: 'Atención al Cliente',
     departmentId: 1,
-    office: [
-      {
-        id: 202,
-        nombre: 'Gestión de Reclamos',
-        descripcion: 'Resolución especializada de quejas y reclamos complejos.',
-        jefeId: 5,
-        empleadosIds: [5],
-        departmentId: 2
-      }
-    ],
+    office: 'Gestión de Reclamos',
     officeId: 202,
     category: '20',
     status: 'Activo' as EmployeeStatus,
@@ -1013,29 +972,6 @@ export const INTEGRATED_ORG_DATA = [
 
 
 
-
-// Lista completa de oficinas
-export const OFFICES = [
-  // Dirección General
-  { id: 101, name: 'Dirección Ejecutiva', departmentId: 1, location: 'Sede Central - Piso 10' },
-  
-  // Atención al Cliente
-  { id: 201, name: 'Atención Telefónica', departmentId: 2, location: 'Sede Central - Piso 2' },
-  { id: 202, name: 'Gestión de Reclamos', departmentId: 2, location: 'Anexo Sur - Piso 1' },
-  
-  // Recursos Humanos
-  { id: 301, name: 'Administración de Personal', departmentId: 3, location: 'Sede Central - Piso 3' },
-  { id: 302, name: 'Selección y Capacitación', departmentId: 3, location: 'Sede Central - Piso 3' },
-  
-  // Sistemas
-  { id: 401, name: 'Desarrollo de Aplicaciones', departmentId: 4, location: 'Anexo Norte - Piso 2' },
-  { id: 402, name: 'Soporte Técnico', departmentId: 4, location: 'Anexo Norte - Piso 1' },
-  
-  // Legales
-  { id: 501, name: 'Auditoría Legal', departmentId: 5, location: 'Sede Central - Piso 4' },
-  { id: 502, name: 'Asesoría Jurídica', departmentId: 5, location: 'Sede Central - Piso 4' }
-];
-
 export const AVAILABLE_SKILLS = [
   { id: 1, nombre: 'React.js', level: 8 },
   { id: 2, nombre: 'Node.js', level: 7 },
@@ -1061,23 +997,22 @@ export const SOFT_SKILLS_CATALOG = [
   { id: 8, nombre: 'Resolución de Problemas', description: 'Identificación y solución creativa de problemas' }
 ];
 
-// Status options for consistency
-export const EMPLOYEE_STATUS = {
-  ACTIVE: 'Activo',
-  ON_LEAVE: 'De licencia',
-  MEDICAL_LEAVE: 'Parte médico',
-  INACTIVE: 'Inactivo',
-  SUSPENDED: 'Suspendido'
-};
 
-export const EMPLOYMENT_STATUS = {
-  PERMANENT: 'Planta permanente',
-  CONTRACT: 'Contratado',
-  COMMISSIONED: 'Comisionado',
-  AUDITOR: 'Auditor',
-  TEMPORARY: 'Temporal'
-};
+export const EMPLOYMENT_STATUS = [
+  'Planta permanente',
+  'Contratado',
+  'Comisionado',
+  'Auditor',
+  'Temporal'
+];
 
+
+
+  export const TIPOS_LICENCIA = [
+    'Activo','Licencia', 'Parte_Medico', 'Profilactica', 'Particular',
+    'Matrimonio', 'Matrimonio_Hijo', 'Paternidad', 'Paternidad_Especial',
+    'Maternidad', 'Fallecimiento', 'Enfermedad', 'Guarda_Tenencia','Articulo'
+  ];
 export const EMPLOYEE_ROLES = {
   EMPLOYEE: 'empleado',
   SUPERVISOR: 'supervisor',
@@ -1226,7 +1161,7 @@ export const SKILL_STATUS_DATA: SkillStatus[] = [
   },
 ];
 
-
+export const ACTIVITY_TYPES = [...new Set(EMPLOYEES_DATA.map(e => e.activityType))];
 
 // [
 //   {

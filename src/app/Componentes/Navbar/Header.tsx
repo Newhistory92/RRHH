@@ -11,24 +11,16 @@ import { MenuItem } from 'primereact/menuitem';
 import { Divider } from 'primereact/divider';
 import { NotificationDialog } from "@/app/Componentes/Perfil/NotificationDialog";
 import {EMPLOYEES_DATA} from "@/app/api/prueba2";
-import { Employee} from "@/app/Interfas/Interfaces";
+import { Employee,Notification,Page} from "@/app/Interfas/Interfaces";
 
   
-type Page =
-  | "estadisticas"
-  | "recursos-humanos"
-  | "ia"
-  | "organigrama"
-  | "editar-perfil"
-  | "feedback"
-  | "licencias";
 
 export const Header = ({ setPage }: { setPage: (page: Page) => void }) => {
   const notificationsPanel = useRef<OverlayPanel>(null);
   const profileMenu = useRef<Menu>(null);
   const [selectedNotification, setSelectedNotification] = useState<typeof currentUser.notificaciones[0] | null>(null);
   const [dialogVisible, setDialogVisible] = useState(false);
-  const [notifications, setNotifications] = useState(EMPLOYEES_DATA[0].notificaciones);
+   const [notifications, setNotifications] = useState<Notification[]>(EMPLOYEES_DATA[0].notificaciones ?? [] );
 
   const currentUser: Employee = { ...EMPLOYEES_DATA[0], notificaciones: notifications };
  
@@ -60,12 +52,6 @@ export const Header = ({ setPage }: { setPage: (page: Page) => void }) => {
       template: () => (
         <div className="px-4 py-4 bg-gradient-to-br from-gray-50 to-gray-100 border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <Avatar
-              image={currentUser.photo}
-              size="large"
-              shape="circle"
-              className="border-2 border-cyan-400"
-            />
             <div>
               <p className="font-bold text-gray-800">{currentUser.name}</p>
               <p className="text-sm text-gray-500">{currentUser.email}</p>
@@ -201,7 +187,7 @@ export const Header = ({ setPage }: { setPage: (page: Page) => void }) => {
         <div className="flex items-center">
           <button
             onClick={(e) => profileMenu.current?.toggle(e)}
-            className="flex items-center gap-3 px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/20 group"
+            className="flex items-center gap-3 px-3 py-2 rounded-xl bg-transparent hover:bg-transparent text-gray-800 dark:text-gray-200 transition-all duration-200  hover:shadow-cyan-500/20 group"
           >
             <div className="w-9 h-9 flex-shrink-0 relative">
               <Avatar

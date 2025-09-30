@@ -33,7 +33,7 @@ export interface MCPClient {
 export interface Filters {
   department?: string;
   position?: string;
-  status?: string;
+  employmentStatus?: string;
   activityType?: string;
   minScore?: number;
   maxScore?: number;
@@ -213,7 +213,7 @@ export interface Notification {
   id: number;
   text: string;
   time: string;
-  status: 'nueva' | 'leida';
+  status: string;
 }
 
 // Main Employee interface
@@ -233,7 +233,7 @@ export interface Employee {
   position: string;
   department: string;
   departmentId: number;
-  office: Office[] | null;
+  office: string | null;
   officeId: number | null;
   category: string;
   status: EmployeeStatus;
@@ -550,3 +550,14 @@ export interface SkillTestDialogProps {
   onClose: () => void;
   onTestComplete: (skill: Skill, score: number) => void;
 }
+
+
+export type Page =
+  | "estadisticas"
+  | "recursos-humanos"
+  | "ia"
+  | "organigrama"
+  | "editar-perfil"
+  | "feedback"
+  | "licencias"
+  | "test";
