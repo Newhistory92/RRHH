@@ -1,3 +1,4 @@
+"use client"
 import { BarChart, User } from 'lucide-react';
 import React, { useState, useRef } from 'react';
 import { Dropdown } from 'primereact/dropdown';

@@ -215,7 +215,6 @@ export const EMPLOYEES_DATA = [
     startDate: '2022-05-20',
     permanentDate: null,
     lastCategoryUpdate: '2023-01-10',
-    
     managerId: 4,
     supervisor: 'Carlos Ruiz',
     role: 'empleado' as EmployeeRole,
@@ -987,14 +986,14 @@ export const AVAILABLE_SKILLS = [
 ];
 
 export const SOFT_SKILLS_CATALOG = [
-  { id: 1, nombre: 'Comunicación', description: 'Habilidad para transmitir ideas de forma clara y concisa' },
-  { id: 2, nombre: 'Trabajo en equipo', description: 'Capacidad para colaborar efectivamente con otros' },
-  { id: 3, nombre: 'Resolución de conflictos', description: 'Aptitud para mediar y resolver disputas' },
-  { id: 4, nombre: 'Adaptabilidad', description: 'Flexibilidad ante cambios y nuevas situaciones' },
-  { id: 5, nombre: 'Liderazgo', description: 'Capacidad para guiar y motivar equipos' },
-  { id: 6, nombre: 'Empatía', description: 'Habilidad para comprender y conectar con otros' },
-  { id: 7, nombre: 'Pensamiento Crítico', description: 'Análisis objetivo de información para tomar decisiones' },
-  { id: 8, nombre: 'Resolución de Problemas', description: 'Identificación y solución creativa de problemas' }
+  { id: 1, nombre: 'Comunicación',   descripcion: 'Habilidad para transmitir ideas de forma clara y concisa' },
+  { id: 2, nombre: 'Trabajo en equipo',   descripcion: 'Capacidad para colaborar efectivamente con otros' },
+  { id: 3, nombre: 'Resolución de conflictos',   descripcion: 'Aptitud para mediar y resolver disputas' },
+  { id: 4, nombre: 'Adaptabilidad',  descripcion: 'Flexibilidad ante cambios y nuevas situaciones' },
+  { id: 5, nombre: 'Liderazgo',  descripcion: 'Capacidad para guiar y motivar equipos' },
+  { id: 6, nombre: 'Empatía',  descripcion: 'Habilidad para comprender y conectar con otros' },
+  { id: 7, nombre: 'Pensamiento Crítico',  descripcion: 'Análisis objetivo de información para tomar decisiones' },
+  { id: 8, nombre: 'Resolución de Problemas',  descripcion: 'Identificación y solución creativa de problemas' }
 ];
 
 

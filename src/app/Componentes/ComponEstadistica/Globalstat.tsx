@@ -190,7 +190,7 @@ return (
             title={
                 <div className="flex items-center gap-2">
                     <Users className="h-6 w-6 text-green-500" />
-                    <span>Distribución por Condición Laboral</span>
+                    <span>Distribución por Estado</span>
                 </div>
             }
         >

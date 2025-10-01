@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from 'react';
 import { BarChart2, Users, BrainCircuit } from 'lucide-react';
 import {PredictiveAnalysis} from '@/app/Componentes/MCPIA/Predictive';

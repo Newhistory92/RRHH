@@ -1,6 +1,6 @@
 import React from 'react';
 import { DynamicSection } from '@/app/Componentes/Perfil/DynamicSectionCv';
-import {Employee,certifications} from "@/app/Interfas/Interfaces"
+import {certifications} from "@/app/Interfas/Interfaces"
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
 export interface CvFormacionProps {
@@ -10,24 +10,26 @@ export interface CvFormacionProps {
 }
 
 export default function CertificacionesCursos({ data, updateData, isEditing }: CvFormacionProps) {
-    const handleChange = (id: number, field: keyof Employee, value: string) => {
+    const handleChange = (id:string | number,field: string, value: string | number | boolean | File | null) => {
     const newData = data.map((item) =>
       item.id === id ? { ...item, [field]: value } : item
     );
     updateData(newData);
   };
 
-  const handleRemove = (id) => {
+  const handleRemove = (id:string | number) => {
     const newData = data.filter((item) => item.id !== id);
     updateData(newData);
   };
 
   const handleAdd = () => {
-    const newItem = {
+    const newItem: certifications= {
       id: Date.now(),
       name: "",
-      issuingBody: "",
-      issueDate: "",
+      institution: "",
+      date: "",
+      attachment: null,
+      validUntil: "",
     };
     updateData([...data, newItem]);
   };
@@ -51,14 +53,14 @@ export default function CertificacionesCursos({ data, updateData, isEditing }: C
             grid: "md:col-span-2",
           },
           {
-            name: "issuingBody",
+            name: " institution",
             label: "Institución Emisora",
             type: "text",
             required: true,
             grid: "md:col-span-2",
           },
           {
-            name: "issueDate",
+            name: "date",
             label: "Fecha de Obtención",
             type: "date",
           },

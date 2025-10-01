@@ -1,6 +1,6 @@
 import React from 'react';
 import { Star } from 'lucide-react';
-import { Card } from '../Card';
+import { Card } from 'primereact/card';
 import { SkillsDisplay, EmployeeAvatar } from '../../util/UiRRHH';
 import type { Department, Employee } from '@/app/Interfas/Interfaces';
 

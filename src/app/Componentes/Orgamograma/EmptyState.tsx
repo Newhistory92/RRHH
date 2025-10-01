@@ -1,6 +1,7 @@
 import React from 'react';
 import { Building2 } from 'lucide-react';
-import { Card } from '../Card';
+import { Card } from 'primereact/card';
+        
 
 export const EmptyState: React.FC = () => {
   return (

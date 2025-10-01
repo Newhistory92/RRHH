@@ -1,7 +1,7 @@
 import React from 'react';
 import { PlusCircle } from 'lucide-react';
 import { Button } from 'primereact/button';
-import { Card } from '../Card';
+import { Card } from 'primereact/card';
 import { OfficeCard } from './OfficeCard';
 import type { Department, Employee, Office,ModalContext } from '@/app/Interfas/Interfaces';
 

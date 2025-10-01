@@ -1,4 +1,4 @@
-import {getScoreColor, SoftSkillBar } from '@/app/Componentes/Card';
+import {getScoreColor, SoftSkillBar } from '@/app/util/UiRRHH';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, } from 'recharts';
 import {  X,  BarChart2, Star,  Briefcase, Calendar, MessageSquareWarning, } from 'lucide-react';
 import { Card } from 'primereact/card';

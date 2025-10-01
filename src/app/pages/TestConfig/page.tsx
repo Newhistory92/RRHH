@@ -1,4 +1,4 @@
-
+"use client"
 import React, { useState } from 'react';
 import { TechnicalTests } from '@/app/Componentes/TestComponent/TechnicalTests';
 import { SoftSkills } from '@/app/Componentes/TestComponent/SoftSkills';
@@ -15,9 +15,9 @@ export const TestPage: React.FC = () => {
   const [testsByProfession, setTestsByProfession] = useState<TestsByProfession>(
     initialTestsByProfession
   );
-  const [professions, setProfessions] = useState<string[]>(initialProfessions);
+  const [professions, setProfessions] = useState<{ [key: string]: number[] }>(initialProfessions);
   const [selectedProfession, setSelectedProfession] = useState<string>(
-    initialProfessions[0]
+    Object.keys(initialProfessions)[0]
   );
 
   // Soft Skills State
@@ -28,12 +28,12 @@ export const TestPage: React.FC = () => {
     setSelectedProfession(profession);
   };
 
-  const handleAddProfession = (newProfession: string) => {
-    setProfessions(prev => [...prev, newProfession]);
+  const handleAddProfession = (newProfession: { [key: string]: number[] }) => {
+    setProfessions(prev => ({ ...prev, ...newProfession }));
     // Initialize empty tests array for new profession
     setTestsByProfession(prev => ({
       ...prev,
-      [newProfession]: []
+      [Object.keys(newProfession)[0]]: []
     }));
   };
 

@@ -9,9 +9,10 @@ interface DynamicItem {
   level?: string;
   status?: string;
   isCurrent?: boolean;
-  endDate?: string;
-  attachment?: File;
-  [key: string]: any; // Para permitir propiedades dinámicas
+  endDate?: string  | null;
+  attachment?: File | string | null ;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any; 
 }
 
 interface FieldOption {

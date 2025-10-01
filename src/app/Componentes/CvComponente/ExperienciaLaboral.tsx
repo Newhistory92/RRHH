@@ -1,6 +1,6 @@
 import React from 'react';
 import { DynamicSection } from '@/app/Componentes/Perfil/DynamicSectionCv';
-import { WorkExperience, Employee} from "@/app/Interfas/Interfaces"
+import { WorkExperience} from "@/app/Interfas/Interfaces"
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
 export interface CvFormacionProps {
@@ -10,20 +10,20 @@ export interface CvFormacionProps {
 }
 
 export default function ExperienciaLaboral({ data, updateData, isEditing }: CvFormacionProps) {
-    const handleChange = (id:number,field: keyof Employee, value: string) => {
+   const handleChange = (id:string | number,field: string, value: string | number | boolean | File | null) => {
     const newData = data.map((item) =>
       item.id === id ? { ...item, [field]: value } : item
     );
     updateData(newData);
   };
 
-  const handleRemove = (id) => {
+  const handleRemove = (id:string | number) => {
     const newData = data.filter((item) => item.id !== id);
     updateData(newData);
   };
 
   const handleAdd = () => {
-    const newItem = {
+    const newItem: WorkExperience = {
       id: Date.now(),
       position: "",
       company: "",

@@ -1,6 +1,6 @@
 
 import{INTEGRATED_ORG_DATA ,EMPLOYMENT_STATUS,ACTIVITY_TYPES } from '@/app/api/prueba2';
-import { getScoreColor } from '@/app/Componentes/Card';
+import { getScoreColor } from '@/app/util/UiRRHH';
 import { ChevronDown, ChevronUp,  Filter,  } from 'lucide-react';
 import React from 'react';
 import {  Employee, ProductivityRankingProps, SortableKey, SortDirection  } from '@/app/Interfas/Interfaces';
@@ -64,10 +64,10 @@ export const ProductivityRanking = ({
     return employees
       .filter(e => filters.department === 'all' || e.department === filters.department)
       .filter(e => filters.activityType === 'all' || e.activityType === filters.activityType)
-      .filter(e => filters.employmentStatus === 'all' || e.employmentStatus === filters.employmentStatus);
+      .filter(e => filters.employmentStatus === 'all' || e.employmentStatus === filters.employmentStatus)
   }, [employees, filters]);
 
-  console.log(filteredEmployees)
+
   const sortedEmployees = React.useMemo(() => {
     const sortableEmployees = [...filteredEmployees];
     
@@ -196,7 +196,7 @@ export const ProductivityRanking = ({
 
       <DataTable
         value={currentEmployees}
-        onRowClick={(e) => onSelectEmployee(e.data)}
+        onRowClick={(e) => onSelectEmployee(e.data as Employee)}
         emptyMessage={emptyMessageTemplate()}
         className="w-full"
         rowHover

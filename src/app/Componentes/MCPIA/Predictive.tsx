@@ -2,13 +2,6 @@
 
 import { ArrowLeft } from 'lucide-react';
 
-
-
-
-
-
-
-
 type PredictiveAnalysisProps = {
   onBack: () => void;
 };

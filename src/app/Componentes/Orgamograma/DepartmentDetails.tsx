@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from '../Card';
+import { Card } from 'primereact/card';
 import { DepartmentHeader } from './DepartmentHeader';
 import { DepartmentInfo } from './DepartmentInfo';
 import { OfficesList } from './OfficesList';

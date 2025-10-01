@@ -187,7 +187,8 @@ export interface Message {
 // Soft skills (key-value pairs)
 export interface SoftSkill {
   nombre: string;
-  level:number;
+  level?:number;
+  descripcion: string;
   SkillStatus?: SkillStatus;
 }
 
@@ -200,7 +201,7 @@ export interface TechnicalSkill {
   SkillStatus?: SkillStatus;
 }
 
-interface certifications {
+export interface certifications {
   id: number;
   name: string;
   institution: string;
@@ -303,11 +304,11 @@ export interface AcademicFormation {
 
 // Interfaces para Languages (Idiomas)
 export interface Language {
-  id: number;
+  id: number ;
   language: string;
   level: string;
   certification: string; // Nombre de la certificación (ej: TOEFL, DELE)
-  attachment: File | string | null; // Certificado o comprobante
+  attachment: File | string | null ; // Certificado o comprobante
 }
 
 // Interfaces para Work Experience (Experiencia Laboral)
@@ -470,7 +471,7 @@ export interface OrgNode extends OrgData {
   children?: OrgNode[];
 }
 
-export interface OrgStats {
+export interface  OrgStatsType {
   totalNodos: number;
   maxNivel: number;
   nivelesUnicos: number[];

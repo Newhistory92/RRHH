@@ -1,0 +1,304 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+.pageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #25252b;
+  font-family: 'Poppins', sans-serif;
+}
+
+.container {
+  position: relative;
+  width: 750px;
+  height: 450px;
+  border: 2px solid #e46033;
+  box-shadow: 0 0 25px #e46033;
+  overflow: hidden;
+}
+
+.formBox {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.formBox.login {
+  left: 0;
+  padding: 0 40px;
+}
+
+.formBox.login .animation {
+  transform: translateX(0%);
+  transition: 0.7s;
+  opacity: 1;
+  transition-delay: calc(0.1s * var(--S));
+}
+
+.container.active .formBox.login .animation {
+  transform: translateX(-120%);
+  opacity: 0;
+  transition-delay: calc(0.1s * var(--D));
+}
+
+.formBox.register {
+  right: 0;
+  padding: 0 60px;
+}
+
+.formBox.register .animation {
+  transform: translateX(120%);
+  transition: 0.7s ease;
+  opacity: 0;
+  filter: blur(10px);
+  transition-delay: calc(0.1s * var(--S));
+}
+
+.container.active .formBox.register .animation {
+  transform: translateX(0%);
+  opacity: 1;
+  filter: blur(0px);
+  transition-delay: calc(0.1s * var(--li));
+}
+
+.formBox h2 {
+  font-size: 32px;
+  text-align: center;
+  color: #fff;
+}
+
+.inputBox {
+  position: relative;
+  width: 100%;
+  height: 50px;
+  margin-top: 25px;
+}
+
+.inputBox input {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #fff;
+  font-weight: 600;
+  border-bottom: 2px solid #fff;
+  padding-right: 23px;
+  transition: 0.5s;
+}
+
+.inputBox input:focus,
+.inputBox input:valid {
+  border-bottom: 2px solid #e46033;
+}
+
+.inputBox label {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #fff;
+  transition: 0.5s;
+  pointer-events: none;
+}
+
+.inputBox input:focus ~ label,
+.inputBox input:valid ~ label {
+  top: -5px;
+  color: #e46033;
+}
+
+.icon {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  transform: translateY(-50%);
+  transition: 0.5s;
+}
+
+.inputBox input:focus ~ .icon,
+.inputBox input:valid ~ .icon {
+  fill: #e46033;
+}
+
+.btn {
+  position: relative;
+  width: 100%;
+  height: 45px;
+  background: transparent;
+  border-radius: 40px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  border: 2px solid #e46033;
+  overflow: hidden;
+  z-index: 1;
+  color: #fff;
+  transition: 0.3s;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  height: 300%;
+  width: 100%;
+  background: linear-gradient(#25252b, #e46033, #25252b, #e46033);
+  top: -100%;
+  left: 0;
+  z-index: -1;
+  transition: 0.5s;
+}
+
+.btn:hover::before {
+  top: 0;
+}
+
+.regiLink {
+  font-size: 14px;
+  text-align: center;
+  margin: 20px 0 10px;
+  color: #fff;
+}
+
+.regiLink p {
+  color: #fff;
+}
+
+.regiLink a {
+  text-decoration: none;
+  color: #e46033;
+  font-weight: 600;
+}
+
+.regiLink a:hover {
+  text-decoration: underline;
+}
+
+.infoContent {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.infoContent.loginInfo {
+  right: 0;
+  text-align: right;
+  padding: 0 40px 60px 150px;
+}
+
+.infoContent.loginInfo .animation {
+  transform: translateX(0);
+  transition: 0.7s ease;
+  transition-delay: calc(0.1s * var(--S));
+  opacity: 1;
+  filter: blur(0px);
+}
+
+.container.active .infoContent.loginInfo .animation {
+  transform: translateX(120%);
+  opacity: 0;
+  filter: blur(10px);
+  transition-delay: calc(0.1s * var(--D));
+}
+
+.infoContent.registerInfo {
+  left: 0;
+  text-align: left;
+  padding: 0 150px 60px 38px;
+  pointer-events: none;
+}
+
+.infoContent.registerInfo .animation {
+  transform: translateX(-120%);
+  transition: 0.7s ease;
+  opacity: 0;
+  filter: blur(10px);
+  transition-delay: calc(0.1s * var(--S));
+}
+
+.container.active .infoContent.registerInfo .animation {
+  transform: translateX(0%);
+  opacity: 1;
+  filter: blur(0);
+  transition-delay: calc(0.1s * var(--li));
+}
+
+.infoContent h2 {
+  text-transform: uppercase;
+  font-size: 36px;
+  line-height: 1.3;
+  color: #fff;
+}
+
+.infoContent p {
+  font-size: 16px;
+  color: #fff;
+}
+
+.curvedShape {
+  position: absolute;
+  right: 0;
+  top: -5px;
+  height: 600px;
+  width: 850px;
+  background: linear-gradient(45deg, #25252b, #e46033);
+  transform: rotate(10deg) skewY(40deg);
+  transform-origin: bottom right;
+  transition: 1.5s ease;
+  transition-delay: 1.6s;
+}
+
+.container.active .curvedShape {
+  transform: rotate(0deg) skewY(0deg);
+  transition-delay: 0.5s;
+}
+
+.curvedShape2 {
+  position: absolute;
+  left: 250px;
+  top: 100%;
+  height: 700px;
+  width: 850px;
+  background: #25252b;
+  border-top: 3px solid #e46033;
+  transform: rotate(0deg) skewY(0deg);
+  transform-origin: bottom left;
+  transition: 1.5s ease;
+  transition-delay: 0.5s;
+}
+
+.container.active .curvedShape2 {
+  transform: rotate(-11deg) skewY(-41deg);
+  transition-delay: 1.2s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    width: 90%;
+    height: 500px;
+  }
+
+  .formBox.login,
+  .formBox.register {
+    padding: 0 20px;
+  }
+
+  .infoContent.loginInfo,
+  .infoContent.registerInfo {
+    padding: 0 20px;
+  }
+}

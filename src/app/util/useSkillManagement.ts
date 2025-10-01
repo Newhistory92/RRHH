@@ -13,7 +13,7 @@ export const useSkillManagement = (formData: EntityFormData,setFormData: React.D
       const newSkill: TechnicalSkill = {
         id: Math.max(...availableSkills.map(s => s.id), 0) + 1,
         nombre: newSkillName.trim(),
-        nivel: 'Básico'
+        level: 0
       };
       
       setAvailableSkills(prev => [...prev, newSkill]);

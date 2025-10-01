@@ -2,7 +2,7 @@ import React from 'react';
 import { PlusCircle } from 'lucide-react';
 import { Button } from 'primereact/button';
 import { Tree, TreeSelectionEvent, TreeExpandedEvent } from 'primereact/tree';
-import { Card } from '../Card';
+import { Card } from 'primereact/card';
 import { DepartmentTreeNode } from './DepartmentTreeNode';
 import { useDepartmentTree } from '@/app/util/useDepartmentTree';
 import type { Department, Office,ModalContext  } from '@/app/Interfas/Interfaces';

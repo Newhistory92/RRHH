@@ -47,7 +47,7 @@ export default function HabilidadesBlandas({ data, selectedSkills, updateData, i
               <span className="font-medium text-gray-900">
                 {skill.nombre}
               </span>
-              <p className="text-gray-500">{skill.description}</p>
+              <p className="text-gray-500">{skill.descripcion}</p>
             </div>
           </label>
         ))}

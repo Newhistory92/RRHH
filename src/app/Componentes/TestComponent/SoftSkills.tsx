@@ -18,16 +18,16 @@ export const SoftSkills: React.FC<SoftSkillsProps> = ({
   onDeleteSoftSkill 
 }) => {
   const [newSoftSkill, setNewSoftSkill] = useState<SoftSkill>({
-    name: "",
-    description: "",
+    nombre: "",
+    descripcion: "",
   });
 
   const handleSoftSkillSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newSoftSkill.name.trim() || !newSoftSkill.description.trim()) return;
+    if (!newSoftSkill.nombre.trim() || !newSoftSkill.descripcion.trim()) return;
     
     onAddSoftSkill(newSoftSkill);
-    setNewSoftSkill({ name: "", description: "" });
+    setNewSoftSkill({ nombre: "", descripcion: "" });
   };
 
   const handleInputChange = (field: keyof SoftSkill, value: string) => {
@@ -49,9 +49,9 @@ export const SoftSkills: React.FC<SoftSkillsProps> = ({
               Nombre de la Habilidad Blanda
             </label>
             <InputText 
-              id="softskill-name"
-              value={newSoftSkill.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
+              id="softskill-nombre"
+              value={newSoftSkill.nombre}
+              onChange={(e) => handleInputChange('nombre', e.target.value)}
               className="mt-1 block w-full input-style"
               placeholder="Ej: Liderazgo"
               required
@@ -66,8 +66,8 @@ export const SoftSkills: React.FC<SoftSkillsProps> = ({
             </label>
             <InputTextarea  
               id="softskill-desc"
-              value={newSoftSkill.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+              value={newSoftSkill.descripcion}
+              onChange={(e) => handleInputChange('descripcion', e.target.value)}
               rows={3} 
               cols={30}
               className="w-full mt-1 input-style"
@@ -80,7 +80,7 @@ export const SoftSkills: React.FC<SoftSkillsProps> = ({
               type="submit"
               text 
               raised 
-              disabled={!newSoftSkill.name.trim() || !newSoftSkill.description.trim()}
+              disabled={!newSoftSkill.nombre.trim() || !newSoftSkill.descripcion.trim()}
             >
               Guardar Habilidad Blanda
             </Button>
@@ -111,10 +111,10 @@ export const SoftSkills: React.FC<SoftSkillsProps> = ({
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <p className="font-semibold text-gray-800 dark:text-white">
-                      {skill.name}
+                      {skill.nombre}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      {skill.description}
+                      {skill.descripcion}
                     </p>
                   </div>
                   {onDeleteSoftSkill && (

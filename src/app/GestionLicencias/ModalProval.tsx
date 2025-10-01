@@ -20,7 +20,7 @@ interface ApprovalModalProps {
   supervisores: Supervisor[];
   onClose: () => void;
   onManage: (
-    requestId: number,
+    requestId: number | undefined,
     action: 'aprobar' | 'rechazar',
     data: { siguienteSupervisorId?: number; observacion?: string }
   ) => void;

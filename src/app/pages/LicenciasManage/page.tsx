@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
+"use client"
 import {  useRef, useState } from "react";
 import { FileText, } from 'lucide-react';
 import dynamic from "next/dynamic";

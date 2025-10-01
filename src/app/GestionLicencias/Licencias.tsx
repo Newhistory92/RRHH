@@ -19,7 +19,7 @@ interface ConteinerLicenciaProps {
   solicitudesPendientes: LicenseHistory[];
   onNewRequest: () => void;
   onManageRequest: (      
-    solicitudId: number,
+    solicitudId: number | undefined,
     accion: "aprobar" | "rechazar",
     data: { siguienteSupervisorId?: number; observacion?: string }
   ) => void;

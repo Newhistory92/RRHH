@@ -9,10 +9,10 @@ import { CreateTestModal } from './CreateTestModal';
 
 interface TechnicalTestsProps {
   testsByProfession: TestsByProfession;
-  professions: string[];
+  professions: { [key: string]: number[] };
   selectedProfession: string;
   onSelectedProfessionChange: (profession: string) => void;
-  onAddProfession: (profession: string) => void;
+  onAddProfession: (profession:{ [key: string]: number[] }) => void;
   onSaveTest: (test: Test) => void;
   onDeleteTest?: (testId: string) => void;
 }
@@ -30,8 +30,8 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
 
   const handleAddNewProfession = () => {
     const newProfession = prompt("Ingrese el nombre de la nueva profesión:");
-    if (newProfession && !professions.includes(newProfession)) {
-      onAddProfession(newProfession);
+    if (newProfession && !(newProfession in professions)) {
+      onAddProfession({ [newProfession]: [] });
       onSelectedProfessionChange(newProfession);
     }
   };
