@@ -12,7 +12,7 @@ import { Divider } from 'primereact/divider';
 import { NotificationDialog } from "@/app/Componentes/Perfil/NotificationDialog";
 import {EMPLOYEES_DATA} from "@/app/api/prueba2";
 import { Employee,Notification,Page} from "@/app/Interfas/Interfaces";
-
+import Image from "next/image";
   
 
 export const Header = ({ setPage }: { setPage: (page: Page) => void }) => {
@@ -122,9 +122,14 @@ export const Header = ({ setPage }: { setPage: (page: Page) => void }) => {
   return (
     <header className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 shadow-lg h-16 fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 border-b border-gray-700/50">
       <div className="flex items-center">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent md:hidden">
-          Dashboard
-        </h1>
+        <Image
+          src="/Logo.webp"
+          alt="Logo"
+          width={120}
+          height={120}
+          className="mr-2"
+        />
+        
       </div>
 
       <div className="flex items-center gap-4">

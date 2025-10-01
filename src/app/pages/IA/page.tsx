@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import { BarChart2, Users, BrainCircuit } from 'lucide-react';
-import {PredictiveAnalysis} from '@/app/Componentes/MCPIA/Predictive';
+import PredictiveAnalysis from '@/app/Componentes/MCPIA/Predictive';
 import {HRChatbot} from '@/app/Componentes/MCPIA/HRChatbot';
 import {DepartmentOptimization} from '@/app/Componentes/MCPIA/DepartmentOptimization';
 

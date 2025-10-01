@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BarChart2, Users, BrainCircuit, GitMerge, ClipboardList, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Page} from "@/app/Interfas/Interfaces";
-
+import Image from 'next/image';
 interface SidebarProps {
   activePage: Page;
   setPage: (page: Page) => void;
@@ -104,7 +104,13 @@ export const Sidebar = ({ activePage, setPage, onCollapseChange }: SidebarProps)
             <p className="text-xs text-gray-500">&copy; 2025 Todos los derechos reservados</p>
           </div>
         ) : (
-          <p className="text-xs text-gray-500 transform -rotate-90 whitespace-nowrap">2025</p>
+           <Image
+                    src="/LogoAlone.webp"
+                    alt="Logo"
+                    width={100}
+                    height={100}
+                    className="mr-2"
+                  />
         )}
       </div>
     </aside>

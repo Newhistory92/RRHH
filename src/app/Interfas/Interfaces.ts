@@ -217,6 +217,55 @@ export interface Notification {
   status: string;
 }
 
+
+export interface satisfactionMetrics{
+  overallSatisfaction: number;      // 1-10 ⚠️ CRÍTICO
+  jobSatisfaction: number;          // 1-10
+  teamSatisfaction: number;         // 1-10
+  leadershipSatisfaction: number;   // 1-10
+  workLifeBalance: number;          // 1-10 ⚠️ CRÍTICO
+  careerGrowthSatisfaction: number; // 1-10
+  lastSurveyDate: string;
+}
+
+
+export interface performanceReviews{
+fecha: string; 
+puntuación: number; // 1-10
+fortalezas: string[]; 
+áreasDeMejora: string[]; 
+objetivos: string[]; 
+objetivosLogrados?: number;           // % de objetivos cumplidos
+}
+
+export interface MetricaSatisfaccion {
+satisfaccionGeneral: number; // 1-10 ⚠️ CRÍTICO
+satisfaccionLaboral: number; // 1-10
+satisfaccionEquipo: number; // 1-10
+satisfaccionLiderazgo: number; // 1-10
+equilibrioVidaLaboral: number; // 1-10 ⚠️ CRÍTICO
+satisfaccionCrecimientoProfesional: number; // 1-10
+fechaUltimaEncuesta: string;
+}
+
+export interface CriticalEvents {
+  id: string;
+  date: string;
+  type: 'Cambio de Categoria' | 'Reconocimiento' | 'Cambio supervisor' | 'Conflicto';
+  description: string;
+  impact: number; // -10 a +10
+}
+// export interface SalaryHistory {
+//   currentSalary: number;
+//   currency: 'ARS' | 'USD';
+//   lastIncreaseDate: string;         // ⚠️ CRÍTICO
+//   lastIncreasePercent: number;      // ⚠️ CRÍTICO
+//   increases: Array<{
+//     date: string;
+//     percent: number;
+//     reason: string;
+//   }>;
+// }
 // Main Employee interface
 export interface Employee {
   // Basic Information
@@ -277,6 +326,9 @@ export interface Employee {
   softSkillsArray?: number[]; 
   technicalSkills: TechnicalSkill[];
   notificaciones: Notification[];
+  performanceReviews: performanceReviews[];
+  satisfactionMetrics: satisfactionMetrics;
+  criticalEvents: CriticalEvents[];
 }
 // Department interface
 export interface Department {
@@ -562,3 +614,47 @@ export type Page =
   | "feedback"
   | "licencias"
   | "test";
+
+
+export type MotivoSalida = 
+  | 'Renuncia voluntaria' 
+  | 'Despido' 
+  | 'Jubilación' 
+  | 'Mejor oferta laboral'
+  | 'Reubicación geográfica'
+  | 'Motivos personales'
+  | 'Conflicto laboral'
+  | 'Otro';
+  
+export interface ExEmpleado {
+// Información básica
+id: number; 
+nombre: string; 
+dni: string; 
+puesto: string; 
+departamento: string; 
+idDepartamento: number; 
+
+// Fechas
+fechaInicio: string; 
+fechaFin: string; 
+duracionTrabajo: number; // Meses
+
+// Datos de la salida
+motivoSalida: MotivoSalida; 
+entrevistaSalida: string; 
+volveriaARecrutar: boolean; 
+
+// Indicadores antes de la salida
+ultimaPuntuacionProductividad: number; 
+ultimaPuntuacionSatisfaccion: number; 
+ultimaPuntuacionCompromiso: number; 
+totalLicencias: number; 
+totalAusencias: number; 
+
+// Eventos previos a la salida
+tuvoConflictosRecientes: boolean; 
+tuvoProblemasSalariales: boolean; 
+tuvoCambioDeJefe: boolean; 
+solicitoOtrosPuestos: boolean;
+}

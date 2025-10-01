@@ -1,6 +1,6 @@
 
 
-import { ComplaintStatus, EmployeeRole, EmployeeStatus, EmploymentStatus, LicenseStatus, TestsByProfession,SkillStatus } from "../Interfas/Interfaces";
+import { ExEmpleado,ComplaintStatus, EmployeeRole, EmployeeStatus, EmploymentStatus, LicenseStatus, TestsByProfession,SkillStatus } from "../Interfas/Interfaces";
 
 
 
@@ -185,6 +185,50 @@ export const EMPLOYEES_DATA = [
       { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
     feedback_history: [],
+    performanceReviews: [
+      {
+        id: 1,
+        fecha: '2024-01-15',
+        puntuación: 8,
+        fortalezas: 'Trabajo en equipo',
+        áreasDeMejora: 'Gestión del tiempo',
+        objetivos: 'Mejorar la documentación del proyecto',
+        objetivosLogrados: 80
+      }
+    ],
+    satisfactionMetrics: {
+        overallSatisfaction: 8,
+        jobSatisfaction: 7,
+        teamSatisfaction: 9,
+        leadershipSatisfaction: 8,
+        workLifeBalance: 7,
+        careerGrowthSatisfaction: 8,
+        lastSurveyDate: '2024-01-15'  
+    },
+    MetricaSatisfaccion: [  
+      { year: 2022,
+       overallSatisfaction: 7, 
+       jobSatisfaction: 6, 
+       teamSatisfaction: 8, 
+       leadershipSatisfaction: 7, 
+       workLifeBalance: 6,
+       careerGrowthSatisfaction: 7 
+      },
+    ],
+    CriticalEvents: [
+      {
+        id: 1,
+        date: '2023-11-01',
+        description: 'Reunión de equipo para revisión de proyectos',
+        type: 'Cambio de Categoria',
+      },
+      {
+        id: 2,
+        date: '2023-11-05',
+        description: 'Entrega de informe de resultados',
+        type: 'Cambio supervisor',
+      }
+    ],
     notificaciones: [
   { id: 1, text: 'Nueva solicitud de vacaciones de Juan Pérez.', time: 'hace 5 minutos',status:'nueva' },
   { id: 2, text: 'El reporte de productividad del Q2 está listo.', time: 'hace 2 horas',status:'leida' },
@@ -202,7 +246,7 @@ export const EMPLOYEES_DATA = [
     address: 'Calle Falsa 123',
     birthDate: '1988-03-12',
     photo: 'https://placehold.co/100x100/c2f0c2/333333?text=JP',
-    hours: 120, 
+    hours: 120,
     position: 'Desarrollador de Sistemas',
     department: 'Sistemas',
     departmentId: 2,
@@ -218,13 +262,8 @@ export const EMPLOYEES_DATA = [
     managerId: 4,
     supervisor: 'Carlos Ruiz',
     role: 'empleado' as EmployeeRole,
-
-    schedule: {
-      startTime: '09:00',
-      endTime: '18:00',
-      workingHours: 8
-    },
-    
+    subordinates: [],
+    schedule: { startTime: '09:00', endTime: '18:00', workingHours: 8 },
     productivityScore: 8.5,
     overallProductivity: 88.0,
     monthlyHours: [
@@ -238,67 +277,57 @@ export const EMPLOYEES_DATA = [
       { name: 'Mantenimiento de base de datos', productivity: 8.0 },
       { name: 'Soporte técnico interno', productivity: 8.5 }
     ],
-    
     licenses: {
       '2024': 2,
       '2023': 8,
+      '2022': 1,
+      usuarios: {},
+      saldos: { '2024': { Licencias: 2, Particulares: 0, Articulos: 1, Examen: 0 } },
       history: []
     },
-    absences: {
-      '2024': 0,
-      '2023': 2
-    },
+    absences: { '2024': 0, '2023': 2 },
     permits: [],
-    
     complaints: [],
     messages: [],
-    
-      softSkills: [
-      {
-        nombre: 'Comunicación',
-        level: 9
-      },
-      {
-        nombre: 'Trabajo en equipo',
-        level: 8
-      },
-      {
-        nombre: 'Resolución de conflictos',
-        level: 9
-      },
-      {
-        nombre: 'Adaptabilidad',
-        level: 10
-      },
-      {
-        nombre: 'Liderazgo',
-        level: 7
-      },
-      {
-        nombre: 'Empatía',
-        level: 9
-      }
+    softSkills: [
+      { nombre: 'Comunicación', level: 8 },
+      { nombre: 'Trabajo en equipo', level: 9 },
+      { nombre: 'Resolución de conflictos', level: 7 },
+      { nombre: 'Adaptabilidad', level: 8 },
+      { nombre: 'Liderazgo', level: 5 },
+      { nombre: 'Empatía', level: 7 }
     ],
     technicalSkills: [
       { id: 1, nombre: 'React.js', level: 9 },
       { id: 2, nombre: 'Node.js', level: 8 },
       { id: 3, nombre: 'SQL', level: 8 },
       { id: 4, nombre: 'DevOps con Docker', level: 7 }
-    ],academicFormation: [
-        { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'Universidad Tecnológica Nacional (UTN)', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null },
-        { id: 2, title: 'Bachiller Técnico', institution: 'Escuela Técnica N°5', level: 'Secundario', status: 'Completo', startDate: '2005-03-01', endDate: '2009-12-10', isCurrent: false, attachment: null },
     ],
-    languages: [ { id: 1, language: 'Inglés', level: 'Avanzado', certification: 'TOEFL iBT', attachment: null }, { id: 2, language: 'Español', level: 'Nativo', certification: '', attachment: null }, ],
-    workExperience: [ 
-        { id: 1, position: 'Desarrolladora Frontend Senior', company: 'Empresa Actual', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2020-03-01', endDate: '', isCurrent: true, contractType: 'Tiempo completo' },
-        { id: 2, position: 'Desarrolladora Frontend', company: 'Tech Solutions S.A.', industry: 'Tecnología', location: 'Buenos Aires, Argentina', startDate: '2016-03-01', endDate: '2020-02-28', isCurrent: false, contractType: 'Tiempo completo' },
+    academicFormation: [
+      { id: 1, title: 'Ingeniería en Sistemas de Información', institution: 'UTN', level: 'Universitario', status: 'Completo', startDate: '2010-03-01', endDate: '2015-12-15', isCurrent: false, attachment: null },
+      { id: 2, title: 'Bachiller Técnico', institution: 'Escuela Técnica N°5', level: 'Secundario', status: 'Completo', startDate: '2005-03-01', endDate: '2009-12-10', isCurrent: false, attachment: null }
     ],
-     certifications: [
-      { id: 1, name: 'Certificación en Gestión de Proyectos', institution: 'PMI', date: '2022-05-15', validUntil: '2025-05-15', attachment: null },
-      { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
+    languages: [
+      { id: 1, language: 'Inglés', level: 'Avanzado', certification: 'TOEFL iBT', attachment: null },
+      { id: 2, language: 'Español', level: 'Nativo', certification: '', attachment: null }
+    ],
+    workExperience: [
+      { id: 1, position: 'Desarrollador Backend', company: 'Empresa de Software', industry: 'Tecnología', location: 'Buenos Aires', startDate: '2020-03-01', endDate: '', isCurrent: true, contractType: 'Tiempo completo' },
+      { id: 2, position: 'Trainee Developer', company: 'Startup Labs', industry: 'Tecnología', location: 'Buenos Aires', startDate: '2018-03-01', endDate: '2020-02-28', isCurrent: false, contractType: 'Tiempo completo' }
+    ],
+    certifications: [
+      { id: 1, name: 'Scrum Master Certified', institution: 'Scrum.org', date: '2022-01-15', validUntil: '2025-01-15', attachment: null }
     ],
     feedback_history: [],
+    performanceReviews: [
+      { id: 1, fecha: '2024-02-01', puntuación: 7, fortalezas: 'Resolución de problemas', áreasDeMejora: 'Documentación técnica', objetivos: 'Mejorar en testing', objetivosLogrados: 60 }
+    ],
+    satisfactionMetrics: { overallSatisfaction: 7, jobSatisfaction: 6, teamSatisfaction: 8, leadershipSatisfaction: 6, workLifeBalance: 7, careerGrowthSatisfaction: 6, lastSurveyDate: '2024-02-01' },
+    MetricaSatisfaccion: [{ year: 2023, overallSatisfaction: 6, jobSatisfaction: 6, teamSatisfaction: 7, leadershipSatisfaction: 6, workLifeBalance: 6, careerGrowthSatisfaction: 6 }],
+    CriticalEvents: [],
+    notificaciones: []
   },
+
   {
     id: 3,
     name: 'María Rodríguez',
@@ -347,18 +376,47 @@ export const EMPLOYEES_DATA = [
     ],
     
     licenses: {
-      '2024': 8,
-      '2023': 15,
+      '2024': 21, // Licencias del año actual
+      '2023': 5,  // Licencias del año anterior
+      '2022': 2,  // Licencias de hace 2 años
+     usuarios: {
+  'empleado-1': { id: 1, name: 'Juan Pérez', dni: '12.345.678',  office: 'Contabilidad', role: 'empleado' },
+  'supervisor-1': { id: 2, name: 'Ana García (Jefa de Área)', dni: '98.765.432', department: 'Dirección', role: 'supervisor' },
+  'supervisor-2': { id: 3, name: 'Carlos Gomez (Director Gral.)', dni: '55.666.777', department: 'Gerencia', role: 'supervisor' },
+},
+      saldos: {
+      '2024': {
+        Licencias: 21,
+        Particulares: 5,
+        Articulos: 10,
+        Examen: 4
+      },
+      '2023': {
+        Licencias: 5,
+        Particulares: 0,
+        Articulos: 0,
+        Examen: 0
+      },
+      '2022': {
+        Licencias: 2,
+        Particulares: 0,
+        Articulos: 0,
+        Examen: 0
+      }
+    }, 
       history: [
         {
-          id: 'L3',
-          type: 'Médica',
-          startDate: '2024-06-20',
-          endDate: '2024-06-30',
-          status: 'Aprobada' as LicenseStatus,
-          duration: 11,
-          originalMessage: 'Licencia médica extendida.',
-
+          id: 1,
+          solicitanteId:1,
+          supervisorId :1,
+          name: 'Ana García',
+          type: 'Vacaciones',
+          startDate: '2024-07-10',
+          endDate: '2024-07-20',
+          status: 'Pendiente' as LicenseStatus,
+          duration: 10,
+          originalMessage: 'Se aprueba la licencia por vacaciones solicitada para julio.',
+          createdAt:'2024-07-10'
         }
       ]
     },
@@ -423,6 +481,55 @@ export const EMPLOYEES_DATA = [
       { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
     feedback_history: [],
+    performanceReviews: [
+      {
+        id: 1,
+        fecha: '2024-01-15',
+        puntuación: 8,
+        fortalezas: 'Trabajo en equipo',
+        áreasDeMejora: 'Gestión del tiempo',
+        objetivos: 'Mejorar la documentación del proyecto',
+        objetivosLogrados: 80
+      }
+    ],
+    satisfactionMetrics: {
+        overallSatisfaction: 8,
+        jobSatisfaction: 7,
+        teamSatisfaction: 9,
+        leadershipSatisfaction: 8,
+        workLifeBalance: 7,
+        careerGrowthSatisfaction: 8,
+        lastSurveyDate: '2024-01-15'  
+    },
+    MetricaSatisfaccion: [  
+      { year: 2022,
+       overallSatisfaction: 7, 
+       jobSatisfaction: 6, 
+       teamSatisfaction: 8, 
+       leadershipSatisfaction: 7, 
+       workLifeBalance: 6,
+       careerGrowthSatisfaction: 7 
+      },
+    ],
+    CriticalEvents: [
+      {
+        id: 1,
+        date: '2023-11-01',
+        description: 'Reunión de equipo para revisión de proyectos',
+        type: 'Cambio de Categoria',
+      },
+      {
+        id: 2,
+        date: '2023-11-05',
+        description: 'Entrega de informe de resultados',
+        type: 'Cambio supervisor',
+      }
+    ],
+    notificaciones: [
+  { id: 1, text: 'Nueva solicitud de vacaciones de Juan Pérez.', time: 'hace 5 minutos',status:'nueva' },
+  { id: 2, text: 'El reporte de productividad del Q2 está listo.', time: 'hace 2 horas',status:'leida' },
+  { id: 3, text: 'Recordatorio: Reunión de equipo a las 3 PM.', time: 'hace 1 día',status:'leida' },
+    ],
   },
   {
     id: 4,
@@ -472,10 +579,50 @@ export const EMPLOYEES_DATA = [
       { name: 'Auditorías internas', productivity: 6.5 }
     ],
     
-    licenses: {
-      '2024': 4,
-      '2023': 10,
-      history: []
+     licenses: {
+      '2024': 21, // Licencias del año actual
+      '2023': 5,  // Licencias del año anterior
+      '2022': 2,  // Licencias de hace 2 años
+     usuarios: {
+  'empleado-1': { id: 1, name: 'Juan Pérez', dni: '12.345.678',  office: 'Contabilidad', role: 'empleado' },
+  'supervisor-1': { id: 2, name: 'Ana García (Jefa de Área)', dni: '98.765.432', department: 'Dirección', role: 'supervisor' },
+  'supervisor-2': { id: 3, name: 'Carlos Gomez (Director Gral.)', dni: '55.666.777', department: 'Gerencia', role: 'supervisor' },
+},
+      saldos: {
+      '2024': {
+        Licencias: 21,
+        Particulares: 5,
+        Articulos: 10,
+        Examen: 4
+      },
+      '2023': {
+        Licencias: 5,
+        Particulares: 0,
+        Articulos: 0,
+        Examen: 0
+      },
+      '2022': {
+        Licencias: 2,
+        Particulares: 0,
+        Articulos: 0,
+        Examen: 0
+      }
+    }, 
+      history: [
+        {
+          id: 1,
+          solicitanteId:1,
+          supervisorId :1,
+          name: 'Ana García',
+          type: 'Vacaciones',
+          startDate: '2024-07-10',
+          endDate: '2024-07-20',
+          status: 'Pendiente' as LicenseStatus,
+          duration: 10,
+          originalMessage: 'Se aprueba la licencia por vacaciones solicitada para julio.',
+          createdAt:'2024-07-10'
+        }
+      ]
     },
     absences: {
       '2024': 3,
@@ -542,7 +689,56 @@ export const EMPLOYEES_DATA = [
       { id: 1, name: 'Certificación en Gestión de Proyectos', institution: 'PMI', date: '2022-05-15', validUntil: '2025-05-15', attachment: null },
       { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
-    feedback_history: [],
+      feedback_history: [],
+    performanceReviews: [
+      {
+        id: 1,
+        fecha: '2024-01-15',
+        puntuación: 8,
+        fortalezas: 'Trabajo en equipo',
+        áreasDeMejora: 'Gestión del tiempo',
+        objetivos: 'Mejorar la documentación del proyecto',
+        objetivosLogrados: 80
+      }
+    ],
+    satisfactionMetrics: {
+        overallSatisfaction: 8,
+        jobSatisfaction: 7,
+        teamSatisfaction: 9,
+        leadershipSatisfaction: 8,
+        workLifeBalance: 7,
+        careerGrowthSatisfaction: 8,
+        lastSurveyDate: '2024-01-15'  
+    },
+    MetricaSatisfaccion: [  
+      { year: 2022,
+       overallSatisfaction: 7, 
+       jobSatisfaction: 6, 
+       teamSatisfaction: 8, 
+       leadershipSatisfaction: 7, 
+       workLifeBalance: 6,
+       careerGrowthSatisfaction: 7 
+      },
+    ],
+    CriticalEvents: [
+      {
+        id: 1,
+        date: '2023-11-01',
+        description: 'Reunión de equipo para revisión de proyectos',
+        type: 'Cambio de Categoria',
+      },
+      {
+        id: 2,
+        date: '2023-11-05',
+        description: 'Entrega de informe de resultados',
+        type: 'Cambio supervisor',
+      }
+    ],
+    notificaciones: [
+  { id: 1, text: 'Nueva solicitud de vacaciones de Juan Pérez.', time: 'hace 5 minutos',status:'nueva' },
+  { id: 2, text: 'El reporte de productividad del Q2 está listo.', time: 'hace 2 horas',status:'leida' },
+  { id: 3, text: 'Recordatorio: Reunión de equipo a las 3 PM.', time: 'hace 1 día',status:'leida' },
+    ],
   },
   {
     id: 5,
@@ -592,10 +788,50 @@ export const EMPLOYEES_DATA = [
       { name: 'Gestión de reclamos', productivity: 9.8 }
     ],
     
-    licenses: {
-      '2024': 1,
-      '2023': 5,
-      history: []
+     licenses: {
+      '2024': 21, // Licencias del año actual
+      '2023': 5,  // Licencias del año anterior
+      '2022': 2,  // Licencias de hace 2 años
+     usuarios: {
+  'empleado-1': { id: 1, name: 'Juan Pérez', dni: '12.345.678',  office: 'Contabilidad', role: 'empleado' },
+  'supervisor-1': { id: 2, name: 'Ana García (Jefa de Área)', dni: '98.765.432', department: 'Dirección', role: 'supervisor' },
+  'supervisor-2': { id: 3, name: 'Carlos Gomez (Director Gral.)', dni: '55.666.777', department: 'Gerencia', role: 'supervisor' },
+},
+      saldos: {
+      '2024': {
+        Licencias: 21,
+        Particulares: 5,
+        Articulos: 10,
+        Examen: 4
+      },
+      '2023': {
+        Licencias: 5,
+        Particulares: 0,
+        Articulos: 0,
+        Examen: 0
+      },
+      '2022': {
+        Licencias: 2,
+        Particulares: 0,
+        Articulos: 0,
+        Examen: 0
+      }
+    }, 
+      history: [
+        {
+          id: 1,
+          solicitanteId:1,
+          supervisorId :1,
+          name: 'Ana García',
+          type: 'Vacaciones',
+          startDate: '2024-07-10',
+          endDate: '2024-07-20',
+          status: 'Pendiente' as LicenseStatus,
+          duration: 10,
+          originalMessage: 'Se aprueba la licencia por vacaciones solicitada para julio.',
+          createdAt:'2024-07-10'
+        }
+      ]
     },
     absences: {
       '2024': 0,
@@ -649,7 +885,56 @@ export const EMPLOYEES_DATA = [
       { id: 1, name: 'Certificación en Gestión de Proyectos', institution: 'PMI', date: '2022-05-15', validUntil: '2025-05-15', attachment: null },
       { id: 2, name: 'Curso Avanzado de Comunicación', institution: 'Coursera', date: '2023-03-20', validUntil: '2026-03-20', attachment: null }  ,
     ],
-    feedback_history: [],
+      feedback_history: [],
+    performanceReviews: [
+      {
+        id: 1,
+        fecha: '2024-01-15',
+        puntuación: 8,
+        fortalezas: 'Trabajo en equipo',
+        áreasDeMejora: 'Gestión del tiempo',
+        objetivos: 'Mejorar la documentación del proyecto',
+        objetivosLogrados: 80
+      }
+    ],
+    satisfactionMetrics: {
+        overallSatisfaction: 8,
+        jobSatisfaction: 7,
+        teamSatisfaction: 9,
+        leadershipSatisfaction: 8,
+        workLifeBalance: 7,
+        careerGrowthSatisfaction: 8,
+        lastSurveyDate: '2024-01-15'  
+    },
+    MetricaSatisfaccion: [  
+      { year: 2022,
+       overallSatisfaction: 7, 
+       jobSatisfaction: 6, 
+       teamSatisfaction: 8, 
+       leadershipSatisfaction: 7, 
+       workLifeBalance: 6,
+       careerGrowthSatisfaction: 7 
+      },
+    ],
+    CriticalEvents: [
+      {
+        id: 1,
+        date: '2023-11-01',
+        description: 'Reunión de equipo para revisión de proyectos',
+        type: 'Cambio de Categoria',
+      },
+      {
+        id: 2,
+        date: '2023-11-05',
+        description: 'Entrega de informe de resultados',
+        type: 'Cambio supervisor',
+      }
+    ],
+    notificaciones: [
+  { id: 1, text: 'Nueva solicitud de vacaciones de Juan Pérez.', time: 'hace 5 minutos',status:'nueva' },
+  { id: 2, text: 'El reporte de productividad del Q2 está listo.', time: 'hace 2 horas',status:'leida' },
+  { id: 3, text: 'Recordatorio: Reunión de equipo a las 3 PM.', time: 'hace 1 día',status:'leida' },
+    ],
   }
 ];
 
@@ -993,7 +1278,9 @@ export const SOFT_SKILLS_CATALOG = [
   { id: 5, nombre: 'Liderazgo',  descripcion: 'Capacidad para guiar y motivar equipos' },
   { id: 6, nombre: 'Empatía',  descripcion: 'Habilidad para comprender y conectar con otros' },
   { id: 7, nombre: 'Pensamiento Crítico',  descripcion: 'Análisis objetivo de información para tomar decisiones' },
-  { id: 8, nombre: 'Resolución de Problemas',  descripcion: 'Identificación y solución creativa de problemas' }
+  { id: 8, nombre: 'Resolución de Problemas',  descripcion: 'Identificación y solución creativa de problemas' },
+   { id: 9, nombre: 'Satisfacción del personal',  descripcion: 'Como te sientes en tu puesto de trabajo' },
+    { id: 10, nombre: 'Satisfacción del equipo de trabajo',  descripcion: 'alguno de tu equipo de trabajo es problematico' }
 ];
 
 
@@ -1158,6 +1445,79 @@ export const SKILL_STATUS_DATA: SkillStatus[] = [
     unlockDate: '2024-10-15T13:30:00.000Z',
     
   },
+];
+
+
+export const EX_EMPLEADOS: ExEmpleado[] = [
+{
+id: 101,
+nombre: 'Roberto Sánchez',
+dni: '25.111.222',
+puesto: 'Desarrollador Senior',
+departamento: 'Tecnología',
+idDepartamento: 5,
+fechaInicio: '2019-08-01',
+fechaFin: '2024-02-15',
+duracionTrabajo: 54, // 4.5 años
+motivoSalida: 'Mejor oferta laboral',
+entrevistaSalida: 'Recibió oferta con un 30% más de salario. Expresa agradecimiento pero necesita un crecimiento económico. Ambiente laboral valorado positivamente.',
+volveriaARecrutar: true,
+ultimaPuntuacionProductividad: 8.7,
+ultimaPuntuacionSatisfaccion: 7,
+ultimaPuntuacionCompromiso: 6,
+totalLicencias: 15,
+totalAusencias: 2,
+tuvoConflictosRecientes: false,
+tuvoProblemasSalariales: true, // PATRÓN
+tuvoCambioDeJefe: false,
+solicitoOtrosPuestos: true // PATRÓN
+},
+{
+id: 102,
+nombre: 'Laura Martínez',
+dni: '30.333.444',
+puesto: 'Analista de Marketing',
+departamento: 'Marketing',
+idDepartamento: 3,
+fechaInicio: '2021-03-10',
+fechaFin: '2024-01-20',
+duracionTrabajo: 34, // 2.8 años
+motivoSalida: 'Conflicto laboral',
+entrevistaSalida: 'Problemas con supervisor directo. Falta de reconocimiento y comunicación deficiente. Clima laboral tenso.',
+volveriaARecrutar: false,
+ultimaPuntuacionProductividad: 6.2,
+ultimaPuntuacionSatisfaccion: 3,
+ultimaPuntuacionCompromiso: 2,
+totalLicencias: 25,
+totalAusencias: 8,
+tuvoConflictosRecientes: true, // PATRÓN
+tuvoProblemasSalariales: false,
+tuvoCambioDeJefe: true, // PATRÓN
+solicitoOtrosPuestos: false
+},
+{
+id: 103,
+nombre: 'Diego Fernández',
+dni: '28.555.666',
+puesto: 'Vendedor',
+departamento: 'Ventas',
+idDepartamento: 1,
+fechaInicio: '2020-06-01',
+fechaFin: '2023-11-30',
+duracionTrabajo: 42, // 3.5 años
+motivoSalida: 'Renuncia voluntaria',
+entrevistaSalida: 'Emprendimiento propio. Sin conflictos. Agradece oportunidades de desarrollo.',
+volveriaARecrutar: true,
+ultimaPuntuacionProductividad: 8.9,
+ultimaPuntuacionSatisfaccion: 8,
+ultimaPuntuacionCompromiso: 7,
+totalLicencias: 10,
+totalAusencias: 1,
+tuvoConflictosRecientes: false,
+tuvoProblemasSalariales: false,
+tuvoCambioDeJefe: false,
+solicitoOtrosPuestos: false
+}
 ];
 
 export const ACTIVITY_TYPES = [...new Set(EMPLOYEES_DATA.map(e => e.activityType))];

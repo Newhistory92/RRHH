@@ -13,8 +13,8 @@
   position: relative;
   width: 750px;
   height: 450px;
-  border: 2px solid #e46033;
-  box-shadow: 0 0 25px #e46033;
+  border: 2px solid #1ABCD7;
+  box-shadow: 0 0 25px #1ABCD7;
   overflow: hidden;
 }
 
@@ -28,30 +28,30 @@
   flex-direction: column;
 }
 
-.formBox.login {
+.formBox.Login {
   left: 0;
   padding: 0 40px;
 }
 
-.formBox.login .animation {
+.formBox.Login .animation {
   transform: translateX(0%);
   transition: 0.7s;
   opacity: 1;
   transition-delay: calc(0.1s * var(--S));
 }
 
-.container.active .formBox.login .animation {
+.container.active .formBox.Login .animation {
   transform: translateX(-120%);
   opacity: 0;
   transition-delay: calc(0.1s * var(--D));
 }
 
-.formBox.register {
+.formBox.Register {
   right: 0;
   padding: 0 60px;
 }
 
-.formBox.register .animation {
+.formBox.Register .animation {
   transform: translateX(120%);
   transition: 0.7s ease;
   opacity: 0;
@@ -59,7 +59,7 @@
   transition-delay: calc(0.1s * var(--S));
 }
 
-.container.active .formBox.register .animation {
+.container.active .formBox.Register .animation {
   transform: translateX(0%);
   opacity: 1;
   filter: blur(0px);
@@ -95,7 +95,7 @@
 
 .inputBox input:focus,
 .inputBox input:valid {
-  border-bottom: 2px solid #e46033;
+  border-bottom: 2px solid #1ABCD7;
 }
 
 .inputBox label {
@@ -112,7 +112,7 @@
 .inputBox input:focus ~ label,
 .inputBox input:valid ~ label {
   top: -5px;
-  color: #e46033;
+  color: #1ABCD7;
 }
 
 .icon {
@@ -126,8 +126,8 @@
 }
 
 .inputBox input:focus ~ .icon,
-.inputBox input:valid ~ .icon {
-  fill: #e46033;
+.InputBox input:valid ~ .icon {
+  fill: #1ABCD7;
 }
 
 .btn {
@@ -139,7 +139,7 @@
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
-  border: 2px solid #e46033;
+  border: 2px solid #1ABCD7;
   overflow: hidden;
   z-index: 1;
   color: #fff;
@@ -151,7 +151,7 @@
   position: absolute;
   height: 300%;
   width: 100%;
-  background: linear-gradient(#25252b, #e46033, #25252b, #e46033);
+  background: linear-gradient(#25252b, #1ABCD7, #25252b, #1ABCD7);
   top: -100%;
   left: 0;
   z-index: -1;
@@ -175,7 +175,7 @@
 
 .regiLink a {
   text-decoration: none;
-  color: #e46033;
+  color: #1ABCD7;
   font-weight: 600;
 }
 
@@ -193,13 +193,13 @@
   flex-direction: column;
 }
 
-.infoContent.loginInfo {
+.infoContent.Login {
   right: 0;
   text-align: right;
   padding: 0 40px 60px 150px;
 }
 
-.infoContent.loginInfo .animation {
+.infoContent.Login .animation {
   transform: translateX(0);
   transition: 0.7s ease;
   transition-delay: calc(0.1s * var(--S));
@@ -207,21 +207,21 @@
   filter: blur(0px);
 }
 
-.container.active .infoContent.loginInfo .animation {
+.container.active .infoContent.Login .animation {
   transform: translateX(120%);
   opacity: 0;
   filter: blur(10px);
   transition-delay: calc(0.1s * var(--D));
 }
 
-.infoContent.registerInfo {
+.infoContent.Register {
   left: 0;
   text-align: left;
   padding: 0 150px 60px 38px;
   pointer-events: none;
 }
 
-.infoContent.registerInfo .animation {
+.infoContent.Register .animation {
   transform: translateX(-120%);
   transition: 0.7s ease;
   opacity: 0;
@@ -229,7 +229,7 @@
   transition-delay: calc(0.1s * var(--S));
 }
 
-.container.active .infoContent.registerInfo .animation {
+.container.active .infoContent.Register .animation {
   transform: translateX(0%);
   opacity: 1;
   filter: blur(0);
@@ -254,7 +254,7 @@
   top: -5px;
   height: 600px;
   width: 850px;
-  background: linear-gradient(45deg, #25252b, #e46033);
+  background: linear-gradient(45deg, #25252b, #1ABCD7);
   transform: rotate(10deg) skewY(40deg);
   transform-origin: bottom right;
   transition: 1.5s ease;
@@ -273,7 +273,7 @@
   height: 700px;
   width: 850px;
   background: #25252b;
-  border-top: 3px solid #e46033;
+  border-top: 3px solid #1ABCD7;
   transform: rotate(0deg) skewY(0deg);
   transform-origin: bottom left;
   transition: 1.5s ease;
@@ -292,13 +292,13 @@
     height: 500px;
   }
 
-  .formBox.login,
-  .formBox.register {
+  .formBox.Login,
+  .formBox.Register {
     padding: 0 20px;
   }
 
-  .infoContent.loginInfo,
-  .infoContent.registerInfo {
+  .infoContent.Login,
+  .infoContent.Register {
     padding: 0 20px;
   }
 }
