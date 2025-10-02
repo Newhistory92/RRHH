@@ -658,3 +658,38 @@ tuvoProblemasSalariales: boolean;
 tuvoCambioDeJefe: boolean; 
 solicitoOtrosPuestos: boolean;
 }
+
+export interface DepartmentAnalysis {
+  name: string;
+  employees: number;
+  avgProductivity: number;
+  avgSatisfaction: number;
+  turnoverRisk: 'Bajo' | 'Medio' | 'Alto' | 'Crítico';
+  turnoverScore: number;
+  productivityTrend: 'up' | 'down' | 'stable';
+  predictedPeaks: string[];
+  recommendations: string[];
+  keyInsights: string[];
+  riskFactors: string[];
+  color: string;
+  skillsGap?: skillsGap[];
+}
+export interface  skillsGap {
+    id: number
+    nombre: string
+    nivel: string
+  };
+
+export interface BaseMetrics {
+  avgProductivity: number;
+  avgSatisfaction: number;
+  turnoverScore: number;
+  turnoverRisk: 'Bajo' | 'Medio' | 'Alto' | 'Crítico';
+  productivityTrend: 'up' | 'down' | 'stable';
+  color: string;
+  licenseIncrease: number;
+  predictedPeaks: string[];
+  recommendations: string[];
+  keyInsights: string[];
+  riskFactors: string[];
+}

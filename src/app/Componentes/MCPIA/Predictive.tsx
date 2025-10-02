@@ -1,441 +1,206 @@
-
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, TrendingUp, TrendingDown, AlertTriangle, Users, Activity, Calendar, Target, Brain, Zap } from 'lucide-react';
-import { DEPARTMENTS, EMPLOYEES_DATA} from '@/app/api/prueba2'; // Datos de ejemplo
-import { Employee } from '@/app/Interfas/Interfaces'; 
+import { ArrowLeft, AlertTriangle, Users,   Target, Brain, Zap, CheckCircle, Lightbulb, ShieldAlert } from 'lucide-react';
+import { EMPLOYEES_DATA } from '@/app/api/prueba2';
+import {  DepartmentAnalysis } from '@/app/Interfas/Interfaces';
+import { StatCard,RiskBadge,InfoList} from '@/app/util/UiRRHH';
+import { ProgressBar } from 'primereact/progressbar';
+                
+
 type PredictiveAnalysisProps = {
   onBack: () => void;
 };
-interface DepartmentAnalysis {
-  name: string;
-  employees: number;
-  avgProductivity: number;
-  avgSatisfaction: number;
-  turnoverRisk: 'Bajo' | 'Medio' | 'Alto' | 'Crítico';
-  turnoverScore: number;
-  productivityTrend: 'up' | 'down' | 'stable';
-  predictedPeaks: string[];
-  recommendations: string[];
-  keyInsights: string[];
-  riskFactors: string[];
-  color: string;
-}
 
 export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) {
   const [analysis, setAnalysis] = useState<DepartmentAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedDept, setSelectedDept] = useState<string | null>(null);
-
+ console.log(analysis)
   useEffect(() => {
     const fetchPredictiveAnalysis = async () => {
       setLoading(true);
       
-    const response = await fetch('/api/mcp/predictive-analysis', {
-    method: 'POST',
-    body: JSON.stringify({ 
-      employees: EMPLOYEES_DATA,
-      departments: DEPARTMENTS 
-    })
-  });
-  const mockAnalysis = generatePredictiveAnalysis();
-      
-      setTimeout(() => {
-        setAnalysis(mockAnalysis);
+      try {
+        const response = await fetch('/api/predictive-analysis', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            employees:EMPLOYEES_DATA,
+            analysisType: 'full',
+            timeframe: '3months'
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Error en el análisis predictivo');
+        }
+
+        const result = await response.json();
+        
+        if (result.success) {
+          setAnalysis(result.data.departments);
+        } 
+      } catch (error) {
+        console.error('Error fetching analysis:', error);
+      } finally {
         setLoading(false);
-      }, 1500);
-  //      const aiAnalysis = await response.json();
-  // setAnalysis(aiAnalysis);
-  setLoading(false);
+      }
     };
 
     fetchPredictiveAnalysis();
   }, []);
 
-  // Función que simula análisis predictivo con IA
-  const generatePredictiveAnalysis = (): DepartmentAnalysis[] => {
-    // Datos de ejemplo basados en tu estructura
-    const mockEmployees: Employee[] = EMPLOYEES_DATA;
-
-    // Agrupar por departamento
-    const deptMap = new Map<string, Employee[]>();
-    mockEmployees.forEach(emp => {
-      if (!deptMap.has(emp.department)) {
-        deptMap.set(emp.department, []);
-      }
-      deptMap.get(emp.department)?.push(emp);
-    });
-
-    // Analizar cada departamento
-    const results: DepartmentAnalysis[] = [];
-    
-    deptMap.forEach((employees, deptName) => {
-      // Calcular métricas agregadas
-      const avgProductivity = employees.reduce((sum, e) => sum + e.productivityScore, 0) / employees.length;
-      const avgSatisfaction = employees.reduce((sum, e) => sum + e.satisfactionMetrics.overallSatisfaction, 0) / employees.length;
-      
-      // Calcular tendencia de licencias (indicador de burnout/rotación)
-      const avgLicenses2024 = employees.reduce((sum, e) => sum + e.licenses['2024'], 0) / employees.length;
-      const avgLicenses2023 = employees.reduce((sum, e) => sum + e.licenses['2023'], 0) / employees.length;
-      const licenseIncrease = ((avgLicenses2024 - avgLicenses2023) / avgLicenses2023) * 100;
-      
-      // Score de riesgo de rotación (0-100)
-      const turnoverScore = calculateTurnoverRisk(employees, avgSatisfaction, licenseIncrease);
-      
-      // Determinar nivel de riesgo
-      let turnoverRisk: 'Bajo' | 'Medio' | 'Alto' | 'Crítico';
-      let color: string;
-      
-      if (turnoverScore < 30) {
-        turnoverRisk = 'Bajo';
-        color = 'border-green-500';
-      } else if (turnoverScore < 50) {
-        turnoverRisk = 'Medio';
-        color = 'border-yellow-500';
-      } else if (turnoverScore < 75) {
-        turnoverRisk = 'Alto';
-        color = 'border-orange-500';
-      } else {
-        turnoverRisk = 'Crítico';
-        color = 'border-red-500';
-      }
-
-      // Tendencia de productividad
-      const productivityTrend = avgProductivity > 8.5 ? 'up' : avgProductivity < 7 ? 'down' : 'stable';
-
-      // Predicciones de picos de productividad
-      const predictedPeaks = predictProductivityPeaks(employees);
-
-      // Generar recomendaciones con IA
-      const recommendations = generateAIRecommendations(
-        deptName,
-        turnoverScore,
-        avgProductivity,
-        avgSatisfaction,
-        employees
-      );
-
-      // Insights clave
-      const keyInsights = generateKeyInsights(employees, avgSatisfaction, licenseIncrease);
-
-      // Factores de riesgo
-      const riskFactors = identifyRiskFactors(employees, avgSatisfaction);
-
-      results.push({
-        name: deptName,
-        employees: employees.length,
-        avgProductivity: Math.round(avgProductivity * 10) / 10,
-        avgSatisfaction: Math.round(avgSatisfaction * 10) / 10,
-        turnoverRisk,
-        turnoverScore: Math.round(turnoverScore),
-        productivityTrend,
-        predictedPeaks,
-        recommendations,
-        keyInsights,
-        riskFactors,
-        color
-      });
-    });
-
-    return results;
-  };
-
-  // Algoritmo de cálculo de riesgo de rotación
-  const calculateTurnoverRisk = (
-    employees: Employee[],
-    avgSatisfaction: number,
-    licenseIncrease: number
-  ): number => {
-    let score = 0;
-
-    // Factor 1: Satisfacción baja (peso: 35%)
-    if (avgSatisfaction < 6) score += 35;
-    else if (avgSatisfaction < 7) score += 25;
-    else if (avgSatisfaction < 8) score += 15;
-
-    // Factor 2: Aumento de licencias (peso: 25%)
-    if (licenseIncrease > 100) score += 25;
-    else if (licenseIncrease > 50) score += 15;
-    else if (licenseIncrease > 25) score += 10;
-
-    // Factor 3: Productividad baja (peso: 20%)
-    const lowProductivityCount = employees.filter(e => e.productivityScore < 7).length;
-    const lowProdPercentage = (lowProductivityCount / employees.length) * 100;
-    if (lowProdPercentage > 50) score += 20;
-    else if (lowProdPercentage > 30) score += 12;
-
-    // Factor 4: Work-life balance bajo (peso: 20%)
-    const avgWorkLife = employees.reduce((sum, e) => sum + e.satisfactionMetrics.workLifeBalance, 0) / employees.length;
-    if (avgWorkLife < 5) score += 20;
-    else if (avgWorkLife < 6) score += 12;
-    else if (avgWorkLife < 7) score += 8;
-
-    return Math.min(score, 100);
-  };
-
-  // Predecir picos de productividad basados en patrones históricos
-  const predictProductivityPeaks = (employees: Employee[]): string[] => {
-    // Análisis simplificado - en producción usarías ML
-    const peaks: string[] = [];
-    
-    // Ejemplo: detectar patrones estacionales
-    const currentMonth = new Date().getMonth();
-    
-    if (currentMonth < 3) {
-      peaks.push('Q2 2024 (Abril-Junio): Incremento esperado del 15%');
-    } else if (currentMonth < 6) {
-      peaks.push('Q3 2024 (Julio-Sept): Incremento esperado del 12%');
-    } else {
-      peaks.push('Q4 2024 (Oct-Dic): Incremento esperado del 20%');
-    }
-
-    return peaks;
-  };
-
-  // Generar recomendaciones con lógica de IA
-  const generateAIRecommendations = (
-    dept: string,
-    turnoverScore: number,
-    productivity: number,
-    satisfaction: number,
-    employees: Employee[]
-  ): string[] => {
-    const recs: string[] = [];
-
-    if (turnoverScore > 50) {
-      recs.push('🚨 URGENTE: Implementar plan de retención inmediato. Realizar entrevistas 1:1 con empleados clave.');
-    }
-
-    if (satisfaction < 7) {
-      recs.push('💬 Realizar encuesta de clima laboral profunda para identificar causas específicas de insatisfacción.');
-      recs.push('🎯 Establecer programa de mejora de satisfacción con objetivos medibles.');
-    }
-
-    if (productivity < 8) {
-      recs.push('📈 Implementar programa de capacitación técnica y metodologías ágiles.');
-      recs.push('⚡ Revisar cargas de trabajo y redistribuir tareas para optimizar rendimiento.');
-    }
-
-    const avgWorkLife = employees.reduce((sum, e) => sum + e.satisfactionMetrics.workLifeBalance, 0) / employees.length;
-    if (avgWorkLife < 6) {
-      recs.push('⏰ Implementar políticas de flexibilidad horaria y trabajo remoto.');
-    }
-
-    const avgCareerGrowth = employees.reduce((sum, e) => sum + e.satisfactionMetrics.careerGrowthSatisfaction, 0) / employees.length;
-    if (avgCareerGrowth < 7) {
-      recs.push('🎓 Desarrollar plan de carrera claro con oportunidades de crecimiento visible.');
-    }
-
-    return recs;
-  };
-
-  // Generar insights clave
-  const generateKeyInsights = (
-    employees: Employee[],
-    avgSatisfaction: number,
-    licenseIncrease: number
-  ): string[] => {
-    const insights: string[] = [];
-
-    if (licenseIncrease > 50) {
-      insights.push(`Aumento del ${Math.round(licenseIncrease)}% en licencias vs. año anterior - posible indicador de burnout`);
-    }
-
-    const highPerformers = employees.filter(e => e.productivityScore > 9).length;
-    if (highPerformers > 0) {
-      insights.push(`${highPerformers} empleados de alto rendimiento identificados - priorizar su retención`);
-    }
-
-    const lowSatisfaction = employees.filter(e => e.satisfactionMetrics.overallSatisfaction < 6).length;
-    if (lowSatisfaction > 0) {
-      insights.push(`${lowSatisfaction} empleados con satisfacción crítica (<6/10) - requieren atención inmediata`);
-    }
-
-    return insights;
-  };
-
-  // Identificar factores de riesgo
-  const identifyRiskFactors = (
-    employees: Employee[],
-    avgSatisfaction: number
-  ): string[] => {
-    const risks: string[] = [];
-
-    if (avgSatisfaction < 7) {
-      risks.push('Baja satisfacción general del equipo');
-    }
-
-    const highAbsences = employees.filter(e => e.absences['2024'] > 5).length;
-    if (highAbsences > employees.length * 0.3) {
-      risks.push('Alto índice de ausentismo (>30% del equipo)');
-    }
-
-    const lowTeamSatisfaction = employees.filter(e => e.satisfactionMetrics.teamSatisfaction < 6).length;
-    if (lowTeamSatisfaction > 0) {
-      risks.push('Problemas de cohesión de equipo detectados');
-    }
-
-    return risks;
-  };
-
-  const getRiskIcon = (risk: string) => {
-    switch (risk) {
-      case 'Crítico':
-        return <AlertTriangle className="text-red-500" size={20} />;
-      case 'Alto':
-        return <TrendingDown className="text-orange-500" size={20} />;
-      case 'Medio':
-        return <Activity className="text-yellow-500" size={20} />;
-      default:
-        return <TrendingUp className="text-green-500" size={20} />;
-    }
-  };
-
   if (loading) {
     return (
-      <div className="animate-fade-in flex items-center justify-center h-96">
+      <div className="bg-slate-50 dark:bg-slate-900 flex items-center justify-center min-h-screen p-4">
         <div className="text-center">
-          <Brain className="w-16 h-16 text-blue-500 animate-pulse mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Analizando datos con IA...</p>
+          <Brain className="w-20 h-20 text-cyan-500 animate-pulse mx-auto mb-6" />
+          <h2 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">Analizando Datos con IA</h2>
+          <p className="text-slate-500 dark:text-slate-400">Procesando patrones y generando predicciones...</p>
         </div>
       </div>
     );
   }
 
+
   return (
-    <div className="animate-fade-in">
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6 transition-colors"
-      >
-        <ArrowLeft size={20} />
-        Volver
-      </button>
-
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Zap className="text-blue-500" size={32} />
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Análisis Predictivo con IA</h2>
-        </div>
-        <p className="text-gray-500 dark:text-gray-400">
-          Predicción de rotación de personal y picos de productividad basados en datos históricos y machine learning
-        </p>
-      </div>
-
-      {/* Resumen ejecutivo */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <Users className="text-blue-600 dark:text-blue-400" size={24} />
-            <span className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-              {analysis.reduce((sum, d) => sum + d.employees, 0)}
-            </span>
+    <div className="bg-slate-50 dark:bg-slate-900 min-h-screen p-4 sm:p-6 lg:p-8 font-sans">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="bg-cyan-100 dark:bg-cyan-900/50 p-2 rounded-lg">
+                <Zap className="text-[#1ABCD7]" size={28} />
+              </div>
+              <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Análisis Predictivo de Riesgos</h1>
+            </div>
+            <p className="text-slate-500 dark:text-slate-400">
+              Predicción de rotación y productividad con IA para una gestión proactiva.
+            </p>
           </div>
-          <p className="text-sm text-blue-800 dark:text-blue-300">Empleados Analizados</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 p-4 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <AlertTriangle className="text-red-600 dark:text-red-400" size={24} />
-            <span className="text-2xl font-bold text-red-900 dark:text-red-100">
-              {analysis.filter(d => d.turnoverRisk === 'Alto' || d.turnoverRisk === 'Crítico').length}
-            </span>
-          </div>
-          <p className="text-sm text-red-800 dark:text-red-300">Departamentos en Riesgo</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <Target className="text-green-600 dark:text-green-400" size={24} />
-            <span className="text-2xl font-bold text-green-900 dark:text-green-100">
-              {Math.round(analysis.reduce((sum, d) => sum + d.avgProductivity, 0) / analysis.length * 10) / 10}
-            </span>
-          </div>
-          <p className="text-sm text-green-800 dark:text-green-300">Productividad Promedio</p>
-        </div>
-      </div>
-
-      {/* Análisis por departamento */}
-      <div className="space-y-6">
-        {analysis.map((dept) => (
-          <div
-            key={dept.name}
-            className={`bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-l-4 ${dept.color} transition-all hover:shadow-lg`}
+          <button
+            onClick={onBack}
+            className="flex items-center justify-center gap-2 text-sm font-semibold border-2 border-[#2ecbe7] text-[#1ABCD7] px-4 py-2 rounded-lg transition-all hover:bg-[#2ecbe7] hover:text-white self-start sm:self-center"
           >
-            {/* Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="font-bold text-xl mb-1 text-gray-800 dark:text-white">{dept.name}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {dept.employees} empleados • Productividad: {dept.avgProductivity}/10 • Satisfacción: {dept.avgSatisfaction}/10
-                </p>
-              </div>
-              <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
-                {getRiskIcon(dept.turnoverRisk)}
-                <span className="font-semibold text-sm">{dept.turnoverRisk}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">({dept.turnoverScore}%)</span>
+            <ArrowLeft size={16} />
+            Volver al Dashboard
+          </button>
+        </div>
+
+        {/* Resumen Ejecutivo con StatCards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+          {/* <StatCard 
+            icon={<Users size={24} className="text-cyan-500" />}
+            title="Departamentos Analizados"
+            value={analysis.reduce((sum, d) => sum + d.employees, 0)}
+            colorClass="bg-cyan-100 dark:bg-cyan-900/50"
+          /> */}
+          <StatCard 
+            icon={<Users size={24} className="text-cyan-500" />}
+            title="Empleados Analizados"
+            value={analysis.reduce((sum, d) => sum + d.employees, 0)}
+            colorClass="bg-cyan-100 dark:bg-cyan-900/50"
+          />
+          <StatCard 
+            icon={<AlertTriangle size={24} className="text-red-500" />}
+            title="Departamentos en Riesgo"
+            value={analysis.filter(d => d.turnoverRisk === 'Alto' || d.turnoverRisk === 'Crítico').length}
+            colorClass="bg-red-100 dark:bg-red-900/50"
+          />
+          <StatCard 
+            icon={<Target size={24} className="text-green-500" />}
+            title="Productividad Promedio"
+            value={`${(analysis.reduce((sum, d) => sum + d.avgProductivity, 0) / analysis.length).toFixed(1)}/10`}
+            colorClass="bg-green-100 dark:bg-green-900/50"
+          />
+        </div>
+
+        {/* Listado de Análisis por Departamento */}
+        <div className="space-y-6">
+          {analysis.map((dept) => (
+            <div
+              key={dept.name}
+              className="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 transition-all hover:shadow-xl hover:border-[#2ecbe7] overflow-hidden"
+            >
+              <div className={`h-2 w-full bg-${dept.color}-500`}></div>
+              <div className="p-6">
+                {/* Header de la tarjeta */}
+                <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4 mb-6">
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1">{dept.name}</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      {dept.employees} empleados
+                    </p>
+                  </div>
+                  <RiskBadge risk={dept.turnoverRisk} score={dept.turnoverScore} />
+                </div>
+
+                {/* Métricas clave con barras de progreso */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
+  <div>
+    <div className="flex justify-between items-baseline mb-1">
+      <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Productividad</span>
+      <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
+        {dept.avgProductivity} / 10
+      </span>
+    </div>
+
+    <ProgressBar
+      value={dept.avgProductivity * 10} // Escalamos 1-10 -> 0-100
+      showValue={false} // ocultamos el % para que no muestre "80%"
+      className="h-3"
+    />
+  </div>
+
+  <div>
+    <div className="flex justify-between items-baseline mb-1">
+      <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Satisfacción</span>
+      <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
+        {dept.avgSatisfaction} / 10
+      </span>
+    </div>
+
+    <ProgressBar
+      value={dept.avgSatisfaction * 10}
+      showValue={false}
+      className="h-3"
+    />
+  </div>
+</div>
+{dept.skillsGap && dept.skillsGap.length > 0 && (
+  <div className="col-span-2 mt-4 mb-3">
+    <h4 className="text-sm font-semibold text-red-600 dark:text-red-400 mb-2">
+      Brechas de Habilidades Detectadas
+    </h4>
+    <ul className="list-disc pl-5 text-sm text-slate-700 dark:text-slate-300">
+      {dept.skillsGap.map((skill, idx) => (
+        <li key={idx}>{skill.nombre} (nivel {skill.nivel})</li>
+      ))}
+    </ul>
+  </div>
+)}
+
+
+                {/* Detalles del análisis */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 border-t border-slate-200 dark:border-slate-700 pt-6">
+                  {dept.riskFactors.length > 0 && <InfoList title="Factores de Riesgo" items={dept.riskFactors} icon={<ShieldAlert/>} colorClass="text-orange-500" />}
+                  {dept.keyInsights.length > 0 && <InfoList title="Perspectivas Clave" items={dept.keyInsights} icon={<Lightbulb/>} colorClass="text-yellow-500" />}
+                  {dept.recommendations.length > 0 && <InfoList title="Recomendaciones IA" items={dept.recommendations} icon={<CheckCircle/>} colorClass="text-cyan-500" />}
+                </div>
               </div>
             </div>
+          ))}
+        </div>
 
-            {/* Factores de riesgo */}
-            {dept.riskFactors.length > 0 && (
-              <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                <p className="text-sm font-semibold text-red-800 dark:text-red-300 mb-2">⚠️ Factores de Riesgo Detectados:</p>
-                <ul className="text-sm text-red-700 dark:text-red-300 space-y-1">
-                  {dept.riskFactors.map((risk, idx) => (
-                    <li key={idx}>• {risk}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Insights clave */}
-            {dept.keyInsights.length > 0 && (
-              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                <p className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">💡 Insights Clave:</p>
-                <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-                  {dept.keyInsights.map((insight, idx) => (
-                    <li key={idx}>• {insight}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Picos de productividad predichos */}
-            <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar className="text-green-600 dark:text-green-400" size={16} />
-                <p className="text-sm font-semibold text-green-800 dark:text-green-300">Picos de Productividad Predichos:</p>
-              </div>
-              <ul className="text-sm text-green-700 dark:text-green-300 space-y-1">
-                {dept.predictedPeaks.map((peak, idx) => (
-                  <li key={idx}>• {peak}</li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Recomendaciones de IA */}
-            <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Brain className="text-purple-600 dark:text-purple-400" size={16} />
-                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Recomendaciones de IA:</p>
-              </div>
-              <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2">
-                {dept.recommendations.map((rec, idx) => (
-                  <li key={idx} className="leading-relaxed">• {rec}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Footer con metodología */}
-      <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <p className="text-xs text-gray-600 dark:text-gray-400">
-          <strong>Metodología:</strong> El análisis predictivo se basa en algoritmos de machine learning que evalúan 15+ variables incluyendo: 
-          satisfacción laboral, productividad histórica, ausentismo, licencias, evaluaciones de desempeño, habilidades blandas y patrones estacionales. 
-          El score de riesgo de rotación se calcula con un modelo ponderado validado contra datos históricos.
-        </p>
+        {/* Footer */}
+        <div className="mt-12 p-5 text-center bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl mx-auto">
+            <strong>Metodología:</strong> El análisis se basa en un modelo de IA que evalúa 15+ variables, incluyendo satisfacción, productividad histórica, ausentismo, y evaluaciones de desempeño. La precisión del modelo se re-evalúa continuamente con nuevos datos.
+          </p>
+        </div>
       </div>
     </div>
   );

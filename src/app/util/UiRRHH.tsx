@@ -1,12 +1,13 @@
-import { ReactNode } from 'react';
+import { ReactElement, ReactNode } from 'react';
 import Image from "next/image";
 import { Tag} from 'primereact/tag';        
 import {TechnicalSkill,Employee,Skill} from '@/app/Interfas/Interfaces';
 import { Card } from 'primereact/card';
 import { ProgressBar } from 'primereact/progressbar';
 import { Button } from 'primereact/button';
-import { Camera } from "lucide-react";
+import { Camera,CheckCircle, Activity, TrendingDown, AlertTriangle } from "lucide-react";
 import { useRef, ChangeEvent } from "react";
+import React from 'react';
 interface Department {
   habilidades_requeridas?: TechnicalSkill[];
 }
@@ -29,6 +30,28 @@ export interface ProfilePictureUploaderProps {
     isEditing: boolean;
 }
 
+interface StatCardProps {
+  icon: ReactNode;
+  title: string;
+  value: string | number;
+  colorClass?: string;
+}
+
+type RiskLevel = "Bajo" | "Medio" | "Alto" | "Crítico";
+
+// Props para RiskBadge
+interface RiskBadgeProps {
+  risk: RiskLevel;
+  score: number;
+}
+
+
+interface InfoListProps {
+  title: string;
+  items: string[];
+  icon: ReactElement<{ className?: string }>;
+  colorClass: string;
+}
 export const StatusBadge = ({ status }: { status: string }) => {
   const baseClasses = "px-3 py-1 text-xs font-medium rounded-full inline-block";
   const statusClasses: Record<string, string> = {
@@ -277,4 +300,60 @@ export const SoftSkillBar = ({ skill, score }: { skill: string; score: number | 
             <div className={`${getScoreColor(score)} h-2.5 rounded-full`} style={{ width: `${(score || 0) * 10}%` }}></div>
         </div>
     </div>
+);
+
+
+
+export const StatCard: React.FC<StatCardProps> = ({ icon, title, value, colorClass }) => (
+  <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 transition-all hover:shadow-lg hover:border-cyan-400">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</p>
+        <p className="text-3xl font-bold text-slate-800 dark:text-slate-100">{value}</p>
+      </div>
+      <div className={`p-3 rounded-full ${colorClass}`}>
+        {icon}
+      </div>
+    </div>
+  </div>
+);
+
+export const RiskBadge: React.FC<RiskBadgeProps> = ({ risk, score }) => {
+  const riskStyles: Record<RiskLevel, string> = {
+    "Bajo": "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
+    "Medio": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300",
+    "Alto": "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
+    "Crítico": "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
+  };
+
+  return (
+    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${riskStyles[risk]}`}>
+      {risk === "Bajo" && <CheckCircle size={16} />}
+      {risk === "Medio" && <Activity size={16} />}
+      {risk === "Alto" && <TrendingDown size={16} />}
+      {risk === "Crítico" && <AlertTriangle size={16} />}
+      <span>{risk}</span>
+      <span className="font-mono text-xs opacity-70">({score}%)</span>
+    </div>
+  );
+};
+
+
+export const InfoList: React.FC<InfoListProps> = ({ title, items, icon, colorClass }) => (
+  <div>
+    <div className="flex items-center gap-2 mb-3">
+      {React.cloneElement(icon, { className: `w-5 h-5 ${colorClass}` })}
+      <h4 className="font-semibold text-slate-700 dark:text-slate-200">{title}</h4>
+    </div>
+    <ul className="space-y-2 pl-2">
+      {items.map((item, idx) => (
+        <li key={idx} className="flex items-start gap-3">
+          <span
+            className={`mt-1 w-1.5 h-1.5 rounded-full ${colorClass.replace("text-", "bg-")}`}
+          ></span>
+          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{item}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
 );
