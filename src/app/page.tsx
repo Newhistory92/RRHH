@@ -4,14 +4,14 @@ import { Header } from '@/app/Componentes/Navbar/Header';
 import { Sidebar } from '@/app/Componentes/Navbar/Sidebar';
 import  EstadisticasPage  from '@/app/pages/Estadisticas/page';
 import  RecursosHumanosPage  from '@/app/pages/RRHH/page';
-import { IAPage } from '@/app/pages/IA/page';
+import  IAPage  from '@/app/pages/IA/page';
 import  OrganigramaPage  from '@/app/pages/Organigrama/page';
 import EmployeeCV  from '@/app/pages/Cv/page';
 import LicenciasManage from '@/app/pages/LicenciasManage/page';
 import { PrimeReactProvider } from 'primereact/api';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import 'primeicons/primeicons.css';
-import { TestPage } from './pages/TestConfig/page';
+import  TestPage  from './pages/TestConfig/page';
 import FeedbackTab from './pages/Feedback/page';
 import { Page} from "@/app/Interfas/Interfaces";
 

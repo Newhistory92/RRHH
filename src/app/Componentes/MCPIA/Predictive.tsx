@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, AlertTriangle, Users,   Target, Brain, Zap, CheckCircle, Lightbulb, ShieldAlert } from 'lucide-react';
 import { EMPLOYEES_DATA } from '@/app/api/prueba2';
@@ -92,12 +92,6 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
 
         {/* Resumen Ejecutivo con StatCards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-          {/* <StatCard 
-            icon={<Users size={24} className="text-cyan-500" />}
-            title="Departamentos Analizados"
-            value={analysis.reduce((sum, d) => sum + d.employees, 0)}
-            colorClass="bg-cyan-100 dark:bg-cyan-900/50"
-          /> */}
           <StatCard 
             icon={<Users size={24} className="text-cyan-500" />}
             title="Empleados Analizados"
@@ -182,8 +176,6 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
     </ul>
   </div>
 )}
-
-
                 {/* Detalles del análisis */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 border-t border-slate-200 dark:border-slate-700 pt-6">
                   {dept.riskFactors.length > 0 && <InfoList title="Factores de Riesgo" items={dept.riskFactors} icon={<ShieldAlert/>} colorClass="text-orange-500" />}

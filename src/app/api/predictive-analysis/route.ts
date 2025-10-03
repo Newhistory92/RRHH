@@ -8,6 +8,7 @@ import { groupEmployeesByDepartment } from "@/app/lib/data-grouping";
 import { INTEGRATED_ORG_DATA } from "@/app/api/prueba2";
 import { Tool } from "ai";
 
+
 export async function POST(request: NextRequest) {
   let mcpClient = null;
 
@@ -28,7 +29,10 @@ export async function POST(request: NextRequest) {
       console.warn("⚠️ Cliente MCP no disponible, usando análisis local");
     }
 
-    const mcpTools: Record<string, Tool> = mcpClient ? await mcpClient.tools() : {};
+    const mcpTools: Record<string, Tool> = mcpClient
+  ? (await mcpClient.tools()) as Record<string, Tool>
+  : {};
+
 
     // Agrupar empleados por departamento
     const departmentGroups = groupEmployeesByDepartment(employees);

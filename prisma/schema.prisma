@@ -24,8 +24,6 @@ model User {
   employeeId  Int?      @unique
   employee    Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull, onUpdate: NoAction)
   role        Role      @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  approvedLicenses License[] @relation("ApprovedBy")
-  notifications   Notification[]
   roleId      Int
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -40,44 +38,32 @@ model Employee {
   dni             String    @unique
   name            String
   email           String    @unique
-  birthDate       DateTime?
+  birthDate       String?
   gender          String
   address         String?
-  city            String?
-  province        String?
   phone           String?
   photo           String?
   status          String    // Activo, Licencia, etc.
-  position        String
-  hireDate        DateTime?
-  ultimaCatChange   DateTime?
-  productivityScore Float?
-  horas             Float?
-  monthlyHours      String   @db.Text    // [{month: "Ene", hours: 5}, ...]
-  workSchedule      String   @db.Text    // { ingreso: "09:00", salida: "18:00" }
+  productivityScore Int?  // Puntuación de productividad general
+  horas             Float
   activo            Boolean  @default(true)
+  departmentId      Int
+  department      Department @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  office          Office?    @relation(fields: [officeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  officeId        Int?
   // Self-relation: jefe/subordinados
   managerId       Int?
   manager         Employee? @relation("Manages", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   subordinates    Employee[] @relation("Manages")
-
-  // FK de pertenencia a una oficina (OfficeEmployees). FK está en Employee.
-  officeId        Int?
-  office          Office?    @relation("OfficeEmployees", fields: [officeId], references: [id], onDelete: SetNull, onUpdate: NoAction)
-
-  // Relación inversa para cuando el empleado es jefe de alguna oficina (opuesto a Office.head)
-  headOfOffice    Office?    @relation("OfficeHead")
-
   // Relaciones
-  condicionesLaborales CondicionLaboral[]
+  cronograma      Horario?
+  condicionesLaborales CondicionLaboral
   messages       Message[]
   permissions    Permission[]
   certifications Certification[]
   skillStatuses  SkillStatus[]
   complaints     Complaint[]
   tasks          Task[]
-  department      Department @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  departmentId    Int
   softSkills      EmployeeSoftSkill[]
   technicalSkills EmployeeTechnicalSkill[]
   feedbacks       Feedback[]
@@ -102,42 +88,39 @@ model Employee {
 
 model Department {
   id             Int          @id @default(autoincrement())
-  name           String
+  nombre           String
   description    String?
-  hierarchyLevel Int
-  parentId       Int?
+  jefeId       Int?        @unique
+  jefe         Employee?   @relation("DepartmentHead", fields: [jefeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   nivelJerarquico Int?
-  // Self-relation parent/children — aquí agrego onDelete/onUpdate en la parte que define el parent
-  parent         Department?  @relation("Parent", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  children       Department[] @relation("Parent")
-  requiredSkills String       // Cambiado a String para SQL Server 2012
+  habilidades_requeridas String       // Cambiado a String para SQL Server 2012
   employees      Employee[]
   offices        Office[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
-  @@index([name])
-  @@index([parentId])
-  @@index([hierarchyLevel])
+  @@index([nombre])
+  @@index([jefeId ])
+  @@index([nivelJerarquico])
 }
 
 model Office {
   id             Int          @id @default(autoincrement())
-  name           String
+  nombre         String
   description    String?
   department     Department   @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   departmentId   Int
-  headId    Int?    @unique
-  head      Employee? @relation("OfficeHead", fields: [headId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  jefeId        Int? @unique
+  jefe         Employee? @relation("OfficeHead", fields: [jefeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   // Relación 1:N: muchos empleados pertenecen a una oficina
   employees      Employee[]   @relation("OfficeEmployees")
-  requiredSkills String
+ habilidades_requeridas String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
-  @@index([name])
+  @@index([nombre])
   @@index([departmentId])
-  @@index([headId])
+  @@index([jefeId ])
 }
 
 model TechnicalSkill {
@@ -176,22 +159,22 @@ model EmployeeTechnicalSkill {
 
 model SoftSkill {
   id          Int       @id @default(autoincrement())
-  name        String    @unique
+  nombre       String    @unique
   description String?
   employees   EmployeeSoftSkill[]
   feedbacks   Feedback[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  @@index([name])
+  @@index([nombre])
 }
 
 model EmployeeSoftSkill {
   id          Int      @id @default(autoincrement())
   employeeId  Int
   softSkillId Int
-  level       String?  // "Alto", "Medio", "Bajo" o puntuación
-  score       Int?
+  level       Int?  // "Alto", "Medio", "Bajo" o puntuación
+  SkillStatus SkillStatus? // locked/unlocked
   employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   softSkill   SoftSkill @relation(fields: [softSkillId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   createdAt   DateTime @default(now())
@@ -352,6 +335,7 @@ model Message {
   days        Int?
   startDate   DateTime?
   endDate     DateTime?
+  status      String    // active/inactive
   createdAt   DateTime  @default(now())
 }
 model Permission {
@@ -369,9 +353,11 @@ model Certification {
   employee     Employee  @relation(fields: [employeeId], references: [id])
   employeeId   Int
   name         String
-  issuingBody  String
+  institution  String
   issueDate    DateTime
+  validUntil   DateTime?
   attachment   String?
+  createdAt    DateTime  @default(now())
 }
 
 model SkillStatus {
@@ -389,6 +375,7 @@ model Complaint {
   employee    Employee  @relation(fields: [employeeId], references: [id])
   employeeId  Int
   reason      String
+  status      String   
   createdAt   DateTime @default(now())
 }
 
@@ -409,7 +396,13 @@ model CondicionLaboral {
   fechaPlanta                 DateTime?
   categoria                   String
   ultimaModificacionCategoria DateTime
-
+  position        String
   employeeId Int
   employee   Employee @relation(fields: [employeeId], references: [id])
+}
+
+model Horario {
+horaInicio Int
+horaFin Int
+horasTrabajo Int
 }

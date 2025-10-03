@@ -4,24 +4,12 @@ import { BarChart2, Users, BrainCircuit } from 'lucide-react';
 import PredictiveAnalysis from '@/app/Componentes/MCPIA/Predictive';
 import {HRChatbot} from '@/app/Componentes/MCPIA/HRChatbot';
 import {DepartmentOptimization} from '@/app/Componentes/MCPIA/DepartmentOptimization';
+import { Card } from 'primereact/card';
+        
 
 
-type CardProps = {
-  children: React.ReactNode;
-  onClick: () => void;
-};
+export default function IAPage() {
 
-const Card: React.FC<CardProps> = ({ children, onClick }) => (
-  <button
-    onClick={onClick}
-    className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-left w-full border dark:border-gray-700"
-  >
-    {children}
-  </button>
-);
-
-
-export const IAPage = () => {
   const [activeComponent, setActiveComponent] = useState<string | null>(null);
 
   const renderContent = () => {
