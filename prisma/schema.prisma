@@ -22,9 +22,10 @@ model User {
   email       String    @unique
   password    String
   employeeId  Int?      @unique
+  roleId      Int
   employee    Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull, onUpdate: NoAction)
   role        Role      @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  roleId      Int
+  licenciasSupervisadas License[] @relation("LicenseSupervisores")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -66,14 +67,13 @@ model Employee {
   tasks          Task[]
   softSkills      EmployeeSoftSkill[]
   technicalSkills EmployeeTechnicalSkill[]
-  feedbacks       Feedback[]
+  feedbacks   Feedback[]
   licenses        License[]
   academicRecords AcademicRecord[]
   workExperience  WorkExperience[]
   languages       Language[]
-  cv              Cv?
   user            User?     // Relación inversa con User
-  Absence Absence[]
+  Ausencia        Ausencia[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -82,7 +82,6 @@ model Employee {
   @@index([status])
   @@index([departmentId])
   @@index([managerId])
-  @@index([hireDate])
   @@index([ name])
 }
 
@@ -125,15 +124,15 @@ model Office {
 
 model TechnicalSkill {
   id          Int       @id @default(autoincrement())
-  name        String    @unique
-  description String?
+  nombre      String    @unique
+  description String?    @db.Text
   testType    String?   // multiple-choice, case-study, etc.
   profession  String?   // Contador, Abogado, Desarrollador, etc.
-  employees   EmployeeTechnicalSkill[]
+  questions  Question[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  @@index([name])
+  @@index([nombre])
   @@index([profession])
 }
 
@@ -142,9 +141,7 @@ model EmployeeTechnicalSkill {
   employeeId       Int
   technicalSkillId Int
   level            String?   // "Alto", "Medio", "Bajo" o puntuación
-  score            Int?
-  certified        Boolean   @default(false)
-  certificationDate DateTime?
+  certified         Boolean   @default(false)
   employee         Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   technicalSkill   TechnicalSkill @relation(fields: [technicalSkillId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   createdAt        DateTime  @default(now())
@@ -160,12 +157,9 @@ model EmployeeTechnicalSkill {
 model SoftSkill {
   id          Int       @id @default(autoincrement())
   nombre       String    @unique
-  description String?
-  employees   EmployeeSoftSkill[]
-  feedbacks   Feedback[]
+  description String?    @db.Text
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-
   @@index([nombre])
 }
 
@@ -186,24 +180,62 @@ model EmployeeSoftSkill {
   @@index([level])
 }
 
+
+model Question {
+  id       Int   @id @default(autoincrement())
+  text     String  @db.Text
+  answers  Answer[] 
+   @@index([text])
+}
+
+model Answer {
+  id          Int   @id @default(autoincrement())
+  text        String @db.Text
+  isCorrect   Boolean  @default(false)
+  questionId  Int
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([text])
+  @@index([isCorrect])
+}
+
 model Feedback {
   id          Int       @id @default(autoincrement())
-  title       String
-  description String?
-  score       Int       // Ej: 1-5
-  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  employeeId  Int
-  softSkill   SoftSkill? @relation(fields: [softSkillId], references: [id], onDelete: SetNull, onUpdate: NoAction)
-  softSkillId Int?
-  givenBy     String    // Nombre del evaluador
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  evaluatorId    Int         // quién evalúa
+  evaluatedId    Int?        // empleado evaluado (puede ser nulo si evalúa oficina)
+  officeId       Int?        // oficina evaluada (si aplica)
+  departmentId   Int
+  softSkillId    Int         // habilidad evaluada
+  respuesta      Respuesta[]  // respuestas del cuestionario, ejemplo [0,1,0]
+  createdAt      DateTime    @default(now())
 
-  @@index([employeeId])
+  department     Department @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  evaluator      Employee    @relation("FeedbackEvaluator", fields: [evaluatorId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  evaluated      Employee?   @relation("FeedbackEvaluated", fields: [evaluatedId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  office         Office?     @relation(fields: [officeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  softSkill      SoftSkill   @relation(fields: [softSkillId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([evaluatorId])
+  @@index([evaluatedId])
+  @@index([officeId])
   @@index([softSkillId])
-  @@index([score])
   @@index([createdAt])
 }
+
+model Respuesta {
+  id         Int      @id @default(autoincrement())
+  feedbackId Int
+  malo      Int
+  bueno     Int
+  excelente Int
+  feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+
+  @@index([feedbackId])
+  @@index([malo])
+  @@index([bueno])
+  @@index([excelente])
+}
+
 
 model License {
   id           Int       @id @default(autoincrement())
@@ -211,17 +243,15 @@ model License {
   startDate    DateTime
   endDate      DateTime
   status       String
-  description  String?
   duracion     Int?
   mensajeOriginal  String   @db.Text
   // Relación directa: mantenemos Cascade (tiene sentido si borrás un empleado y sus licencias también deben borrarse)
   employee     Employee  @relation(fields: [employeeId], references: [id], onDelete:  NoAction, onUpdate: NoAction)
   employeeId   Int
-
-  // Relación indirecta: aprobado por un usuario
-  approvedBy   User? @relation("ApprovedBy", fields: [approvedById], references: [id], onDelete: SetNull, onUpdate: NoAction)
-  approvedById Int?
-
+  supervisores     User[]    @relation("LicenseSupervisores")
+  aprobaciones Aprobaciones[]
+  tiposDeLicencias  TiposLicencia[]
+  saldoDeLicencias    SaldoLicencias[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -229,16 +259,47 @@ model License {
   @@index([status])
   @@index([type])
   @@index([startDate, endDate])
-  @@index([approvedById])
 }
 
 
-model Absence {
+model TiposLicencia {
+  anio  Int @id
+  tipo String
+  cantidad Int
+  licenseId Int
+  license   License @relation(fields: [licenseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model SaldoLicencias {
+  anio  Int @id
+  tipo String
+  cantidad Int
+  licenseId Int
+  license   License @relation(fields: [licenseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+
+
+
+
+model Aprobaciones {
+  id           Int       @id @default(autoincrement())
+  licenseId    Int
+  license      License  @relation(fields: [licenseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  supervisorId Int
+  supervisor   Employee? @relation("Manages", fields: [supervisorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  fecha       DateTime @default(now())
+  accion      String
+  observacion String?
+ updatedAt   DateTime @updatedAt
+}
+model Ausencia {
   id          Int       @id @default(autoincrement())
   employee    Employee  @relation(fields: [employeeId], references: [id])
   employeeId  Int
-  year        Int
-  count       Int
+  fecha     DateTime
+  reason      String @db.Text
+  createdAt   DateTime  @default(now())
 }
 model Notification {
   id        Int      @id @default(autoincrement())
@@ -265,6 +326,7 @@ model AcademicRecord {
   startDate   DateTime
   endDate     DateTime?
   isCurrent   Boolean  @default(false)
+  attachment String? @db.Text
   employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   employeeId  Int
   createdAt   DateTime @default(now())
@@ -281,9 +343,10 @@ model Language {
   id           Int      @id @default(autoincrement())
   language     String
   level        String
-  certification String?
+  certification String? @db.Text
   employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   employeeId   Int
+  attachment String? @db.Text
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -314,18 +377,7 @@ model WorkExperience {
   @@index([startDate])
 }
 
-model Cv {
-  id          Int      @id @default(autoincrement())
-  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  employeeId  Int
-  status      String   // Pendiente, Aprobado
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 
-  @@index([employeeId])
-  @@index([status])
-  @@unique([employeeId])
-}
 
 model Message {
   id          Int       @id @default(autoincrement())
@@ -405,4 +457,5 @@ model Horario {
 horaInicio Int
 horaFin Int
 horasTrabajo Int
+employees    Employee[]
 }
