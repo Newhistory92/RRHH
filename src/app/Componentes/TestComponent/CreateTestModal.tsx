@@ -36,7 +36,7 @@ export const CreateTestModal: React.FC<CreateTestModalProps> = ({
     },
   ]);
   const [scenario, setScenario] = useState("");
-
+console.log(  questions)
 // Hook para generación con IA
   const { generateCaseStudy, isGenerating, setIsGenerating, error, clearError } = useCaseStudyGeneration();
 
