@@ -302,3 +302,25 @@
     padding: 0 20px;
   }
 }
+
+.errorText {
+  display: block;
+  color: #ef4444; /* Rojo brillante */
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  padding-left: 0.5rem;
+  animation: slideDown 0.3s ease;
+  font-weight: 500;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

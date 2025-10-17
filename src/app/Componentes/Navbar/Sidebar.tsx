@@ -6,9 +6,10 @@ interface SidebarProps {
   activePage: Page;
   setPage: (page: Page) => void;
   onCollapseChange?: (isCollapsed: boolean) => void;
+   userRole: string | null;
 }
 
-export const Sidebar = ({ activePage, setPage, onCollapseChange }: SidebarProps) => {
+export const Sidebar = ({ activePage, setPage, onCollapseChange, userRole }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleToggleCollapse = () => {
@@ -20,11 +21,11 @@ export const Sidebar = ({ activePage, setPage, onCollapseChange }: SidebarProps)
   };
 
   const navItems = [
-    { id: 'estadisticas' as Page, label: 'Estadísticas', icon: BarChart2 },
-    { id: 'recursos-humanos' as Page, label: 'Recursos Humanos', icon: Users },
-    { id: 'ia' as Page, label: 'Inteligencia Artificial', icon: BrainCircuit },
-    { id: 'organigrama' as Page, label: 'Organigrama', icon: GitMerge },
-    { id: 'test' as Page, label: 'Test', icon: ClipboardList },
+     { id: 'estadisticas' as Page, label: 'Estadísticas', icon: BarChart2, roles: ['RRHH'] },
+    { id: 'recursos-humanos' as Page, label: 'Recursos Humanos', icon: Users, roles: ['RRHH'] },
+    { id: 'ia' as Page, label: 'Inteligencia Artificial', icon: BrainCircuit, roles: ['RRHH'] },
+    { id: 'organigrama' as Page, label: 'Organigrama', icon: GitMerge, roles: ['RRHH'] },
+    { id: 'test' as Page, label: 'Test', icon: ClipboardList, roles: ['RRHH'] },
   ];
 
   return (
@@ -59,41 +60,49 @@ export const Sidebar = ({ activePage, setPage, onCollapseChange }: SidebarProps)
 
       {/* Navegación */}
       <nav className="flex-1 px-3 py-6 overflow-y-auto overflow-x-hidden">
-        <ul className="space-y-2">
-          {navItems.map(item => (
-            <li key={item.id}>
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setPage(item.id);
-                }}
-                className={`flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative ${
-                  activePage === item.id
-                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white hover:shadow-md'
-                } ${isCollapsed ? 'justify-center' : ''}`}
-                title={isCollapsed ? item.label : ''}
-              >
-                <item.icon 
-                  size={22} 
-                  className={`${activePage === item.id ? 'text-white' : 'text-gray-400 group-hover:text-cyan-400'} transition-colors duration-200 flex-shrink-0`}
-                />
-                {!isCollapsed && (
-                  <span className="ml-4 font-medium text-sm truncate">{item.label}</span>
-                )}
-                
-                {/* Tooltip cuando está colapsado */}
-                {isCollapsed && (
-                  <div className="absolute left-full ml-6 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap shadow-xl border border-gray-700 z-50">
-                    {item.label}
-                    <div className="absolute top-1/2 -left-2 -translate-y-1/2 border-8 border-transparent border-r-gray-800"></div>
-                  </div>
-                )}
-              </a>
-            </li>
-          ))}
-        </ul>
+        {navItems.length > 0 ? (
+          <ul className="space-y-2">
+  {navItems
+    .filter(item => !item.roles || item.roles.includes(userRole!)) // Solo mostrar si el rol coincide
+    .map(item => (
+      <li key={item.id}>
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            setPage(item.id);
+          }}
+          className={`flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative ${
+            activePage === item.id
+              ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30'
+              : 'text-gray-300 hover:bg-gray-800 hover:text-white hover:shadow-md'
+          } ${isCollapsed ? 'justify-center' : ''}`}
+          title={isCollapsed ? item.label : ''}
+        >
+          <item.icon 
+            size={22} 
+            className={`${activePage === item.id ? 'text-white' : 'text-gray-400 group-hover:text-cyan-400'} transition-colors duration-200 flex-shrink-0`}
+          />
+          {!isCollapsed && (
+            <span className="ml-4 font-medium text-sm truncate">{item.label}</span>
+          )}
+
+          {/* Tooltip cuando está colapsado */}
+          {isCollapsed && (
+            <div className="absolute left-full ml-6 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap shadow-xl border border-gray-700 z-50">
+              {item.label}
+              <div className="absolute top-1/2 -left-2 -translate-y-1/2 border-8 border-transparent border-r-gray-800"></div>
+            </div>
+          )}
+        </a>
+      </li>
+    ))}
+</ul>
+        ) : (
+          <div className="text-center text-gray-500 text-sm py-4">
+            <p>No hay páginas disponibles</p>
+          </div>
+        )}
       </nav>
 
       {/* Footer */}
@@ -104,13 +113,13 @@ export const Sidebar = ({ activePage, setPage, onCollapseChange }: SidebarProps)
             <p className="text-xs text-gray-500">&copy; 2025 Todos los derechos reservados</p>
           </div>
         ) : (
-           <Image
-                    src="/LogoAlone.webp"
-                    alt="Logo"
-                    width={100}
-                    height={100}
-                    className="mr-2"
-                  />
+          <Image
+            src="/LogoAlone.webp"
+            alt="Logo"
+            width={40}
+            height={40}
+            className="mx-auto"
+          />
         )}
       </div>
     </aside>

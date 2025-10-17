@@ -119,7 +119,7 @@ export interface Licenses {
   '2024': number;
   '2023': number;
   usuarios: Record<number, Usuario>
-   saldos: Saldo[]
+  saldos: Saldo[]
   history: LicenseHistory[];
 }
 

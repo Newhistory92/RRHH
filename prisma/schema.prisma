@@ -18,16 +18,18 @@ model Role {
 }
 
 model User {
-  id          Int       @id @default(autoincrement())
-  email       String    @unique
+  id          Int            @id @default(autoincrement())
+  usuario    String       @unique
+  email       String         @unique
   password    String
-  employeeId  Int?      @unique
-  roleId      Int
-  employee    Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull, onUpdate: NoAction)
-  role        Role      @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  licenciasSupervisadas License[] @relation("LicenseSupervisores")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  employeeId  Int?            @unique
+  roleId      Int?
+  employee    Employee?       @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  role        Role?           @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  notifications Notification[]
+  licenseSupervisores LicenseSupervisor[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
   @@index([email])
   @@index([employeeId])
@@ -35,117 +37,132 @@ model User {
 }
 
 model Employee {
-  id              Int       @id @default(autoincrement())
-  dni             String    @unique
-  name            String
-  email           String    @unique
-  birthDate       String?
-  gender          String
-  address         String?
-  phone           String?
-  photo           String?
-  status          String    // Activo, Licencia, etc.
-  productivityScore Int?  // Puntuación de productividad general
-  horas             Float
-  activo            Boolean  @default(true)
-  departmentId      Int
-  department      Department @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  office          Office?    @relation(fields: [officeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  officeId        Int?
+  id                    Int       @id @default(autoincrement())
+  dni                   String    @unique
+  name                  String
+  email                 String    @unique
+  birthDate             DateTime?
+  gender                String
+  address               String?
+  phone                 String?
+  photo                 String?
+  status                String    // Activo, Licencia, etc.
+  productivityScore     Int?      // Puntuación de productividad general
+  horas                 Float
+  activo                Boolean   @default(true)
+  departmentId          Int
+  department            Department @relation("DepartmentEmployees", fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  office                Office?   @relation("OfficeEmployees", fields: [officeId], references: [id],  onDelete: NoAction, onUpdate: NoAction)
+  officeId              Int?
   // Self-relation: jefe/subordinados
-  managerId       Int?
-  manager         Employee? @relation("Manages", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  subordinates    Employee[] @relation("Manages")
-  // Relaciones
-  cronograma      Horario?
-  condicionesLaborales CondicionLaboral
-  messages       Message[]
-  permissions    Permission[]
-  certifications Certification[]
-  skillStatuses  SkillStatus[]
-  complaints     Complaint[]
-  tasks          Task[]
-  softSkills      EmployeeSoftSkill[]
-  technicalSkills EmployeeTechnicalSkill[]
-  feedbacks   Feedback[]
-  licenses        License[]
-  academicRecords AcademicRecord[]
-  workExperience  WorkExperience[]
-  languages       Language[]
-  user            User?     // Relación inversa con User
-  Ausencia        Ausencia[]
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  managerId             Int?
+  manager               Employee? @relation("Manages", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subordinates          Employee[] @relation("Manages")
+  // Relación de jefatura de departamento (inversa)
+  departmentHead        Department? @relation("DepartmentHead")
+  // Relación de jefatura de oficina (inversa)
+  officeHead            Office? @relation("OfficeHead")
+  // Relaciones de horario
+  cronograma            Horario? @relation(fields: [cronogramaId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  cronogramaId          Int?
+  condicionesLaborales  CondicionLaboral?
+  messages              Message[]
+  permissions           Permission[]
+  certifications        Certification[]
+  skillStatuses         SkillStatus[]
+  complaints            Complaint[]
+  tasks                 Task[]
+  softSkills            EmployeeSoftSkill[]
+  technicalSkills       EmployeeTechnicalSkill[]
+  feedbacksGiven        Feedback[] @relation("FeedbackEvaluator")
+  feedbacksReceived     Feedback[] @relation("FeedbackEvaluated")
+  licenses              License[]
+  academicRecords       AcademicRecord[]
+  workExperience        WorkExperience[]
+  languages             Language[]
+  user                  User?     // Relación inversa con User
+  ausencias             Ausencia[]
+  aprobaciones          Aprobaciones[] @relation("LicenseApprover")
+  resenasDeRendimiento  ResenasDeRendimiento[]
+  satisfaccionMetrica   SatisfaccionMetrica?
+  criticalEvents        CriticalEvents[]
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   @@index([dni])
   @@index([email])
   @@index([status])
   @@index([departmentId])
   @@index([managerId])
-  @@index([ name])
+  @@index([name])
 }
 
 model Department {
-  id             Int          @id @default(autoincrement())
-  nombre           String
-  description    String?
-  jefeId       Int?        @unique
-  jefe         Employee?   @relation("DepartmentHead", fields: [jefeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  nivelJerarquico Int?
-  habilidades_requeridas String       // Cambiado a String para SQL Server 2012
-  employees      Employee[]
-  offices        Office[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id                     Int        @id @default(autoincrement())
+  nombre                 String
+  description            String?
+  jefeId                 Int?       @unique
+  nivelJerarquico        Int?
+  habilidades_requeridas String
+
+  jefe                   Employee?   @relation("DepartmentHead", fields: [jefeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  employees              Employee[]  @relation("DepartmentEmployees")
+  offices                Office[]
+  feedbacks              Feedback[]
+
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
 
   @@index([nombre])
-  @@index([jefeId ])
+  @@index([jefeId])
   @@index([nivelJerarquico])
 }
 
 model Office {
-  id             Int          @id @default(autoincrement())
-  nombre         String
-  description    String?
-  department     Department   @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  departmentId   Int
-  jefeId        Int? @unique
-  jefe         Employee? @relation("OfficeHead", fields: [jefeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  // Relación 1:N: muchos empleados pertenecen a una oficina
-  employees      Employee[]   @relation("OfficeEmployees")
- habilidades_requeridas String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id                     Int        @id @default(autoincrement())
+  nombre                 String
+  description            String?
+  departmentId           Int
+  jefeId                 Int?       @unique
+  habilidades_requeridas String
+
+  department             Department   @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  jefe                   Employee?    @relation("OfficeHead", fields: [jefeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  employees              Employee[]   @relation("OfficeEmployees")
+  feedbacks              Feedback[]
+
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
 
   @@index([nombre])
   @@index([departmentId])
-  @@index([jefeId ])
 }
 
 model TechnicalSkill {
-  id          Int       @id @default(autoincrement())
-  nombre      String    @unique
-  description String?    @db.Text
-  testType    String?   // multiple-choice, case-study, etc.
-  profession  String?   // Contador, Abogado, Desarrollador, etc.
-  questions  Question[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id                      Int       @id @default(autoincrement())
+  nombre                  String    @unique
+  description             String?   @db.Text
+  testType                String?   // multiple-choice, case-study, etc.
+  profession              String?   // Contador, Abogado, Desarrollador, etc.
+  questions               Question[]
+  employeeTechnicalSkills EmployeeTechnicalSkill[]
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 
   @@index([nombre])
   @@index([profession])
 }
 
 model EmployeeTechnicalSkill {
-  id               Int       @id @default(autoincrement())
+  id               Int            @id @default(autoincrement())
   employeeId       Int
   technicalSkillId Int
-  level            String?   // "Alto", "Medio", "Bajo" o puntuación
-  certified         Boolean   @default(false)
-  employee         Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  technicalSkill   TechnicalSkill @relation(fields: [technicalSkillId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  level            String?        // "Alto", "Medio", "Bajo" o puntuación
+  certified        Boolean        @default(false)
+  employee         Employee       @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  technicalSkill   TechnicalSkill @relation(fields: [technicalSkillId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
   @@unique([employeeId, technicalSkillId])
   @@index([employeeId])
@@ -155,24 +172,29 @@ model EmployeeTechnicalSkill {
 }
 
 model SoftSkill {
-  id          Int       @id @default(autoincrement())
-  nombre       String    @unique
-  description String?    @db.Text
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id                 Int                 @id @default(autoincrement())
+  nombre             String              @unique
+  description        String?             @db.Text
+  employeeSoftSkills EmployeeSoftSkill[]
+  feedbacks          Feedback[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
   @@index([nombre])
 }
 
 model EmployeeSoftSkill {
-  id          Int      @id @default(autoincrement())
-  employeeId  Int
-  softSkillId Int
-  level       Int?  // "Alto", "Medio", "Bajo" o puntuación
-  SkillStatus SkillStatus? // locked/unlocked
-  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  softSkill   SoftSkill @relation(fields: [softSkillId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            Int          @id @default(autoincrement())
+  employeeId    Int
+  softSkillId   Int
+  level         Int?         // puede representar "Alto", "Medio", "Bajo" o un valor numérico
+  skillStatusId Int?
+
+  employee      Employee     @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  softSkill     SoftSkill    @relation(fields: [softSkillId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  skillStatus   SkillStatus? @relation(fields: [skillStatusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
   @@unique([employeeId, softSkillId])
   @@index([employeeId])
@@ -180,44 +202,44 @@ model EmployeeSoftSkill {
   @@index([level])
 }
 
-
 model Question {
-  id       Int   @id @default(autoincrement())
-  text     String  @db.Text
-  answers  Answer[] 
-   @@index([text])
+  id                 Int             @id @default(autoincrement())
+  text               String          @db.Text
+  answers            Answer[] 
+  technicalSkillId   Int?
+  technicalSkill     TechnicalSkill? @relation(fields: [technicalSkillId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  
 }
 
 model Answer {
-  id          Int   @id @default(autoincrement())
-  text        String @db.Text
-  isCorrect   Boolean  @default(false)
-  questionId  Int
-  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  id         Int      @id @default(autoincrement())
+  text       String   @db.Text
+  isCorrect  Boolean  @default(false)
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@index([text])
+
   @@index([isCorrect])
 }
 
 model Feedback {
-  id          Int       @id @default(autoincrement())
-  evaluatorId    Int         // quién evalúa
-  evaluatedId    Int?        // empleado evaluado (puede ser nulo si evalúa oficina)
-  officeId       Int?        // oficina evaluada (si aplica)
-  departmentId   Int
-  softSkillId    Int         // habilidad evaluada
-  respuesta      Respuesta[]  // respuestas del cuestionario, ejemplo [0,1,0]
-  createdAt      DateTime    @default(now())
+  id           Int        @id @default(autoincrement())
+  evaluatorId  Int
+  evaluatedId  Int?
+  officeId     Int?
+  departmentId Int
+  softSkillId  Int
+  respuesta    Respuesta[]
+  createdAt    DateTime   @default(now())
 
-  department     Department @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  evaluator      Employee    @relation("FeedbackEvaluator", fields: [evaluatorId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  evaluated      Employee?   @relation("FeedbackEvaluated", fields: [evaluatedId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  office         Office?     @relation(fields: [officeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  softSkill      SoftSkill   @relation(fields: [softSkillId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  evaluator    Employee   @relation("FeedbackEvaluator", fields: [evaluatorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  evaluated    Employee?  @relation("FeedbackEvaluated", fields: [evaluatedId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  office       Office?    @relation(fields: [officeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  softSkill    SoftSkill  @relation(fields: [softSkillId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([evaluatorId])
   @@index([evaluatedId])
-  @@index([officeId])
   @@index([softSkillId])
   @@index([createdAt])
 }
@@ -225,10 +247,10 @@ model Feedback {
 model Respuesta {
   id         Int      @id @default(autoincrement())
   feedbackId Int
-  malo      Int
-  bueno     Int
-  excelente Int
-  feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  malo       Int
+  bueno      Int
+  excelente  Int
+  feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([feedbackId])
   @@index([malo])
@@ -236,24 +258,22 @@ model Respuesta {
   @@index([excelente])
 }
 
-
 model License {
-  id           Int       @id @default(autoincrement())
-  type         String
-  startDate    DateTime
-  endDate      DateTime
-  status       String
-  duracion     Int?
-  mensajeOriginal  String   @db.Text
-  // Relación directa: mantenemos Cascade (tiene sentido si borrás un empleado y sus licencias también deben borrarse)
-  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete:  NoAction, onUpdate: NoAction)
-  employeeId   Int
-  supervisores     User[]    @relation("LicenseSupervisores")
-  aprobaciones Aprobaciones[]
-  tiposDeLicencias  TiposLicencia[]
-  saldoDeLicencias    SaldoLicencias[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                    Int                     @id @default(autoincrement())
+  type                  String
+  startDate             DateTime
+  endDate               DateTime
+  status                String
+  duracion              Int?
+  mensajeOriginal       String                  @db.Text
+  employee              Employee                @relation(fields: [employeeId], references: [id],  onDelete: NoAction, onUpdate: NoAction)
+  employeeId            Int
+  supervisores          LicenseSupervisor[]
+  aprobaciones          Aprobaciones[]
+  configuracionLicencias ConfiguracionLicencias[]
+  consumoLicencias      ConsumoLicencias[]
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
 
   @@index([employeeId])
   @@index([status])
@@ -261,76 +281,114 @@ model License {
   @@index([startDate, endDate])
 }
 
+// Tabla intermedia para la relación many-to-many entre License y User
+model LicenseSupervisor {
+  id          Int      @id @default(autoincrement())
+  licenseId   Int
+  userId      Int
+  license     License  @relation(fields: [licenseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt   DateTime @default(now())
 
-model TiposLicencia {
-  anio  Int @id
-  tipo String
-  cantidad Int
-  licenseId Int
-  license   License @relation(fields: [licenseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  @@unique([licenseId, userId])
+  @@index([licenseId])
+  @@index([userId])
 }
 
-model SaldoLicencias {
-  anio  Int @id
-  tipo String
-  cantidad Int
-  licenseId Int
-  license   License @relation(fields: [licenseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+// OPTIMIZACIÓN: Configuración anual de licencias disponibles por tipo
+model ConfiguracionLicencias {
+  id         Int      @id @default(autoincrement())
+  anio       Int 
+  tipo       String
+  categoria  String
+  diasTotales Int     // Días totales disponibles por tipo de licencia
+  licenseId  Int
+  license    License  @relation(fields: [licenseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([licenseId, anio, tipo])
+  @@index([anio])
+  @@index([categoria])
+  @@index([tipo])
 }
 
+// OPTIMIZACIÓN: Registro de consumo de licencias
+model ConsumoLicencias {
+  id              Int      @id @default(autoincrement())
+  anio            Int 
+  tipo            String
+  diasConsumidos  Int      // Días consumidos de este tipo de licencia
+  licenseId       Int
+  license         License  @relation(fields: [licenseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  fechaConsumo    DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-
-
+  @@index([licenseId])
+  @@index([anio])
+  @@index([tipo])
+  @@index([fechaConsumo])
+}
 
 model Aprobaciones {
   id           Int       @id @default(autoincrement())
   licenseId    Int
-  license      License  @relation(fields: [licenseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  license      License   @relation(fields: [licenseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   supervisorId Int
-  supervisor   Employee? @relation("Manages", fields: [supervisorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  fecha       DateTime @default(now())
-  accion      String
-  observacion String?
- updatedAt   DateTime @updatedAt
+  supervisor   Employee? @relation("LicenseApprover", fields: [supervisorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  fecha        DateTime  @default(now())
+  accion       String
+  observacion  String?
+  updatedAt    DateTime  @updatedAt
+
+  @@index([licenseId])
+  @@index([supervisorId])
+  @@index([fecha])
 }
+
 model Ausencia {
-  id          Int       @id @default(autoincrement())
-  employee    Employee  @relation(fields: [employeeId], references: [id])
-  employeeId  Int
-  fecha     DateTime
-  reason      String @db.Text
-  createdAt   DateTime  @default(now())
+  id         Int      @id @default(autoincrement())
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employeeId Int
+  fecha      DateTime
+  reason     String   @db.Text
+  createdAt  DateTime @default(now())
+
+  @@index([employeeId])
+  @@index([fecha])
 }
+
 model Notification {
   id        Int      @id @default(autoincrement())
   text      String
-  type      String   // license_approval, system_alert, etc.
+  status    String   // license_approval, system_alert, etc.
   userId    Int?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 
   @@index([userId])
-  @@index([type])
+  @@index([status])
   @@index([isRead])
   @@index([createdAt])
 }
 
 model AcademicRecord {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   profession  String?
   title       String
   institution String
-  level       String   // Universitario, Secundario
-  status      String   // Completo, En curso
+  level       String    // Universitario, Secundario
+  status      String    // Completo, En curso
   startDate   DateTime
   endDate     DateTime?
-  isCurrent   Boolean  @default(false)
-  attachment String? @db.Text
-  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  isCurrent   Boolean   @default(false)
+  attachment  String?   @db.Text
+  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   employeeId  Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([employeeId])
   @@index([profession])
@@ -340,15 +398,15 @@ model AcademicRecord {
 }
 
 model Language {
-  id           Int      @id @default(autoincrement())
-  language     String
-  level        String
-  certification String? @db.Text
-  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  employeeId   Int
-  attachment String? @db.Text
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  language      String
+  level         String
+  certification String?  @db.Text
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employeeId    Int
+  attachment    String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([employeeId])
   @@index([language])
@@ -365,7 +423,7 @@ model WorkExperience {
   endDate      DateTime?
   isCurrent    Boolean   @default(false)
   contractType String?
-  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   employeeId   Int
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -377,85 +435,154 @@ model WorkExperience {
   @@index([startDate])
 }
 
-
-
 model Message {
-  id          Int       @id @default(autoincrement())
-  employee    Employee  @relation(fields: [employeeId], references: [id])
-  employeeId  Int
-  text        String
-  days        Int?
-  startDate   DateTime?
-  endDate     DateTime?
-  status      String    // active/inactive
-  createdAt   DateTime  @default(now())
+  id         Int       @id @default(autoincrement())
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employeeId Int
+  text       String
+  days       Int?
+  startDate  DateTime?
+  endDate    DateTime?
+  status     String    // active/inactive
+  createdAt  DateTime  @default(now())
+
+  @@index([employeeId])
+  @@index([status])
 }
+
 model Permission {
-  id          Int       @id @default(autoincrement())
-  employee    Employee  @relation(fields: [employeeId], references: [id])
-  employeeId  Int
-  date        DateTime
-  exitTime    String
-  returnTime  String
-  hours       Float
+  id         Int      @id @default(autoincrement())
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employeeId Int
+  date       DateTime
+  exitTime   String
+  returnTime String
+  hours      Float
+
+  @@index([employeeId])
+  @@index([date])
 }
 
 model Certification {
-  id           Int       @id @default(autoincrement())
-  employee     Employee  @relation(fields: [employeeId], references: [id])
-  employeeId   Int
-  name         String
-  institution  String
-  issueDate    DateTime
-  validUntil   DateTime?
-  attachment   String?
-  createdAt    DateTime  @default(now())
+  id          Int       @id @default(autoincrement())
+  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employeeId  Int
+  name        String
+  institution String
+  issueDate   DateTime
+  validUntil  DateTime?
+  attachment  String?
+  createdAt   DateTime  @default(now())
+
+  @@index([employeeId])
+  @@index([name])
+  @@index([issueDate])
 }
 
 model SkillStatus {
-  id         Int       @id @default(autoincrement())
-  employee   Employee  @relation(fields: [employeeId], references: [id])
-  employeeId Int
-  skillId    Int
-  status     String    // locked/unlocked
-  unlockDate DateTime?
+  id                 Int                 @id @default(autoincrement())
+  employee           Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employeeId         Int
+  skillId            Int
+  status             String              // locked/unlocked
+  employeeSoftSkills EmployeeSoftSkill[]
+  unlockDate         DateTime?
+
+  @@index([employeeId])
+  @@index([skillId])
+  @@index([status])
 }
 
-
 model Complaint {
-  id          Int       @id @default(autoincrement())
-  employee    Employee  @relation(fields: [employeeId], references: [id])
-  employeeId  Int
-  reason      String
-  status      String   
-  createdAt   DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employeeId Int
+  reason     String
+  status     String   
+  createdAt  DateTime @default(now())
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model Task {
-  id          Int       @id @default(autoincrement())
-  employee    Employee  @relation(fields: [employeeId], references: [id])
-  employeeId  Int
-  name        String
+  id           Int      @id @default(autoincrement())
+  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employeeId   Int
+  name         String
   productivity Float
+
+  @@index([employeeId])
+  @@index([name])
 }
 
-
-
 model CondicionLaboral {
-  id                          Int       @id @default(autoincrement())
-  tipoContrato                String
-  fechaIngreso                DateTime
-  fechaPlanta                 DateTime?
-  categoria                   String
-  ultimaModificacionCategoria DateTime
-  position        String
-  employeeId Int
-  employee   Employee @relation(fields: [employeeId], references: [id])
+  id           Int       @id @default(autoincrement())
+  tipoContrato String
+  fechaIngreso DateTime
+  fechaPlanta  DateTime?
+  categoria    String
+  position     String
+  employeeId   Int       @unique
+  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([employeeId])
 }
 
 model Horario {
-horaInicio Int
-horaFin Int
-horasTrabajo Int
-employees    Employee[]
+  id           Int        @id @default(autoincrement())
+  horaInicio   Int
+  horaFin      Int
+  horasTrabajo Int
+  employees    Employee[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model ResenasDeRendimiento {
+  id           Int      @id @default(autoincrement())
+  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employeeId   Int
+  period       String
+  score        Float
+  fortaleza    String?   
+  areademejora String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([employeeId])
+  @@index([period])
+  @@index([createdAt])
+}
+
+model SatisfaccionMetrica {
+  id                              Int      @id @default(autoincrement())
+  employee                        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employeeId                      Int      @unique
+  SatisfacciónGeneral             Int
+  SatisfacciónLaboral             Int
+  SatisfacciónEquipo              Int
+  SatisfacciónLiderazgo           Int
+  SatisfacciónCrecimientoCarrera  Int
+  FechaÚltimaEncuesta             DateTime
+  createdAt                       DateTime @default(now())
+  updatedAt                       DateTime @updatedAt
+
+  @@index([employeeId])
+  @@index([FechaÚltimaEncuesta])
+}
+
+model CriticalEvents {
+  id          Int      @id @default(autoincrement())
+  employeeId  Int
+  type        String
+  description String   @db.Text
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([employeeId])
+  @@index([type])
+  @@index([createdAt])
 }
