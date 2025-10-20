@@ -5,7 +5,7 @@ import {TechnicalSkill,Employee,Skill} from '@/app/Interfas/Interfaces';
 import { Card } from 'primereact/card';
 import { ProgressBar } from 'primereact/progressbar';
 import { Button } from 'primereact/button';
-import { Camera,CheckCircle, Activity, TrendingDown, AlertTriangle } from "lucide-react";
+import { Camera,CheckCircle, Activity, TrendingDown, AlertTriangle,Plus,SquarePen} from "lucide-react";
 import { useRef, ChangeEvent } from "react";
 import React from 'react';
 interface Department {
@@ -357,3 +357,166 @@ export const InfoList: React.FC<InfoListProps> = ({ title, items, icon, colorCla
     </ul>
   </div>
 );
+
+
+export const UsersTable = ({ users, onEdit, onToggleStatus }) => (
+    <div className="overflow-x-auto bg-gray-900/50 rounded-lg">
+        <table className="min-w-full text-sm text-left text-gray-300">
+            <thead className="bg-gray-700 text-xs uppercase font-semibold">
+                <tr>
+                    <th scope="col" className="px-6 py-3">Nombre</th>
+                    <th scope="col" className="px-6 py-3 hidden md:table-cell">DNI</th>
+                    <th scope="col" className="px-6 py-3 hidden lg:table-cell">Género</th>
+                    <th scope="col" className="px-6 py-3 hidden md:table-cell">Rol</th>
+                    <th scope="col" className="px-6 py-3 hidden sm:table-cell">Estado</th>
+                    <th scope="col" className="px-6 py-3 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {users.map(user => (
+                    <tr key={user.id} className="border-b border-gray-700 hover:bg-gray-700/50 transition">
+                        <td className="px-6 py-4 font-medium whitespace-nowrap">
+                            <div className="flex items-center space-x-3">
+                                <Image
+                                 className={`h-8 w-8 rounded-full object-cover ${user.status === 'inactive' ? 'filter grayscale' : ''}`}
+                                 src={user.avatar}
+                                 alt={user.name}
+                                 width={40}
+                                 height={40}
+                               
+                               />
+                                <span className={user.status === 'inactive' ? 'text-gray-400' : 'text-white'}>{user.name}</span>
+                            </div>
+                        </td>
+                        <td className={`px-6 py-4 hidden md:table-cell ${user.status === 'inactive' ? 'text-gray-400' : ''}`}>{user.dni}</td>
+                        <td className={`px-6 py-4 hidden lg:table-cell ${user.status === 'inactive' ? 'text-gray-400' : ''}`}>{user.gender}</td>
+                        <td className={`px-6 py-4 hidden md:table-cell ${user.status === 'inactive' ? 'text-gray-400' : ''}`}>{user.role}</td>
+                        <td className="px-6 py-4 hidden sm:table-cell">
+                             {user.status === 'active' 
+                                ? <span className="bg-green-900 text-green-300 text-xs font-medium px-2.5 py-0.5 rounded-full">Activo</span>
+                                : <span className="bg-gray-600 text-gray-300 text-xs font-medium px-2.5 py-0.5 rounded-full">Inactivo</span>
+                             }
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                            {user.status === 'active' ? (
+                                <>
+                                    <Button onClick={() => onEdit(user)} className="border border-[#2ecbe7] text-[#1ABCD7] hover:bg-cyan-500/10 text-xs py-1 px-3 rounded-md mr-2 transition">Editar</Button>
+                                    <Button onClick={() => onToggleStatus(user.id)} className="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-3 rounded-md shadow-md transition transform hover:scale-105">Desactivar</Button>
+                                </>
+                            ) : (
+                                <Button onClick={() => onToggleStatus(user.id)} className="bg-green-500 hover:bg-green-600 text-white text-xs py-1 px-3 rounded-md shadow-md transition transform hover:scale-105">Activar</Button>
+                            )}
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
+);
+
+export const RolesGrid = ({ roles, onEdit }) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {roles.map(role => (
+            <div key={role.id} className="bg-gray-700 p-6 rounded-xl shadow-lg relative">
+                <div className="absolute top-4 right-4">
+                    <button onClick={() => onEdit(role)} className="text-gray-400 hover:text-white transition"><SquarePen /></button>
+                </div>
+                <h3 className={`font-bold text-lg text-${role.color}-400`}>{role.name}</h3>
+                <p className="text-gray-400 mt-2 text-sm pr-8">{role.description}</p>
+            </div>
+        ))}
+        <div onClick={() => onEdit(null)} className="border-2 border-dashed border-gray-600 rounded-xl flex items-center justify-center p-6 hover:border-cyan-500 hover:text-cyan-500 transition cursor-pointer">
+            <div className="text-center">
+                <Plus />
+                <p className="mt-2 font-semibold">Crear Nuevo Rol</p>
+            </div>
+        </div>
+    </div>
+);
+
+export const ProfileSettings = () => {
+    const settings = [
+        "Formación Académica", "Experiencia Laboral", "Idiomas", "Habilidades Técnicas",
+        "Habilidades Blandas", "Certificaciones", "Licencias", "Encuesta"
+    ];
+    return (
+        <div className="bg-gray-700 p-6 rounded-xl shadow-lg max-w-2xl mx-auto">
+            <h3 className="font-bold text-lg text-white">Configuración de Perfiles</h3>
+            <p className="text-gray-400 mt-1 text-sm">Define los campos que los usuarios pueden gestionar en sus perfiles.</p>
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {settings.map((setting, index) => (
+                    <div key={setting} className="flex items-center justify-between bg-gray-800 p-3 rounded-lg">
+                        <p className="font-medium">{setting}</p>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" defaultChecked={index % 2 === 0 || index < 2} className="sr-only peer" />
+                            <div className="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                        </label>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+export const UserEditModal = ({ user, roles, onClose, onSave }) => (
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 transition-opacity duration-300">
+        <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 transform transition-transform duration-300 scale-100">
+            <h3 className="text-xl font-semibold mb-4 text-white">Editar Usuario</h3>
+            <form onSubmit={onSave}>
+                <div className="mb-4">
+                    <label htmlFor="editUserName" className="block text-sm font-medium text-gray-300 mb-1">Nombre</label>
+                    <input type="text" id="editUserName" name="editUserName" defaultValue={user.name} className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5" required />
+                </div>
+                 <div className="mb-4">
+                    <label htmlFor="editUserDni" className="block text-sm font-medium text-gray-300 mb-1">DNI</label>
+                    <input type="text" id="editUserDni" name="editUserDni" defaultValue={user.dni} className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5" required />
+                </div>
+                 <div className="mb-4">
+                    <label htmlFor="editUserGender" className="block text-sm font-medium text-gray-300 mb-1">Género</label>
+                    <select id="editUserGender" name="editUserGender" defaultValue={user.gender} className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5" required>
+                        <option>Femenino</option>
+                        <option>Masculino</option>
+                        <option>Otro</option>
+                    </select>
+                </div>
+                <div className="mb-6">
+                    <label htmlFor="editUserRole" className="block text-sm font-medium text-gray-300 mb-1">Rol</label>
+                    <select id="editUserRole" name="editUserRole" defaultValue={user.role} className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5">
+                        {roles.map(role => <option key={role.id} value={role.name}>{role.name}</option>)}
+                    </select>
+                </div>
+                <div className="flex justify-end gap-3">
+                    <Button type="button" onClick={onClose} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition">Cancelar</Button>
+                    <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition">Guardar Cambios</Button>
+                </div>
+            </form>
+        </div>
+    </div>
+);
+
+export const RoleEditModal = ({ role, onClose, onSave }) => {
+    const isCreating = !role.id;
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 transition-opacity duration-300">
+            <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 transform transition-transform duration-300 scale-100">
+                <h3 className="text-xl font-semibold mb-4 text-white">{isCreating ? "Crear Nuevo Rol" : "Editar Rol"}</h3>
+                <form onSubmit={onSave}>
+                    <input type="hidden" name="editRoleId" defaultValue={role.id || ''} />
+                    <div className="mb-4">
+                        <label htmlFor="editRoleName" className="block text-sm font-medium text-gray-300 mb-1">Nombre del Rol</label>
+                        <input type="text" id="editRoleName" name="editRoleName" defaultValue={role.name} className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5" required />
+                    </div>
+                    <div className="mb-6">
+                        <label htmlFor="editRoleDescription" className="block text-sm font-medium text-gray-300 mb-1">Descripción</label>
+                        <textarea id="editRoleDescription" name="editRoleDescription" rows="3" defaultValue={role.description} className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5"></textarea>
+                    </div>
+                    <div className="flex justify-end gap-3">
+                        <Button type="button" onClick={onClose} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition">Cancelar</Button>
+                        <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition">Guardar</Button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+

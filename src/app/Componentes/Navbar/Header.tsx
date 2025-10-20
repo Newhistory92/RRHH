@@ -13,14 +13,12 @@ import { NotificationDialog } from "@/app/Componentes/Perfil/NotificationDialog"
 import {EMPLOYEES_DATA} from "@/app/api/prueba2";
 import { Employee,Notification,Page} from "@/app/Interfas/Interfaces";
 import Image from "next/image";
-
   interface HeaderProps {
   setPage: (page: Page) => void;
-  userRole: string | null;
 }
 
 
-export function Header({ setPage, userRole }: HeaderProps) {
+export function Header({ setPage }: HeaderProps) {
   const notificationsPanel = useRef<OverlayPanel>(null);
   const profileMenu = useRef<Menu>(null);
   const [selectedNotification, setSelectedNotification] = useState<typeof currentUser.notificaciones[0] | null>(null);
@@ -29,7 +27,7 @@ export function Header({ setPage, userRole }: HeaderProps) {
 
   const currentUser: Employee = { ...EMPLOYEES_DATA[0], notificaciones: notifications };
  
-
+ 
 
   const handleNotificationClick = (notif: typeof currentUser.notificaciones[0]) => {
     setSelectedNotification(notif);
@@ -54,56 +52,47 @@ export function Header({ setPage, userRole }: HeaderProps) {
 
   const unreadCount = notifications.filter(n => n.status === 'nueva').length;
 
- const profileMenuItems: MenuItem[] = [
-  {
-    template: () => (
-      <div className="px-4 py-4 bg-gradient-to-br from-gray-50 to-gray-100 border-b border-gray-200">
-        <div className="flex items-center gap-3">
-          <div>
-            <p className="font-bold text-gray-800">{currentUser.name}</p>
-            <p className="text-sm text-gray-500">{currentUser.email}</p>
+  const profileMenuItems: MenuItem[] = [
+    {
+      template: () => (
+        <div className="px-4 py-4 bg-gradient-to-br from-gray-50 to-gray-100 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <div>
+              <p className="font-bold text-gray-800">{currentUser.name}</p>
+              <p className="text-sm text-gray-500">{currentUser.email}</p>
+            </div>
           </div>
         </div>
-      </div>
-    ),
-    roles: ['User', 'RRHH'] // todos pueden ver la cabecera
-  },
-  {
-    label: 'Editar Perfil',
-    icon: 'pi pi-user-edit',
-    className: 'hover:bg-cyan-50',
-    command: () => setPage("editar-perfil"),
-    roles: ['User']
-  },
-  {
-    label: 'Licencias',
-    icon: 'pi pi-id-card',
-    className: 'hover:bg-cyan-50',
-    command: () => setPage("licencias"),
-    roles: ['User']
-  },
-  {
-    label: 'Encuesta',
-    icon: 'pi pi-file-edit',
-    className: 'hover:bg-cyan-50',
-    command: () => setPage('feedback'),
-    roles: ['User']
-  },
-  {
-    separator: true,
-    roles: ['User', 'RRHH']
-  },
-  {
-    label: 'Cerrar Sesión',
-    icon: 'pi pi-sign-out',
-    className: 'text-red-500 hover:bg-red-50',
-    command: () => handleLogout(),
-    roles: ['User', 'RRHH']
-  }
-];
-
-
-
+      )
+    },
+    {
+      label: 'Editar Perfil',
+      icon: 'pi pi-user-edit',
+      className: 'hover:bg-cyan-50',
+      command: () => setPage("editar-perfil")
+    },
+    {
+      label: 'Licencias',
+      icon: 'pi pi-id-card',
+      className: 'hover:bg-cyan-50',
+      command: () => setPage("licencias")
+    },
+    {
+      label: 'Encuesta',
+      icon: 'pi pi-file-edit',
+      className: 'hover:bg-cyan-50',
+      command: () => setPage('feedback')
+    },
+    {
+      separator: true
+    },
+    {
+      label: 'Cerrar Sesión',
+      icon: 'pi pi-sign-out',
+      className: 'text-red-500 hover:bg-red-50',
+      command: () => console.log('Cerrar sesión')
+    }
+  ];
 
   const NotificationItem = ({ notif }: { notif: typeof currentUser.notificaciones[0] }) => (
     <div 
@@ -134,7 +123,7 @@ export function Header({ setPage, userRole }: HeaderProps) {
       </div>
     </div>
   );
-const filteredMenuItems = profileMenuItems.filter(item => !item.roles || item.roles.includes(userRole!));
+
   return (
     <header className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 shadow-lg h-16 fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 border-b border-gray-700/50">
       <div className="flex items-center">

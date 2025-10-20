@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -9,6 +10,7 @@ import  IAPage  from '@/app/pages/IA/page';
 import  OrganigramaPage  from '@/app/pages/Organigrama/page';
 import EmployeeCV  from '@/app/pages/Cv/page';
 import LicenciasManage from '@/app/pages/LicenciasManage/page';
+import  AdminPage  from '@/app/pages/Admin/page';
 import { PrimeReactProvider } from 'primereact/api';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import 'primeicons/primeicons.css';
@@ -26,7 +28,7 @@ export default function App() {
   // Páginas permitidas por rol
   const rolePermissions: Record<string, Page[]> = {
     RRHH: ['estadisticas', 'recursos-humanos', 'ia', 'organigrama', 'test'],
-    User: ['editar-perfil', 'licencias', 'feedback']
+    User: ['editar-perfil', 'licencias', 'feedback', 'admin'],
   };
 
   useEffect(() => {
@@ -102,6 +104,8 @@ export default function App() {
         return <FeedbackTab />;
       case 'test':
         return <TestPage />;
+         case 'admin':
+        return <AdminPage />;
       default:
         return <EstadisticasPage />;
     }
@@ -122,7 +126,7 @@ export default function App() {
   return (
     <div className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
       <PrimeReactProvider>
-        <Header setPage={handlePageChange} userRole={userRole} />
+        <Header setPage={handlePageChange} />
         <Sidebar 
           activePage={page} 
           setPage={handlePageChange}

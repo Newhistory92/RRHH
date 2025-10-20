@@ -613,7 +613,8 @@ export type Page =
   | "editar-perfil"
   | "feedback"
   | "licencias"
-  | "test";
+  | "test"
+  | "admin";
 
 
 export type MotivoSalida = 
