@@ -128,15 +128,28 @@ export interface Saldo {
   [tipo: string]: number 
 }
 
-
 export interface Usuario {
-  id: number
-  name: string
-  dni: string
-  office?: string
-  department?: string
-  role: string
+    id: number;
+    name: string;
+    usuario: string;
+    dni: string;
+    gender: string;
+    email: string;
+    role: string;
+    office?: string
+   department?: string
+    status: 'active' | 'inactive';
+    avatar: string;
+    lastActionDate?: string;
 }
+
+export interface Role {
+    id: number;
+    name: string;
+    description: string;
+    color: string;
+}
+
 
 export interface Aprobacion {
   supervisorId: number

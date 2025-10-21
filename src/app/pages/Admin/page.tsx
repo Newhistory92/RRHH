@@ -3,27 +3,9 @@ import { ProfileSettings, RoleEditModal, RolesGrid, UserEditModal, UsersTable } 
 import { useState, useMemo, useEffect } from 'react';
 import { UserRoundSearch } from "lucide-react";
 import { InputText } from 'primereact/inputtext';
+import {Usuario,Role} from '@/app/Interfas/Interfaces';
 
-// --- Tipos de TypeScript ---
-interface User {
-    id: number;
-    name: string;
-    dni: string;
-    gender: string;
-    email: string;
-    role: string;
-    department: string;
-    status: 'active' | 'inactive';
-    avatar: string;
-    lastActionDate?: string;
-}
 
-interface Role {
-    id: number;
-    name: string;
-    description: string;
-    color: string;
-}
 
 interface ApiUser {
     id: number;
@@ -50,15 +32,15 @@ const initialRoles: Role[] = [
 
 export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<string>('active-users');
-    const [users, setUsers] = useState<User[]>([]);
+    const [users, setUsers] = useState<Usuario[]>([]);
     const [roles, setRoles] = useState<Role[]>(initialRoles);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(true);
-    
+    console.log(users);
     // Estados para los modales
     const [isUserModalOpen, setUserModalOpen] = useState<boolean>(false);
     const [isRoleModalOpen, setRoleModalOpen] = useState<boolean>(false);
-    const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [editingUser, setEditingUser] = useState<Usuario | null>(null);
     const [editingRole, setEditingRole] = useState<Role | null>(null);
 
     // --- Función para obtener usuarios de la API ---
@@ -67,16 +49,16 @@ export default function AdminPage() {
             setLoading(true);
             const response = await fetch('http://127.0.0.1:8000/users/');
             const data: ApiResponse = await response.json();
-            
+            console.log('Datos de usuarios recibidos de la API:', data);
             // Mapear los datos de la API al formato de la aplicación
-            const mappedUsers: User[] = data.users.map((apiUser) => ({
+            const mappedUsers: Usuario[] = data.users.map((apiUser) => ({
                 id: apiUser.id,
-                name: apiUser.employee_name || apiUser.usuario,
+                name: apiUser.employee_name || 'No especificado',
+                usuario: apiUser.usuario,
                 dni: apiUser.dni || 'N/A',
                 gender: apiUser.gender || 'No especificado',
                 email: apiUser.email,
                 role: apiUser.role_name,
-                department: 'General', // No viene en la API, valor por defecto
                 status: 'active' as const,
                 avatar: apiUser.photo || `https://i.pravatar.cc/150?u=${apiUser.email}`,
             }));
@@ -98,16 +80,15 @@ export default function AdminPage() {
     // Memoizar usuarios filtrados para optimizar el rendimiento
     const filteredUsers = useMemo(() => 
         users.filter(user =>
-            user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.department.toLowerCase().includes(searchTerm.toLowerCase())
+            user.name.toLowerCase().includes(searchTerm.toLowerCase())
         ), [users, searchTerm]);
 
     const activeUsers = filteredUsers.filter(user => user.status === 'active');
     const inactiveUsers = filteredUsers.filter(user => user.status === 'inactive');
 
     // --- Manejadores de Eventos ---
-    const handleToggleUserStatus = (userId: number) => {
-        setUsers(users.map(user => {
+  const handleToggleUserStatus = (userId: number) => {
+        setUsers(prevUsers => prevUsers.map(user => {
             if (user.id === userId) {
                 const isNowInactive = user.status === 'active';
                 return {
@@ -121,7 +102,7 @@ export default function AdminPage() {
     };
 
     // --- Funciones para Modales ---
-    const openUserModal = (user: User) => {
+    const openUserModal = (user: Usuario) => {
         setEditingUser(user);
         setUserModalOpen(true);
     };
@@ -140,13 +121,13 @@ export default function AdminPage() {
         const editUserRole = form.elements.namedItem('editUserRole') as HTMLInputElement;
         
         if (editingUser) {
-            const updatedUserData: Partial<User> = {
+            const updatedUserData: Partial<Usuario> = {
                 name: editUserName.value,
                 dni: editUserDni.value,
                 gender: editUserGender.value,
                 role: editUserRole.value,
             };
-            setUsers(users.map(u => u.id === editingUser.id ? { ...u, ...updatedUserData } as User : u));
+            setUsers(users.map(u => u.id === editingUser.id ? { ...u, ...updatedUserData } as Usuario : u));
             closeUserModal();
         }
     };
