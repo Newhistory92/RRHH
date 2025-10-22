@@ -132,13 +132,13 @@ export interface Usuario {
     id: number;
     name: string;
     usuario: string;
+    activo:boolean;
     dni: string;
     gender: string;
     email: string;
     role: string;
     office?: string
    department?: string
-    status: 'active' | 'inactive';
     avatar: string;
     lastActionDate?: string;
 }

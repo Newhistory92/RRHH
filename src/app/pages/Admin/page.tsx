@@ -7,9 +7,11 @@ import {Usuario,Role} from '@/app/Interfas/Interfaces';
 
 
 
+
 interface ApiUser {
     id: number;
     usuario: string;
+    activo:boolean;
     email: string;
     roleId: number;
     role_name: string;
@@ -23,17 +25,16 @@ interface ApiResponse {
     users: ApiUser[];
 }
 
-// --- Datos Iniciales ---
-const initialRoles: Role[] = [
-    { id: 1, name: 'Administrador', description: 'Acceso total al sistema. Puede gestionar usuarios, roles y configuraciones globales.', color: 'cyan' },
-    { id: 2, name: 'Editor', description: 'Puede crear, editar y eliminar contenido, pero no puede gestionar usuarios.', color: 'teal' },
-    { id: 3, name: 'Visitante', description: 'Acceso de solo lectura al contenido público de la aplicación.', color: 'gray' },
-];
+interface RolesApiResponse {
+    roles: Role[];
+}
+
+
 
 export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<string>('active-users');
     const [users, setUsers] = useState<Usuario[]>([]);
-    const [roles, setRoles] = useState<Role[]>(initialRoles);
+    const [roles, setRoles] = useState<Role[]>();
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(true);
     console.log(users);
@@ -59,7 +60,7 @@ export default function AdminPage() {
                 gender: apiUser.gender || 'No especificado',
                 email: apiUser.email,
                 role: apiUser.role_name,
-                status: 'active' as const,
+                activo:apiUser.activo,
                 avatar: apiUser.photo || `https://i.pravatar.cc/150?u=${apiUser.email}`,
             }));
             
@@ -75,31 +76,56 @@ export default function AdminPage() {
     // Cargar usuarios al montar el componente
     useEffect(() => {
         fetchUsers();
+        fetchRoles();
     }, []);
 
+    const fetchRoles = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch('http://127.0.0.1:8000/roles/');
+            const data: RolesApiResponse = await response.json();
+            setRoles(data.roles);
+        } catch (error) {
+            console.error('Error al cargar roles:', error);
+        } finally {
+           setLoading(false);
+        }
+    };
     // Memoizar usuarios filtrados para optimizar el rendimiento
     const filteredUsers = useMemo(() => 
         users.filter(user =>
             user.name.toLowerCase().includes(searchTerm.toLowerCase())
         ), [users, searchTerm]);
 
-    const activeUsers = filteredUsers.filter(user => user.status === 'active');
-    const inactiveUsers = filteredUsers.filter(user => user.status === 'inactive');
+    // --- Filtrado por estado ---
+const activeUsers = filteredUsers.filter(user => user.activo === true);
+const inactiveUsers = filteredUsers.filter(user => user.activo === false);
 
-    // --- Manejadores de Eventos ---
-  const handleToggleUserStatus = (userId: number) => {
-        setUsers(prevUsers => prevUsers.map(user => {
-            if (user.id === userId) {
-                const isNowInactive = user.status === 'active';
-                return {
-                    ...user,
-                    status: isNowInactive ? 'inactive' as const : 'active' as const,
-                    lastActionDate: isNowInactive ? new Date().toISOString().split('T')[0] : undefined,
-                };
-            }
-            return user;
-        }));
-    };
+// --- Manejador de cambio de estado ---
+const handleToggleUserStatus = async (userId: number, currentStatus: boolean) => {
+  try {
+    // Calculamos el nuevo estado
+    const newStatus = !currentStatus;
+
+    // Llamada al backend
+    const response = await fetch(`http://127.0.0.1:8000/users/${userId}/activo`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ activo: newStatus })
+    });
+
+    if (!response.ok) throw new Error('Error actualizando estado');
+
+    // Actualizamos localmente
+    setUsers(prev =>
+      prev.map(u => (u.id === userId ? { ...u, activo: newStatus } : u))
+    );
+  } catch (error) {
+    console.error('No se pudo actualizar el estado:', error);
+  }
+};
+
+
 
     // --- Funciones para Modales ---
     const openUserModal = (user: Usuario) => {
@@ -112,23 +138,53 @@ export default function AdminPage() {
         setEditingUser(null);
     };
 
-    const handleUserUpdate = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const form = e.target as HTMLFormElement;
-        const editUserName = form.elements.namedItem('editUserName') as HTMLInputElement;
-        const editUserDni = form.elements.namedItem('editUserDni') as HTMLInputElement;
-        const editUserGender = form.elements.namedItem('editUserGender') as HTMLInputElement;
-        const editUserRole = form.elements.namedItem('editUserRole') as HTMLInputElement;
-        
-        if (editingUser) {
-            const updatedUserData: Partial<Usuario> = {
-                name: editUserName.value,
-                dni: editUserDni.value,
-                gender: editUserGender.value,
-                role: editUserRole.value,
-            };
-            setUsers(users.map(u => u.id === editingUser.id ? { ...u, ...updatedUserData } as Usuario : u));
-            closeUserModal();
+    const handleUserUpdate = async (formData: {
+  name: string;
+  dni: string;
+  gender: string;
+}) => {
+  if (!editingUser) return;
+console.log(formData)
+  try {
+    // --- Paso 1: Crear o vincular empleado ---
+    const employeeResponse = await fetch("http://127.0.0.1:8000/users/employee", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        dni: formData.dni,
+        name: formData.name,
+        gender: formData.gender,
+        email: editingUser.email,
+        user_id: editingUser.id, // vinculamos al usuario
+      }),
+    });
+
+    if (!employeeResponse.ok) {
+      throw new Error("Error al crear/vincular empleado");
+    }
+
+    closeUserModal();
+    console.log("Usuario actualizado correctamente en backend ✅");
+  } catch (error) {
+    console.error("❌ Error al actualizar usuario:", error);
+  }
+};
+
+
+ const handleRoleEmployeUpdate = async (userId: number, role: string) => {
+    console.log(role)
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/users/${userId}/role`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ role }),
+            });
+
+            if (!response.ok) throw new Error("Error al actualizar rol");
+        closeUserModal();
+            console.log("Rol actualizado correctamente ✅");
+        } catch (error) {
+            console.error("Error al actualizar rol:", error);
         }
     };
 
@@ -142,7 +198,7 @@ export default function AdminPage() {
         setEditingRole(null);
     };
 
-    const handleRoleUpdate = (e: React.FormEvent<HTMLFormElement>) => {
+      const handleRoleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const form = e.target as HTMLFormElement;
         const editRoleName = form.elements.namedItem('editRoleName') as HTMLInputElement;
@@ -150,19 +206,42 @@ export default function AdminPage() {
         const editRoleId = form.elements.namedItem('editRoleId') as HTMLInputElement;
         
         const roleId = editRoleId.value;
-        const updatedRoleData: Omit<Role, 'id' | 'color'> = { 
+        const roleData = { 
             name: editRoleName.value, 
-            description: editRoleDescription.value 
+            description: editRoleDescription.value,
+            color: 'purple' // Default color
         };
 
-        if (roleId && parseInt(roleId)) {
-            setRoles(roles.map(r => r.id === parseInt(roleId) ? { ...r, ...updatedRoleData } : r));
-        } else {
-            const newId = roles.length > 0 ? Math.max(...roles.map(r => r.id)) + 1 : 1;
-            setRoles([...roles, { ...updatedRoleData, id: newId, color: 'purple' }]);
+        try {
+            if (roleId && parseInt(roleId)) {
+                // Actualizar rol existente
+                const response = await fetch(`http://127.0.0.1:8000/roles/${roleId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(roleData)
+                });
+                
+                if (response.ok) {
+                    await fetchRoles(); // Recargar roles
+                }
+            } else {
+                // Crear nuevo rol
+                const response = await fetch('http://127.0.0.1:8000/roles/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(roleData)
+                });
+                
+                if (response.ok) {
+                    await fetchRoles(); // Recargar roles
+                }
+            }
+            closeRoleModal();
+        } catch (error) {
+            console.error('Error al guardar rol:', error);
         }
-        closeRoleModal();
     };
+
 
     const TabButton = ({ id, title }: { id: string; title: string }) => (
         <button
@@ -224,24 +303,29 @@ export default function AdminPage() {
                                 {loading ? (
                                     <div className="text-center py-8 text-gray-400">Cargando usuarios...</div>
                                 ) : (
-                                    <UsersTable users={activeUsers} onEdit={openUserModal} onToggleStatus={handleToggleUserStatus} />
+                                    <UsersTable users={activeUsers} onEdit={openUserModal} onToggleStatus={(userId: number) => {
+    const user = users.find(u => u.id === userId);
+    if (user) handleToggleUserStatus(userId, user.activo);
+  }} />
                                 )}
                             </div>
                         )}
                         {activeTab === 'inactive-users' && (
                             <div>
                                 <h2 className="text-xl font-semibold text-white mb-4">Listado de Usuarios Inactivos</h2>
-                                <UsersTable users={inactiveUsers} onToggleStatus={handleToggleUserStatus} />
+                                <UsersTable users={inactiveUsers} onToggleStatus={(userId: number) => {
+    const user = users.find(u => u.id === userId);
+    if (user) handleToggleUserStatus(userId, user.activo);
+  }} />
                             </div>
-                        )}
-                        {activeTab === 'roles' && <RolesGrid roles={roles} onEdit={openRoleModal} />}
+                        )}{activeTab === 'roles' && <RolesGrid roles={roles ?? []} onEdit={openRoleModal} />}
                         {activeTab === 'profiles' && <ProfileSettings />}
                     </div>
                 </main>
             </div>
             
-            {isUserModalOpen && editingUser && <UserEditModal user={editingUser} roles={roles} onClose={closeUserModal} onSave={handleUserUpdate} />}
-            {isRoleModalOpen && editingRole && <RoleEditModal role={editingRole} onClose={closeRoleModal} onSave={handleRoleUpdate} />}
+            {isUserModalOpen && editingUser && <UserEditModal user={editingUser}  roles={roles ?? []} onClose={closeUserModal} onSave={handleUserUpdate}   onRoleChange={handleRoleEmployeUpdate} />}
+             {isRoleModalOpen && editingRole && <RoleEditModal role={editingRole} onClose={closeRoleModal} onSave={handleRoleUpdate} />}
         </div>
     );
 }

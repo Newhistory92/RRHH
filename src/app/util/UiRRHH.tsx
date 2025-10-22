@@ -6,9 +6,6 @@ import { Card } from 'primereact/card';
 import { ProgressBar } from 'primereact/progressbar';
 import { Button } from 'primereact/button';
 import { Camera,CheckCircle, Activity, TrendingDown, AlertTriangle,Plus,SquarePen} from "lucide-react";
-import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
-import { InputTextarea } from 'primereact/inputtextarea';
 import { useRef, ChangeEvent } from "react";
 import React from 'react';
 interface Department {
@@ -72,14 +69,16 @@ interface UserEditModalProps {
     user:Usuario;
     roles: Role[];
     onClose: () => void;
-    onSave: (e: React.FormEvent<HTMLFormElement>) => void;
+     onSave: (formData: {
+    name: string;
+    dni: string;
+    gender: string;
+    role: string;
+  }) => void;
+   onRoleChange: (userId: number, role: string) => void; 
 }
 
-interface RoleEditModalProps {
-    role: Role;
-    onClose: () => void;
-    onSave: (e: React.FormEvent<HTMLFormElement>) => void;
-}
+
 
 
 export const StatusBadge = ({ status }: { status: string }) => {
@@ -388,6 +387,8 @@ export const InfoList: React.FC<InfoListProps> = ({ title, items, icon, colorCla
   </div>
 );
 export const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onToggleStatus }) => (
+
+ 
     <div className="overflow-x-auto bg-gray-900/50 rounded-lg">
         <table className="min-w-full text-sm text-left text-gray-300">
             <thead className="bg-gray-700 text-xs uppercase font-semibold">
@@ -407,55 +408,64 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onToggleS
                         <td className="px-6 py-4 font-medium whitespace-nowrap">
                             <div className="flex items-center space-x-3">
                                 <Image
-                                    className={`h-8 w-8 rounded-full object-cover ${user.status === 'inactive' ? 'filter grayscale' : ''}`}
+                                     className={`h-8 w-8 rounded-full object-cover ${!user.activo ? 'filter grayscale' : ''}`}
                                     src={user.avatar}
                                     alt={user.name}
                                     width={40}
                                     height={40}
                                 />
-                                <span className={user.status === 'inactive' ? 'text-gray-400' : 'text-white'}>{user.usuario}</span>
+                                <span className={!user.activo ? 'text-gray-400' : 'text-white'}>
+                  {user.usuario}
+                </span>
                             </div>
                         </td>
-                        <td className={`px-6 py-4 hidden lg:table-cell ${user.status === 'inactive' ? 'text-gray-400' : ''}`}>{user.name}</td>
-                        <td className={`px-6 py-4 hidden md:table-cell ${user.status === 'inactive' ? 'text-gray-400' : ''}`}>{user.dni}</td>
-                        <td className={`px-6 py-4 hidden md:table-cell ${user.status === 'inactive' ? 'text-gray-400' : ''}`}>{user.role}</td>
-                        <td className={`px-6 py-4 hidden md:table-cell ${user.status === 'inactive' ? 'text-gray-400' : ''}`}>{user.department || user.office}</td>
+                        <td className={`px-6 py-4 hidden lg:table-cell ${!user.activo ? 'text-gray-400' : ''}`}>{user.name}</td>
+                        <td className={`px-6 py-4 hidden md:table-cell ${!user.activo ? 'text-gray-400' : ''}`}>{user.dni}</td>
+                        <td className={`px-6 py-4 hidden md:table-cell${!user.activo ? 'text-gray-400' : ''}`}>{user.role}</td>
+                        <td className={`px-6 py-4 hidden md:table-cell ${!user.activo ? 'text-gray-400' : ''}`}>{user.department || user.office}</td>
                         <td className="px-6 py-4 hidden sm:table-cell">
-                            {user.status === 'active' 
-                                ? <span className="bg-green-900 text-green-300 text-xs font-medium px-2.5 py-0.5 rounded-full">Activo</span>
-                                : <span className="bg-gray-600 text-gray-300 text-xs font-medium px-2.5 py-0.5 rounded-full">Inactivo</span>
-                            }
+                            {user.activo ? (
+                <span className="bg-green-900 text-green-300 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                  Activo
+                </span>
+              ) : (
+                <span className="bg-gray-600 text-gray-300 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                  Inactivo
+                </span>
+              )}
                         </td>
-                        <td className="px-6 py-4 text-center">
-                            {user.status === 'active' ? (
-                                <>
-                                    {onEdit && (
-                                        <Button 
-                                            onClick={() => onEdit(user)} 
-                                            className="border border-[#2ecbe7] text-[#1ABCD7] hover:bg-cyan-500/10 text-xs py-1 px-3 rounded-md mr-2 transition"
-                                            outlined
-                                        >
-                                            Editar
-                                        </Button>
-                                    )}
-                                    <Button 
-                                        onClick={() => onToggleStatus(user.id)} 
-                                        className="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-3 rounded-md shadow-md transition"
-                                        severity="danger"
-                                    >
-                                        Desactivar
-                                    </Button>
-                                </>
-                            ) : (
-                                <Button 
-                                    onClick={() => onToggleStatus(user.id)} 
-                                    className="bg-green-500 hover:bg-green-600 text-white text-xs py-1 px-3 rounded-md shadow-md transition"
-                                    severity="success"
-                                >
-                                    Activar
-                                </Button>
-                            )}
-                        </td>
+                       <td className="px-6 py-4 text-center">
+  {user.activo ? (
+
+    <div className="flex items-center justify-center gap-3">
+      {onEdit && (
+        <Button
+          onClick={() => onEdit(user)}
+          className="border border-[#2ecbe7] text-[#1ABCD7] hover:bg-cyan-500/10 text-xs py-1 px-3 rounded-md transition"
+          outlined
+          label="Editar"
+        />
+      )}
+      <Button
+  onClick={() => onToggleStatus(user.id)}
+  className="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-3 rounded-md shadow-md transition"
+  severity="danger"
+  label="Desactivar"
+/>
+
+    </div>
+  ) : (
+    <div className="flex items-center justify-center">
+      <Button
+  onClick={() => onToggleStatus(user.id)}
+  className="bg-green-500 hover:bg-green-600 text-white text-xs py-1 px-3 rounded-md shadow-md transition"
+  severity="success"
+  label="Activar"
+/>
+
+    </div>
+  )}
+</td>
                     </tr>
                 ))}
             </tbody>
@@ -489,256 +499,214 @@ export const RolesGrid: React.FC<RolesGridProps> = ({ roles, onEdit }) => (
 );
 
 export const ProfileSettings: React.FC = () => {
-    const settings: string[] = [
-        "Formación Académica", "Experiencia Laboral", "Idiomas", "Habilidades Técnicas",
-        "Habilidades Blandas", "Certificaciones", "Licencias", "Encuesta"
-    ];
-    
-    return (
-        <div className="bg-gray-700 p-6 rounded-xl shadow-lg max-w-2xl mx-auto">
-            <h3 className="font-bold text-lg text-white">Configuración de Perfiles</h3>
-            <p className="text-gray-400 mt-1 text-sm">Define los campos que los usuarios pueden gestionar en sus perfiles.</p>
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {settings.map((setting, index) => (
-                    <div key={setting} className="flex items-center justify-between bg-gray-800 p-3 rounded-lg">
-                        <p className="font-medium">{setting}</p>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" defaultChecked={index % 2 === 0 || index < 2} className="sr-only peer" />
-                            <div className="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
-                        </label>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
+  // Mapeo de nombres en castellano a nombres reales de las tablas
+  const tableMap: Record<string, string> = {
+    "Formación Académica": "AcademicRecord",
+    "Experiencia Laboral": "WorkExperience",
+    "Idiomas": "Language",
+    "Habilidades Técnicas": "TechnicalSkill",
+    "Habilidades Blandas": "SoftSkill",
+    "Certificaciones": "Certification",
+    "Encuesta": "Feedback",
+  };
+
+  // Estado de los toggles
+  const [toggles, setToggles] = useState<Record<string, boolean>>({
+    "Formación Académica": true,
+    "Experiencia Laboral": true,
+    "Idiomas": false,
+    "Habilidades Técnicas": true,
+    "Habilidades Blandas": false,
+    "Certificaciones": true,
+    "Encuesta": false,
+  });
+
+  // Maneja el cambio del toggle y hace el PUT al backend
+  const handleToggleChange = async (setting: string) => {
+    const newState = !toggles[setting];
+    setToggles((prev) => ({ ...prev, [setting]: newState }));
+
+    const tabla = tableMap[setting];
+    const url = `http://127.0.0.1:8000/records/${tabla}/toggle`;
+
+    try {
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ activo: newState }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al actualizar ${setting}`);
+      }
+
+      console.log(`✅ ${setting} actualizado correctamente: ${newState}`);
+    } catch (error) {
+      console.error(`❌ Falló la actualización de ${setting}:`, error);
+    }
+  };
+
+  return (
+    <div className="bg-gray-700 p-6 rounded-xl shadow-lg max-w-2xl mx-auto">
+      <h3 className="font-bold text-lg text-white">Configuración de Perfiles</h3>
+      <p className="text-gray-400 mt-1 text-sm">
+        Define los campos que los usuarios pueden gestionar en sus perfiles.
+      </p>
+
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {Object.keys(toggles).map((setting) => (
+          <div
+            key={setting}
+            className="flex items-center justify-between bg-gray-800 p-3 rounded-lg"
+          >
+            <p className="font-medium text-white">{setting}</p>
+
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={toggles[setting]}
+                onChange={() => handleToggleChange(setting)}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+            </label>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
-export const UserEditModal: React.FC<UserEditModalProps> = ({ user, roles, onClose, onSave }) => {
-    const [formData, setFormData] = useState({
-        name: user.name,
-        dni: user.dni,
-        gender: user.gender,
-        role: user.role
-    });
 
-    const genderOptions = [
-        { label: 'Femenino', value: 'Femenino' },
-        { label: 'Masculino', value: 'Masculino' },
-        { label: 'Otro', value: 'Otro' }
-    ];
+export const UserEditModal: React.FC<UserEditModalProps> = ({ user, roles, onClose, onSave,  onRoleChange }) => {
+ const [formData, setFormData] = useState({
+    name: user.name,
+    dni: user.dni,
+    gender: user.gender,
+    role: user.role,
+  });
+  console.log(roles)
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-    const roleOptions = roles.map(role => ({
-        label: role.name,
-        value: role.name
-    }));
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onSave(formData); // enviamos los datos al padre
+  };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // Agregar los valores del formData a los elementos del formulario
-        const form = e.currentTarget;
-        const nameInput = form.elements.namedItem('editUserName') as HTMLInputElement;
-        const dniInput = form.elements.namedItem('editUserDni') as HTMLInputElement;
-        const genderInput = form.elements.namedItem('editUserGender') as HTMLInputElement;
-        const roleInput = form.elements.namedItem('editUserRole') as HTMLInputElement;
-        
-        nameInput.value = formData.name;
-        dniInput.value = formData.dni;
-        genderInput.value = formData.gender;
-        roleInput.value = formData.role;
-        
-        onSave(e);
-    };
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 transition-opacity duration-300">
+      <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 transform transition-transform duration-300 scale-100">
+        <h3 className="text-xl font-semibold mb-4 text-white">Editar Usuario</h3>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Nombre
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5"
+              required
+            />
+          </div>
 
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 transition-opacity duration-300 z-50">
-            <style jsx>{`
-                .p-dropdown-panel {
-                    background: #374151 !important;
-                    border: 1px solid #4b5563 !important;
-                }
-                .p-dropdown-item {
-                    color: white !important;
-                }
-                .p-dropdown-item:hover {
-                    background: #4b5563 !important;
-                }
-                .p-inputtext, .p-dropdown, .p-inputtextarea {
-                    padding: 0.625rem !important;
-                }
-            `}</style>
-            <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 transform transition-transform duration-300 scale-100">
-                <h3 className="text-xl font-semibold mb-4 text-white">Editar Usuario</h3>
-                <form onSubmit={handleSubmit}>
-                    <input type="hidden" name="editUserName" value={formData.name} />
-                    <input type="hidden" name="editUserDni" value={formData.dni} />
-                    <input type="hidden" name="editUserGender" value={formData.gender} />
-                    <input type="hidden" name="editUserRole" value={formData.role} />
-                    
-                    <div className="mb-4">
-                        <label htmlFor="editUserName" className="block text-sm font-medium text-gray-300 mb-1">
-                            Nombre
-                        </label>
-                        <InputText 
-                            id="editUserName"
-                            value={formData.name}
-                            onChange={(e) => setFormData({...formData, name: e.target.value})}
-                            className="w-full bg-gray-700 border-gray-600 text-white"
-                            required
-                        />
-                    </div>
-                    
-                    <div className="mb-4">
-                        <label htmlFor="editUserDni" className="block text-sm font-medium text-gray-300 mb-1">
-                            DNI
-                        </label>
-                        <InputText 
-                            id="editUserDni"
-                            value={formData.dni}
-                            onChange={(e) => setFormData({...formData, dni: e.target.value})}
-                            className="w-full bg-gray-700 border-gray-600 text-white"
-                            required
-                        />
-                    </div>
-                    
-                    <div className="mb-4">
-                        <label htmlFor="editUserGender" className="block text-sm font-medium text-gray-300 mb-1">
-                            Género
-                        </label>
-                        <Dropdown 
-                            id="editUserGender"
-                            value={formData.gender}
-                            options={genderOptions}
-                            onChange={(e) => setFormData({...formData, gender: e.value})}
-                            className="w-full bg-gray-700 border-gray-600 text-white"
-                            placeholder="Seleccionar género"
-                            panelClassName="bg-gray-700"
-                        />
-                    </div>
-                    
-                    <div className="mb-6">
-                        <label htmlFor="editUserRole" className="block text-sm font-medium text-gray-300 mb-1">
-                            Rol
-                        </label>
-                        <Dropdown 
-                            id="editUserRole"
-                            value={formData.role}
-                            options={roleOptions}
-                            onChange={(e) => setFormData({...formData, role: e.value})}
-                            className="w-full bg-gray-700 border-gray-600 text-white"
-                            placeholder="Seleccionar rol"
-                            panelClassName="bg-gray-700"
-                        />
-                    </div>
-                    
-                    <div className="flex justify-end gap-3">
-                        <Button 
-                            type="button" 
-                            onClick={onClose} 
-                            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition"
-                            outlined
-                        >
-                            Cancelar
-                        </Button>
-                        <Button 
-                            type="submit" 
-                            className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition"
-                        >
-                            Guardar Cambios
-                        </Button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    );
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              DNI
+            </label>
+            <input
+              type="text"
+              name="dni"
+              value={formData.dni}
+              onChange={handleChange}
+              className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5"
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Género
+            </label>
+            <select
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5"
+            >
+              <option>Femenino</option>
+              <option>Masculino</option>
+            </select>
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Rol
+            </label>
+           <select
+  name="role"
+  value={formData.role}
+  onChange={(e) => {
+    handleChange(e);
+    onRoleChange(user.id, e.target.value); // actualiza el rol por separado
+  }}
+  className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5"
+>
+  {roles.map((role) => (
+    <option key={role.id} value={role.id}>
+      {role.name}
+    </option>
+  ))}
+</select>
+
+          </div>
+
+          <div className="flex justify-end gap-3">
+            <Button
+              type="button"
+              onClick={onClose}
+              className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition"
+            >
+              Guardar Cambios
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 };
 
-export const RoleEditModal: React.FC<RoleEditModalProps> = ({ role, onClose, onSave }) => {
-    const isCreating = !role.id || role.id === 0;
-    const [formData, setFormData] = useState({
-        name: role.name,
-        description: role.description
-    });
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // Agregar los valores del formData a los elementos del formulario
-        const form = e.currentTarget;
-        const nameInput = form.elements.namedItem('editRoleName') as HTMLInputElement;
-        const descInput = form.elements.namedItem('editRoleDescription') as HTMLInputElement;
-        
-        nameInput.value = formData.name;
-        descInput.value = formData.description;
-        
-        onSave(e);
-    };
-    
+export const RoleEditModal: React.FC<{ role: Role; onClose: () => void; onSave: (e: React.FormEvent<HTMLFormElement>) => void }> = 
+    ({ role, onClose, onSave }) => {
+    const isCreating = !role.id;
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 transition-opacity duration-300 z-50">
-            <style jsx>{`
-                .p-dropdown-panel {
-                    background: #374151 !important;
-                    border: 1px solid #4b5563 !important;
-                }
-                .p-dropdown-item {
-                    color: white !important;
-                }
-                .p-dropdown-item:hover {
-                    background: #4b5563 !important;
-                }
-                .p-inputtext, .p-dropdown, .p-inputtextarea {
-                    padding: 0.625rem !important;
-                }
-            `}</style>
-            <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 transform transition-transform duration-300 scale-100">
-                <h3 className="text-xl font-semibold mb-4 text-white">
-                    {isCreating ? "Crear Nuevo Rol" : "Editar Rol"}
-                </h3>
-                <form onSubmit={handleSubmit}>
-                    <input type="hidden" name="editRoleId" value={role.id || ''} />
-                    <input type="hidden" name="editRoleName" value={formData.name} />
-                    <input type="hidden" name="editRoleDescription" value={formData.description} />
-                    
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+            <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6">
+                <h3 className="text-xl font-semibold mb-4 text-white">{isCreating ? "Crear Nuevo Rol" : "Editar Rol"}</h3>
+                <form onSubmit={onSave}>
+                    <input type="hidden" name="editRoleId" defaultValue={role.id || ''} />
                     <div className="mb-4">
-                        <label htmlFor="editRoleName" className="block text-sm font-medium text-gray-300 mb-1">
-                            Nombre del Rol
-                        </label>
-                        <InputText 
-                            id="editRoleName"
-                            value={formData.name}
-                            onChange={(e) => setFormData({...formData, name: e.target.value})}
-                            className="w-full bg-gray-700 border-gray-600 text-white"
-                            required
-                        />
+                        <label htmlFor="editRoleName" className="block text-sm font-medium text-gray-300 mb-1">Nombre del Rol</label>
+                        <input type="text" id="editRoleName" name="editRoleName" defaultValue={role.name} className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5" required />
                     </div>
-                    
                     <div className="mb-6">
-                        <label htmlFor="editRoleDescription" className="block text-sm font-medium text-gray-300 mb-1">
-                            Descripción
-                        </label>
-                        <InputTextarea 
-                            id="editRoleDescription"
-                            value={formData.description}
-                            onChange={(e) => setFormData({...formData, description: e.target.value})}
-                            rows={3}
-                            className="w-full bg-gray-700 border-gray-600 text-white"
-                        />
+                        <label htmlFor="editRoleDescription" className="block text-sm font-medium text-gray-300 mb-1">Descripción</label>
+                        <textarea id="editRoleDescription" name="editRoleDescription" rows={3} defaultValue={role.description} className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5"></textarea>
                     </div>
-                    
                     <div className="flex justify-end gap-3">
-                        <Button 
-                            type="button" 
-                            onClick={onClose} 
-                            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition"
-                            outlined
-                        >
-                            Cancelar
-                        </Button>
-                        <Button 
-                            type="submit" 
-                            className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition"
-                        >
-                            Guardar
-                        </Button>
+                        <button type="button" onClick={onClose} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition">Cancelar</button>
+                        <button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition">Guardar</button>
                     </div>
                 </form>
             </div>
