@@ -141,6 +141,7 @@ export interface Usuario {
    department?: string
     avatar: string;
     lastActionDate?: string;
+   employee_id?: number;
 }
 
 export interface Role {

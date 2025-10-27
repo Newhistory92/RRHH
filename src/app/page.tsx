@@ -35,7 +35,8 @@ export default function App() {
     // Verificar si el usuario está autenticado
     const token = localStorage.getItem('token');
     const roleName = localStorage.getItem('roleName');
-
+    const usuario = localStorage.getItem('employeeId');
+console.log("ID empleado:", usuario);
     if (!token) {
       // Si no hay token, redirigir al login
       router.push('/login');

@@ -13,6 +13,7 @@ import { NotificationDialog } from "@/app/Componentes/Perfil/NotificationDialog"
 import {EMPLOYEES_DATA} from "@/app/api/prueba2";
 import { Employee,Notification,Page} from "@/app/Interfas/Interfaces";
 import Image from "next/image";
+import { logoutUser } from '@/app/util/auth';
   interface HeaderProps {
   setPage: (page: Page) => void;
 }
@@ -28,7 +29,13 @@ export function Header({ setPage }: HeaderProps) {
   const currentUser: Employee = { ...EMPLOYEES_DATA[0], notificaciones: notifications };
  
  
-
+ const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
   const handleNotificationClick = (notif: typeof currentUser.notificaciones[0]) => {
     setSelectedNotification(notif);
     setDialogVisible(true);
@@ -90,7 +97,7 @@ export function Header({ setPage }: HeaderProps) {
       label: 'Cerrar Sesión',
       icon: 'pi pi-sign-out',
       className: 'text-red-500 hover:bg-red-50',
-      command: () => console.log('Cerrar sesión')
+      command: handleLogout 
     }
   ];
 

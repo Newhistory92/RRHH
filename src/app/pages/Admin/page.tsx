@@ -19,6 +19,7 @@ interface ApiUser {
     dni: string | null;
     gender: string | null;
     photo: string | null;
+     employee_id: number;
 }
 
 interface ApiResponse {
@@ -62,6 +63,7 @@ export default function AdminPage() {
                 role: apiUser.role_name,
                 activo:apiUser.activo,
                 avatar: apiUser.photo || `https://i.pravatar.cc/150?u=${apiUser.email}`,
+                 employee_id: apiUser.employee_id,
             }));
             
             setUsers(mappedUsers);
@@ -138,35 +140,40 @@ const handleToggleUserStatus = async (userId: number, currentStatus: boolean) =>
         setEditingUser(null);
     };
 
-    const handleUserUpdate = async (formData: {
+const handleUserUpdate = async (formData: {
   name: string;
   dni: string;
   gender: string;
 }) => {
   if (!editingUser) return;
-console.log(formData)
+  console.log(formData);
+
   try {
-    // --- Paso 1: Crear o vincular empleado ---
+    // Si tiene employee_id, es PUT (actualizar), si no, es POST (crear)
+    const method = editingUser.employee_id ? 'PUT' : 'POST';
+    console.log(`Usando método ${method} para empleado`);
     const employeeResponse = await fetch("http://127.0.0.1:8000/users/employee", {
-      method: "POST",
+      method: method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         dni: formData.dni,
         name: formData.name,
         gender: formData.gender,
         email: editingUser.email,
-        user_id: editingUser.id, // vinculamos al usuario
+        user_id: editingUser.id,
+        employee_id: editingUser.employee_id || undefined,
       }),
     });
 
     if (!employeeResponse.ok) {
-      throw new Error("Error al crear/vincular empleado");
+      throw new Error(`Error al ${method === 'PUT' ? 'actualizar' : 'crear'} empleado`);
     }
 
+    await fetchUsers();
     closeUserModal();
-    console.log("Usuario actualizado correctamente en backend ✅");
+    console.log(`Empleado ${method === 'PUT' ? 'actualizado' : 'creado'} correctamente ✅`);
   } catch (error) {
-    console.error("❌ Error al actualizar usuario:", error);
+    console.error("❌ Error al procesar empleado:", error);
   }
 };
 

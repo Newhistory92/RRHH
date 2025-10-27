@@ -580,12 +580,12 @@ export const ProfileSettings: React.FC = () => {
 
 export const UserEditModal: React.FC<UserEditModalProps> = ({ user, roles, onClose, onSave,  onRoleChange }) => {
  const [formData, setFormData] = useState({
-    name: user.name,
-    dni: user.dni,
-    gender: user.gender,
-    role: user.role,
+    name: user.name === 'No especificado' ? '' : user.name,
+    dni: user.dni === 'N/A' ? '' : user.dni,
+    gender: user.gender === 'No especificado' ? '' : user.gender,
+     role: user.role  || "",
   });
-  console.log(roles)
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -638,33 +638,39 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({ user, roles, onClo
               value={formData.gender}
               onChange={handleChange}
               className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5"
+              required
             >
-              <option>Femenino</option>
-              <option>Masculino</option>
+              <option value="">Seleccionar género</option>
+              <option value="Femenino">Femenino</option>
+              <option value="Masculino">Masculino</option>
             </select>
           </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Rol
-            </label>
-           <select
-  name="role"
-  value={formData.role}
-  onChange={(e) => {
-    handleChange(e);
-    onRoleChange(user.id, e.target.value); // actualiza el rol por separado
-  }}
-  className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5"
->
-  {roles.map((role) => (
-    <option key={role.id} value={role.id}>
-      {role.name}
-    </option>
-  ))}
-</select>
+        <div className="mb-6">
+  <label className="block text-sm font-medium text-gray-300 mb-1">
+    Rol
+  </label>
+  <select
+    name="role"
+    value={formData.role} // valor actual
+    onChange={(e) => {
+      setFormData((prev) => ({ ...prev, role: e.target.value }));
+      onRoleChange(user.id, e.target.value);
+    }}
+    className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5"
+  >
+    {/* Opción vacía siempre primera */}
+    <option value="">-- Selecciona un rol --</option>
 
-          </div>
+    {/* Lista de roles */}
+    {roles.map((role) => (
+      <option key={role.id} value={role.id}>
+        {role.name}
+      </option>
+    ))}
+  </select>
+</div>
+
 
           <div className="flex justify-end gap-3">
             <Button
@@ -674,12 +680,12 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({ user, roles, onClo
             >
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition"
-            >
-              Guardar Cambios
-            </Button>
+           <Button
+  type="submit"
+  className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition"
+>
+  {user.employee_id ? 'Actualizar Datos' : 'Guardar Datos'}
+</Button>
           </div>
         </form>
       </div>

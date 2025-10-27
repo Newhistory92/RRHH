@@ -6,6 +6,7 @@ import { registerSchema } from "@/app/util/authValidation";
 import styles from './AuthPage.module.css';
 import { Toast } from 'primereact/toast';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
+import { cookies } from "next/headers";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -103,10 +104,16 @@ export default function AuthPage() {
 
       if (res.ok) {
         // Guardar token y datos del usuario
-        localStorage.setItem("token", data.access_token);
-        localStorage.setItem("usuario", data.usuario);
+        (await
+          cookies()).set("token", data.access_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 6, // 6 horas
+    path: "/",
+  });
+        // localStorage.setItem("usuario", data.usuario);
         localStorage.setItem("roleName", data.roleName);
-        
+        localStorage.setItem("employeeId", data.employeeId);
         // Mostrar toast de éxito
         toast.current?.show({
           severity: 'success',
