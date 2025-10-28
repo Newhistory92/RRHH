@@ -647,29 +647,35 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({ user, roles, onClo
           </div>
 
         <div className="mb-6">
-  <label className="block text-sm font-medium text-gray-300 mb-1">
-    Rol
-  </label>
-  <select
-    name="role"
-    value={formData.role} // valor actual
-    onChange={(e) => {
-      setFormData((prev) => ({ ...prev, role: e.target.value }));
-      onRoleChange(user.id, e.target.value);
-    }}
-    className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5"
-  >
-    {/* Opción vacía siempre primera */}
-    <option value="">-- Selecciona un rol --</option>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Rol
+            </label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={(e) => {
+                const newRole = e.target.value;
+                setFormData((prev) => ({ ...prev, role: newRole }));
+                
+                // Solo llamar onRoleChange si se selecciona un rol válido (no vacío)
+                if (newRole) {
+                  onRoleChange(user.id, newRole);
+                }
+              }}
+              className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5"
+            >
+              {/* Opción por defecto */}
+              <option value="">Sin Rol Asignado</option>
 
-    {/* Lista de roles */}
-    {roles.map((role) => (
-      <option key={role.id} value={role.id}>
-        {role.name}
-      </option>
-    ))}
-  </select>
-</div>
+              {/* Lista de roles de la API */}
+              {roles.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
 
 
           <div className="flex justify-end gap-3">

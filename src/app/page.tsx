@@ -24,6 +24,7 @@ export default function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [employeeData, setEmployeeData] = useState<any>(null);
 
   // Páginas permitidas por rol
   const rolePermissions: Record<string, Page[]> = {
@@ -32,28 +33,54 @@ export default function App() {
   };
 
   useEffect(() => {
-    // Verificar si el usuario está autenticado
-    const token = localStorage.getItem('token');
-    const roleName = localStorage.getItem('roleName');
-    const usuario = localStorage.getItem('employeeId');
-console.log("ID empleado:", usuario);
-    if (!token) {
-      // Si no hay token, redirigir al login
-      router.push('/login');
-      return;
-    }
+    const fetchEmployeeData = async () => {
+      // Verificar si el usuario está autenticado
+      const token = localStorage.getItem('token');
+      const roleName = localStorage.getItem('roleName');
+      const Empleado_ID = localStorage.getItem('employeeId');
 
-    setUserRole(roleName);
-    
-    // Establecer página inicial según el rol
-    if (roleName) {
-      const allowedPages = rolePermissions[roleName] || [];
-      if (allowedPages.length > 0) {
-        setPage(allowedPages[0]);
+      if (!token) {
+        // Si no hay token, redirigir al login
+        router.push('/login');
+        return;
       }
-    }
-    
-    setIsLoading(false);
+
+      setUserRole(roleName);
+      
+      // Establecer página inicial según el rol
+      if (roleName) {
+        const allowedPages = rolePermissions[roleName] || [];
+        if (allowedPages.length > 0) {
+          setPage(allowedPages[0]);
+        }
+      }
+
+      // Fetch de datos del empleado si existe el ID
+      if (Empleado_ID) {
+        try {
+          const response = await fetch(`http://127.0.0.1:8000/employee/${Empleado_ID}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            console.log('Datos del empleado obtenidos:', data);
+            setEmployeeData(data);
+          } else {
+            console.error('Error al obtener datos del empleado:', response.statusText);
+          }
+        } catch (error) {
+          console.error('Error en la petición:', error);
+        }
+      }
+      
+      setIsLoading(false);
+    };
+
+    fetchEmployeeData();
   }, [router]);
 
   // Verificar si el usuario tiene permiso para ver una página
@@ -97,12 +124,12 @@ console.log("ID empleado:", usuario);
         return <IAPage />;
       case 'organigrama':
         return <OrganigramaPage />;
-      case 'editar-perfil':
-        return <EmployeeCV />;
+       case 'editar-perfil':
+        return <EmployeeCV employeeData={employeeData}  />;
       case 'licencias':
-        return <LicenciasManage />;
+        return <LicenciasManage employeeData={employeeData}  />;
       case 'feedback':
-        return <FeedbackTab />;
+        return <FeedbackTab employeeData={employeeData}  />;
       case 'test':
         return <TestPage />;
          case 'admin':

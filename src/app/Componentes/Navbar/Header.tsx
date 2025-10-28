@@ -25,7 +25,8 @@ export function Header({ setPage }: HeaderProps) {
   const [selectedNotification, setSelectedNotification] = useState<typeof currentUser.notificaciones[0] | null>(null);
   const [dialogVisible, setDialogVisible] = useState(false);
    const [notifications, setNotifications] = useState<Notification[]>(EMPLOYEES_DATA[0].notificaciones ?? [] );
-
+  const Usuario = localStorage.getItem('usuario');
+      const roleName = localStorage.getItem('roleName');
   const currentUser: Employee = { ...EMPLOYEES_DATA[0], notificaciones: notifications };
  
  
@@ -65,8 +66,8 @@ export function Header({ setPage }: HeaderProps) {
         <div className="px-4 py-4 bg-gradient-to-br from-gray-50 to-gray-100 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <div>
-              <p className="font-bold text-gray-800">{currentUser.name}</p>
-              <p className="text-sm text-gray-500">{currentUser.email}</p>
+              <p className="font-bold text-gray-800">{Usuario}</p>
+              <p className="text-sm text-gray-500">{roleName}</p>
             </div>
           </div>
         </div>

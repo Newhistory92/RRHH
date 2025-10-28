@@ -13,58 +13,72 @@ import HabilidadesBlandas from '@/app/Componentes/CvComponente/HabilidadesBlanda
 import CertificacionesCursos from '@/app/Componentes/CvComponente/CertificacionesCursos';
 import {Employee} from "@/app/Interfas/Interfaces"
 import { Button } from 'primereact/button';
-export default function EmployeeCV() {
-  const loggedInEmployee = EMPLOYEES_DATA.find((e) => e.id === 1);
-  // Inicializar cvData con la estructura completa, agregando campos faltantes
-  
- const [cvData, setCvData] = useState<Employee | null>(
-  loggedInEmployee
-    ? {
-        ...loggedInEmployee,
-        gender: loggedInEmployee.gender || '',
-        academicFormation: loggedInEmployee.academicFormation || [],
-        workExperience: loggedInEmployee.workExperience || [],
-        languages: loggedInEmployee.languages || [],
-        certifications: loggedInEmployee.certifications || [],
-        skillStatus: [], // Inicializar como array vacío
-        softSkillsArray: (loggedInEmployee.softSkills || [])
-          .map(skill => {
-            const skillCatalog = SOFT_SKILLS_CATALOG.find(
-              s => s.nombre === skill.nombre
-            );
-            return skillCatalog ? skillCatalog.id : null;
-          })
-          .filter((id): id is number => id !== null), // Type guard para filtrar nulls
-      }
-    : null
-);
 
+interface EmployeeCVProps {
+  employeeData: Employee | null;
+}
 
-
+export default function EmployeeCV({ employeeData }: EmployeeCVProps) {
+  const [cvData, setCvData] = useState<Employee | null>(employeeData);
   const [originalCvData, setOriginalCvData] = useState<Employee | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
+console.log(cvData)
+
   // Manejar el caso donde el empleado no se encuentra
-  if (!cvData) {
+ if (!cvData) {
     return (
       <div className="bg-gray-100 font-sans min-h-screen flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
-          <p className="text-gray-700">No se pudo encontrar la información del empleado.</p>
+          {employeeData === null ? (
+            <>
+              <div className="flex justify-center mb-4">
+                <i className="pi pi-spin pi-spinner text-4xl text-blue-500"></i>
+              </div>
+              <p className="text-gray-700 text-center">Cargando información del empleado...</p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
+              <p className="text-gray-700">No se pudo encontrar la información del empleado.</p>
+            </>
+          )}
         </div>
       </div>
     );
   }
 
+
   const handleEdit = () => {
     setOriginalCvData(JSON.parse(JSON.stringify(cvData)));
     setIsEditing(true);
-  };
+  }; 
+ const handleSave = async () => {
+    // Enviar datos actualizados al backend
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://127.0.0.1:8000/employee/${cvData.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(cvData),
+      });
 
-  const handleSave = () => {
-    // In a real app, you'd send `cvData` to your backend here.
-    setIsEditing(false);
-    setOriginalCvData(null); // Clear backup
+      if (response.ok) {
+        setIsEditing(false);
+        setOriginalCvData(null);
+        // Opcional: mostrar mensaje de éxito
+        console.log('Datos guardados exitosamente');
+      } else {
+        console.error('Error al guardar los datos');
+        // Opcional: mostrar mensaje de error al usuario
+      }
+    } catch (error) {
+      console.error('Error en la petición:', error);
+      // Opcional: mostrar mensaje de error al usuario
+    }
   };
 
   const handleCancel = () => {
