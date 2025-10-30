@@ -1,6 +1,7 @@
 import React from 'react';
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from 'primereact/dropdown';
+import { Calendar } from 'primereact/calendar';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { ProfilePictureUploader } from '@/app/util/UiRRHH';
 import {Employee} from "@/app/Interfas/Interfaces"
@@ -23,12 +24,40 @@ const genderOptions: GenderOption[] = [
 ];
 
 export default function DatosPersonales({ data, updateData, isEditing }: CvProps) {
-  const handleChange = (field: keyof Employee, value: string) => {
-    updateData({ [field]: value });
+
+  
+  const handleChange = (field: keyof Employee, value: Employee[keyof Employee]) => {
+    updateData({ [field]: value } as Partial<Employee>);
   };
 
   const handleDropdownChange = (e: { value: string }) => {
     handleChange("gender", e.value);
+  };
+
+
+   const parseBirthDate = (birthDate?: string | Date | null): Date | null => {
+    if (!birthDate) return null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const date = new Date(birthDate as any);
+    return isNaN(date.getTime()) ? null : date;
+  };
+
+  // Formatear fecha para mostrar como string en modo disabled
+  const formatBirthDateForDisplay = (): string => {
+    if (!data.birthDate) return '';
+    const date = new Date(data.birthDate);
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('es-ES', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric' 
+    });
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleDateChange = (e: any) => {
+    const value: Date | null = e?.value ?? null;
+    handleChange("birthDate", value);
   };
 
   return (
@@ -74,14 +103,25 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
             <label htmlFor="birthDate" className="text-sm font-medium text-gray-700">
               Fecha de Nacimiento
             </label>
-            <InputText
-              id="birthDate"
-              value={data.birthDate || ''}
-              disabled
-              className="w-full"
-            />
+            {isEditing ? (
+              <Calendar
+                id="birthDate"
+                value={parseBirthDate(data.birthDate)}
+                onChange={handleDateChange}
+                dateFormat="dd/mm/yy"
+                showIcon
+                className="w-full"
+                placeholder="Seleccione fecha"
+              />
+            ) : (
+              <InputText
+                id="birthDate"
+                value={formatBirthDateForDisplay()}
+                disabled
+                className="w-full"
+              />
+            )}
           </div>
-          
           {/* Género */}
           <div className="flex flex-col gap-2">
             <label htmlFor="gender" className="text-sm font-medium text-gray-700">
@@ -138,14 +178,11 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
             <label htmlFor="email" className="text-sm font-medium text-gray-700">
               Email
             </label>
-            <InputText
+              <InputText
               id="email"
               type="email"
               value={data.email || ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
-                handleChange("email", e.target.value)
-              }
-              disabled={!isEditing}
+              disabled
               className="w-full"
             />
           </div>

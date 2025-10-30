@@ -37,8 +37,7 @@ export default function HabilidadesTecnicas({
     const [isTestModalVisible, setIsTestModalVisible] = useState(false);
     const [selectedSkillForTest, setSelectedSkillForTest] = useState<Skill | null>(null);
     
-    console.log('skillStatus:', skillStatus);
-    console.log('data:', data);
+  
 
     useEffect(() => {
         if (!position) {

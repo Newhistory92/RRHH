@@ -289,7 +289,7 @@ export interface Employee {
   email: string;
   phone: string;
   address: string;
-  birthDate: string;
+  birthDate: Date | null;
   gender?: string;
   photo: string;
   hours: number; // Total available hours for permissions
@@ -306,7 +306,7 @@ export interface Employee {
   startDate: string;
   permanentDate: string | null; // Can be null if employee is not permanent yet
   lastCategoryUpdate: string;
- academicFormation: AcademicFormation[];
+ AcademicFormation: AcademicFormation[];
   languages: Language[];
   workExperience: WorkExperience[];
   certifications: certifications[];

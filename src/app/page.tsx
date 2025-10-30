@@ -16,7 +16,7 @@ import "primereact/resources/themes/lara-light-cyan/theme.css";
 import 'primeicons/primeicons.css';
 import  TestPage  from './pages/TestConfig/page';
 import FeedbackTab from './pages/Feedback/page';
-import { Page} from "@/app/Interfas/Interfaces";
+import { Employee, Page} from "@/app/Interfas/Interfaces";
 
 export default function App() {
   const router = useRouter();
@@ -24,7 +24,7 @@ export default function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [employeeData, setEmployeeData] = useState<any>(null);
+  const [employeeData, setEmployeeData] = useState<Employee | null>(null);
 
   // Páginas permitidas por rol
   const rolePermissions: Record<string, Page[]> = {
@@ -67,7 +67,7 @@ export default function App() {
 
           if (response.ok) {
             const data = await response.json();
-            console.log('Datos del empleado obtenidos:', data);
+   
             setEmployeeData(data);
           } else {
             console.error('Error al obtener datos del empleado:', response.statusText);

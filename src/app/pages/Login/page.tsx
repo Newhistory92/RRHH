@@ -6,7 +6,7 @@ import { registerSchema } from "@/app/util/authValidation";
 import styles from './AuthPage.module.css';
 import { Toast } from 'primereact/toast';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
-import { cookies } from "next/headers";
+import {loginUser} from '@/app/util/auth';
 
 export default function AuthPage() {
   const router = useRouter();
@@ -88,64 +88,43 @@ export default function AuthPage() {
 
  const handleLoginSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      const res = await fetch("http://127.0.0.1:8000/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          username: usuario,
-          password: password,
-        }),
+      // 🔥 Llamamos la función centralizada
+      const data = await loginUser(usuario, password);
+      console.log("Login exitoso:", data);
+
+      // Guardar en localStorage los datos del usuario
+      localStorage.setItem("roleName", data.roleName);
+      localStorage.setItem("employeeId", data.employeeId || "");
+
+      // Mostrar toast de éxito
+      toast.current?.show({
+        severity: "success",
+        summary: "Inicio de sesión exitoso",
+        detail: `¡Bienvenido ${data.usuario}!`,
+        life: 2000,
       });
 
-      const data = await res.json();
-      console.log(data);
+      // Redirigir después de 1 segundo
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("❌ Error al iniciar sesión:", error);
 
-      if (res.ok) {
-        // Guardar token y datos del usuario
-        (await
-          cookies()).set("token", data.access_token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 6, // 6 horas
-    path: "/",
-  });
-        // localStorage.setItem("usuario", data.usuario);
-        localStorage.setItem("roleName", data.roleName);
-        localStorage.setItem("employeeId", data.employeeId);
-        // Mostrar toast de éxito
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Inicio de sesión exitoso',
-          detail: `¡Bienvenido ${data.usuario}!`,
-          life: 2000
-        });
-
-        // Redirigir después de 1 segundo
-        setTimeout(() => {
-          router.push('/');
-        }, 1000);
-      } else {
-        // Mostrar toast de error
-        toast.current?.show({
-          severity: 'error',
-          summary: 'Error de autenticación',
-          detail: data.detail || 'Usuario o contraseña incorrectos',
-          life: 3000
-        });
-      }
-    } catch (error) {
-      console.error(error);
       toast.current?.show({
-        severity: 'error',
-        summary: 'Error de conexión',
-        detail: 'No se pudo conectar con el servidor',
-        life: 3000
+        severity: "error",
+        summary: "Error de autenticación",
+        detail:
+          error.message === "Login fallido"
+            ? "Usuario o contraseña incorrectos"
+            : "No se pudo conectar con el servidor",
+        life: 3000,
       });
     }
   };
-  
 
 
 

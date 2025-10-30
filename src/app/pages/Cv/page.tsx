@@ -91,6 +91,8 @@ console.log(cvData)
 
   const updateCvData = (newData: Partial<Employee>) => {
     setCvData(prev => prev ? ({ ...prev, ...newData }) : null);
+    
+
   };
 
  return (
@@ -108,8 +110,8 @@ console.log(cvData)
           />
           
           <FormacionAcademica 
-            data={cvData.academicFormation} 
-            updateData={(academicFormation) => updateCvData({ academicFormation })} 
+            data={cvData.AcademicFormation} 
+            updateData={(AcademicFormation) => updateCvData({ AcademicFormation })} 
             isEditing={isEditing} 
           />
           

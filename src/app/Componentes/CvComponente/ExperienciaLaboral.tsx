@@ -10,6 +10,7 @@ export interface CvFormacionProps {
 }
 
 export default function ExperienciaLaboral({ data, updateData, isEditing }: CvFormacionProps) {
+  
    const handleChange = (id:string | number,field: string, value: string | number | boolean | File | null) => {
     const newData = data.map((item) =>
       item.id === id ? { ...item, [field]: value } : item
