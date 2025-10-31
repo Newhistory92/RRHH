@@ -1,14 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EmployeeDetailView } from "@/app/Componentes/TablaOperador/Perfildetail";
-import { EMPLOYEES_DATA } from "@/app/api/prueba2";
 import { MessagesView } from "@/app/Componentes/TablaOperador/MensajeDetail";
 import { EmployeeTableView } from "@/app/Componentes/TablaOperador/Table";
-import {
-  LicenseDetailModal,
-  PermissionModal,
-} from "@/app/Componentes/ModalRRHH/LicenseModal";
+import {LicenseDetailModal,PermissionModal} from "@/app/Componentes/ModalRRHH/LicenseModal";
 import {
   Employee,
   EmployeeStatus,
@@ -27,17 +23,39 @@ export interface ViewState {
   id?: number;
 }
 export default function RecursosHumanosPage() {
-  const [employees, setEmployees] = useState<Employee[]>(EMPLOYEES_DATA);
-  const [archivedMessages, setArchivedMessages] = useState<ArchivedMessage[]>(
-    []
-  );
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [archivedMessages, setArchivedMessages] = useState<ArchivedMessage[]>([]);
   const [currentView, setCurrentView] = useState<ViewState>({ name: "table" });
-  const [permissionModalEmployeeId, setPermissionModalEmployeeId] = useState<
-    number | null
-  >(null);
-  const [selectedLicense, setSelectedLicense] = useState<LicenseHistory | null>(
-    null
-  );
+  const [permissionModalEmployeeId, setPermissionModalEmployeeId] = useState<number | null>(null);
+  const [selectedLicense, setSelectedLicense] = useState<LicenseHistory | null>(null);
+
+useEffect(() => {
+  const fetchEmployeeData = async () => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/rrhh/employees/`);
+      if (!response.ok) {
+        console.error('Error al obtener datos del empleado:', response.statusText);
+        setEmployees([]);
+        setIsLoading(false);
+        return;
+      }
+      const data = await response.json();
+      console.log("Fetched employee data:", data);
+
+      // Tomamos el array dentro de `data.employees`
+      setEmployees(Array.isArray(data.employees) ? data.employees : []);
+    } catch (error) {
+      console.error('Error en la petición:', error);
+      setEmployees([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchEmployeeData();
+}, []);
+
 
   const handleApplyLicense = (employeeId: number, message: Message) => {
     setEmployees((prev) =>
@@ -57,7 +75,7 @@ export default function RecursosHumanosPage() {
           return {
             ...emp,
             status: "De licencia" as EmployeeStatus,
-            licencias: [...emp.licenses.history, newLicense],
+            licencias: [...emp.licenses.aprobaciones, newLicense],
             mensajes: emp.messages.filter((m) => m.id !== message.id),
           };
         }
@@ -106,10 +124,21 @@ export default function RecursosHumanosPage() {
     alert("Permiso guardado correctamente.");
   };
 
-  const permissionModalEmployee = useMemo(() => 
-    employees.find(e => e.id === permissionModalEmployeeId) || null, 
-    [employees, permissionModalEmployeeId]
-  );
+const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === permissionModalEmployeeId) || null,
+  [employees, permissionModalEmployeeId]
+);
+
+
+   if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="text-center">
+          <i className="pi pi-spin pi-spinner text-4xl text-blue-500 mb-4"></i>
+          <p className="text-gray-600 dark:text-gray-400">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
 
   const renderContent = () => {
     switch (currentView.name) {

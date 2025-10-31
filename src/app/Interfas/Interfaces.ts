@@ -78,9 +78,9 @@ export type ComplaintStatus = 'Resuelto' | 'Pendiente' | 'En proceso';
 
 // Schedule interface
 export interface Schedule {
-  startTime: string;
-  endTime: string;
-  workingHours: number;
+  horaInicio: string;
+  horaFin: string;
+  horasTrabajo: number;
 }
 
 // Monthly hours tracking
@@ -120,7 +120,7 @@ export interface Licenses {
   '2023': number;
   usuarios: Record<number, Usuario>
   saldos: Saldo[]
-  history: LicenseHistory[];
+  aprobaciones: LicenseHistory[];
 }
 
 export interface Saldo {
@@ -176,6 +176,7 @@ export interface Permit {
   id: string;
   date: string;
   departureTime: string;
+  exitTime : string;
   returnTime: string;
   hours: number;
 }
@@ -269,6 +270,16 @@ export interface CriticalEvents {
   description: string;
   impact: number; // -10 a +10
 }
+
+
+export interface CondicionLaboral {
+  tipoContrato: EmploymentStatus;
+  fechaIngreso: Date | null;
+  fechaPlanta: Date | null;
+  categoria: string;
+  fechaCategoria: Date | null;
+  position: string;
+}
 // export interface SalaryHistory {
 //   currentSalary: number;
 //   currency: 'ARS' | 'USD';
@@ -292,32 +303,27 @@ export interface Employee {
   birthDate: Date | null;
   gender?: string;
   photo: string;
+  status: EmployeeStatus;
   hours: number; // Total available hours for permissions
   // Employment Details
   position: string;
-  department: string;
+  department: Department;
   departmentId: number;
-  office: string | null;
+  office: Office;
   officeId: number | null;
-  category: string;
-  status: EmployeeStatus;
-  employmentStatus: EmploymentStatus;
-  activityType: string;
-  startDate: string;
-  permanentDate: string | null; // Can be null if employee is not permanent yet
-  lastCategoryUpdate: string;
+  condicionLaboral: CondicionLaboral;
  AcademicFormation: AcademicFormation[];
   languages: Language[];
   workExperience: WorkExperience[];
   certifications: certifications[];
   // Management
   managerId: number | null; // Can be null if no manager assigned
-  supervisor: string | null; // Can be null if no supervisor assigned
+  manager: Employee; // Can be null if no manager assigned
   role: EmployeeRole;
   subordinates: number[];
 
   // Schedule
-  schedule: Schedule;
+  horario: Schedule;
 
   // Performance Metrics
   productivityScore: number;
@@ -354,6 +360,7 @@ export interface Department {
   parentId?: number | null;
   habilidades_requeridas?:TechnicalSkill[];
   oficinas: Office[];
+  
 }
 
 export interface AcademicFormation {
@@ -442,7 +449,6 @@ export type SoftSkillsCatalogData = SoftSkillCatalog[];
 
 // Optional: Utility types for partial updates
 export type EmployeeUpdate = Partial<Employee>;
-export type EmployeeBasicInfo = Pick<Employee, 'id' | 'name' | 'email' | 'position' | 'department' | 'status'>;
 export type EmployeeContactInfo = Pick<Employee, 'email' | 'phone' | 'address'>;
 export type EmployeePerformance = Pick<Employee, 'productivityScore' | 'overallProductivity' | 'monthlyHours' | 'tasks'>;
 

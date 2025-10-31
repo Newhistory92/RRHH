@@ -14,14 +14,16 @@ interface LicenseHistoryTabProps {
 export const ProfileTab = ({ employee }: { employee: Employee }) => {
  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    position: employee.position,
-    scheduleStart: employee.schedule.startTime,
-    scheduleEnd: employee.schedule.endTime,
-    employmentStatus: employee.employmentStatus,
-    startDate: new Date(employee.startDate),
-    permanentDate: employee.permanentDate ? new Date(employee.permanentDate) : null,
-    category: employee.category,
-    lastCategoryUpdate: new Date(employee.lastCategoryUpdate)
+    position: employee.condicionLaboral.position,
+    scheduleStart: employee.horario.horaInicio,
+    scheduleEnd: employee.horario.horaFin,
+    employmentStatus: employee.condicionLaboral.tipoContrato,
+     startDate: employee.condicionLaboral?.fechaIngreso
+  ? new Date(employee.condicionLaboral.fechaIngreso)
+  : null,
+    permanentDate: employee.condicionLaboral.fechaPlanta ? new Date(employee.condicionLaboral.fechaPlanta) : null,
+    category: employee.condicionLaboral.categoria,
+    lastCategoryUpdate: employee.condicionLaboral.fechaCategoria ? new Date(employee.condicionLaboral.fechaCategoria) : null
   });
    const handleSave = () => {
     // Aquí implementarías la lógica para guardar los cambios
@@ -31,22 +33,31 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
 
   const handleCancel = () => {
     setFormData({
-      position: employee.position,
-      scheduleStart: employee.schedule.startTime,
-      scheduleEnd: employee.schedule.endTime,
-      employmentStatus: employee.employmentStatus,
-      startDate: new Date(employee.startDate),
-      permanentDate: employee.permanentDate ? new Date(employee.permanentDate) : null,
-      category: employee.category,
-      lastCategoryUpdate: new Date(employee.lastCategoryUpdate)
+      position: employee.condicionLaboral.position,
+    scheduleStart: employee.horario.horaInicio,
+    scheduleEnd: employee.horario.horaFin,
+    employmentStatus: employee.condicionLaboral.tipoContrato,
+    startDate: employee.condicionLaboral?.fechaIngreso
+  ? new Date(employee.condicionLaboral.fechaIngreso)
+  : null,
+
+    permanentDate: employee.condicionLaboral.fechaPlanta ? new Date(employee.condicionLaboral.fechaPlanta) : null,
+    category: employee.condicionLaboral.categoria,
+    lastCategoryUpdate: employee.condicionLaboral.fechaCategoria ? new Date(employee.condicionLaboral.fechaCategoria) : null
     });
     setIsEditing(false);
   };
 
-  const formatDate = (date: Date | null) => {
-    if (!date) return '';
-    return date.toISOString().split('T')[0];
-  };
+const formatDate = (date: Date| null) => {
+  if (!date) return '';
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('es-AR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+};
 
   const getEmploymentStatusLabel = (status: EmploymentStatus) => {
     const labels = {
@@ -54,7 +65,8 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
       contract: 'Contratado',
       temporary: 'Temporal'
     };
-    return labels[status] || status;
+    const key = status as keyof typeof labels;
+    return labels[key] || status;
   };
 
   const employmentStatusOptions = [
@@ -88,7 +100,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
               {employee.address}
             </InfoCard>
             <InfoCard icon={Cake} title="Fecha de Nacimiento">
-              {employee.birthDate}
+               {formatDate(employee.birthDate)}
             </InfoCard>
             <InfoCard icon={AtSign} title="Email">
               {employee.email}
@@ -137,7 +149,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
               )}
             </InfoCard>
             
-            {(employee.permanentDate || isEditing) && (
+            {( employee.condicionLaboral.fechaPlanta || isEditing) && (
               <InfoCard icon={CheckCircle} title="Ingreso a Planta">
                 {isEditing ? (
                   <Calendar 
@@ -155,12 +167,12 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
             <InfoCard icon={User} title="Categoría">
               {isEditing ? (
                 <InputText 
-                  value={formData.category}
+                  value={formData.category ?? ''}
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
                   className="w-full p-inputtext-sm"
                 />
               ) : (
-                formData.category
+                formData.category || ''
               )}
             </InfoCard>
             
@@ -217,9 +229,10 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
               )}
             </InfoCard>
             
-            <InfoCard icon={Building} title="Departamento/ Supervisor">
-              {employee.department} - {employee.office} / {employee.supervisor}
-            </InfoCard>
+       <InfoCard icon={Building} title="Departamento / Supervisor">
+        {employee.department?.nombre ?? "Sin departamento"} - {employee.office?.nombre ?? "Sin oficina"} / {employee.manager?.name ?? "Sin supervisor"}
+        </InfoCard>
+
             
             <InfoCard icon={Clock} title="Horario Laboral">
               {isEditing ? (
@@ -263,10 +276,13 @@ export const LicenseHistoryTab = ({ licenses, onRowClick }: LicenseHistoryTabPro
   };
 
   // Cálculos de paginación
-  const totalItems = licenses.history.length;
+const aprobaciones = Array.isArray(licenses)
+  ? licenses.flatMap(l => l.aprobaciones || [])
+  : []
+const totalItems = aprobaciones.length;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = licenses.history.slice(startIndex, endIndex);
+  const currentItems = aprobaciones.slice(startIndex, endIndex);
 
   return (
     <div className="mt-4 flow-root">
@@ -405,30 +421,34 @@ export const PermissionHistoryTab = ({ permisos }: { permisos: Permit[] }) => (
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {permisos.length > 0 ? (
-                permisos.map((p) => (
-                  <tr key={p.id}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                      {p.date}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {p.departureTime}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {p.returnTime}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <HoursDisplay hours={p.hours} />
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} className="text-center py-8 text-gray-500">
-                    No hay historial de permisos.
-                  </td>
-                </tr>
-              )}
+                {Array.isArray(permisos) && permisos.length > 0 ? (
+    permisos.map((p, index) => (
+      <tr key={p.id ?? index}>
+        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+          {p.date ?? "Sin fecha"}
+        </td>
+        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+          {p.exitTime ?? "—"}
+        </td>
+        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+          {p.returnTime ?? "—"}
+        </td>
+        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+          <HoursDisplay hours={p.hours ?? 0} />
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td
+        colSpan={4}
+        className="text-center text-sm text-gray-500 py-4"
+      >
+        No hay permisos registrados
+      </td>
+    </tr>
+  )}
+              
             </tbody>
           </table>
         </div>

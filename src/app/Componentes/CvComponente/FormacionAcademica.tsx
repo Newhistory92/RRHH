@@ -1,14 +1,7 @@
 import React from 'react';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { DynamicSection } from '@/app/Componentes/Perfil/DynamicSectionCv';
-import {  AcademicFormation} from "@/app/Interfas/Interfaces"
-
-export interface CvFormacionProps {
-  data: AcademicFormation[];
-  updateData: (updates:  AcademicFormation[]) => void;
-  isEditing: boolean;
-}
-
+import { AcademicFormation } from "@/app/Interfas/Interfaces"
 
 export interface CvFormacionProps {
   data: AcademicFormation[];
@@ -19,25 +12,56 @@ export interface CvFormacionProps {
 export default function FormacionAcademica({ data, updateData, isEditing }: CvFormacionProps) {
 
   const handleChange = (id: string | number, field: string, value: string | number | boolean | File | null) => {
-    const newData = data.map((item) =>
-      item.id === id ? { ...item, [field]: value } : item
-    );
+    const newData = data.map((item) => {
+      if (item.id === id) {
+        // Convertir fechas de string a Date cuando sea necesario
+        if ((field === 'startDate' || field === 'endDate') && typeof value === 'string' && value) {
+          return { ...item, [field]: new Date(value) };
+        }
+        // Si se marca isCurrent, limpiar endDate
+        if (field === 'isCurrent' && value === true) {
+          return { ...item, isCurrent: true, endDate: null };
+        }
+        return { ...item, [field]: value };
+      }
+      return item;
+    });
     updateData(newData);
   };
 
-  const handleRemove = (id: string | number) => {
+ const handleRemove = async (id: string | number) => {
+  try {
+    // 1️⃣ Confirmar (opcional)
+    if (!confirm("¿Seguro que deseas eliminar esta formación académica?")) return;
+
+    // 2️⃣ Llamar al backend
+    const res = await fetch(`http://127.0.0.1:8000/employee/Academic/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      throw new Error("No se pudo eliminar el registro en el servidor.");
+    }
+
+    // 3️⃣ Actualizar el estado local
     const newData = data.filter((item) => item.id !== id);
     updateData(newData);
-  };
+
+    console.log(`Formación académica con id ${id} eliminada exitosamente.`);
+  } catch (error) {
+    console.error("Error eliminando formación académica:", error);
+    alert("Ocurrió un error al eliminar el registro.");
+  }
+};
 
   const handleAdd = () => {
-    // No incluir el ID - el backend lo generará
     const newItem: Omit<AcademicFormation, 'id'> & { id?: number } = {
       title: "",
       institution: "",
       level: "Universitario",
       status: "En curso",
-      startDate: "",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      startDate: null as any, 
       endDate: null,
       isCurrent: false,
       attachment: null,
@@ -46,8 +70,17 @@ export default function FormacionAcademica({ data, updateData, isEditing }: CvFo
     updateData([...safeData, newItem as AcademicFormation]);
   };
 
-  // Asegurar que data siempre sea un array
-  const safeData = Array.isArray(data) ? data : [];
+  // Convertir fechas DateTime a string para el render
+  const formatDataForRender = (items: AcademicFormation[]) => {
+    return items.map(item => ({
+      ...item,
+      startDate: item.startDate ? new Date(item.startDate).toISOString().split('T')[0] : '',
+      endDate: item.endDate ? new Date(item.endDate).toISOString().split('T')[0] : null,
+    }));
+  };
+
+  // Asegurar que data siempre sea un array y formatear para render
+  const safeData = Array.isArray(data) ? formatDataForRender(data) : [];
 
   return (
     <Accordion activeIndex={0}>
@@ -94,10 +127,10 @@ export default function FormacionAcademica({ data, updateData, isEditing }: CvFo
                 { value: "Incompleto", label: "Incompleto" },
               ],
             },
-            { name: "startDate", label: "Fecha de Inicio", type: "date" },
+            { name: "startDate", label: "Fecha de Inicio", type: "date", required: true },
             { 
               name: "endDate", 
-              label: "Fecha de Fin (dejar vacío si está cursando)", 
+              label: "Fecha de Fin (opcional si está cursando)", 
               type: "date"
             },
             {

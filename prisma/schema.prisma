@@ -177,7 +177,7 @@ model SoftSkill {
   description        String?             @db.Text
   employeeSoftSkills EmployeeSoftSkill[]
   feedbacks          Feedback[]
-  activo                Boolean   @default(true)
+  activo             Boolean   @default(true)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   @@index([nombre])
@@ -385,7 +385,6 @@ model AcademicRecord {
   status      String    // Completo, En curso
   startDate   DateTime
   endDate     DateTime?
-  isCurrent   Boolean   @default(false)
   activo                Boolean   @default(true)
   attachment  String?   @db.Text
   employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -529,6 +528,7 @@ model CondicionLaboral {
   fechaIngreso DateTime
   fechaPlanta  DateTime?
   categoria    String
+  fechaCategoria DateTime?
   position     String
   employeeId   Int       @unique
   employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)

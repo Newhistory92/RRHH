@@ -61,8 +61,10 @@ export const EmployeeTableView = ({
     }
 
     if (filters.departamento) {
-      filtered = filtered.filter((e) => e.department === filters.departamento);
-    }
+  filtered = filtered.filter(
+    (e) => e.department?.nombre === filters.departamento
+  );
+}
 
     if (filters.searchTerm) {
       const term = filters.searchTerm.toLowerCase();
@@ -70,7 +72,7 @@ export const EmployeeTableView = ({
         (e) =>
           e.name.toLowerCase().includes(term) ||
           e.dni.toLowerCase().includes(term) ||
-          e.department.toLowerCase().includes(term)
+          e.department?.nombre?.toLowerCase().includes(term)
       );
     }
     if (sortConfig.key) {
@@ -140,6 +142,17 @@ export const EmployeeTableView = ({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getDepartmentName = (dep: any) => {
+  if (!dep) return "Sin departamento";
+  if (typeof dep === "string") return dep;
+  if (typeof dep === "object" && "nombre" in dep && dep.nombre)
+    return dep.nombre;
+  return "Sin departamento";
+};
+
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="sm:flex sm:items-center sm:justify-between">
@@ -201,21 +214,27 @@ export const EmployeeTableView = ({
           </select>
         </div>
         <div className="sm:col-span-2">
-          <select
-            className="block w-full px-3 rounded-md border-0 py-2.5 text-gray-900 shadow-xl ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm"
-            value={filters.departamento}
-            onChange={(e) => {
-              setFilters({ ...filters, departamento: e.target.value });
-              setCurrentPage(1); // Resetear a primera página al filtrar
-            }}
-          >
-            <option value="">Todos los Departamentos</option>
-            {[...new Set(employees.map((e) => e.department))].map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
+         <select
+  className="block w-full px-3 rounded-md border-0 py-2.5 text-gray-900 shadow-xl ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm"
+  value={filters.departamento}
+  onChange={(e) => {
+    setFilters({ ...filters, departamento: e.target.value });
+    setCurrentPage(1);
+  }}
+>
+  <option value="">Todos los Departamentos</option>
+  {[...new Map(
+  employees
+    .filter(e => e.department && e.department.nombre)
+    .map(e => [e.department.id ?? e.department.nombre, e.department.nombre])
+).entries()].map(([id, nombre]) => (
+  <option key={id} value={nombre}>
+    {nombre}
+  </option>
+))}
+
+</select>
+
         </div>
       </div>
 
@@ -277,7 +296,7 @@ export const EmployeeTableView = ({
                         className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hover:bg-gray-50 cursor-pointer"
                         onClick={() => onSelectEmployee(employee.id)}
                       >
-                        {employee.department}
+                       {getDepartmentName(employee.department)}
                       </td>
                       <td
                         className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hover:bg-gray-50 cursor-pointer"

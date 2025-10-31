@@ -91,10 +91,15 @@ export const StatusBadge = ({ status }: { status: string }) => {
   return <span className={`${baseClasses} ${statusClasses[status] ?? 'bg-gray-100 text-gray-800'}`}>{status}</span>;
 };
 
-export const HoursDisplay = ({ hours }: { hours: number }) => {
-  const classes = hours >= 0 ? 'text-blue-600' : 'text-orange-600';
-  const sign = hours > 0 ? '+' : '';
-  return <span className={`font-semibold ${classes}`}>{sign}{hours.toFixed(2)}hs</span>;
+export const HoursDisplay = ({ hours }: { hours: number | null }) => {
+  const safeHours = hours ?? 0; // si es null o undefined, usar 0
+  const classes = safeHours >= 0 ? 'text-blue-600' : 'text-orange-600';
+  const sign = safeHours > 0 ? '+' : '';
+  return (
+    <span className={`font-semibold ${classes}`}>
+      {sign}{safeHours.toFixed(2)}hs
+    </span>
+  );
 };
 
 export const InfoCard = ({ icon: Icon, title, children }: InfoCardProps) => (
