@@ -98,7 +98,7 @@ export const EmployeeDetailView = ({
           />
         )}
         {activeTab === "permisos" && (
-          <PermissionHistoryTab permisos={employee.permits} />
+          <PermissionHistoryTab permisos={employee.permisos} />
         )}
       </div>
     </div>

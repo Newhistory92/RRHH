@@ -459,8 +459,8 @@ model Permission {
   employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   employeeId Int
   date       DateTime
-  exitTime   String
-  returnTime String
+  exitTime   Float
+  returnTime Float
   hours      Float
 
   @@index([employeeId])
@@ -532,15 +532,16 @@ model CondicionLaboral {
   position     String
   employeeId   Int       @unique
   employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
+//  createdAt    DateTime   @default(now())
+//   updatedAt    DateTime   @updatedAt
   @@index([employeeId])
 }
 
 model Horario {
   id           Int        @id @default(autoincrement())
-  horaInicio   Int
-  horaFin      Int
-  horasTrabajo Int
+  horaInicio   Float
+  horaFin      Float
+  horasTrabajo Float
   employees    Employee[]
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt

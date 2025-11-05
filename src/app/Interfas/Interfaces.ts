@@ -70,7 +70,7 @@ export interface PaginationProps {
 
 // Basic types for employee data
 export type EmployeeStatus = 'Activo' | 'De licencia' | 'Parte médico' | 'Inactivo' | 'Suspendido';
-export type EmploymentStatus = 'Planta permanente' | 'Contratado' | 'Comisionado' | 'Auditor' | 'Temporal';
+export type EmploymentStatus = 'Planta permanente' | 'Contratado' | 'Comisionado' | 'Auditor_medico' 
 export type EmployeeRole = 'empleado' | 'supervisor' | 'manager' | 'admin' | 'auditor';
 export type LicenseStatus = 'Aprobada' | 'Pendiente' | 'Rechazada'| 'Pendiente Siguiente Aprobación';
 export type ComplaintStatus = 'Resuelto' | 'Pendiente' | 'En proceso';
@@ -174,10 +174,9 @@ export interface Absences {
 // Permits
 export interface Permit {
   id: string;
-  date: string;
-  departureTime: string;
-  exitTime : string;
-  returnTime: string;
+  date: Date;
+  exitTime : number;
+  returnTime: number;
   hours: number;
 }
 
@@ -334,7 +333,7 @@ export interface Employee {
   // Absences and Licenses
   licenses: Licenses;
   absences: Absences;
-  permits: Permit[];
+  permisos: Permit[];
 
   // Feedback and Issues
   complaints: Complaint[];
@@ -427,11 +426,10 @@ export const EMPLOYEE_STATUS: Record<string, EmployeeStatus> = {
 } as const;
 
 export const EMPLOYMENT_STATUS: Record<string, EmploymentStatus> = {
-  PERMANENT: 'Planta permanente',
-  CONTRACT: 'Contratado',
-  COMMISSIONED: 'Comisionado',
-  AUDITOR: 'Auditor',
-  TEMPORARY: 'Temporal'
+  PERMANENTE: 'Planta permanente',
+  CONTRATADO: 'Contratado',
+  COMISIONADO: 'Comisionado',
+  AUDITOR_MEDICO: 'Auditor_medico',
 } as const;
 
 export const EMPLOYEE_ROLES: Record<string, EmployeeRole> = {

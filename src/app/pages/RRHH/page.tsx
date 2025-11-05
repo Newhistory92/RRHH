@@ -10,7 +10,6 @@ import {
   EmployeeStatus,
   LicenseHistory,
   Message,
-  Permit,
 } from "@/app/Interfas/Interfaces";
 
 export interface ArchivedMessage extends Message {
@@ -94,40 +93,10 @@ useEffect(() => {
     alert("Licencia aplicada correctamente.");
   };
 
-  const handleApplyPermission = (
-    employeeId: number,
-    { departureTime: salida, returnTime: retorno }: Permit
-  ) => {
-    setEmployees((prev) =>
-      prev.map((emp) => {
-        if (emp.id === employeeId) {
-          const exitTime = new Date(`1970-01-01T${salida}:00`);
-          const returnTime = new Date(`1970-01-01T${retorno}:00`);
-          const diffMillis = returnTime.getTime() - exitTime.getTime();
-          const diffHours = diffMillis / (1000 * 60 * 60);
-          const newPermission = {
-            id: `P${Date.now()}`,
-            fecha: new Date().toLocaleDateString("es-AR"),
-            horaSalida: salida,
-            horaRetorno: retorno,
-            horas: -diffHours,
-          };
-          return {
-            ...emp,
-            horas: emp.hours - diffHours,
-            permisos: [...emp.permits, newPermission],
-          };
-        }
-        return emp;
-      })
-    );
-    alert("Permiso guardado correctamente.");
-  };
 
 const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === permissionModalEmployeeId) || null,
   [employees, permissionModalEmployeeId]
 );
-
 
    if (isLoading) {
     return (
@@ -191,7 +160,6 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
           <PermissionModal
             employee={permissionModalEmployee}
             onClose={() => setPermissionModalEmployeeId(null)}
-            onSave={handleApplyPermission}
           />
           <LicenseDetailModal
             license={selectedLicense}
