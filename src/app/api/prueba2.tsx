@@ -1,6 +1,6 @@
 
 
-import { ExEmpleado,ComplaintStatus, EmployeeRole, EmployeeStatus, EmploymentStatus, LicenseStatus, TestsByProfession,SkillStatus } from "../Interfas/Interfaces";
+import { ExEmpleado,ComplaintStatus, EmployeeRole, EmployeeStatus, EmploymentStatus, LicenseStatus, TestsByProfession,SkillStatus, Skill } from "../Interfas/Interfaces";
 
 
 
@@ -1522,164 +1522,156 @@ solicitoOtrosPuestos: false
 
 export const ACTIVITY_TYPES = [...new Set(EMPLOYEES_DATA.map(e => e.activityType))];
 
-// [
-//   {
-//     "evaluador": "Ana García",
-//     "evaluado": "Laura Fernández",
-//     "softSkills": {
-//       "nombre": "Resolución de conflictos",
-//       "level": 9
-//     },
-//     "respuesta": [
-//       0,
-//       1,
-//       0
-//     ]
-//   },
-//   {
-//     "evaluador": "Ana García",
-//     "evaluado": "Laura Fernández",
-//     "softSkills": {
-//       "nombre": "Trabajo en equipo",
-//       "level": 8
-//     },
-//     "respuesta": [
-//       0,
-//       1,
-//       0
-//     ]
-//   },
-//   {
-//     "evaluador": "Ana García",
-//     "evaluado": "Laura Fernández",
-//     "softSkills": {
-//       "nombre": "Empatía",
-//       "level": 9
-//     },
-//     "respuesta": [
-//       0,
-//       0,
-//       1
-//     ]
-//   },
-//   {
-//     "evaluador": "Ana García",
-//     "evaluado": "Laura Fernández",
-//     "softSkills": {
-//       "nombre": "Liderazgo",
-//       "level": 7
-//     },
-//     "respuesta": [
-//       1,
-//       0,
-//       0
-//     ]
-//   },
-//   {
-//     "evaluador": "Ana García",
-//     "evaluado": "Laura Fernández",
-//     "softSkills": {
-//       "nombre": "Adaptabilidad",
-//       "level": 10
-//     },
-//     "respuesta": [
-//       0,
-//       0,
-//       1
-//     ]
-//   },
-//   {
-//     "evaluador": "Ana García",
-//     "evaluado": "Laura Fernández",
-//     "softSkills": {
-//       "nombre": "Comunicación",
-//       "level": 9
-//     },
-//     "respuesta": [
-//       1,
-//       0,
-//       0
-//     ]
-//   }
-// ]
 
-
-
-// export const getInitialDB = () => {
-//   const currentYear = new Date().getFullYear();
-  
-//   // Convertir EMPLOYEES_DATA al formato del mockup original manteniendo jerarquía
-//   const usuarios = {};
-//   const saldos = {};
-  
-//   EMPLOYEES_DATA.forEach(employee => {
-//     let userId;
-    
-//     // Generar ID según jerarquía específica
-//     if (employee.role === 'empleado') {
-//       userId = `empleado-${employee.id}`;
-//     } else if (employee.role === 'supervisor') {
-//       if (employee.supervisorLevel === 1) {
-//         userId = 'supervisor-1'; // Supervisor directo
-//       } else if (employee.supervisorLevel === 2) {
-//         userId = 'supervisor-2'; // Supervisor del supervisor
-//       }
-//     }
-    
-//     usuarios[userId] = {
-//       id: userId,
-//       name: employee.name,
-//       dni: employee.dni, // null para supervisores
-//       oficina: employee.role === 'empleado' ? employee.office[0] : undefined,
-//       department: employee.role === 'supervisor' ? employee.department : undefined,
-//       rol: employee.role
-//     };
-    
-//     saldos[userId] = Object.keys(employee.licenseBalances).map(year => ({
-//       anio: parseInt(year),
-//       ...employee.licenseBalances[year]
-//     }));
-//   });
-  
-//   return {
-//     usuarios,
-//     saldos,
-//     solicitudes: []
-//   };
-// };
-
-// // Función helper para obtener la cadena de supervisión
-// export const getSupervisionChain = (employeeId) => {
-//   const employee = getEmployeeById(employeeId);
-//   if (!employee) return [];
-  
-//   const chain = [];
-//   let current = employee;
-  
-//   while (current && current.managerId) {
-//     const supervisor = getEmployeeById(current.managerId);
-//     if (supervisor) {
-//       chain.push({
-//         id: supervisor.id,
-//         name: supervisor.name,
-//         role: supervisor.role,
-//         level: supervisor.supervisorLevel
-//       });
-//       current = supervisor;
-//     } else {
-//       break;
-//     }
-//   }
-  
-//   return chain;
-// };
-
-// // Función helper para obtener empleado por ID
-// export const getEmployeeById = (id) => {
-//   return EMPLOYEES_DATA.find(emp => emp.id === id);
-// };
-
-// // Función helper para obtener empleados por rol
-// export const getEmployeesByRole = (role) => {
-//   return EMPLOYEES_DATA.filter(emp => emp.role === role);
-// };
+export const SKILLS = [
+  {
+    "id": 1,
+    "nombre": "Comunicación efectiva",
+    "level": 0
+  },
+  {
+    "id": 2,
+    "nombre": "Trabajo en equipo",
+    "level": 0
+  },
+  {
+    "id": 3,
+    "nombre": "Orientación al ciudadano",
+    "level": 0
+  },
+  {
+    "id": 4,
+    "nombre": "Pensamiento crítico y resolución de problemas",
+    "level": 0
+  },
+  {
+    "id": 5,
+    "nombre": "Empatía y escucha activa",
+    "level": 0
+  },
+  {
+    "id": 6,
+    "nombre": "Responsabilidad y compromiso institucional",
+    "level": 0
+  },
+  {
+    "id": 7,
+    "nombre": "Adaptabilidad al cambio",
+    "level": 0
+  },
+  {
+    "id": 8,
+    "nombre": "Gestión del tiempo y organización personal",
+    "level": 0
+  },
+  {
+    "id": 9,
+    "nombre": "Iniciativa y proactividad",
+    "level": 0
+  },
+  {
+    "id": 10,
+    "nombre": "Capacidad de aprendizaje continuo",
+    "level": 0
+  },
+  {
+    "id": 11,
+    "nombre": "Tolerancia a la presión y manejo del estrés",
+    "level": 0
+  },
+  {
+    "id": 12,
+    "nombre": "Liderazgo y motivación de equipos",
+    "level": 0
+  },
+  {
+    "id": 13,
+    "nombre": "Ética y transparencia en la gestión pública",
+    "level": 0
+  },
+  {
+    "id": 14,
+    "nombre": "Capacidad de negociación y consenso",
+    "level": 0
+  },
+  {
+    "id": 15,
+    "nombre": "Orientación a resultados",
+    "level": 0
+  },
+  {
+    "id": 16,
+    "nombre": "Conocimiento en normativa y procedimientos administrativos",
+    "level": 0
+  },
+  {
+    "id": 17,
+    "nombre": "Gestión documental y uso del sistema GDE",
+    "level": 0
+  },
+  {
+    "id": 18,
+    "nombre": "Manejo de herramientas ofimáticas (Word, Excel, PowerPoint, Outlook)",
+    "level": 0
+  },
+  {
+    "id": 19,
+    "nombre": "Redacción de informes y documentos oficiales",
+    "level": 0
+  },
+  {
+    "id": 20,
+    "nombre": "Gestión presupuestaria y control de gastos públicos",
+    "level": 0
+  },
+  {
+    "id": 21,
+    "nombre": "Uso de sistemas de gestión financiera (SIGAF u otros)",
+    "level": 0
+  },
+  {
+    "id": 22,
+    "nombre": "Compras y contrataciones públicas",
+    "level": 0
+  },
+  {
+    "id": 23,
+    "nombre": "Atención ciudadana y gestión de reclamos",
+    "level": 0
+  },
+  {
+    "id": 24,
+    "nombre": "Planeamiento y evaluación de políticas públicas",
+    "level": 0
+  },
+  {
+    "id": 25,
+    "nombre": "Manejo de bases de datos y análisis de información",
+    "level": 0
+  },
+  {
+    "id": 26,
+    "nombre": "Transparencia, acceso a la información y rendición de cuentas",
+    "level": 0
+  },
+  {
+    "id": 27,
+    "nombre": "Uso de plataformas colaborativas y herramientas digitales",
+    "level": 0
+  },
+  {
+    "id": 28,
+    "nombre": "Gestión de proyectos públicos",
+    "level": 0
+  },
+  {
+    "id": 29,
+    "nombre": "Seguridad y confidencialidad de la información",
+    "level": 0
+  },
+  {
+    "id": 30,
+    "nombre": "Atención y trato inclusivo en la función pública",
+    "level": 0
+  }
+]

@@ -38,11 +38,11 @@ export const SkillsField: React.FC<SkillsFieldProps> = ({
           setFormData(prev => ({ ...prev, habilidades_requeridas: e.value }));
         }}
         options={availableSkills}
-        optionLabel="name"
+        optionLabel="nombre"
         placeholder="Seleccionar habilidades"
         className="w-full"
         filter
-        filterBy="name"
+        filterBy="nombre"
         maxSelectedLabels={5}
         selectedItemsLabel="{0} habilidades seleccionadas"
       />

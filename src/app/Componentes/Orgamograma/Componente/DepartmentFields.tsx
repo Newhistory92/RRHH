@@ -18,7 +18,7 @@ export const DepartmentFields: React.FC<FormFieldProps> = ({
   const departmentOptions = departments
     .filter((d) => d.id !== formData.id)
     .map((d) => ({ label: d.nombre, value: d.id }));
-
+console.log(employees)
   const employeeOptions = employees.map(emp => ({
     name: emp.name,
     id: emp.id,

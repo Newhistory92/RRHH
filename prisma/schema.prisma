@@ -102,13 +102,11 @@ model Department {
   description            String?
   jefeId                 Int?       @unique
   nivelJerarquico        Int?
-  habilidades_requeridas String
-
+  habilidades_requeridas Skill[]
   jefe                   Employee?   @relation("DepartmentHead", fields: [jefeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   employees              Employee[]  @relation("DepartmentEmployees")
   offices                Office[]
   feedbacks              Feedback[]
-
   createdAt              DateTime    @default(now())
   updatedAt              DateTime    @updatedAt
 
@@ -123,8 +121,7 @@ model Office {
   description            String?
   departmentId           Int
   jefeId                 Int?       @unique
-  habilidades_requeridas String
-
+  habilidades_requeridas Skill[]
   department             Department   @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   jefe                   Employee?    @relation("OfficeHead", fields: [jefeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   employees              Employee[]   @relation("OfficeEmployees")
@@ -201,6 +198,18 @@ model EmployeeSoftSkill {
   @@index([employeeId])
   @@index([softSkillId])
   @@index([level])
+}
+
+
+model Skill {
+  id            Int          @id @default(autoincrement())
+  nombre        String       @unique
+  level         Int  
+  departmentId           Int
+  officeId               Int?
+  department             Department   @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  office                 Office?      @relation(fields: [officeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdAt     DateTime     @default(now())
 }
 
 model Question {
@@ -593,3 +602,5 @@ model CriticalEvents {
   @@index([type])
   @@index([createdAt])
 }
+
+

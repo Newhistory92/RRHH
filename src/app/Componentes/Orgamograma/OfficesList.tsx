@@ -21,7 +21,7 @@ export const OfficesList: React.FC<OfficesListProps> = ({
     <div>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-2xl font-bold text-gray-800">
-          Oficinas ({department.oficinas?.length || 0})
+          Oficinas ({department.offices?.length || 0})
         </h3>
         <Button
           icon={<PlusCircle className="w-5 h-5 mr-1" />}
@@ -35,11 +35,11 @@ export const OfficesList: React.FC<OfficesListProps> = ({
         />
       </div>
       
-      {department.oficinas?.length > 0 ? (
-        department.oficinas.map((office) => (
+      {department.offices?.length > 0 ? (
+        department.offices.map((offices) => (
           <OfficeCard
-            key={office.id}
-            office={office}
+            key={offices.id}
+            office={offices}
             onEdit={onOpenModal}
             employees={employees} 
           />

@@ -358,7 +358,7 @@ export interface Department {
   jefeId?: number | null;
   parentId?: number | null;
   habilidades_requeridas?:TechnicalSkill[];
-  oficinas: Office[];
+  offices: Office[];
   
 }
 

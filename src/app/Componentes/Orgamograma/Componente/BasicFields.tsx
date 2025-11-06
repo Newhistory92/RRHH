@@ -4,7 +4,6 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { FloatLabel } from "primereact/floatlabel";
 import { FormFieldProps } from '@/app/Interfas/Interfaces';
 
-
 export const BasicFields: React.FC<FormFieldProps> = ({
   formData,
   setFormData,
@@ -12,7 +11,7 @@ export const BasicFields: React.FC<FormFieldProps> = ({
 }) => {
   const departmentOptions = departments
     .filter((d) => d.id !== formData.id)
-    .map((d) => ({ label: d.nombre, value: d.id }));
+    .map((d) => ({ label: d.nombre, value: d.nombre })); // 👈 value = nombre
 
   return (
     <>
@@ -22,18 +21,21 @@ export const BasicFields: React.FC<FormFieldProps> = ({
           Nombre
         </label>
         <Dropdown
-          value={formData.nombre}
+          value={formData.nombre ?? ''}
           onChange={(e: DropdownChangeEvent) => {
-            console.log('Nombre cambiado:', e.value);
             setFormData(prev => ({ ...prev, nombre: e.value }));
+          }}
+          // 👇 Captura texto libre escrito por el usuario
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setFormData(prev => ({ ...prev, nombre: e.target.value }));
           }}
           options={departmentOptions}
           optionLabel="label"
-          optionValue="label"
+          optionValue="value"
           editable
           placeholder="Seleccionar o escribir nombre"
           className="w-full mb-8"
-          required
+          showClear
         />
       </div>
 
@@ -42,8 +44,10 @@ export const BasicFields: React.FC<FormFieldProps> = ({
         <InputTextarea 
           id="descripcion" 
           autoResize 
-          value={formData.descripcion} 
-          onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))} 
+          value={formData.descripcion ?? ''} 
+          onChange={(e) =>
+            setFormData(prev => ({ ...prev, descripcion: e.target.value }))
+          }
           rows={3} 
           className="w-full"
         />

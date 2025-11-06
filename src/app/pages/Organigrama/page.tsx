@@ -1,12 +1,12 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {  Sparkles, LayoutGrid,  } from 'lucide-react';
 import { OrgChart } from '@/app/Componentes/OrganigramaGraf/OrgChart';
 import { DepartmentManagementView } from '@/app/Componentes/Orgamograma/Departamento';
 import { EntityFormModal } from '@/app/Componentes/Orgamograma/Componente/EntityFormModal';
 import {INTEGRATED_ORG_DATA, EMPLOYEES_DATA,} from '@/app/api/prueba2';
 import {ModalConfig, Department, Office, EntityFormData,Employee  } from '@/app/Interfas/Interfaces';
-
+import { departmentApi, transformApiDataToApp } from '@/app/Componentes/Orgamograma/departmentApi';
 interface ModalContext {
   departmentId?: number;
   [key: string]: unknown; // Para permitir propiedades adicionales
@@ -14,7 +14,10 @@ interface ModalContext {
 
 
 export default function OrganigramaPage() {
- const [departmentsData, setDepartmentsData] = useState<Department[]>(INTEGRATED_ORG_DATA);
+  const [departmentsData, setDepartmentsData] = useState<Department[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig>({type: "department", data: undefined, context: {},});
@@ -22,6 +25,50 @@ export default function OrganigramaPage() {
  
 
 
+useEffect(() => {
+  const fetchEmployeeData = async () => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/rrhh/employees/`);
+      if (!response.ok) {
+        console.error('Error al obtener datos del empleado:', response.statusText);
+        setEmployees([]);
+        setLoading(false);
+        return;
+      }
+      const data = await response.json();
+      console.log("Fetched employee data:", data);
+
+      // Tomamos el array dentro de `data.employees`
+      setEmployees(Array.isArray(data.employees) ? data.employees : []);
+    } catch (error) {
+      console.error('Error en la petición:', error);
+      setEmployees([]);
+    } finally {
+     setLoading(false);
+    }
+  };
+
+  fetchEmployeeData();
+}, []);
+
+  useEffect(() => {
+  const fetchDepartments = async () => {
+    try {
+      setLoading(true);
+      const response = await departmentApi.getAll();
+     // const transformedData = transformApiDataToApp(response.departments);
+      setDepartmentsData(response.departments);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchDepartments();
+}, []);
+
+console.log('Departments Data:', departmentsData);
   const handleSelectDepartment = (department: Department) => {
     setSelectedDepartment(departmentsData.find((d) => d.id === department.id) || null);
   };
@@ -41,109 +88,35 @@ export default function OrganigramaPage() {
 
   const handleCloseModal = () => setIsModalOpen(false);
 
-const handleSave = (formData: EntityFormData): void => {
-    const { type, data, context } = modalConfig;
-    
+const handleSave = async (formData: EntityFormData): Promise<void> => {
+  const { type, data, context } = modalConfig;
+  
+  try {
     if (type === "department") {
       if (data && 'nivel_jerarquico' in data) {
-        // Editando departamento existente
-        const updatedDepartment: Department = {
-          ...(data as Department),
-          ...formData,
-          nivel_jerarquico: formData.nivel_jerarquico || 1,
-          parentId: formData.parentId || null
-        };
-        
-        setDepartmentsData(
-          departmentsData.map((d) =>
-            d.id === data.id ? updatedDepartment : d
-          )
-        );
+        await departmentApi.update(data.id, { formData });
       } else {
-        // Creando nuevo departamento
-        const newDepartment: Department = {
-          id: Date.now(),
-          nombre: formData.nombre,
-          descripcion: formData.descripcion,
-          nivel_jerarquico: formData.nivel_jerarquico || 1,
-          jefeId: formData.jefeId,
-          parentId: formData.parentId || null,
-          habilidades_requeridas: formData.habilidades_requeridas || [],
-          oficinas: []
-        };
-        
-        setDepartmentsData([...departmentsData, newDepartment]);
+        await departmentApi.create(formData);
       }
     } else if (type === "office") {
-      let parentDeptId: number;
-      
-      if (data && 'empleadosIds' in data) {
-        // Editando oficina existente - buscar el departamento padre
-        const parentDept = departmentsData.find((d) => 
-          d.oficinas.some((o) => o.id === data.id)
-        );
-        if (!parentDept) {
-          console.error('No se encontró el departamento padre de la oficina');
-          return;
-        }
-        parentDeptId = parentDept.id;
-      } else {
-        // Creando nueva oficina
-        if (!context?.departmentId) {
-          console.error('No se especificó el departamento para la nueva oficina');
-          return;
-        }
-        parentDeptId = context.departmentId;
+      const parentDeptId = context?.departmentId;
+      if (parentDeptId) {
+        await departmentApi.createOffice(parentDeptId, { nombre: formData.nombre });
       }
-      
-      setDepartmentsData(
-        departmentsData.map((d) => {
-          if (d.id === parentDeptId) {
-            let newOficinas: Office[];
-            
-            if (data && 'empleadosIds' in data) {
-              // Editando oficina existente
-              const updatedOffice: Office = {
-                ...(data as Office),
-                ...formData,
-                empleadosIds: formData.empleadosIds || []
-              };
-              
-              newOficinas = d.oficinas.map((o) =>
-                o.id === data.id ? updatedOffice : o
-              );
-            } else {
-              // Creando nueva oficina
-              const newOffice: Office = {
-                id: Date.now(), //eliminar cuando pase a base de datos
-                nombre: formData.nombre,
-                descripcion: formData.descripcion,
-                jefeId: formData.jefeId,
-                empleadosIds: formData.empleadosIds || [],
-                departmentId: parentDeptId,
-                habilidades_requeridas: formData.habilidades_requeridas || []
-              };
-              
-              newOficinas = [...d.oficinas, newOffice];
-            }
-            
-            return { ...d, oficinas: newOficinas };
-          }
-          return d;
-        })
-      );
     }
     
-    // Actualizar departamento seleccionado si es necesario
-    if (selectedDepartment && data && 'nivel_jerarquico' in data && selectedDepartment.id === data.id) {
-      const updatedDept = departmentsData.find(d => d.id === data.id);
-      if (updatedDept) {
-        handleSelectDepartment(updatedDept);
-      }
-    }
+    // Recargar datos
+    const response = await departmentApi.getAll();
+    const transformedData = transformApiDataToApp(response.departments);
+    setDepartmentsData(transformedData);
     
     handleCloseModal();
-  };
+  } catch (err) {
+    console.error('Error:', err);
+  }
+};
+
+
 
   return (
     <div className="bg-gray-100 font-sans min-h-screen">
@@ -189,7 +162,7 @@ const handleSave = (formData: EntityFormData): void => {
             onSelect={handleSelectDepartment}
             selectedDepartment={selectedDepartment}
             onOpenModal={handleOpenModal}
-            employees={EMPLOYEES_DATA as unknown as Employee[]}
+            employees={employees as unknown as Employee[]}
           />
         )}
           {activeTab === "organigrama" &&
@@ -209,7 +182,7 @@ const handleSave = (formData: EntityFormData): void => {
           onClose={handleCloseModal}
           onSave={handleSave}
           departments={departmentsData}
-          employees={EMPLOYEES_DATA as unknown as Employee[]} 
+          employees={employees as unknown as Employee[]} 
         />
       )}
       <style jsx>{`
