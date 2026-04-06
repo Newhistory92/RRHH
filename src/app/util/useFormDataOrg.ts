@@ -38,14 +38,15 @@ export const useFormData = (config: ModalConfig, employees: Employee[]) => {
       }
     } else {
       const entityData: EntityFormData = {
+        id: data.id, // CRÍTICO: Preservar el ID para filtrado de auto-referencia
         nombre: data.nombre || '',
         descripcion: data.descripcion || '',
         jefeId: data.jefeId || null,
         habilidades_requeridas: data.habilidades_requeridas || [],
-        nivel_jerarquico: (data as Department).nivel_jerarquico || 1,
+        nivel_jerarquico: (data as Department).nivel_jerarquico || (data as any).nivelJerarquico || 1,
         parentId: (data as Department).parentId || null,
-        empleadosIds: (data as Office)?.empleadosIds || 
-                     (data as Department)?.oficinas?.flatMap(office => office.empleadosIds || []) || []
+        parentDepartmentId: (data as Office).parentDepartmentId || null,
+        empleadosIds: (data as any).employees?.map((e: any) => e.id) || (data as Office)?.empleadosIds || []
       };
       setFormData(entityData);
     }

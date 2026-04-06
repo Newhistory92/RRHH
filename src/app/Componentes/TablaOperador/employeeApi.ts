@@ -1,10 +1,17 @@
+// employeeApi.ts
+// API de empleados usando el cliente centralizado (apiClient).
+// Antes, estas funciones NO incluían el header de Authorization.
+// Ahora se inyecta automáticamente via apiClient.
+
+import { apiClient } from "@/app/util/apiClient";
+
 // Tipos para las requests
 interface UpdateCondicionLaboralRequest {
   tipoContrato: string;
-  fechaIngreso: string; // ISO string format
-  fechaPlanta?: string | null; // ISO string format
+  fechaIngreso: string; // Formato ISO string
+  fechaPlanta?: string | null; // Formato ISO string
   categoria: string;
-  fechaCategoria?: string | null; // ISO string format
+  fechaCategoria?: string | null; // Formato ISO string
   position: string;
 }
 
@@ -15,113 +22,46 @@ interface UpdateHorarioRequest {
 
 // Función helper para convertir "HH:MM" a decimal
 export const timeStringToDecimal = (timeString: string): number => {
-  const [hours, minutes] = timeString.split(':').map(Number);
-  return hours + (minutes / 60);
+  const [hours, minutes] = timeString.split(":").map(Number);
+  return hours + minutes / 60;
 };
 
 // Función helper para convertir decimal a "HH:MM"
 export const decimalToTimeString = (decimal: number): string => {
   const hours = Math.floor(decimal);
   const minutes = Math.round((decimal - hours) * 60);
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 };
 
-// Función para actualizar condición laboral
+// Actualizar condición laboral del empleado
 export const updateCondicionLaboral = async (
   employeeId: number,
   data: UpdateCondicionLaboralRequest
 ): Promise<void> => {
-  try {
-    const response = await fetch(
-      `http://127.0.0.1:8000/rrhh/employee/${employeeId}/condicion-laboral`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.message || `Error al actualizar condición laboral: ${response.status}`
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error en updateCondicionLaboral:', error);
-    throw error;
-  }
+  return apiClient.put<void>(
+    `/rrhh/employee/${employeeId}/condicion-laboral`,
+    data
+  );
 };
 
-// Función para actualizar horario
+// Actualizar horario del empleado
 export const updateHorario = async (
   employeeId: number,
   data: UpdateHorarioRequest
 ): Promise<void> => {
-  try {
-    const response = await fetch(
-      `http://127.0.0.1:8000/rrhh/employee/${employeeId}/horario`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.message || `Error al actualizar horario: ${response.status}`
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error en updateHorario:', error);
-    throw error;
-  }
+  return apiClient.put<void>(
+    `/rrhh/employee/${employeeId}/horario`,
+    data
+  );
 };
 
-
-
-
-
-
-// Función para actualizar horario
+// Registrar permiso horario del empleado
 export const permisoHorario = async (
   employeeId: number,
   data: UpdateHorarioRequest
 ): Promise<void> => {
-  try {
-    const response = await fetch(
-      `http://127.0.0.1:8000/rrhh/employee/${employeeId}/permission`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.message || `Error al actualizar horario: ${response.status}`
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error en updateHorario:', error);
-    throw error;
-  }
+  return apiClient.put<void>(
+    `/rrhh/employee/${employeeId}/permission`,
+    data
+  );
 };
-
-

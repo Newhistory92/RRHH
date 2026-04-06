@@ -44,7 +44,7 @@ export function middleware(req: NextRequest) {
         loginUrl.searchParams.set("error", "verify_failed");
         return NextResponse.redirect(loginUrl);
       });
-  } catch  {
+  } catch {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("error", "unexpected");
     return NextResponse.redirect(loginUrl);

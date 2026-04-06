@@ -1,7 +1,7 @@
-import {InfoCard, HoursDisplay} from "@/app/util/UiRRHH"
-import { User, Briefcase, Clock, Building,  Calendar as CalendarIcon, CheckCircle, Phone, Home,Cake,AtSign,Handshake,CopyCheck,ChartColumnStacked } from 'lucide-react';
-import {  Employee, Licenses,LicenseHistory, Permit, EmploymentStatus} from '@/app/Interfas/Interfaces';
-import { Pagination} from '@/app/Componentes/Pagination/pagination';
+import { InfoCard, HoursDisplay } from "@/app/util/UiRRHH"
+import { User, Briefcase, Clock, Building, Calendar as CalendarIcon, CheckCircle, Phone, Home, Cake, AtSign, Handshake, CopyCheck, ChartColumnStacked } from 'lucide-react';
+import { Employee, Licenses, LicenseHistory, Permit, EmploymentStatus } from '@/app/Interfas/Interfaces';
+import { Pagination } from '@/app/Componentes/Pagination/pagination';
 import { useState } from "react";
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
@@ -18,7 +18,7 @@ interface LicenseHistoryTabProps {
 
 
 
-const formatDate = (date: Date| null) => {
+const formatDate = (date: Date | null) => {
   if (!date) return '';
   const d = new Date(date);
   if (isNaN(d.getTime())) return '';
@@ -29,12 +29,12 @@ const formatDate = (date: Date| null) => {
   });
 };
 export const ProfileTab = ({ employee }: { employee: Employee }) => {
- const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const toast = useRef<Toast>(null);
   const [formData, setFormData] = useState({
     position: employee.condicionLaboral.position,
-    scheduleStart: typeof employee.horario.horaInicio === 'number' 
+    scheduleStart: typeof employee.horario.horaInicio === 'number'
       ? decimalToTimeString(employee.horario.horaInicio)
       : employee.horario.horaInicio,
     scheduleEnd: typeof employee.horario.horaFin === 'number'
@@ -44,32 +44,32 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
     startDate: employee.condicionLaboral?.fechaIngreso
       ? new Date(employee.condicionLaboral.fechaIngreso)
       : null,
-    permanentDate: employee.condicionLaboral.fechaPlanta 
-      ? new Date(employee.condicionLaboral.fechaPlanta) 
+    permanentDate: employee.condicionLaboral.fechaPlanta
+      ? new Date(employee.condicionLaboral.fechaPlanta)
       : null,
     category: employee.condicionLaboral.categoria,
-    lastCategoryUpdate: employee.condicionLaboral.fechaCategoria 
-      ? new Date(employee.condicionLaboral.fechaCategoria) 
+    lastCategoryUpdate: employee.condicionLaboral.fechaCategoria
+      ? new Date(employee.condicionLaboral.fechaCategoria)
       : null
   });
 
 
 
- const handleSave = async () => {
+  const handleSave = async () => {
     setIsSaving(true);
     try {
       // Preparar datos para condición laboral
       const condicionLaboralData = {
         tipoContrato: formData.employmentStatus,
-        fechaIngreso: formData.startDate 
-          ? formData.startDate.toISOString() 
+        fechaIngreso: formData.startDate
+          ? formData.startDate.toISOString()
           : new Date().toISOString(),
-        fechaPlanta: formData.permanentDate 
-          ? formData.permanentDate.toISOString() 
+        fechaPlanta: formData.permanentDate
+          ? formData.permanentDate.toISOString()
           : null,
         categoria: formData.category || '',
-        fechaCategoria: formData.lastCategoryUpdate 
-          ? formData.lastCategoryUpdate.toISOString() 
+        fechaCategoria: formData.lastCategoryUpdate
+          ? formData.lastCategoryUpdate.toISOString()
           : null,
         position: formData.position
       };
@@ -79,7 +79,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
         horaInicio: timeStringToDecimal(formData.scheduleStart),
         horaFin: timeStringToDecimal(formData.scheduleEnd)
       };
-    console.log(horarioData)
+      console.log(horarioData)
       // Ejecutar ambas actualizaciones en paralelo
       await Promise.all([
         updateCondicionLaboral(employee.id, condicionLaboralData),
@@ -99,8 +99,8 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
       toast.current?.show({
         severity: 'error',
         summary: 'Error',
-        detail: error instanceof Error 
-          ? error.message 
+        detail: error instanceof Error
+          ? error.message
           : 'No se pudieron guardar los cambios',
         life: 5000
       });
@@ -111,10 +111,10 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
 
 
 
-const handleCancel = () => {
+  const handleCancel = () => {
     setFormData({
       position: employee.condicionLaboral.position,
-      scheduleStart: typeof employee.horario.horaInicio === 'number' 
+      scheduleStart: typeof employee.horario.horaInicio === 'number'
         ? decimalToTimeString(employee.horario.horaInicio)
         : employee.horario.horaInicio,
       scheduleEnd: typeof employee.horario.horaFin === 'number'
@@ -124,12 +124,12 @@ const handleCancel = () => {
       startDate: employee.condicionLaboral?.fechaIngreso
         ? new Date(employee.condicionLaboral.fechaIngreso)
         : null,
-      permanentDate: employee.condicionLaboral.fechaPlanta 
-        ? new Date(employee.condicionLaboral.fechaPlanta) 
+      permanentDate: employee.condicionLaboral.fechaPlanta
+        ? new Date(employee.condicionLaboral.fechaPlanta)
         : null,
       category: employee.condicionLaboral.categoria,
-      lastCategoryUpdate: employee.condicionLaboral.fechaCategoria 
-        ? new Date(employee.condicionLaboral.fechaCategoria) 
+      lastCategoryUpdate: employee.condicionLaboral.fechaCategoria
+        ? new Date(employee.condicionLaboral.fechaCategoria)
         : null
     });
     setIsEditing(false);
@@ -192,15 +192,15 @@ const handleCancel = () => {
               </InfoCard>
             </div>
           </div>
-          
+
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="flex justify-between items-center mb-4 border-b pb-2">
               <h3 className="text-lg font-bold text-gray-800">
                 Condición Laboral
               </h3>
               {!isEditing && (
-                <Button 
-                  icon="pi pi-pencil" 
+                <Button
+                  icon="pi pi-pencil"
                   className="p-button-text p-button-sm"
                   onClick={() => setIsEditing(true)}
                   style={{ color: '#2563eb' }}
@@ -210,22 +210,22 @@ const handleCancel = () => {
             <div className="space-y-4">
               <InfoCard icon={Handshake} title="Tipo de Contrato">
                 {isEditing ? (
-                  <Dropdown 
+                  <Dropdown
                     value={formData.employmentStatus}
                     options={employmentStatusOptions}
-                    onChange={(e) => setFormData({...formData, employmentStatus: e.value})}
+                    onChange={(e) => setFormData({ ...formData, employmentStatus: e.value })}
                     className="w-full"
                   />
                 ) : (
                   getEmploymentStatusLabel(formData.employmentStatus)
                 )}
               </InfoCard>
-              
+
               <InfoCard icon={CalendarIcon} title="Fecha de Ingreso">
                 {isEditing ? (
-                  <Calendar 
+                  <Calendar
                     value={formData.startDate}
-                    onChange={(e) => setFormData({...formData, startDate: e.value as Date})}
+                    onChange={(e) => setFormData({ ...formData, startDate: e.value as Date })}
                     dateFormat="yy-mm-dd"
                     className="w-full"
                   />
@@ -233,13 +233,13 @@ const handleCancel = () => {
                   formatDate(formData.startDate)
                 )}
               </InfoCard>
-              
+
               {(employee.condicionLaboral.fechaPlanta || isEditing) && (
                 <InfoCard icon={CheckCircle} title="Ingreso a Planta">
                   {isEditing ? (
-                    <Calendar 
+                    <Calendar
                       value={formData.permanentDate}
-                      onChange={(e) => setFormData({...formData, permanentDate: e.value as Date})}
+                      onChange={(e) => setFormData({ ...formData, permanentDate: e.value as Date })}
                       dateFormat="yy-mm-dd"
                       className="w-full"
                     />
@@ -248,24 +248,24 @@ const handleCancel = () => {
                   )}
                 </InfoCard>
               )}
-              
+
               <InfoCard icon={User} title="Categoría">
                 {isEditing ? (
-                  <InputText 
+                  <InputText
                     value={formData.category ?? ''}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     className="w-full p-inputtext-sm"
                   />
                 ) : (
                   formData.category || ''
                 )}
               </InfoCard>
-              
+
               <InfoCard icon={CopyCheck} title="Ultima Recategorización">
                 {isEditing ? (
-                  <Calendar 
+                  <Calendar
                     value={formData.lastCategoryUpdate}
-                    onChange={(e) => setFormData({...formData, lastCategoryUpdate: e.value as Date})}
+                    onChange={(e) => setFormData({ ...formData, lastCategoryUpdate: e.value as Date })}
                     dateFormat="yy-mm-dd"
                     className="w-full"
                   />
@@ -274,20 +274,20 @@ const handleCancel = () => {
                 )}
               </InfoCard>
             </div>
-            
+
             {isEditing && (
               <div className="flex gap-2 mt-4 pt-4 border-t">
-                <Button 
-                  label="Guardar" 
-                  icon="pi pi-check" 
+                <Button
+                  label="Guardar"
+                  icon="pi pi-check"
                   className="p-button-sm p-button-success flex-1"
                   onClick={handleSave}
                   loading={isSaving}
                   disabled={isSaving}
                 />
-                <Button 
-                  label="Cancelar" 
-                  icon="pi pi-times" 
+                <Button
+                  label="Cancelar"
+                  icon="pi pi-times"
                   className="p-button-sm p-button-secondary flex-1"
                   onClick={handleCancel}
                   disabled={isSaving}
@@ -296,7 +296,7 @@ const handleCancel = () => {
             )}
           </div>
         </div>
-        
+
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
@@ -305,10 +305,10 @@ const handleCancel = () => {
             <div className="space-y-4">
               <InfoCard icon={Briefcase} title="Posición">
                 {isEditing ? (
-                  <Dropdown 
+                  <Dropdown
                     value={formData.position}
                     options={positionOptions}
-                    onChange={(e) => setFormData({...formData, position: e.value})}
+                    onChange={(e) => setFormData({ ...formData, position: e.value })}
                     className="w-full"
                     editable
                   />
@@ -316,35 +316,35 @@ const handleCancel = () => {
                   formData.position
                 )}
               </InfoCard>
-              
+
               <InfoCard icon={Building} title="Departamento / Supervisor">
                 {employee.department?.nombre ?? "Sin departamento"} - {employee.office?.nombre ?? "Sin oficina"} / {employee.manager?.name ?? "Sin supervisor"}
               </InfoCard>
-              
+
               <InfoCard icon={Clock} title="Horario Laboral">
                 {isEditing ? (
-                  <div className="flex gap-2 items-center">
-                    <InputMask 
+                  <div className="flex gap-2 items-center w-full">
+                    <InputMask
                       value={formData.scheduleStart}
-                      onChange={(e) => setFormData({...formData, scheduleStart: e.value || ''})}
+                      onChange={(e) => setFormData({ ...formData, scheduleStart: e.value || '' })}
                       mask="99:99"
                       placeholder="09:00"
-                      className="flex-1 p-inputtext-sm"
+                      className="p-inputtext-sm w-20"
                     />
-                    <span>-</span>
-                    <InputMask 
+                    <span className="text-gray-500 flex-shrink-0">—</span>
+                    <InputMask
                       value={formData.scheduleEnd}
-                      onChange={(e) => setFormData({...formData, scheduleEnd: e.value || ''})}
+                      onChange={(e) => setFormData({ ...formData, scheduleEnd: e.value || '' })}
                       mask="99:99"
                       placeholder="18:00"
-                      className="flex-1 p-inputtext-sm"
+                      className="p-inputtext-sm w-20"
                     />
                   </div>
                 ) : (
                   `${formData.scheduleStart} - ${formData.scheduleEnd}`
                 )}
               </InfoCard>
-              
+
               <InfoCard icon={ChartColumnStacked} title="Productividad">
                 {employee.productivityScore} Promedio
               </InfoCard>
@@ -361,7 +361,7 @@ const handleCancel = () => {
 export const LicenseHistoryTab = ({ licenses, onRowClick }: LicenseHistoryTabProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     // Scroll suave hacia arriba al cambiar de página
@@ -369,10 +369,10 @@ export const LicenseHistoryTab = ({ licenses, onRowClick }: LicenseHistoryTabPro
   };
 
   // Cálculos de paginación
-const aprobaciones = Array.isArray(licenses)
-  ? licenses.flatMap(l => l.aprobaciones || [])
-  : []
-const totalItems = aprobaciones.length;
+  const aprobaciones = Array.isArray(licenses)
+    ? licenses.flatMap(l => l.aprobaciones || [])
+    : []
+  const totalItems = aprobaciones.length;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentItems = aprobaciones.slice(startIndex, endIndex);
@@ -438,13 +438,12 @@ const totalItems = aprobaciones.length;
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <span
-                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                          lic.status === "Aprobada"
+                        className={`px-2 py-1 text-xs font-semibold rounded-full ${lic.status === "Aprobada"
                             ? "bg-green-100 text-green-800"
                             : lic.status === "Rechazada"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
+                              ? "bg-red-100 text-red-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
                       >
                         {lic.status}
                       </span>
@@ -460,7 +459,7 @@ const totalItems = aprobaciones.length;
                 )}
               </tbody>
             </table>
-            
+
             {/* Mostrar información de paginación y el componente solo si hay datos */}
             {totalItems > 0 && (
               <div className="mt-6 flex flex-col sm:flex-row justify-between items-center">
@@ -480,8 +479,8 @@ const totalItems = aprobaciones.length;
 };
 
 export const PermissionHistoryTab = ({ permisos }: { permisos: Permit[] }) => (
-console.log(permisos),
-  
+  console.log(permisos),
+
   <div className="mt-4 flow-root">
     <div className="bg-white p-6 rounded-lg shadow-md">
       <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -516,33 +515,33 @@ console.log(permisos),
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-                {Array.isArray(permisos) && permisos.length > 0 ? (
-    permisos.map((p, index) => (
-      <tr key={p.id ?? index}>
-        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-          { formatDate(p.date) ?? "Sin fecha"}
-        </td>
-        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-          {decimalToTimeString(p.exitTime) ?? "—"}
-        </td>
-        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-          {decimalToTimeString(p.returnTime) ?? "—"}
-        </td>
-        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-          <HoursDisplay hours={p.hours ?? 0} />
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td
-        colSpan={4}
-        className="text-center text-sm text-gray-500 py-4"
-      >
-        No hay permisos registrados
-      </td>
-    </tr>
-  )}         
+              {Array.isArray(permisos) && permisos.length > 0 ? (
+                permisos.map((p, index) => (
+                  <tr key={p.id ?? index}>
+                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                      {formatDate(p.date) ?? "Sin fecha"}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {decimalToTimeString(p.exitTime) ?? "—"}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {decimalToTimeString(p.returnTime) ?? "—"}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      <HoursDisplay hours={p.hours ?? 0} />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="text-center text-sm text-gray-500 py-4"
+                  >
+                    No hay permisos registrados
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

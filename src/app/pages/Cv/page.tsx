@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { FileText, Edit, Save } from 'lucide-react';
 import { SectionTitle } from '@/app/util/UiCv';
-import { EMPLOYEES_DATA , SOFT_SKILLS_CATALOG} from '@/app/api/prueba2';
+import { EMPLOYEES_DATA, SOFT_SKILLS_CATALOG } from '@/app/api/prueba2';
 import DatosPersonales from '@/app/Componentes/CvComponente/DatosPersonales';
 import FormacionAcademica from '@/app/Componentes/CvComponente/FormacionAcademica';
 import ExperienciaLaboral from '@/app/Componentes/CvComponente/ExperienciaLaboral';
@@ -11,22 +11,23 @@ import Idiomas from '@/app/Componentes/CvComponente/Idiomas';
 import HabilidadesTecnicas from '@/app/Componentes/CvComponente/HabilidadesTecnicas';
 import HabilidadesBlandas from '@/app/Componentes/CvComponente/HabilidadesBlandas';
 import CertificacionesCursos from '@/app/Componentes/CvComponente/CertificacionesCursos';
-import {Employee} from "@/app/Interfas/Interfaces"
+import { Employee } from "@/app/Interfas/Interfaces"
 import { Button } from 'primereact/button';
 
 interface EmployeeCVProps {
   employeeData: Employee | null;
+  globalSettings?: Record<string, boolean>;
 }
 
-export default function EmployeeCV({ employeeData }: EmployeeCVProps) {
+export default function EmployeeCV({ employeeData, globalSettings = {} }: EmployeeCVProps) {
   const [cvData, setCvData] = useState<Employee | null>(employeeData);
   const [originalCvData, setOriginalCvData] = useState<Employee | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-console.log(cvData)
+  console.log(cvData)
 
   // Manejar el caso donde el empleado no se encuentra
- if (!cvData) {
+  if (!cvData) {
     return (
       <div className="bg-gray-100 font-sans min-h-screen flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-md">
@@ -52,8 +53,8 @@ console.log(cvData)
   const handleEdit = () => {
     setOriginalCvData(JSON.parse(JSON.stringify(cvData)));
     setIsEditing(true);
-  }; 
- const handleSave = async () => {
+  };
+  const handleSave = async () => {
     // Enviar datos actualizados al backend
     try {
       const token = localStorage.getItem('token');
@@ -91,11 +92,11 @@ console.log(cvData)
 
   const updateCvData = (newData: Partial<Employee>) => {
     setCvData(prev => prev ? ({ ...prev, ...newData }) : null);
-    
+
 
   };
 
- return (
+  return (
     <div className="bg-gray-100 font-sans min-h-screen">
       <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
         <div className="flex justify-between items-start mb-6">
@@ -103,50 +104,62 @@ console.log(cvData)
         </div>
 
         <div className="space-y-4">
-          <DatosPersonales 
-            data={cvData} 
-            updateData={updateCvData} 
-            isEditing={isEditing} 
+          <DatosPersonales
+            data={cvData}
+            updateData={updateCvData}
+            isEditing={isEditing}
           />
-          
-          <FormacionAcademica 
-            data={cvData.AcademicFormation} 
-            updateData={(AcademicFormation) => updateCvData({ AcademicFormation })} 
-            isEditing={isEditing} 
-          />
-          
-          <ExperienciaLaboral 
-            data={cvData.workExperience} 
-            updateData={(workExperience) => updateCvData({ workExperience })} 
-            isEditing={isEditing} 
-          />
-          
-          <Idiomas 
-            data={cvData.languages} 
-            updateData={(languages) => updateCvData({ languages })} 
-            isEditing={isEditing} 
-          />
-          
-          <HabilidadesTecnicas 
-            data={cvData.technicalSkills} 
-            skillStatus={cvData.skillStatus || []}
-            position={cvData.position}
-            updateData={(technicalSkills, skillStatus) => updateCvData({ technicalSkills, skillStatus })} 
-            isEditing={isEditing} 
-          />
-          
-          <HabilidadesBlandas 
-            data={cvData.softSkills} 
-            selectedSkills={cvData.softSkillsArray || []}
-            updateData={(softSkills, softSkillsArray) => updateCvData({ softSkills, softSkillsArray })} 
-            isEditing={isEditing} 
-          />
-          
-          <CertificacionesCursos 
-            data={cvData.certifications} 
-            updateData={(certifications) => updateCvData({ certifications })} 
-            isEditing={isEditing} 
-          />
+
+          {globalSettings["AcademicRecord"] !== false && (
+            <FormacionAcademica
+              data={cvData.AcademicFormation}
+              updateData={(AcademicFormation) => updateCvData({ AcademicFormation })}
+              isEditing={isEditing}
+            />
+          )}
+
+          {globalSettings["WorkExperience"] !== false && (
+            <ExperienciaLaboral
+              data={cvData.workExperience}
+              updateData={(workExperience) => updateCvData({ workExperience })}
+              isEditing={isEditing}
+            />
+          )}
+
+          {globalSettings["Language"] !== false && (
+            <Idiomas
+              data={cvData.languages}
+              updateData={(languages) => updateCvData({ languages })}
+              isEditing={isEditing}
+            />
+          )}
+
+          {globalSettings["TechnicalSkill"] !== false && (
+            <HabilidadesTecnicas
+              data={cvData.technicalSkills}
+              skillStatus={cvData.skillStatus || []}
+              position={cvData.position}
+              updateData={(technicalSkills, skillStatus) => updateCvData({ technicalSkills, skillStatus })}
+              isEditing={isEditing}
+            />
+          )}
+
+          {globalSettings["SoftSkill"] !== false && (
+            <HabilidadesBlandas
+              data={cvData.softSkills}
+              selectedSkills={cvData.softSkillsArray || []}
+              updateData={(softSkills, softSkillsArray) => updateCvData({ softSkills, softSkillsArray })}
+              isEditing={isEditing}
+            />
+          )}
+
+          {globalSettings["Certification"] !== false && (
+            <CertificacionesCursos
+              data={cvData.certifications}
+              updateData={(certifications) => updateCvData({ certifications })}
+              isEditing={isEditing}
+            />
+          )}
         </div>
 
         <div className="mt-8 flex justify-end gap-4">
@@ -155,10 +168,10 @@ console.log(cvData)
               <Button
                 onClick={handleCancel}
                 label="Cancelar"
-                severity="info" 
+                severity="info"
                 text raised
               >
-              
+
               </Button>
               <Button
                 onClick={handleSave}

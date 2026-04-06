@@ -1,4 +1,8 @@
-// utils/auth.ts
+// util/auth.ts
+// Funciones de autenticación:
+// - loginUser: Server Action para login (guarda cookie httpOnly)
+// - logoutUser: función SERVER (no usar desde Client Components directamente)
+// - logoutFromClient: función CLIENT para cerrar sesión desde el navegador
 "use server";
 
 import { cookies } from "next/headers";
@@ -14,10 +18,8 @@ export async function loginUser(username: string, password: string) {
 
   const data = await res.json();
 
-  // Guardar el token en cookie segura
-  (await
-        // Guardar el token en cookie segura
-        cookies()).set("token", data.access_token, {
+  // Guardar el token en cookie segura (HttpOnly)
+  (await cookies()).set("token", data.access_token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 6, // 6 horas
@@ -27,6 +29,7 @@ export async function loginUser(username: string, password: string) {
   return data;
 }
 
+// Cierre de sesión del lado del SERVIDOR (para Server Actions / API routes)
 export async function logoutUser() {
   const token = (await cookies()).get("token")?.value;
   if (token) {

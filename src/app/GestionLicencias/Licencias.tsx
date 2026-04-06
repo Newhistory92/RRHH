@@ -1,158 +1,240 @@
-"use client"
-import React, { useState,  useMemo} from 'react';
-import { Users,  Send,  Briefcase, Award, GraduationCap,  Clock, ChevronsRight, MessageSquare } from 'lucide-react';
-import { Button } from 'primereact/button';
-import { Card } from 'primereact/card';
+"use client";
+// Componente "Mis Licencias" — Muestra:
+// 1. Saldos desglosados por tipo (diasTotales, consumidos, disponibles)
+// 2. Historial completo de TODAS las solicitudes del empleado
+// 3. Panel de pendientes de aprobación (solo para supervisores)
+
+import React, { useState, useMemo } from 'react';
+import { Users, Send, Briefcase, Award, GraduationCap, Clock, ChevronRight, MessageSquare, Plus, CalendarRange, FileText, Heart, Baby, AlertTriangle } from 'lucide-react';
 import { ApprovalModal } from './ModalProval';
-import {LicenseHistory, Saldo,  LicenseStatus, Usuario,Employee } from "@/app/Interfas/Interfaces"
-import { ProgressSpinner } from 'primereact/progressspinner';
-type SolicitudParsed = LicenseHistory & {
-  fechaDesdeParsed: Date;
-  fechaHastaParsed: Date;
-};
+import { LicenseHistory, Saldo, LicenseStatus, Usuario, Employee } from "@/app/Interfas/Interfaces";
 
+// ─── Tipos ────────────────────────────────────────────────────────────────────
 
-interface ConteinerLicenciaProps {
-  userData:Employee ;      
-  saldos: Saldo[];        
+type SolicitudParsed = LicenseHistory & { desde: Date; hasta: Date };
+
+interface Props {
+  userData: Employee;
+  saldos: Saldo[];
   misSolicitudes: LicenseHistory[];
   solicitudesPendientes: LicenseHistory[];
   onNewRequest: () => void;
-  onManageRequest: (      
-    solicitudId: number | undefined,
-    accion: "aprobar" | "rechazar",
-    data: { siguienteSupervisorId?: number; observacion?: string }
-  ) => void;
-  supervisores: Usuario[]; // ✅ Correcto
+  onManageRequest: (id: number | undefined, accion: "aprobar" | "rechazar", data: { siguienteSupervisorId?: number; observacion?: string }) => void;
+  supervisores: Usuario[];
 }
-export default function ConteinerLicencia({ userData, saldos, misSolicitudes, solicitudesPendientes, onNewRequest, onManageRequest, supervisores }: ConteinerLicenciaProps) {
-    const [selectedRequest, setSelectedRequest] = useState<LicenseHistory | null>(null);
-    const solicitante =  userData.name;
-   const fechasPendientes: SolicitudParsed[] = useMemo(
-    () =>
-      solicitudesPendientes.map((solicitud) => ({
-        ...solicitud,
-        fechaDesdeParsed: new Date(solicitud.startDate),
-        fechaHastaParsed: new Date(solicitud.endDate),
-      })),
-    [solicitudesPendientes]
-  );
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-  const getStatusChip = (
-  estado: LicenseStatus,
-  observacion?: string
-): React.ReactNode => {
-  const styles: Record<LicenseStatus, string> = {
-    'Pendiente': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    'Pendiente Siguiente Aprobación': 'bg-cyan-100 text-cyan-800 border-cyan-200',
-    'Aprobada': 'bg-green-100 text-green-800 border-green-200',
-    'Rechazada': 'bg-red-100 text-red-800 border-red-200',
-  };
+const STATUS: Record<LicenseStatus, { cls: string; label: string }> = {
+  'Pendiente': { cls: 'bg-yellow-50 text-yellow-700 border-yellow-200', label: 'Pendiente' },
+  'Pendiente Siguiente Aprobación': { cls: 'bg-cyan-50 text-cyan-700 border-cyan-200', label: 'En revisión' },
+  'Aprobada': { cls: 'bg-green-50 text-green-700 border-green-200', label: 'Aprobada' },
+  'Rechazada': { cls: 'bg-red-50 text-red-700 border-red-200', label: 'Rechazada' },
+};
+
+// Mapa de íconos dinámico por tipo de licencia
+const ICONOS: Record<string, React.ReactNode> = {
+  Licencias: <Briefcase size={14} className="text-cyan-500" />,
+  Vacaciones: <Briefcase size={14} className="text-cyan-500" />,
+  Particulares: <Users size={14} className="text-cyan-500" />,
+  Particular: <Users size={14} className="text-cyan-500" />,
+  Articulos: <Award size={14} className="text-cyan-500" />,
+  Examen: <GraduationCap size={14} className="text-cyan-500" />,
+  'Lic por Examen': <GraduationCap size={14} className="text-cyan-500" />,
+  Estudio: <GraduationCap size={14} className="text-cyan-500" />,
+  Nacimiento: <Baby size={14} className="text-cyan-500" />,
+  Paternidad: <Baby size={14} className="text-cyan-500" />,
+  Maternidad: <Heart size={14} className="text-pink-500" />,
+  Embarazo: <Heart size={14} className="text-pink-500" />,
+  'Matrimonio del empleado': <Heart size={14} className="text-red-400" />,
+  'Matrimonio de su hijo': <Heart size={14} className="text-red-400" />,
+  Enfermedad: <AlertTriangle size={14} className="text-amber-500" />,
+  'Lic por Enfermedad': <AlertTriangle size={14} className="text-amber-500" />,
+  LAR: <Clock size={14} className="text-gray-500" />,
+};
+
+const getIcon = (tipo: string) => ICONOS[tipo] || <FileText size={14} className="text-cyan-500" />;
+
+const fmt = (d: string | Date) => new Date(d).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
+
+const StatusChip = ({ status, observacion }: { status: LicenseStatus; observacion?: string }) => {
+  const s = STATUS[status];
   return (
-    <span
-      title={observacion}
-      className={`px-3 py-1 text-sm font-medium rounded-full border ${styles[estado]}`}
-    >
-      {estado}
+    <span title={observacion} className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border ${s.cls}`}>
+      {s.label}
     </span>
   );
 };
 
-        const licenciaIconos = {
-         Licencias: <Briefcase className='text-[#1ABCD7] text-shadow-md' />,
-         Particulares: <Users className='text-[#1ABCD7] text-shadow-md'/>,
-         Articulos: <Award className='text-[#1ABCD7] text-shadow-md'/>,
-         Examen: <GraduationCap className='text-[#1ABCD7] text-shadow-md' />,
-         };
-
-        return (
-            <div className="space-y-8">
-                {selectedRequest && 
-                <ApprovalModal request={selectedRequest}
-                 supervisores={supervisores.filter(s => s.id !== userData.id && !selectedRequest.aprobaciones?.some(a => a.supervisorId === s.id))} 
-                 onManage={onManageRequest} onClose={() => setSelectedRequest(null)} />}
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <Card title="Mis Licencias" className="lg:col-span-2">
-                       
-                        {!saldos ? <ProgressSpinner /> : (
-                            <div className="space-y-4">
-                             {Object.entries(saldos).map(([anio, valores]) => (
-  <details key={anio} className="bg-gray-50 p-2 rounded-lg">
-    <summary className="font-semibold text-lg cursor-pointer">Año {anio}</summary>
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center pt-3">
-      {Object.entries(valores).map(([tipo, dias]) => (
-        <div key={tipo}>
-          <p className="font-semibold text-gray-700 flex items-center justify-center gap-1">
-            {licenciaIconos[tipo as keyof typeof licenciaIconos]} {tipo}
-          </p>
-          <p className="text-2xl font-bold text-blue-500 text-shadow-md ">{dias as number}</p>
-        </div>
-      ))}
+const Section = ({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) => (
+  <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+    <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-50">
+      {icon}
+      <h2 className="text-sm font-semibold text-gray-700">{title}</h2>
     </div>
-  </details>
-))}
-
-                            </div>
-                        )}
-                    </Card>
-                    <Card  title="Nueva Solicitud" className="flex flex-col justify-center items-center text-center">
-                      <p className="text-gray-600 mb-4">Inicia una nueva solicitud de licencia aquí.</p>
-                      <Button raised 
-                      label="Solicitar Licencia"
-                       onClick={onNewRequest}>
-                        <Send size={18} className='ml-2' /> 
-                       </Button>
-                      </Card>
-                </div>
-                {userData.role === 'supervisor' && solicitudesPendientes.length > 0 && (
-                    <Card>
-                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                        <Clock className='text-[#1ABCD7] text-shadow-md'/> Solicitudes Pendientes de Mi Aprobación</h2>
-                        <div className="space-y-2 shadow-lg">
-                            {fechasPendientes.map(solicitud => (
-                                <button key={solicitud.id} onClick={() => setSelectedRequest(solicitud)} className="w-full text-left p-4 border rounded-lg bg-gray-50 hover:bg-[#c4e3e9] flex justify-between items-center">
-                                    <div>
-                                        <p>
-                                            <span className="font-bold">{ solicitante}</span> solicita <span className="font-bold">{solicitud.duration} días</span>
-                                        </p>
-                                        <p className="text-sm text-gray-600">
-                                            Del {solicitud.fechaDesdeParsed.toLocaleDateString()} al {solicitud.fechaHastaParsed.toLocaleDateString()}
-                                        </p>
-                                    </div>
-                                    <ChevronsRight />
-                                </button>
-                            ))}
-                        </div>
-                    </Card>
-                )}
-                <Card>
-                    <h2 className="text-xl font-bold mb-4">Historial de Mis Solicitudes</h2>
-                    <div className="space-y-3 shadow-lg">
-                       {misSolicitudes.length > 0 ? misSolicitudes.map(solicitud => (
-  <div key={solicitud.id} className="p-4 border rounded-lg flex flex-col md:flex-row justify-between items-center gap-4">
-    <div>
-      <p className="font-semibold">
-        Solicitud por {solicitud.duration} días
-      </p>
-      <p className="text-sm text-gray-600">
-        Del {new Date(solicitud.startDate).toLocaleDateString()} al {new Date(solicitud.endDate).toLocaleDateString()}
-      </p>
-      {solicitud.status === 'Rechazada' && (
-        <p className="text-sm text-red-600 mt-1">
-          <MessageSquare size={14} className="inline" /> <span className="font-bold">Observación:</span> {solicitud.observacion}
-        </p>
-      )}
-    </div>
-    {getStatusChip(solicitud.status, solicitud.observacion)}
+    <div className="p-5">{children}</div>
   </div>
-)) : (
-  <p className="text-gray-500 text-center py-4">No tienes solicitudes registradas.</p>
-)}
+);
 
+// ─── Componente ───────────────────────────────────────────────────────────────
+
+export default function ConteinerLicencia({ userData, saldos, misSolicitudes, solicitudesPendientes, onNewRequest, onManageRequest, supervisores }: Props) {
+  const [selectedRequest, setSelectedRequest] = useState<LicenseHistory | null>(null);
+
+  const pendientes = useMemo<SolicitudParsed[]>(() =>
+    solicitudesPendientes.map(s => ({ ...s, desde: new Date(s.startDate), hasta: new Date(s.endDate) })),
+    [solicitudesPendientes],
+  );
+
+  return (
+    <div className="space-y-4 max-w-4xl mx-auto">
+
+      {selectedRequest && (
+        <ApprovalModal
+          request={selectedRequest}
+          supervisores={supervisores.filter(s =>
+            s.id !== userData.id && !selectedRequest.aprobaciones?.some(a => a.supervisorId === s.id)
+          )}
+          onManage={onManageRequest}
+          onClose={() => setSelectedRequest(null)}
+        />
+      )}
+
+      {/* ── Fila superior: saldos + nueva solicitud ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+        {/* Saldos desglosados por tipo de licencia */}
+        <div className="lg:col-span-2">
+          <Section title="Mis Licencias — Saldo por Tipo" icon={<CalendarRange size={15} className="text-cyan-500" />}>
+            {!saldos ? (
+              <div className="flex justify-center py-6">
+                <span className="w-6 h-6 rounded-full border-2 border-gray-200 border-t-cyan-500 animate-spin" />
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {Object.entries(saldos).map(([anio, valores]) => (
+                  <details key={anio} className="group rounded-lg border border-gray-100 overflow-hidden">
+                    <summary className="flex items-center justify-between px-4 py-2.5 bg-gray-50 cursor-pointer text-sm font-semibold text-gray-700 hover:bg-gray-100 transition list-none">
+                      Año {anio}
+                      <ChevronRight size={14} className="text-gray-400 group-open:rotate-90 transition-transform" />
+                    </summary>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 px-4 py-3">
+                      {Object.entries(valores).map(([tipo, datos]) => {
+                        // datos puede ser un objeto { diasTotales, consumidos, disponibles } o un número simple
+                        const esObjeto = typeof datos === 'object' && datos !== null && 'diasTotales' in datos;
+                        const diasTotales = esObjeto ? (datos as any).diasTotales : (datos as number);
+                        const consumidos = esObjeto ? (datos as any).consumidos : 0;
+                        const disponibles = esObjeto ? (datos as any).disponibles : (datos as number);
+                        const porcentaje = diasTotales > 0 ? (consumidos / diasTotales) * 100 : 0;
+
+                        return (
+                          <div key={tipo} className="border border-gray-100 rounded-xl p-3 hover:border-cyan-200 transition">
+                            <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+                              {getIcon(tipo)}
+                              <span className="font-medium truncate">{tipo}</span>
+                            </div>
+                            <div className="flex items-baseline gap-1 mb-1">
+                              <p className="text-xl font-bold text-cyan-600">{disponibles}</p>
+                              <span className="text-[10px] text-gray-400">/ {diasTotales} días</span>
+                            </div>
+                            {/* Barra de consumo */}
+                            <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all"
+                                style={{
+                                  width: `${Math.min(porcentaje, 100)}%`,
+                                  backgroundColor: porcentaje > 80 ? '#ef4444' : porcentaje > 50 ? '#f59e0b' : '#06b6d4'
+                                }}
+                              />
+                            </div>
+                            <p className="text-[10px] text-gray-400 mt-1">
+                              {consumidos > 0 ? `${consumidos} consumidos` : 'Sin consumo'}
+                            </p>
+                          </div>
+                        );
+                      })}
                     </div>
-                </Card>
-            </div>
-        );
-    };
+                  </details>
+                ))}
+              </div>
+            )}
+          </Section>
+        </div>
+
+        {/* Nueva solicitud */}
+        <div className="bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl p-5 flex flex-col items-center justify-center text-center text-white shadow-sm">
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-3">
+            <Plus size={20} className="text-white" />
+          </div>
+          <h3 className="font-semibold text-sm mb-1">Nueva Solicitud</h3>
+          <p className="text-xs text-cyan-100 mb-4">Iniciá tu solicitud de licencia</p>
+          <button
+            onClick={onNewRequest}
+            className="flex items-center gap-1.5 px-4 py-2 bg-white text-cyan-600 text-xs font-semibold rounded-full hover:bg-cyan-50 transition shadow-sm"
+          >
+            <Send size={13} />
+            Solicitar
+          </button>
+        </div>
+      </div>
+
+      {/* ── Pendientes de aprobación (solo supervisor) ── */}
+      {userData.role === 'supervisor' && pendientes.length > 0 && (
+        <Section title="Pendientes de Mi Aprobación" icon={<Clock size={15} className="text-amber-500" />}>
+          <div className="space-y-2">
+            {pendientes.map(s => (
+              <button
+                key={s.id}
+                onClick={() => setSelectedRequest(s)}
+                className="w-full text-left flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-cyan-200 hover:bg-cyan-50/50 transition group"
+              >
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">
+                    {s.name} · <span className="text-cyan-600">{s.type}</span> · {s.duration} días
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {fmt(s.desde)} → {fmt(s.hasta)}
+                  </p>
+                </div>
+                <ChevronRight size={16} className="text-gray-300 group-hover:text-cyan-500 transition" />
+              </button>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* ── Historial completo de solicitudes ── */}
+      <Section title="Historial de Solicitudes">
+        {misSolicitudes.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-4">No tenés solicitudes registradas.</p>
+        ) : (
+          <div className="space-y-2">
+            {misSolicitudes.map(s => (
+              <div key={s.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    {getIcon(s.type)}
+                    <p className="text-sm font-semibold text-gray-800">
+                      {s.duration} días · {s.type}
+                    </p>
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    {fmt(s.startDate)} → {fmt(s.endDate)}
+                  </p>
+                  {s.status === 'Rechazada' && s.observacion && (
+                    <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                      <MessageSquare size={11} />
+                      {s.observacion}
+                    </p>
+                  )}
+                </div>
+                <StatusChip status={s.status} observacion={s.observacion} />
+              </div>
+            ))}
+          </div>
+        )}
+      </Section>
+
+    </div>
+  );
+}

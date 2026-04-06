@@ -1,238 +1,161 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-import {  useRef, useState } from "react";
+// Página principal del módulo de Gestión de Licencias.
+// - Carga datos del empleado, saldos, historial y supervisores desde la API.
+// - Los supervisores se obtienen dinámicamente desde la tabla LicenseSupervisor.
+// - Los saldos incluyen diasTotales, consumidos y disponibles por tipo.
+
+import { useRef, useState, useEffect } from "react";
 import { FileText, } from 'lucide-react';
 import dynamic from "next/dynamic";
-import {EMPLOYEES_DATA} from "@/app/api/prueba2";
-import {Employee,Usuario,LicenseHistory} from "@/app/Interfas/Interfaces"
-import { Toast } from 'primereact/toast';            
-const RequestForm = dynamic(() => import("@/app/GestionLicencias/FormularioLicencia"), {
-  ssr: false,
-});
+import { Toast } from 'primereact/toast';
+import { apiClient } from "@/app/util/apiClient";
+import { LicenseHistory, Usuario } from "@/app/Interfas/Interfaces";
 
-const  ConteinerLicencia = dynamic(() => import("@/app/GestionLicencias/Licencias"), {
-  ssr: false,
-});
-
+const RequestForm = dynamic(() => import("@/app/GestionLicencias/FormularioLicencia"), { ssr: false });
+const ConteinerLicencia = dynamic(() => import("@/app/GestionLicencias/Licencias"), { ssr: false });
 
 export default function LicenciasManage() {
-  const [currentUser, setCurrentUser] = useState<Employee>(EMPLOYEES_DATA[0]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [view, setView] = useState("contenedor");
-   const toast = useRef<Toast>(null);
-  console.log(currentUser);
+  const [misSolicitudes, setMisSolicitudes] = useState<LicenseHistory[]>([]);
+  const [solicitudesPendientes, setSolicitudesPendientes] = useState<LicenseHistory[]>([]);
+  const [loading, setLoading] = useState(true);
 
-const misSolicitudes: LicenseHistory[] = currentUser
-  ? currentUser.licenses.history
-      .filter((s) => s.solicitanteId === currentUser.id)   
-      .sort((a, b) =>
-          new Date(b.createdAt).getTime() -
-          new Date(a.createdAt).getTime()
-      )
-  : [];
-  
+  const toast = useRef<Toast>(null);
+  const [misSaldos, setMisSaldos] = useState<any>({});
+  // Lista dinámica de supervisores para derivación de aprobaciones (tabla LicenseSupervisor)
+  const [supervisores, setSupervisores] = useState<Usuario[]>([]);
 
- // 🔹 2. Solicitudes pendientes si el empleado ACTUAL es supervisor
-const misSubordinados = currentUser.subordinates || []; // IDs de empleados que reportan a Ana
-const solicitudesPendientes: LicenseHistory[] =
-  currentUser?.role === "supervisor"
-    ? currentUser.licenses.history
-        ?.filter((s) => {
-          // Ver solicitudes donde:
-          // 1. Ella sea la supervisor directa, O
-          // 2. La solicitud sea de uno de sus subordinados
-          return (s.supervisorId === currentUser.id) || 
-                 (misSubordinados.includes(s.solicitanteId) && s.status?.startsWith("Pendiente"));
-        })
-        .sort((a, b) => 
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        )
-    : [];
-console.log(solicitudesPendientes)
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const empId = Number(localStorage.getItem("employeeId"));
+      const role = localStorage.getItem("roleName");
 
-  const supervisores: Usuario[] = Object.values(currentUser.licenses.usuarios).filter(
-    (u) => u.role === "supervisor"
-  );
-  
+      // Fetch employee profile, solicitudes propias y saldos
+      if (empId) {
+        const [empRes, misReqs, saldosRes] = await Promise.all([
+          apiClient.get<any>(`/employee/${empId}`),
+          apiClient.get<any>(`/licenses/requests?employee_id=${empId}`),
+          apiClient.get<any>(`/licenses/saldos?employee_id=${empId}`)
+        ]);
 
-const misSaldos = currentUser.licenses?.saldos;
+        setCurrentUser({ ...empRes, role });
+        setMisSolicitudes(misReqs.requests || []);
 
-  const handleNewRequest = (nuevaSolicitud:LicenseHistory) => {
-    setCurrentUser(prev => ({
-  ...prev,
-  licenses: {
-    ...prev.licenses,
-    history: [...prev.licenses.history, nuevaSolicitud]
-  }
-}));
-    setView("contenedor");
+        // Transformar saldos — ahora incluye el objeto completo por tipo
+        const saldosMap: any = {};
+        if (saldosRes.balances) {
+          saldosRes.balances.forEach((bal: any) => {
+            if (!saldosMap[bal.anio]) saldosMap[bal.anio] = {};
+            // Guardar objeto con diasTotales, consumidos y disponibles
+            saldosMap[bal.anio][bal.tipo] = {
+              diasTotales: bal.diasTotales,
+              consumidos: bal.consumidos,
+              disponibles: bal.disponibles,
+            };
+          });
+        }
+        setMisSaldos(saldosMap);
+      }
+
+      // Cargar supervisores para derivación desde la tabla LicenseSupervisor
+      try {
+        const supRes = await apiClient.get<{ supervisores: Usuario[] }>('/licenses/supervisores-disponibles');
+        setSupervisores(supRes.supervisores || []);
+      } catch (err) {
+        console.warn("No se pudieron cargar supervisores para derivación:", err);
+      }
+
+      // Si es supervisor/admin, cargar solicitudes pendientes de aprobación
+      if (role === "admin" || role === "supervisor" || role === "rrhh") {
+        const pendientesReqs = await apiClient.get<any>('/licenses/requests?status=Pendiente');
+        setSolicitudesPendientes(pendientesReqs.requests || []);
+      }
+    } catch (err) {
+      console.error("Error fetching licenses", err);
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Fallo al cargar licencias' });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleManageRequest = (
-    solicitudId: number,
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleNewRequest = async (nuevaSolicitud: any) => {
+    try {
+      await apiClient.post('/licenses/request', nuevaSolicitud);
+      toast.current?.show({ severity: 'success', summary: 'Éxito', detail: 'Solicitud enviada' });
+      fetchData();
+      setView("contenedor");
+    } catch (err) {
+      console.error(err);
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: 'No se pudo enviar la solicitud' });
+    }
+  };
+
+  const handleManageRequest = async (
+    solicitudId: number | undefined,
     accion: "aprobar" | "rechazar",
     data: { siguienteSupervisorId?: number; observacion?: string }
   ) => {
-    setCurrentUser((prev) => {
-      if (!prev) {
-        toast.current?.show({
-          severity: "warn",
-          summary: "Error",
-          detail: "No hay usuario logueado.",
-          life: 3000,
-        });
-        return prev;
-      }
+    if (!solicitudId) return;
+    try {
+      const status = accion === "aprobar" ? (data.siguienteSupervisorId ? "Pendiente Siguiente Aprobación" : "Aprobada") : "Rechazada";
 
-      // Clonar para no mutar estado
-      const next =
-        typeof structuredClone === "function"
-          ? structuredClone(prev)
-          : (JSON.parse(JSON.stringify(prev)) as Employee);
-
-      // Buscar la solicitud
-      const solicitud = next.licenses?.history?.find(
-        (s) => String(s.id) === String(solicitudId)
-      );
-      if (!solicitud) {
-        toast.current?.show({
-          severity: "warn",
-          summary: "No encontrado",
-          detail: "Solicitud no encontrada.",
-          life: 3000,
-        });
-        return prev;
-      }
-
-      // Aprobador actual: el usuario logueado
-    const aprobadorActual = next.licenses.usuarios[prev.id]
-      if (!aprobadorActual) {
-        toast.current?.show({
-          severity: "warn",
-          summary: "No autorizado",
-          detail: "El usuario actual no es un supervisor válido.",
-          life: 3000,
-        });
-        return prev;
-      }
-
-      // Registrar aprobación / rechazo
-      solicitud.aprobaciones = solicitud.aprobaciones || [];
-      solicitud.aprobaciones.push({
-        supervisorId: aprobadorActual.id,
-        nombre: aprobadorActual.name,
-        fecha: new Date().toISOString(),
-        accion,
+      await apiClient.patch(`/licenses/requests/${solicitudId}/status`, {
+        status,
         observacion: data.observacion,
+        supervisorId: currentUser?.id
       });
 
-      // Lógica de gestión
-      if (accion === "aprobar") {
-        if (data.siguienteSupervisorId) {
-          solicitud.status = "Pendiente Siguiente Aprobación";
-          solicitud.supervisorId = data.siguienteSupervisorId;
-        } else {
-          solicitud.status = "Aprobada";
-          (solicitud as any).supervisorId = null;
-
-          // --- Actualizar saldos ---
-          const solicitanteKey = String(solicitud.solicitanteId ?? prev.id);
-          const perUserSaldos = (next.licenses?.saldos as any)?.[solicitanteKey];
-
-          if (Array.isArray(perUserSaldos)) {
-            // Estructura: Saldo[] por usuario
-            Object.entries(solicitud.tiposLicencia || {}).forEach(
-              ([anio, tipos]) => {
-                const saldoAnual = perUserSaldos.find(
-                  (s: any) => String(s.anio) === String(anio)
-                );
-                if (saldoAnual) {
-                  Object.entries(tipos).forEach(([tipo, dias]) => {
-                    if (typeof saldoAnual[tipo] === "number") {
-                      saldoAnual[tipo] =
-                        (saldoAnual[tipo] as number) - Number(dias);
-                    }
-                  });
-                }
-              }
-            );
-          } else {
-            // Estructura: saldos globales por año
-            Object.entries(solicitud.tiposLicencia || {}).forEach(
-              ([anio, tipos]) => {
-                const globalYear = (next.licenses?.saldos as any)?.[anio];
-                if (globalYear && typeof globalYear === "object") {
-                  Object.entries(tipos).forEach(([tipo, dias]) => {
-                    if (typeof globalYear[tipo] === "number") {
-                      globalYear[tipo] =
-                        (globalYear[tipo] as number) - Number(dias);
-                    }
-                  });
-                }
-              }
-            );
-          }
-        }
-      } else {
-        // Rechazo
-        solicitud.status = "Rechazada";
-        solicitud.observacion = data.observacion || solicitud.observacion;
-        (solicitud as any).supervisorId = null;
-      }
-
-      // Feedback con toast
-      toast.current?.show({
-        severity: "success",
-        summary: "Solicitud gestionada",
-        detail:
-          accion === "aprobar"
-            ? "Solicitud aprobada correctamente."
-            : "Solicitud rechazada correctamente.",
-        life: 3000,
-      });
-
-      return next;
-    });
+      toast.current?.show({ severity: 'success', summary: 'Actualizado', detail: `Licencia ${status}` });
+      fetchData();
+    } catch (error) {
+      console.error(error);
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar la licencia' });
+    }
   };
 
-
-  // Verificación de que currentUser no sea null antes de renderizar
-  if (!currentUser) {
+  if (loading) {
     return (
       <div className="bg-gray-100 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">No se pudo cargar la información del usuario</p>
-        </div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen font-sans">
+    <div className="bg-gray-50 p-4 font-sans min-h-screen">
+      <Toast ref={toast} />
       <div className="flex items-center gap-3 py-4 px-4">
-        <FileText className=" text-[#1ABCD7] text-shadow-md" size={32} />
+        <FileText className="text-[#1ABCD7]" size={32} />
         <h1 className="text-2xl font-bold text-gray-800">
           Gestión de Licencias
         </h1>
       </div>
-      <main className="p-4 md:p-8">
-        {view === "contenedor" && (
+      <main>
+        {view === "contenedor" && currentUser && (
           <ConteinerLicencia
-            userData={currentUser} 
-            saldos={misSaldos} 
+            userData={currentUser}
+            saldos={misSaldos}
             misSolicitudes={misSolicitudes}
             solicitudesPendientes={solicitudesPendientes}
             onNewRequest={() => setView("new_request")}
-            onManageRequest={handleManageRequest} 
-            supervisores={supervisores} 
+            onManageRequest={handleManageRequest}
+            supervisores={supervisores}
           />
         )}
-        {view === "new_request" && (
+        {view === "new_request" && currentUser && (
           <RequestForm
             saldos={misSaldos}
-            supervisores={supervisores.filter((s) => s.id !== currentUser.id )}
-            userData={currentUser} 
-            onCancel={() => setView("contenedor")} 
-            onSubmit={handleNewRequest}
+            supervisores={supervisores.filter((s) => s.id !== currentUser.id)}
+            userData={currentUser}
+            onCancel={() => setView("contenedor")}
+            onSubmit={handleNewRequest as any}
           />
         )}
       </main>

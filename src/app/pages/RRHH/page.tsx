@@ -32,7 +32,10 @@ export default function RecursosHumanosPage() {
 useEffect(() => {
   const fetchEmployeeData = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/rrhh/employees/`);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://127.0.0.1:8000/rrhh/employees`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (!response.ok) {
         console.error('Error al obtener datos del empleado:', response.statusText);
         setEmployees([]);

@@ -9,13 +9,19 @@ import { FormFieldProps } from '@/app/Interfas/Interfaces';
 export const OfficeFields: React.FC<FormFieldProps> = ({
   formData,
   setFormData,
-  employees
+  employees,
+  departments
 }) => {
   const { 
     employeeOptionTemplate, 
     selectedEmployeeTemplate, 
     employeeMultiSelectTemplate 
   } = useEmployeeTemplates({ employees });
+
+  const departmentOptions = departments.map((d) => ({
+    label: d.nombre,
+    value: d.id,
+  }));
 
   const employeeOptions = employees.map(emp => ({
     name: emp.name,
@@ -32,6 +38,28 @@ export const OfficeFields: React.FC<FormFieldProps> = ({
 
   return (
     <>
+      {/* Departamento Padre (Jerarquía) */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Depende de (Dpto. Padre)
+        </label>
+        <Dropdown
+          value={formData.parentDepartmentId}
+          onChange={(e: DropdownChangeEvent) => {
+            console.log('Parent Department ID cambiado:', e.value);
+            setFormData(prev => ({ ...prev, parentDepartmentId: e.value }));
+          }}
+          options={departmentOptions}
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar departamento superior"
+          className="w-full"
+          showClear
+          filter
+          filterBy="label"
+        />
+      </div>
+
       {/* Jefe de Oficina */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">

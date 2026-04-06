@@ -1,130 +1,178 @@
-
 "use client";
-import React, { useRef, useState } from "react";
-import { Bell, ChevronDown, } from "lucide-react";
-import { Badge } from 'primereact/badge';
-import { Button } from 'primereact/button';
-import { OverlayPanel } from 'primereact/overlaypanel';
-import { Avatar } from 'primereact/avatar';
-import { Menu } from 'primereact/menu';
-import { MenuItem } from 'primereact/menuitem';
-import { Divider } from 'primereact/divider';
+// Componentes/Navbar/Header.tsx
+// Bug 5 (SSR): Se corrige el acceso síncrono a localStorage en el render.
+//   localStorage no existe en el servidor (SSR), por eso causaba el error de hydration.
+//   Solución: usar useEffect + useState para leer localStorage solo en el cliente.
+//
+// Bug 3 (Logout): Se reemplaza logoutUser() (Server Action) por logoutFromClient()
+//   que funciona correctamente desde un Client Component.
+
+import React, { useRef, useState, useEffect, useCallback } from "react";
+import { Bell, ChevronDown } from "lucide-react";
+import { Badge } from "primereact/badge";
+import { Button } from "primereact/button";
+import { OverlayPanel } from "primereact/overlaypanel";
+import { Avatar } from "primereact/avatar";
+import { Menu } from "primereact/menu";
+import { MenuItem } from "primereact/menuitem";
+import { Divider } from "primereact/divider";
 import { NotificationDialog } from "@/app/Componentes/Perfil/NotificationDialog";
-import {EMPLOYEES_DATA} from "@/app/api/prueba2";
-import { Employee,Notification,Page} from "@/app/Interfas/Interfaces";
+import { Notification, Page, Employee } from "@/app/Interfas/Interfaces";
 import Image from "next/image";
-import { logoutUser } from '@/app/util/auth';
-  interface HeaderProps {
+import { logoutFromClient } from "@/app/util/authClient";
+
+interface HeaderProps {
   setPage: (page: Page) => void;
+  employeeData?: Employee | null;
 }
 
+// Foto de avatar por defecto mientras carga el perfil real
+const DEFAULT_AVATAR = "/Default-avatar.webp";
 
-export function Header({ setPage }: HeaderProps) {
+export function Header({ setPage, employeeData }: HeaderProps) {
   const notificationsPanel = useRef<OverlayPanel>(null);
   const profileMenu = useRef<Menu>(null);
-  const [selectedNotification, setSelectedNotification] = useState<typeof currentUser.notificaciones[0] | null>(null);
+
+  // ── Bug 5 fix: leer localStorage SOLO en el cliente ──────────────────────
+  // Los estados comienzan vacíos (lo que el servidor renderiza).
+  // El useEffect los rellena en el cliente evitando el mismatch de hydration.
+  const [usuario, setUsuario] = useState<string>("");
+  const [roleName, setRoleName] = useState<string>("");
+  const [userPhoto, setUserPhoto] = useState<string>(DEFAULT_AVATAR);
+  const [userName, setUserName] = useState<string>("Usuario");
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const [selectedNotification, setSelectedNotification] =
+    useState<Notification | null>(null);
   const [dialogVisible, setDialogVisible] = useState(false);
-   const [notifications, setNotifications] = useState<Notification[]>(EMPLOYEES_DATA[0].notificaciones ?? [] );
-  const Usuario = localStorage.getItem('usuario');
-      const roleName = localStorage.getItem('roleName');
-  const currentUser: Employee = { ...EMPLOYEES_DATA[0], notificaciones: notifications };
- 
- 
- const handleLogout = async () => {
+
+  // Leer datos del cliente después del montaje (evita SSR mismatch)
+  useEffect(() => {
+    setUsuario(localStorage.getItem("usuario") ?? "");
+    setRoleName(localStorage.getItem("roleName") ?? "");
+    // Las notificaciones reales vendrán de la API; por defecto vacío
+    // TODO: reemplazar por fetch a /notifications/{employeeId}
+    setNotifications([]);
+  }, []);
+
+  useEffect(() => {
+    if (employeeData) {
+      setUserName(employeeData.name || localStorage.getItem("usuario") || "Usuario");
+      setUserPhoto(employeeData.photo || DEFAULT_AVATAR);
+    }
+  }, [employeeData]);
+
+  // ── Bug 3 fix: logout funcional desde Client Component ───────────────────
+  const handleLogout = async () => {
     try {
-      await logoutUser();
+      await logoutFromClient(); // Limpia localStorage, cookie y redirige al login
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
+      // Forzar redirect al login aunque falle el fetch
+      window.location.href = "pages/Login";
     }
   };
-  const handleNotificationClick = (notif: typeof currentUser.notificaciones[0]) => {
+
+  // ── Bug 4 fix: useCallback para estabilizar la referencia de onMarkAsRead ─
+  // Sin useCallback, cada render crea una función nueva → loop en NotificationDialog
+  const markAsRead = useCallback((notificationId: number) => {
+    setNotifications((prev) =>
+      prev.map((notif) =>
+        notif.id === notificationId
+          ? { ...notif, status: "leida" as const }
+          : notif
+      )
+    );
+  }, []); // Sin dependencias → función estable entre renders
+
+  const handleNotificationClick = (notif: Notification) => {
     setSelectedNotification(notif);
     setDialogVisible(true);
     notificationsPanel.current?.hide();
   };
 
-  const markAsRead = (notificationId: number) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === notificationId 
-          ? { ...notif, status: 'leida' as const }
-          : notif
-      )
-    );
-  };
-
-  const getPreviewText = (text: string, maxLength: number = 80) => {
+  const getPreviewText = (text: string, maxLength = 80) => {
     if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+    return text.substring(0, maxLength) + "...";
   };
 
-  const unreadCount = notifications.filter(n => n.status === 'nueva').length;
+  const unreadCount = notifications.filter((n) => n.status === "nueva").length;
 
   const profileMenuItems: MenuItem[] = [
     {
       template: () => (
         <div className="px-4 py-4 bg-gradient-to-br from-gray-50 to-gray-100 border-b border-gray-200">
           <div className="flex items-center gap-3">
+            <div className="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-md">
+              <img
+                src={userPhoto}
+                alt="Foto de perfil"
+                className="w-full h-full object-cover object-center rounded-full"
+              />
+            </div>
             <div>
-              <p className="font-bold text-gray-800">{Usuario}</p>
-              <p className="text-sm text-gray-500">{roleName}</p>
+              <p className="font-bold text-gray-800">{employeeData?.name || userName}</p>
+              <p className="text-sm text-gray-500">@{usuario || "—"} • {roleName || "—"}</p>
             </div>
           </div>
         </div>
-      )
+      ),
     },
     {
-      label: 'Editar Perfil',
-      icon: 'pi pi-user-edit',
-      className: 'hover:bg-cyan-50',
-      command: () => setPage("editar-perfil")
+      label: "Editar Perfil",
+      icon: "pi pi-user-edit",
+      className: "hover:bg-cyan-50",
+      command: () => setPage("editar-perfil"),
     },
     {
-      label: 'Licencias',
-      icon: 'pi pi-id-card',
-      className: 'hover:bg-cyan-50',
-      command: () => setPage("licencias")
+      label: "Licencias",
+      icon: "pi pi-id-card",
+      className: "hover:bg-cyan-50",
+      command: () => setPage("licencias"),
     },
     {
-      label: 'Encuesta',
-      icon: 'pi pi-file-edit',
-      className: 'hover:bg-cyan-50',
-      command: () => setPage('feedback')
+      label: "Encuesta",
+      icon: "pi pi-file-edit",
+      className: "hover:bg-cyan-50",
+      command: () => setPage("feedback"),
     },
+    { separator: true },
     {
-      separator: true
+      label: "Cerrar Sesión",
+      icon: "pi pi-sign-out",
+      className: "text-red-500 hover:bg-red-50",
+      command: handleLogout,
     },
-    {
-      label: 'Cerrar Sesión',
-      icon: 'pi pi-sign-out',
-      className: 'text-red-500 hover:bg-red-50',
-      command: handleLogout 
-    }
   ];
 
-  const NotificationItem = ({ notif }: { notif: typeof currentUser.notificaciones[0] }) => (
-    <div 
+  const NotificationItem = ({ notif }: { notif: Notification }) => (
+    <div
       className="p-3 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-all duration-200 rounded-lg mx-1 my-1"
       onClick={() => handleNotificationClick(notif)}
     >
       <div className="flex items-start gap-3">
         <div className="relative w-10 h-10 flex-shrink-0">
-          <Avatar 
-            image={currentUser.photo}
-            className="flex-shrink-0 border-2 border-cyan-300" 
-            size="normal" 
+          <Avatar
+            image={userPhoto}
+            className="flex-shrink-0 border-2 border-cyan-300"
             shape="circle"
+
           />
-          {notif.status === 'nueva' && (
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full border-2 border-white animate-pulse"></span>
+          {notif.status === "nueva" && (
+            <span className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full border-2 border-white animate-pulse" />
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className={`text-sm mb-1 line-clamp-2 ${notif.status === 'nueva' ? 'text-gray-900 font-semibold' : 'text-gray-700'}`}>
+          <p
+            className={`text-sm mb-1 line-clamp-2 ${notif.status === "nueva"
+              ? "text-gray-900 font-semibold"
+              : "text-gray-700"
+              }`}
+          >
             {getPreviewText(notif.text)}
           </p>
           <p className="text-xs text-gray-500 flex items-center gap-1">
-            <i className="pi pi-clock text-xs text-cyan-500"></i>
+            <i className="pi pi-clock text-xs text-cyan-500" />
             {notif.time}
           </p>
         </div>
@@ -142,7 +190,6 @@ export function Header({ setPage }: HeaderProps) {
           height={120}
           className="mr-2"
         />
-        
       </div>
 
       <div className="flex items-center gap-4">
@@ -160,10 +207,10 @@ export function Header({ setPage }: HeaderProps) {
             )}
           </button>
 
-          <OverlayPanel 
-            ref={notificationsPanel} 
+          <OverlayPanel
+            ref={notificationsPanel}
             className="w-96 shadow-2xl border-0"
-            style={{ width: '400px' }}
+            style={{ width: "400px" }}
           >
             <div className="bg-gradient-to-br from-cyan-50 to-blue-50 -m-4 p-4 rounded-t-lg mb-2">
               <div className="flex items-center justify-between">
@@ -172,27 +219,33 @@ export function Header({ setPage }: HeaderProps) {
                 </h3>
                 <div className="flex items-center gap-2">
                   {unreadCount > 0 && (
-                    <Badge 
-                      value={unreadCount} 
+                    <Badge
+                      value={unreadCount}
                       severity="info"
                       className="bg-gradient-to-br from-cyan-500 to-blue-600"
                     />
                   )}
                   <span className="text-sm text-gray-600 font-medium">
-                    / {currentUser.notificaciones.length} total
+                    / {notifications.length} total
                   </span>
                 </div>
               </div>
             </div>
-            
+
             <div className="max-h-96 overflow-y-auto pr-1">
-              {currentUser.notificaciones.map((notif) => (
-                <NotificationItem key={notif.id} notif={notif} />
-              ))}
+              {notifications.length === 0 ? (
+                <p className="text-center text-gray-500 py-6 text-sm">
+                  No tenés notificaciones nuevas
+                </p>
+              ) : (
+                notifications.map((notif) => (
+                  <NotificationItem key={notif.id} notif={notif} />
+                ))
+              )}
             </div>
 
             <Divider className="my-2" />
-            
+
             <Button
               label="Ver todas las notificaciones"
               text
@@ -205,19 +258,19 @@ export function Header({ setPage }: HeaderProps) {
         <div className="flex items-center">
           <button
             onClick={(e) => profileMenu.current?.toggle(e)}
-            className="flex items-center gap-3 px-3 py-2 rounded-xl bg-transparent hover:bg-transparent text-gray-800 dark:text-gray-200 transition-all duration-200  hover:shadow-cyan-500/20 group"
+            className="flex items-center gap-3 px-3 py-2 rounded-xl bg-transparent hover:bg-transparent text-gray-200 transition-all duration-200 hover:shadow-cyan-500/20 group"
           >
-            <div className="w-9 h-9 flex-shrink-0 relative">
+            <div >
               <Avatar
-                image={currentUser.photo}
+                image={userPhoto}
                 shape="circle"
-                size="normal"
+                size="large"
                 className="w-full h-full border-2 border-cyan-400 group-hover:border-cyan-300 transition-colors"
               />
-              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-gray-800"></span>
+              <Badge severity="success" />
             </div>
             <span className="hidden md:inline text-sm font-medium text-gray-200 group-hover:text-cyan-400 transition-colors">
-              {currentUser.name.split(' ')[0]}
+              {userName.split(" ")[0] || usuario || "Perfil"}
             </span>
             <ChevronDown
               size={16}
@@ -234,14 +287,15 @@ export function Header({ setPage }: HeaderProps) {
         </div>
       </div>
 
+      {/* Bug 4 fix: onMarkAsRead es estable gracias a useCallback */}
       <NotificationDialog
         visible={dialogVisible}
         onHide={() => setDialogVisible(false)}
         notification={selectedNotification}
-        userPhoto={currentUser.photo}
-        userName={currentUser.name}
+        userPhoto={userPhoto}
+        userName={userName}
         onMarkAsRead={markAsRead}
       />
     </header>
   );
-};
+}

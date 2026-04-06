@@ -7,6 +7,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model TestPrisma {
+  id Int @id @default(autoincrement())
+}
+
 model Role {
   id          Int      @id @default(autoincrement())
   name        String   @unique
@@ -58,9 +62,9 @@ model Employee {
   manager               Employee? @relation("Manages", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   subordinates          Employee[] @relation("Manages")
   // Relación de jefatura de departamento (inversa)
-  departmentHead        Department? @relation("DepartmentHead")
+  departmentHead        Department[] @relation("DepartmentHead")
   // Relación de jefatura de oficina (inversa)
-  officeHead            Office? @relation("OfficeHead")
+  officeHead            Office[] @relation("OfficeHead")
   // Relaciones de horario
   cronograma            Horario? @relation(fields: [cronogramaId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   cronogramaId          Int?
@@ -85,6 +89,10 @@ model Employee {
   resenasDeRendimiento  ResenasDeRendimiento[]
   satisfaccionMetrica   SatisfaccionMetrica?
   criticalEvents        CriticalEvents[]
+  testAttempts          TestAttempt[]
+  areaChangeRequests    AreaChangeRequest[]
+  feedbackGiven         FeedbackEvaluacion[] @relation("evaluatorFeedback")
+  feedbackReceived      FeedbackEvaluacion[] @relation("evaluatedFeedback")
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
@@ -100,10 +108,14 @@ model Department {
   id                     Int        @id @default(autoincrement())
   nombre                 String
   description            String?
-  jefeId                 Int?       @unique
+  jefeId                 Int?
   nivelJerarquico        Int?
+  // Auto-referencia: jerarquía padre-hijo entre departamentos
+  parentId               Int?
+  parent                 Department?  @relation("DepartmentHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children               Department[] @relation("DepartmentHierarchy")
   habilidades_requeridas Skill[]
-  jefe                   Employee?   @relation("DepartmentHead", fields: [jefeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  jefe   Employee? @relation("DepartmentHead", fields: [jefeId], references: [id])
   employees              Employee[]  @relation("DepartmentEmployees")
   offices                Office[]
   feedbacks              Feedback[]
@@ -113,6 +125,7 @@ model Department {
   @@index([nombre])
   @@index([jefeId])
   @@index([nivelJerarquico])
+  @@index([parentId])
 }
 
 model Office {
@@ -120,7 +133,9 @@ model Office {
   nombre                 String
   description            String?
   departmentId           Int
-  jefeId                 Int?       @unique
+  jefeId                 Int?
+  // Departamento padre jerárquico (para el organigrama)
+  parentDepartmentId     Int?
   habilidades_requeridas Skill[]
   department             Department   @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   jefe                   Employee?    @relation("OfficeHead", fields: [jefeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
@@ -132,6 +147,7 @@ model Office {
 
   @@index([nombre])
   @@index([departmentId])
+  @@index([parentDepartmentId])
 }
 
 model TechnicalSkill {
@@ -142,6 +158,7 @@ model TechnicalSkill {
   profession              String?   // Contador, Abogado, Desarrollador, etc.
   questions               Question[]
   employeeTechnicalSkills EmployeeTechnicalSkill[]
+  testAttempts            TestAttempt[]
   activo                Boolean   @default(true)
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
@@ -172,9 +189,10 @@ model SoftSkill {
   id                 Int                 @id @default(autoincrement())
   nombre             String              @unique
   description        String?             @db.Text
-  employeeSoftSkills EmployeeSoftSkill[]
-  feedbacks          Feedback[]
-  activo             Boolean   @default(true)
+  employeeSoftSkills    EmployeeSoftSkill[]
+  feedbacks             Feedback[]
+  feedbackEvaluaciones  FeedbackEvaluacion[]
+  activo                Boolean   @default(true)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   @@index([nombre])
@@ -226,7 +244,7 @@ model Answer {
   text       String   @db.Text
   isCorrect  Boolean  @default(false)
   questionId Int
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
 
   @@index([isCorrect])
@@ -261,7 +279,7 @@ model Respuesta {
   malo       Int
   bueno      Int
   excelente  Int
-  feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete:NoAction, onUpdate: NoAction)
 
   @@index([feedbackId])
   @@index([malo])
@@ -269,6 +287,22 @@ model Respuesta {
   @@index([excelente])
 }
 
+model ConsumoLicencias {
+  id              Int      @id @default(autoincrement())
+  anio            Int 
+  tipo            String
+  diasConsumidos  Int      // Días consumidos de este tipo de licencia
+  licenseId       Int
+  license         License  @relation(fields: [licenseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  fechaConsumo    DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([licenseId])
+  @@index([anio])
+  @@index([tipo])
+  @@index([fechaConsumo])
+}
 model License {
   id                    Int                     @id @default(autoincrement())
   type                  String
@@ -297,8 +331,8 @@ model LicenseSupervisor {
   id          Int      @id @default(autoincrement())
   licenseId   Int
   userId      Int
-  license     License  @relation(fields: [licenseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  license     License  @relation(fields: [licenseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user        User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate:NoAction)
   createdAt   DateTime @default(now())
 
   @@unique([licenseId, userId])
@@ -313,34 +347,17 @@ model ConfiguracionLicencias {
   tipo       String
   categoria  String
   diasTotales Int     // Días totales disponibles por tipo de licencia
-  licenseId  Int
-  license    License  @relation(fields: [licenseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  licenseId  Int?
+  license    License?  @relation(fields: [licenseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  @@unique([licenseId, anio, tipo])
   @@index([anio])
   @@index([categoria])
   @@index([tipo])
 }
 
 // OPTIMIZACIÓN: Registro de consumo de licencias
-model ConsumoLicencias {
-  id              Int      @id @default(autoincrement())
-  anio            Int 
-  tipo            String
-  diasConsumidos  Int      // Días consumidos de este tipo de licencia
-  licenseId       Int
-  license         License  @relation(fields: [licenseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  fechaConsumo    DateTime @default(now())
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@index([licenseId])
-  @@index([anio])
-  @@index([tipo])
-  @@index([fechaConsumo])
-}
 
 model Aprobaciones {
   id           Int       @id @default(autoincrement())
@@ -360,7 +377,7 @@ model Aprobaciones {
 
 model Ausencia {
   id         Int      @id @default(autoincrement())
-  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete:NoAction, onUpdate: NoAction)
   employeeId Int
   fecha      DateTime
   reason     String   @db.Text
@@ -396,7 +413,7 @@ model AcademicRecord {
   endDate     DateTime?
   activo                Boolean   @default(true)
   attachment  String?   @db.Text
-  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeeId  Int
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -413,7 +430,7 @@ model Language {
   language      String
   level         String
   certification String?  @db.Text
-  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeeId    Int
   attachment    String?  @db.Text
   activo                Boolean   @default(true)
@@ -435,7 +452,7 @@ model WorkExperience {
   endDate      DateTime?
   isCurrent    Boolean   @default(false)
   contractType String?
-  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeeId   Int
   activo                Boolean   @default(true)
   createdAt    DateTime  @default(now())
@@ -450,7 +467,7 @@ model WorkExperience {
 
 model Message {
   id         Int       @id @default(autoincrement())
-  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeeId Int
   text       String
   days       Int?
@@ -465,7 +482,7 @@ model Message {
 
 model Permission {
   id         Int      @id @default(autoincrement())
-  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeeId Int
   date       DateTime
   exitTime   Float
@@ -478,7 +495,7 @@ model Permission {
 
 model Certification {
   id          Int       @id @default(autoincrement())
-  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeeId  Int
   name        String
   institution String
@@ -495,7 +512,7 @@ model Certification {
 
 model SkillStatus {
   id                 Int                 @id @default(autoincrement())
-  employee           Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee           Employee            @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeeId         Int
   skillId            Int
   status             String              // locked/unlocked
@@ -509,7 +526,7 @@ model SkillStatus {
 
 model Complaint {
   id         Int      @id @default(autoincrement())
-  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeeId Int
   reason     String
   status     String   
@@ -522,7 +539,7 @@ model Complaint {
 
 model Task {
   id           Int      @id @default(autoincrement())
-  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeeId   Int
   name         String
   productivity Float
@@ -540,7 +557,7 @@ model CondicionLaboral {
   fechaCategoria DateTime?
   position     String
   employeeId   Int       @unique
-  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 //  createdAt    DateTime   @default(now())
 //   updatedAt    DateTime   @updatedAt
   @@index([employeeId])
@@ -558,7 +575,7 @@ model Horario {
 
 model ResenasDeRendimiento {
   id           Int      @id @default(autoincrement())
-  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeeId   Int
   period       String
   score        Float
@@ -574,19 +591,19 @@ model ResenasDeRendimiento {
 
 model SatisfaccionMetrica {
   id                              Int      @id @default(autoincrement())
-  employee                        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee                        Employee @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeeId                      Int      @unique
-  SatisfacciónGeneral             Int
-  SatisfacciónLaboral             Int
-  SatisfacciónEquipo              Int
-  SatisfacciónLiderazgo           Int
-  SatisfacciónCrecimientoCarrera  Int
-  FechaÚltimaEncuesta             DateTime
+SatisfaccionGeneral             Int
+SatisfaccionLaboral             Int
+SatisfaccionEquipo              Int
+SatisfaccionLiderazgo           Int
+SatisfaccionCrecimientoCarrera  Int
+FechaUltimaEncuesta             DateTime
   createdAt                       DateTime @default(now())
   updatedAt                       DateTime @updatedAt
 
   @@index([employeeId])
-  @@index([FechaÚltimaEncuesta])
+  @@index([FechaUltimaEncuesta])
 }
 
 model CriticalEvents {
@@ -594,7 +611,7 @@ model CriticalEvents {
   employeeId  Int
   type        String
   description String   @db.Text
-  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -603,4 +620,89 @@ model CriticalEvents {
   @@index([createdAt])
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// MÓDULO DE TESTS TÉCNICOS
+// ─────────────────────────────────────────────────────────────────────────────
 
+/// Registra cada intento de test de un empleado para una habilidad técnica.
+/// Permite aplicar la restricción de 1 test cada 3 meses por habilidad.
+model TestAttempt {
+  id               Int            @id @default(autoincrement())
+  employeeId       Int
+  technicalSkillId Int
+  /// Resultado estandarizado: "Malo" | "Bueno" | "Excelente"
+  score            String
+  /// Porcentaje de respuestas correctas (0-100)
+  correctPct       Float
+  /// JSON: IDs de preguntas mostradas en este intento (para anti-repetición)
+  questionsUsed    String         @db.Text
+  takenAt          DateTime       @default(now())
+
+  employee         Employee       @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  technicalSkill   TechnicalSkill @relation(fields: [technicalSkillId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([employeeId, technicalSkillId, takenAt])
+  @@index([employeeId])
+  @@index([technicalSkillId])
+  @@index([takenAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MÓDULO DE SOLICITUDES DE CAMBIO DE ÁREA (para Objetivo 7 — Futuro)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Solicitud de un empleado para cambiar de departamento u oficina.
+model AreaChangeRequest {
+  id           Int       @id @default(autoincrement())
+  employeeId   Int
+  targetDeptId Int?
+  targetOffId  Int?
+  /// Motivo escrito por el empleado
+  reason       String    @db.Text
+  /// "Pendiente" | "Aprobado" | "Rechazado" | "Intercambio_sugerido"
+  status       String    @default("Pendiente")
+  /// JSON con sugerencia de área generada por IA
+  aiSuggestion String?   @db.Text
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([employeeId, status])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MÓDULO DE FEEDBACK — Auditoría de ciclo (P4)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Registra qué evaluador evaluó a qué compañero en qué habilidad blanda.
+/// El resultado (Malo/Bueno/Excelente) se guarda de forma AGREGADA en Respuesta,
+/// garantizando el anonimato: sólo se sabe que SE evaluó, no qué se respondió.
+model FeedbackEvaluacion {
+  id                    Int      @id @default(autoincrement())
+  evaluatorEmployeeId   Int
+  evaluatedEmployeeId   Int
+  softSkillId           Int
+  cycleStart            DateTime
+  createdAt             DateTime @default(now())
+
+  evaluator  Employee  @relation("evaluatorFeedback", fields: [evaluatorEmployeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  evaluated  Employee  @relation("evaluatedFeedback",  fields: [evaluatedEmployeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  softSkill  SoftSkill @relation(fields: [softSkillId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([evaluatorEmployeeId, evaluatedEmployeeId, softSkillId, cycleStart])
+  @@index([evaluatorEmployeeId, cycleStart])
+  @@index([evaluatedEmployeeId])
+}
+
+model TokenBlacklist {
+  id         Int      @id @default(autoincrement())
+  token      String   @db.NVarChar(2048)
+  expires_at DateTime @db.DateTime2
+  created_at DateTime @default(now()) @db.DateTime2
+
+  @@index([token], map: "IX_TokenBlacklist_token")
+  @@index([expires_at], map: "IX_TokenBlacklist_expires_at")
+}

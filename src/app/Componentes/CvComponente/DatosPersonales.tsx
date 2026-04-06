@@ -80,7 +80,7 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
             <InputText
               id="name"
               value={data.name || ''}
-              disabled
+              disabled={!isEditing}
               className="w-full"
             />
           </div>
@@ -93,7 +93,7 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
             <InputText
               id="dni"
               value={data.dni || ''}
-              disabled
+              disabled={!isEditing}
               className="w-full"
             />
           </div>
@@ -182,7 +182,7 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
               id="email"
               type="email"
               value={data.email || ''}
-              disabled
+              disabled={!isEditing}
               className="w-full"
             />
           </div>

@@ -2,8 +2,8 @@
 import { useState, useMemo } from 'react';
 import { Search, AlertTriangle, Bell, LogOut, ChevronUpIcon, ChevronDownIcon } from 'lucide-react';
 import { StatusBadge, HoursDisplay } from "@/app/util/UiRRHH"
-import { Pagination} from '@/app/Componentes/Pagination/pagination';
-import {  Employee, SortDirection, } from '@/app/Interfas/Interfaces';
+import { Pagination } from '@/app/Componentes/Pagination/pagination';
+import { Employee, SortDirection, } from '@/app/Interfas/Interfaces';
 
 export interface EmployeeTableViewProps {
   employees: Employee[];
@@ -23,10 +23,10 @@ interface SortConfig {
   key: SortableKeys;
   direction: SortDirection;
 }
- interface SortableHeaderProps {
-    children: React.ReactNode;
-    columnKey: keyof Employee;
-  }
+interface SortableHeaderProps {
+  children: React.ReactNode;
+  columnKey: keyof Employee;
+}
 export const EmployeeTableView = ({
   employees,
   onSelectEmployee,
@@ -44,7 +44,6 @@ export const EmployeeTableView = ({
   });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
   const handleSort = (key: keyof Employee) => {
     let direction: SortDirection = "ascending";
     if (sortConfig.key === key && sortConfig.direction === "ascending") {
@@ -61,10 +60,10 @@ export const EmployeeTableView = ({
     }
 
     if (filters.departamento) {
-  filtered = filtered.filter(
-    (e) => e.department?.nombre === filters.departamento
-  );
-}
+      filtered = filtered.filter(
+        (e) => e.department?.nombre === filters.departamento
+      );
+    }
 
     if (filters.searchTerm) {
       const term = filters.searchTerm.toLowerCase();
@@ -145,12 +144,12 @@ export const EmployeeTableView = ({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getDepartmentName = (dep: any) => {
-  if (!dep) return "Sin departamento";
-  if (typeof dep === "string") return dep;
-  if (typeof dep === "object" && "nombre" in dep && dep.nombre)
-    return dep.nombre;
-  return "Sin departamento";
-};
+    if (!dep) return "Sin departamento";
+    if (typeof dep === "string") return dep;
+    if (typeof dep === "object" && "nombre" in dep && dep.nombre)
+      return dep.nombre;
+    return "Sin departamento";
+  };
 
 
   return (
@@ -214,26 +213,26 @@ export const EmployeeTableView = ({
           </select>
         </div>
         <div className="sm:col-span-2">
-         <select
-  className="block w-full px-3 rounded-md border-0 py-2.5 text-gray-900 shadow-xl ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm"
-  value={filters.departamento}
-  onChange={(e) => {
-    setFilters({ ...filters, departamento: e.target.value });
-    setCurrentPage(1);
-  }}
->
-  <option value="">Todos los Departamentos</option>
-  {[...new Map(
-  employees
-    .filter(e => e.department && e.department.nombre)
-    .map(e => [e.department.id ?? e.department.nombre, e.department.nombre])
-).entries()].map(([id, nombre]) => (
-  <option key={id} value={nombre}>
-    {nombre}
-  </option>
-))}
+          <select
+            className="block w-full px-3 rounded-md border-0 py-2.5 text-gray-900 shadow-xl ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm"
+            value={filters.departamento}
+            onChange={(e) => {
+              setFilters({ ...filters, departamento: e.target.value });
+              setCurrentPage(1);
+            }}
+          >
+            <option value="">Todos los Departamentos</option>
+            {[...new Map(
+              employees
+                .filter(e => e.department && e.department.nombre)
+                .map(e => [e.department.id ?? e.department.nombre, e.department.nombre])
+            ).entries()].map(([id, nombre]) => (
+              <option key={id} value={nombre}>
+                {nombre}
+              </option>
+            ))}
 
-</select>
+          </select>
         </div>
       </div>
       {/* Tabla */}
@@ -294,7 +293,7 @@ export const EmployeeTableView = ({
                         className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hover:bg-gray-50 cursor-pointer"
                         onClick={() => onSelectEmployee(employee.id)}
                       >
-                       {getDepartmentName(employee.department)}
+                        {getDepartmentName(employee.department)}
                       </td>
                       <td
                         className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hover:bg-gray-50 cursor-pointer"

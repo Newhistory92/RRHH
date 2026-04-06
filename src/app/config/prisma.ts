@@ -18,10 +18,11 @@ if (process.env.NODE_ENV === "production") {
 async function executePrismaOperation<T>(operation: () => Promise<T>): Promise<T> {
   try {
     await prisma.$connect();
-    return await operation(); 
+
+    return await operation();
   } catch (error) {
     console.error("Error during Prisma operation:", error);
-    throw error; 
+    throw error;
   } finally {
     await prisma.$disconnect();
   }

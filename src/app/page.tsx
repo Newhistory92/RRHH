@@ -1,150 +1,170 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
+// app/page.tsx — Shell principal de la aplicación.
+// RBAC: usa roleId numérico (1=ADMIN, 2=USER, 3=RRHH, 4=ESTADISTA)
+// proveniente de localStorage, y los helpers de util/rbac.ts
+// para determinar permisos de navegación y sidebar.
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiClient } from '@/app/util/apiClient';
 import { Header } from '@/app/Componentes/Navbar/Header';
 import { Sidebar } from '@/app/Componentes/Navbar/Sidebar';
-import  EstadisticasPage  from '@/app/pages/Estadisticas/page';
-import  RecursosHumanosPage  from '@/app/pages/RRHH/page';
-import  IAPage  from '@/app/pages/IA/page';
-import  OrganigramaPage  from '@/app/pages/Organigrama/page';
-import EmployeeCV  from '@/app/pages/Cv/page';
+import EstadisticasPage from '@/app/pages/Estadisticas/page';
+import RecursosHumanosPage from '@/app/pages/RRHH/page';
+import IAPage from '@/app/pages/IA/page';
+import OrganigramaPage from '@/app/pages/Organigrama/page';
+import EmployeeCV from '@/app/pages/Cv/page';
 import LicenciasManage from '@/app/pages/LicenciasManage/page';
-import  AdminPage  from '@/app/pages/Admin/page';
+import AdminPage from '@/app/pages/Admin/page';
+import ConfiguracionLicencias from '@/app/pages/ConfiguracionLicencias/page';
 import { PrimeReactProvider } from 'primereact/api';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import 'primeicons/primeicons.css';
-import  TestPage  from './pages/TestConfig/page';
+import TestPage from './pages/TestConfig/page';
 import FeedbackTab from './pages/Feedback/page';
-import { Employee, Page} from "@/app/Interfas/Interfaces";
+import { Employee, Page } from "@/app/Interfas/Interfaces";
+import {
+  canAccess,
+  getDefaultPage,
+  isReadOnlyForRole,
+  ROLE_ID,
+} from "@/app/util/rbac";
 
 export default function App() {
   const router = useRouter();
+
+  // ── Estado de autenticación (se llena desde localStorage en useEffect) ──────
+  const [roleId, setRoleId] = useState<number | null>(null);
   const [page, setPage] = useState<Page>('estadisticas');
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [userRole, setUserRole] = useState<string | null>(null);
+  const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [employeeData, setEmployeeData] = useState<Employee | null>(null);
-
-  // Páginas permitidas por rol
-  const rolePermissions: Record<string, Page[]> = {
-    RRHH: ['estadisticas', 'recursos-humanos', 'ia', 'organigrama', 'test'],
-    User: ['editar-perfil', 'licencias', 'feedback', 'admin'],
-  };
+  const [globalSettings, setGlobalSettings] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const fetchEmployeeData = async () => {
-      // Verificar si el usuario está autenticado
       const token = localStorage.getItem('token');
-      const roleName = localStorage.getItem('roleName');
-      const Empleado_ID = localStorage.getItem('employeeId');
-
+      const storedId = localStorage.getItem('roleId');   // Número guardado al login
+      const employeeId = localStorage.getItem('employeeId');
       if (!token) {
-        // Si no hay token, redirigir al login
-        router.push('/login');
+        router.push('/');
         return;
       }
 
-      setUserRole(roleName);
-      
+      const parsedRoleId = storedId ? parseInt(storedId, 10) : null;
+      setRoleId(parsedRoleId);
+
       // Establecer página inicial según el rol
-      if (roleName) {
-        const allowedPages = rolePermissions[roleName] || [];
-        if (allowedPages.length > 0) {
-          setPage(allowedPages[0]);
-        }
+      if (parsedRoleId) {
+        setPage(getDefaultPage(parsedRoleId));
       }
 
-      // Fetch de datos del empleado si existe el ID
-      if (Empleado_ID) {
+      // Fetch de datos del empleado — usa apiClient para interceptar 401
+      if (employeeId) {
         try {
-          const response = await fetch(`http://127.0.0.1:8000/employee/${Empleado_ID}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-   
-            setEmployeeData(data);
-          } else {
-            console.error('Error al obtener datos del empleado:', response.statusText);
-          }
-        } catch (error) {
-          console.error('Error en la petición:', error);
+          const empData = await apiClient.get<any>(`/employee/${employeeId}`);
+          setEmployeeData(empData);
+        } catch (err) {
+          console.error('Error al obtener datos del empleado:', err);
         }
       }
-      
+
       setIsLoading(false);
     };
 
     fetchEmployeeData();
   }, [router]);
 
-  // Verificar si el usuario tiene permiso para ver una página
-  const canAccessPage = (pageName: Page): boolean => {
-    if (!userRole) return false;
-    const allowedPages = rolePermissions[userRole] || [];
-    return allowedPages.includes(pageName);
-  };
+  // Actualizar configuración maestra si el admin navega — usa apiClient para interceptar 401
+  useEffect(() => {
+    const fetchConfigs = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      try {
+        const settings = await apiClient.get<Record<string, boolean>>('/records/status');
+        setGlobalSettings(settings);
+      } catch (err) {
+        console.error("Error al cargar configuración global:", err);
+      }
+    };
+    fetchConfigs();
+  }, [page]);
 
-  // Manejar cambio de página con validación de permisos
+  // Verificar permiso antes de navegar
   const handlePageChange = (newPage: Page) => {
-    if (canAccessPage(newPage)) {
+    if (roleId && canAccess(roleId, newPage)) {
+
       setPage(newPage);
     } else {
-      console.warn(`Usuario con rol ${userRole} no tiene acceso a ${newPage}`);
+      console.warn(`Rol ${roleId} no tiene acceso a la página: ${newPage}`);
     }
   };
 
+  // ── Renderizado de página con control de acceso ───────────────────────────
   const renderPage = () => {
-    // Verificar permisos antes de renderizar
-    if (!canAccessPage(page)) {
+    if (!roleId || !canAccess(roleId, page)) {
       return (
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
-            <i className="pi pi-lock text-6xl text-gray-400 mb-4"></i>
+            <i className="pi pi-lock text-6xl text-gray-400 mb-4" />
             <h2 className="text-2xl font-bold mb-2">Acceso Denegado</h2>
             <p className="text-gray-600 dark:text-gray-400">
-              No tienes permisos para acceder a esta página.
+              No tenés permisos para acceder a esta página.
             </p>
           </div>
         </div>
       );
     }
 
+    // Prop readOnly para páginas que ESTADISTA debe ver sin edição
+    const readOnly = isReadOnlyForRole(roleId, page);
+
     switch (page) {
       case 'estadisticas':
         return <EstadisticasPage />;
       case 'recursos-humanos':
         return <RecursosHumanosPage />;
+      case 'configuracion-licencias':
+        return <ConfiguracionLicencias />;
       case 'ia':
         return <IAPage />;
       case 'organigrama':
-        return <OrganigramaPage />;
-       case 'editar-perfil':
-        return <EmployeeCV employeeData={employeeData}  />;
+        // Pasa readOnly al Organigrama para que muestre/oculte controles de edición
+        return <OrganigramaPage readOnly={readOnly} />;
+      case 'editar-perfil':
+        return <EmployeeCV employeeData={employeeData} globalSettings={globalSettings} />;
       case 'licencias':
-        return <LicenciasManage employeeData={employeeData}  />;
+        return <LicenciasManage />;
       case 'feedback':
-        return <FeedbackTab employeeData={employeeData}  />;
+        if (globalSettings["Feedback"] === false) {
+          return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+              <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md text-center border dark:border-gray-700">
+                <i className="pi pi-ban text-6xl text-gray-300 dark:text-gray-600 mb-4" />
+                <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-2">Módulo Inactivo</h2>
+                <p className="text-gray-500 dark:text-gray-400">Este módulo ha sido deshabilitado por el administrador.</p>
+              </div>
+            </div>
+          );
+        }
+        return <FeedbackTab />;
       case 'test':
         return <TestPage />;
-         case 'admin':
-        return <AdminPage />;
+      case 'admin':
+        // Solo ADMIN (id 1) puede llegar aquí, protegido por canAccess()
+        return roleId === ROLE_ID.ADMIN ? <AdminPage /> : null;
       default:
         return <EstadisticasPage />;
     }
   };
 
-  // Mostrar loading mientras se verifica la autenticación
+  // ── Loading ───────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
         <div className="text-center">
-          <i className="pi pi-spin pi-spinner text-4xl text-blue-500 mb-4"></i>
+          <i className="pi pi-spin pi-spinner text-4xl text-blue-500 mb-4" />
           <p className="text-gray-600 dark:text-gray-400">Cargando...</p>
         </div>
       </div>
@@ -154,17 +174,23 @@ export default function App() {
   return (
     <div className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
       <PrimeReactProvider>
-        <Header setPage={handlePageChange} />
-        <Sidebar 
-          activePage={page} 
+        <Header setPage={handlePageChange} employeeData={employeeData} />
+        {/* Sidebar se oculta automáticamente para USER (roleId 2) */}
+        <Sidebar
+          activePage={page}
           setPage={handlePageChange}
-          onCollapseChange={setIsSidebarCollapsed}
-          userRole={userRole}
+          onCollapseChange={setSidebarCollapsed}
+          roleId={roleId}
         />
-        <main 
+        <main
           className={`pt-20 pr-4 md:pr-8 pb-8 transition-all duration-300 ${
-            isSidebarCollapsed ? 'md:pl-24' : 'md:pl-72'
-          }`}
+            // Sin sidebar para USER → sin padding izquierdo
+            !roleId || roleId === ROLE_ID.USER
+              ? 'pl-4 md:pl-8'
+              : isSidebarCollapsed
+                ? 'md:pl-24'
+                : 'md:pl-72'
+            }`}
         >
           {renderPage()}
         </main>

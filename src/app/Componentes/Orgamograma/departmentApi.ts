@@ -1,6 +1,10 @@
-import { EntityFormData } from "@/app/Interfas/Interfaces";
+// departmentApi.ts
+// API de departamentos usando el cliente centralizado (apiClient).
+// Todas las peticiones incluyen automáticamente el token Bearer
+// y manejan errores 401 (sesión expirada) de forma transparente.
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+import { apiClient } from "@/app/util/apiClient";
+import { EntityFormData } from "@/app/Interfas/Interfaces";
 
 export interface ApiEmployee {
   id: number;
@@ -12,11 +16,16 @@ export interface ApiOffice {
   id: number;
   nombre: string;
   employees: ApiEmployee[];
+  parentDepartmentId?: number | null;
 }
 
 export interface ApiDepartment {
   id: number;
   nombre: string;
+  description?: string;
+  nivelJerarquico?: number;
+  jefeId?: number | null;
+  parentId?: number | null;
   offices: ApiOffice[];
   employees: ApiEmployee[];
 }
@@ -27,95 +36,86 @@ export interface ApiResponse {
 }
 
 export const departmentApi = {
-  // GET - Obtener todos los departamentos
-  getAll: async (): Promise<ApiResponse> => {
-    const response = await fetch(`${API_BASE_URL}/departments/`);
-    if (!response.ok) throw new Error('Error al obtener departamentos');
-    return response.json();
+  // GET — Obtener todos los departamentos con oficinas, empleados y habilidades
+  getAll: (): Promise<ApiResponse> =>
+    apiClient.get<ApiResponse>("/departments/"),
+
+  // POST — Crear departamento
+  create: (formData: EntityFormData): Promise<{ message: string }> => {
+    console.log("Creando departamento con datos:", formData);
+    return apiClient.post<{ message: string }>("/departments/", formData);
   },
 
-  // POST - Crear departamento
-  create: async ( formData: EntityFormData) => {
-    console.log('Creating department with data:', formData);
-    const response = await fetch(`${API_BASE_URL}/departments/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
-    if (!response.ok) throw new Error('Error al crear departamento');
-    return response.json();
-  },
+  // PUT — Actualizar departamento
+  update: (depId: number, data: unknown): Promise<{ message: string }> =>
+    apiClient.put<{ message: string }>(`/departments/${depId}`, data),
 
-  // PUT - Actualizar departamento
-  update: async (depId: number, data: { nombre: string }) => {
-    const response = await fetch(`${API_BASE_URL}/departments/${depId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) throw new Error('Error al actualizar departamento');
-    return response.json();
-  },
+  // DELETE — Eliminar departamento
+  delete: (depId: number): Promise<{ message: string }> =>
+    apiClient.delete<{ message: string }>(`/departments/${depId}`),
 
-  // DELETE - Eliminar departamento
-  delete: async (depId: number) => {
-    const response = await fetch(`${API_BASE_URL}/departments/${depId}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error('Error al eliminar departamento');
-    return response.json();
-  },
+  // POST — Crear oficina dentro de un departamento
+  createOffice: (
+    depId: number,
+    officeData: Partial<EntityFormData>
+  ): Promise<{ message: string; office_id: number }> =>
+    apiClient.post<{ message: string; office_id: number }>(
+      `/departments/${depId}/offices`,
+      officeData
+    ),
 
-  // POST - Crear oficina
-  createOffice: async (depId: number, officeData: { nombre: string }) => {
-    const response = await fetch(`${API_BASE_URL}/departments/${depId}/offices`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(officeData),
-    });
-    if (!response.ok) throw new Error('Error al crear oficina');
-    return response.json();
-  },
+  // PUT — Actualizar oficina
+  updateOffice: (
+    officeId: number,
+    officeData: Partial<EntityFormData>
+  ): Promise<{ message: string }> =>
+    apiClient.put<{ message: string }>(
+      `/rrhh/office/${officeId}`, // Asumiendo este endpoint en el backend
+      officeData
+    ),
 
-  // PUT - Asignar empleado a departamento
-  assignEmployeeToDept: async (depId: number, empId: number) => {
-    const response = await fetch(
-      `${API_BASE_URL}/departments/${depId}/assign-employee/${empId}`,
-      { method: 'PUT' }
-    );
-    if (!response.ok) throw new Error('Error al asignar empleado');
-    return response.json();
-  },
+  // DELETE — Eliminar oficina
+  deleteOffice: (officeId: number): Promise<{ message: string }> =>
+    apiClient.delete<{ message: string }>(`/rrhh/office/${officeId}`),
 
-  // PUT - Asignar empleado a oficina
-  assignEmployeeToOffice: async (officeId: number, empId: number) => {
-    const response = await fetch(
-      `${API_BASE_URL}/departments/office/${officeId}/assign-employee/${empId}`,
-      { method: 'PUT' }
-    );
-    if (!response.ok) throw new Error('Error al asignar empleado');
-    return response.json();
-  },
+  // PUT — Asignar empleado a departamento
+  assignEmployeeToDept: (
+    depId: number,
+    empId: number
+  ): Promise<{ message: string }> =>
+    apiClient.put<{ message: string }>(
+      `/departments/${depId}/assign-employee/${empId}`
+    ),
+
+  // PUT — Asignar empleado a oficina
+  assignEmployeeToOffice: (
+    officeId: number,
+    empId: number
+  ): Promise<{ message: string }> =>
+    apiClient.put<{ message: string }>(
+      `/departments/office/${officeId}/assign-employee/${empId}`
+    ),
 };
 
-// Función para transformar datos de API al formato de tu app
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// Función para transformar datos de la API al formato de la app.
+// IMPORTANTE: ahora mapea parentId y nivel_jerarquico reales del backend.
 export const transformApiDataToApp = (apiDepts: ApiDepartment[]): any[] => {
-  return apiDepts.map(dept => ({
+  return apiDepts.map((dept) => ({
     id: dept.id,
     nombre: dept.nombre,
-    descripcion: '',
-   nivelJerarquico: 0,
-    jefeId: undefined,
-    parentId: null,
+    descripcion: dept.description || "",
+    nivel_jerarquico: dept.nivelJerarquico ?? 1,
+    jefeId: dept.jefeId ?? null,
+    parentId: dept.parentId ?? null,
     habilidades_requeridas: [],
-    oficinas: dept.offices.map(office => ({
+    oficinas: dept.offices.map((office) => ({
       id: office.id,
       nombre: office.nombre,
-      descripcion: '',
+      descripcion: "",
       jefeId: undefined,
-      empleadosIds: office.employees.map(emp => emp.id),
+      empleadosIds: office.employees.map((emp) => emp.id),
       departmentId: dept.id,
+      parentDepartmentId: office.parentDepartmentId ?? null,
       habilidades_requeridas: [],
     })),
   }));

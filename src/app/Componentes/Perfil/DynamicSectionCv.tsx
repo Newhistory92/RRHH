@@ -9,10 +9,10 @@ interface DynamicItem {
   level?: string;
   status?: string;
   isCurrent?: boolean;
-  endDate?: string  | null;
-  attachment?: File | string | null ;
+  endDate?: string | null;
+  attachment?: File | string | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any; 
+  [key: string]: any;
 }
 
 interface FieldOption {
@@ -50,9 +50,9 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
   isEditing,
 }) => {
   // Validación y console.log para debugging
-//   console.log('DynamicSection - items:', items);
-//   console.log('DynamicSection - items type:', typeof items);
-//   console.log('DynamicSection - is array:', Array.isArray(items));
+  //   console.log('DynamicSection - items:', items);
+  //   console.log('DynamicSection - items type:', typeof items);
+  //   console.log('DynamicSection - is array:', Array.isArray(items));
 
   // Validar que items sea un array válido
   if (!items || !Array.isArray(items)) {
@@ -74,8 +74,6 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
   return (
     <div className="space-y-6">
       {items.map((item: DynamicItem) => {
-        // console.log('Processing item:', item);
-        
         return (
           <div key={item.id} className="p-4 border rounded-lg relative">
             {sectionName === "academicFormation" &&
@@ -88,11 +86,11 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                   <Star className="w-6 h-6 fill-current" />
                 </div>
               )}
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {fields.map((field: Field) => {
                 const gridClass = field.grid || "md:col-span-1";
-                
+
                 if (field.type === "checkbox") {
                   return (
                     <div key={field.name} className={`${gridClass} flex items-end`}>
@@ -105,9 +103,8 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                             onChange(item.id, field.name, e.target.checked);
                             if (e.target.checked) onChange(item.id, "endDate", "");
                           }}
-                          className={`h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${
-                            !isEditing ? "cursor-not-allowed" : ""
-                          }`}
+                          className={`h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${!isEditing ? "cursor-not-allowed" : ""
+                            }`}
                           disabled={!isEditing}
                         />
                         {field.label}
@@ -115,7 +112,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                     </div>
                   );
                 }
-                
+
                 if (field.type === "select") {
                   return (
                     <div key={field.name} className={`${gridClass} flex flex-col gap-2`}>
@@ -139,7 +136,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                     </div>
                   );
                 }
-                
+
                 if (field.type === "file") {
                   return (
                     <div key={field.name} className={`${gridClass} flex flex-col gap-2`}>
@@ -160,7 +157,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                     </div>
                   );
                 }
-                
+
                 return (
                   <div key={field.name} className={`${gridClass} flex flex-col gap-2`}>
                     <label htmlFor={`${field.name}-${item.id}`} className="text-sm font-medium text-gray-700">
@@ -184,7 +181,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                 );
               })}
             </div>
-            
+
             {isEditing && (
               <button
                 onClick={() => onRemove(item.id)}
@@ -197,7 +194,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
           </div>
         );
       })}
-      
+
       {isEditing && (
         <button
           onClick={onAdd}

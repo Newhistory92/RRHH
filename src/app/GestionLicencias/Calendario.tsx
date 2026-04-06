@@ -1,207 +1,184 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar } from 'primereact/calendar';
-import { addLocale, LocaleOptions } from 'primereact/api';
-import { Button } from 'primereact/button';
-import { Badge } from 'primereact/badge';
-// --- INTERFACES DE TYPESCRIPT ---
-interface HolidayApi {
-  fecha: string;
-  tipo: string;
-  nombre: string;
-}
+'use client';
 
-interface Holiday {
-  originalDate: string;
-  date: Date;
-  name: string;
-  type: string;
-}
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Temporal } from '@js-temporal/polyfill';
+import { Calendar } from 'primereact/calendar';
+import { addLocale, type LocaleOptions } from 'primereact/api';
+import { CalendarDays, X } from 'lucide-react';
+import {
+  type HolidayApi,
+  type PlainHoliday,
+  processHolidays,
+  countBusinessDays,
+  toNativeDate,
+  fromNativeDate,
+} from '@/app/lib/dates';
+
+// ─── Locale (fuera del componente, se registra una sola vez) ──────────────────
+
+addLocale('es', {
+  firstDayOfWeek: 1,
+  dayNames: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+  dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+  dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+  monthNames: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+  monthNamesShort: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
+  today: 'Hoy',
+  clear: 'Limpiar',
+} as LocaleOptions);
+
+// ─── Props ────────────────────────────────────────────────────────────────────
 
 interface DateRangePickerProps {
-  onDateChange: (startDate: Date | null, endDate: Date | null) => void;
+  onDateChange: (start: Date | null, end: Date | null, dias: number) => void;
+  maxDays?: number;
 }
 
-interface MoveableDatesConfig {
-  [originalDate: string]: string; // Key: 'YYYY-MM-DD', Value: 'YYYY-MM-DD'
-}
 
-// --- CONFIGURACIÓN DE FECHAS TRASLADABLES ---
-const moveableDatesConfig: MoveableDatesConfig = {
-  '2025-10-12': '2025-10-13',
-};
-
-export default function DateRangePicker({ onDateChange }: DateRangePickerProps) {
-  // Cambiado: Definir correctamente el tipo para selección de rango
-  const [dates, setDates] = useState<[Date | null, Date | null] | null>(null);
-  const [holidays, setHolidays] = useState<Holiday[]>([]);
-  const [businessDays, setBusinessDays] = useState<number>(0);
-
-  addLocale('es', {
-    firstDayOfWeek: 1,
-    dayNames: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
-    dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
-    dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
-    monthNames: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
-    monthNamesShort: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
-    today: 'Hoy',
-    clear: 'Limpiar',
-  } as LocaleOptions);
-
+// Hook para detectar si es mobile
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
-    const fetchAndProcessHolidays = async () => {
-      const year = new Date().getFullYear();
-      try {
-        const response = await fetch(`https://api.argentinadatos.com/v1/feriados/${year}`);
-        if (!response.ok) {
-          throw new Error('No se pudieron obtener los feriados.');
-        }
-        const data: HolidayApi[] = await response.json();
-        
-        const holidaysMap = new Map<string, Holiday>();
-        data.forEach(holiday => {
-          // Solo parseamos la fecha para el calendario (para disabledDates)
-          const [year, month, day] = holiday.fecha.split('-').map(Number);
-          const dateForCalendar = new Date(year, month - 1, day);
-          
-          holidaysMap.set(holiday.fecha, {
-            originalDate: holiday.fecha,
-            date: dateForCalendar,
-            name: holiday.nombre,
-            type: holiday.tipo,
-          });
-        });
+    const mq = window.matchMedia('(max-width: 640px)');
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return isMobile;
+}
 
-        // Procesar feriados trasladables
-        for (const originalDate in moveableDatesConfig) {
-          if (holidaysMap.has(originalDate)) {
-            const holidayToMove = holidaysMap.get(originalDate)!;
-            const newDateStr = moveableDatesConfig[originalDate];
-            
-            holidaysMap.delete(originalDate);
-            
-            const [year, month, day] = newDateStr.split('-').map(Number);
-            holidayToMove.date = new Date(year, month - 1, day);
-            holidayToMove.name = `${holidayToMove.name} (Trasladado)`;
-            holidaysMap.set(newDateStr, holidayToMove);
-          }
-        }
-        setHolidays(Array.from(holidaysMap.values()));
-      } catch (error) {
-        console.error("Error al obtener feriados:", error);
-      }
-    };
-    fetchAndProcessHolidays();
+// ─── Componente ───────────────────────────────────────────────────────────────
+
+export default function DateRangePicker({ onDateChange, maxDays }: DateRangePickerProps) {
+  const [dates, setDates] = useState<[Date | null, Date | null] | null>(null);
+  const [holidayMap, setHolidayMap] = useState<Map<string, PlainHoliday>>(new Map());
+  const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
+  // ── Fetch feriados ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    const year = Temporal.Now.plainDateISO().year;
+
+    fetch(`https://api.argentinadatos.com/v1/feriados/${year}`)
+      .then(r => { if (!r.ok) throw new Error('Error al obtener feriados'); return r.json(); })
+      .then((data: HolidayApi[]) => setHolidayMap(processHolidays(data)))
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
+  // ── Cálculo de días hábiles ─────────────────────────────────────────────────
+  const businessDays = useMemo(() => {
+    if (!dates?.[0] || !dates?.[1]) return 0;
+
+    const start = fromNativeDate(dates[0]);
+    const end = fromNativeDate(dates[1]);
+    const holidaySet = new Set(holidayMap.keys());
+
+    return countBusinessDays(start, end, holidaySet);
+  }, [dates, holidayMap]);
+
+  // ── Notificar al padre ──────────────────────────────────────────────────────
   useEffect(() => {
-    if (dates && dates.length === 2 && dates[0] && dates[1]) {
-      const [startDate, endDate] = dates;
-      
-      const holidaySet = new Set(holidays.map(h => {
-        const dateStr = h.date.getFullYear() + '-' + 
-          String(h.date.getMonth() + 1).padStart(2, '0') + '-' + 
-          String(h.date.getDate()).padStart(2, '0');
-        return dateStr;
-      }));
-      
-      let count = 0;
-      const currentDate = new Date(startDate.getTime());
+    onDateChange(dates?.[0] ?? null, dates?.[1] ?? null, businessDays);
+  }, [dates, businessDays, onDateChange]);
 
-      while (currentDate <= endDate) {
-        const dayOfWeek = currentDate.getDay();
-        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-        
-        const currentDateStr = currentDate.getFullYear() + '-' + 
-          String(currentDate.getMonth() + 1).padStart(2, '0') + '-' + 
-          String(currentDate.getDate()).padStart(2, '0');
-        
-        const isHoliday = holidaySet.has(currentDateStr);
+  // ── disabledDates para PrimeReact (necesita Date nativo) ───────────────────
+  const disabledDates = useMemo(
+    () => Array.from(holidayMap.values()).map(h => toNativeDate(h.date)),
+    [holidayMap],
+  );
 
-        if (!isWeekend && !isHoliday) {
-          count++;
-        }
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-      
-      setBusinessDays(count);
-      onDateChange(startDate, endDate);
-    } else {
-      setBusinessDays(0);
-      onDateChange(null, null);
-    }
-  }, [dates, holidays, onDateChange]);
-
-  const disabledDates = holidays.map(h => h.date);
-  
-  const dateTemplate = (dateMeta: { year: number, month: number, day: number, today: boolean, selectable: boolean }) => {
-    const currentRenderDate = new Date(dateMeta.year, dateMeta.month, dateMeta.day);
-    const dateString = currentRenderDate.getFullYear() + '-' + 
-      String(currentRenderDate.getMonth() + 1).padStart(2, '0') + '-' + 
-      String(currentRenderDate.getDate()).padStart(2, '0');
-    
-    const holiday = holidays.find(h => {
-      const holidayStr = h.date.getFullYear() + '-' + 
-        String(h.date.getMonth() + 1).padStart(2, '0') + '-' + 
-        String(h.date.getDate()).padStart(2, '0');
-      return holidayStr === dateString;
-    });
+  // ── Template de celda del calendario ───────────────────────────────────────
+  const dateTemplate = useCallback((meta: { year: number; month: number; day: number }) => {
+    // PrimeReact entrega month 0-based → reconstruimos el string ISO manualmente
+    const iso = `${meta.year}-${String(meta.month + 1).padStart(2, '0')}-${String(meta.day).padStart(2, '0')}`;
+    const holiday = holidayMap.get(iso);
 
     if (holiday) {
       return (
-        <strong style={{ textDecoration: 'line-through', color: 'red' }} title={holiday.name}>
-          {dateMeta.day}
-        </strong>
+        <span
+          title={holiday.name}
+          className="line-through text-red-400 font-medium"
+        >
+          {meta.day}
+        </span>
       );
     }
-    return dateMeta.day;
-  };
-  
-  const today = new Date();
-  const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const maxDate = new Date(today.getFullYear(), 11, 31);
-  
-  const handleClearSelection = () => {
-    setDates(null);
-  };
+    return meta.day;
+  }, [holidayMap]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleCalendarChange = (e: any) => {
-    setDates(e.value);
-  };
+  // ── Límites del calendario ──────────────────────────────────────────────────
+  const today = Temporal.Now.plainDateISO();
+  const minDate = toNativeDate(today);
+  const maxDate = toNativeDate(today.with({ month: 12, day: 31 }));
 
+  const exceedsMax = maxDays !== undefined && businessDays > maxDays;
+
+  // ─── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col items-center">
-      <Calendar
-        value={dates}
-        onChange={handleCalendarChange}
-        selectionMode="range"
-        readOnlyInput
-        inline
-        locale="es"
-        numberOfMonths={2}
-        minDate={minDate}
-        maxDate={maxDate}
-        disabledDays={[0, 6]} 
-        disabledDates={disabledDates}
-        dateTemplate={dateTemplate} 
-        className="w-full md:w-auto"
-        panelClassName="rounded-lg shadow-md"
-      />
-      <div className="mt-6 text-center w-full flex justify-center items-center gap-4">
-        <Button label="Limpiar selección" text raised
-          onClick={handleClearSelection}
-          className="px-6 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          disabled={!dates}
-        >
-        </Button>
-      </div>
-      {businessDays > 0 && (
-        <div className="mt-4 text-center">
-            <Button text label=" Días hábiles seleccionados:" >
-                <Badge severity="success" value={businessDays}></Badge>
-            </Button>
-        </div>
+    <div className="flex flex-col items-center gap-4 w-full">
+
+      {/* Indicador de carga */}
+      {loading && (
+        <p className="text-xs text-gray-400 flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-full border-2 border-gray-300 border-t-cyan-500 animate-spin" />
+          Cargando feriados...
+        </p>
       )}
+
+      {/* Calendario */}
+      <div className="w-full overflow-x-auto">
+        <Calendar
+          value={dates}
+          onChange={e => setDates(e.value as [Date | null, Date | null])}
+          selectionMode="range"
+          readOnlyInput
+          inline
+          locale="es"
+          numberOfMonths={isMobile ? 1 : 2}
+          minDate={minDate}
+          maxDate={maxDate}
+          disabledDays={[0, 6]}
+          disabledDates={disabledDates}
+          dateTemplate={dateTemplate}
+          className="w-full"
+          pt={{
+            panel: { className: 'rounded-2xl shadow-lg border border-gray-100 overflow-hidden' },
+          }}
+        />
+      </div>
+      {/* Acciones */}
+      <div className="flex flex-wrap items-center justify-center gap-3 w-full">
+
+        {/* Días hábiles */}
+        {businessDays > 0 && (
+          <div className={`flex items-center gap-2 px-4 py-2 border rounded-full ${exceedsMax ? 'bg-red-50 border-red-200 text-red-700' : 'bg-cyan-50 border-cyan-200 text-cyan-700'}`}>
+            <CalendarDays className="w-4 h-4" />
+            <span className="text-sm font-medium">
+              {businessDays} {businessDays === 1 ? 'día hábil' : 'días hábiles'}
+              {maxDays !== undefined ? ` / Máx. permitidos: ${maxDays}` : ''}
+            </span>
+          </div>
+        )}
+
+        {/* Mensaje error local */}
+        {exceedsMax && (
+          <div className="w-full text-center text-xs text-red-600 font-semibold mt-1">
+            Superaste el máximo de días para esta licencia. Ajustá las fechas.
+          </div>
+        )}
+
+        {/* Limpiar */}
+        {dates && (
+          <button
+            onClick={() => setDates(null)}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition shadow-sm"
+          >
+            <X className="w-3.5 h-3.5" />
+            Limpiar
+          </button>
+        )}
+      </div>
     </div>
   );
-};
+}

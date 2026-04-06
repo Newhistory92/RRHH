@@ -10,7 +10,7 @@ export const useDepartmentTree = (departmentsData: Department[], selectedDepartm
     const departmentMap = new Map<number, TreeNode>();
     const roots: TreeNode[] = [];
 
-    // Crear todos los nodos
+    // Paso 1: Crear todos los nodos en el mapa
     departments.forEach(dept => {
       const node: TreeNode = {
         key: dept.id.toString(),
@@ -21,15 +21,19 @@ export const useDepartmentTree = (departmentsData: Department[], selectedDepartm
       departmentMap.set(dept.id, node);
     });
 
-    // Construir jerarquía
+    // Paso 2: Construir jerarquía usando parentId real del backend
     departments.forEach(dept => {
-      const node = departmentMap.get(dept.id);
-      if (dept.parentId && departmentMap.has(dept.parentId)) {
-        const parent = departmentMap.get(dept.parentId);
-        parent!.children = parent!.children || [];
-        parent!.children.push(node!);
+      const node = departmentMap.get(dept.id)!;
+      const parentId = dept.parentId;
+
+      if (parentId && departmentMap.has(parentId) && parentId !== dept.id) {
+        // Tiene padre → agregarlo como hijo del padre
+        const parent = departmentMap.get(parentId)!;
+        parent.children = parent.children || [];
+        parent.children.push(node);
       } else {
-        roots.push(node!);
+        // Sin padre → es un nodo raíz
+        roots.push(node);
       }
     });
 

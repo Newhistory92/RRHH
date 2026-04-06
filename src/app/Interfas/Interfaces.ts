@@ -55,24 +55,24 @@ export interface ProductivityRankingProps {
   onFilterChange: (key: keyof Filters, value: string) => void; // Cambiado
   sortConfig: SortConfig;
   onSortChange: (sortConfig: SortConfig) => void;
-   currentPage: number;
-   onPageChange: (page: number) => void;
+  currentPage: number;
+  onPageChange: (page: number) => void;
 }
 
 
 
 export interface PaginationProps {
-    totalItems: number;
-    itemsPerPage: number;
-    currentPage: number;
-    onPageChange: (page: number) => void;
+  totalItems: number;
+  itemsPerPage: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
 }
 
 // Basic types for employee data
 export type EmployeeStatus = 'Activo' | 'De licencia' | 'Parte médico' | 'Inactivo' | 'Suspendido';
-export type EmploymentStatus = 'Planta permanente' | 'Contratado' | 'Comisionado' | 'Auditor_medico' 
+export type EmploymentStatus = 'Planta permanente' | 'Contratado' | 'Comisionado' | 'Auditor_medico'
 export type EmployeeRole = 'empleado' | 'supervisor' | 'manager' | 'admin' | 'auditor';
-export type LicenseStatus = 'Aprobada' | 'Pendiente' | 'Rechazada'| 'Pendiente Siguiente Aprobación';
+export type LicenseStatus = 'Aprobada' | 'Pendiente' | 'Rechazada' | 'Pendiente Siguiente Aprobación';
 export type ComplaintStatus = 'Resuelto' | 'Pendiente' | 'En proceso';
 
 
@@ -111,7 +111,7 @@ export interface LicenseHistory {
   aprobaciones?: Aprobacion[]
   tiposLicencia: TiposLicencia
   observacion?: string
-  
+
 }
 
 // Licenses tracking
@@ -125,46 +125,70 @@ export interface Licenses {
 
 export interface Saldo {
   anio: number
-  [tipo: string]: number 
+  [tipo: string]: number
 }
 
 export interface Usuario {
-    id: number;
-    name: string;
-    usuario: string;
-    activo:boolean;
-    dni: string;
-    gender: string;
-    email: string;
-    role: string;
-    office?: string
-   department?: string
-    avatar: string;
-    lastActionDate?: string;
-   employee_id?: number;
+  id: number;
+  name: string;
+  usuario: string;
+  activo: boolean;
+  dni: string;
+  gender: string;
+  email: string;
+  role: string;
+  office?: string
+  department?: string
+  avatar: string;
+  lastActionDate?: string;
+  employee_id?: number;
 }
 
 export interface Role {
-    id: number;
-    name: string;
-    description: string;
-    color: string;
+  id: number;
+  name: string;
+  description: string;
+  color: string;
 }
 
 
 export interface Aprobacion {
   supervisorId: number
   nombre: string
-  fecha: string           
+  fecha: string
   accion: "aprobar" | "rechazar"
   observacion?: string
 }
 
 export interface TiposLicencia {
   [anio: string]: {
-  [tipo: string]: number
+    [tipo: string]: number
   }
 }
+
+export interface ConfiguracionLicenciaData {
+  id: number;
+  anio: number;
+  tipo: string;
+  categoria: string;
+  diasTotales: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface LicenseRequestPayload {
+  name: string;
+  type: string;
+  supervisorId: number;
+  solicitanteId: number;
+  startDate: string;
+  endDate: string;
+  duration: number;
+  tiposLicencia: TiposLicencia;
+  originalMessage: string;
+  status: LicenseStatus;
+}
+
 // Absences tracking
 export interface Absences {
   '2024': number;
@@ -175,7 +199,7 @@ export interface Absences {
 export interface Permit {
   id: string;
   date: Date;
-  exitTime : number;
+  exitTime: number;
   returnTime: number;
   hours: number;
 }
@@ -201,7 +225,7 @@ export interface Message {
 // Soft skills (key-value pairs)
 export interface SoftSkill {
   nombre: string;
-  level?:number;
+  level?: number;
   descripcion: string;
   SkillStatus?: SkillStatus;
 }
@@ -211,7 +235,7 @@ export interface SoftSkill {
 export interface TechnicalSkill {
   id: number;
   nombre: string;
-  level:number;
+  level: number;
   SkillStatus?: SkillStatus;
 }
 
@@ -232,7 +256,7 @@ export interface Notification {
 }
 
 
-export interface satisfactionMetrics{
+export interface satisfactionMetrics {
   overallSatisfaction: number;      // 1-10 ⚠️ CRÍTICO
   jobSatisfaction: number;          // 1-10
   teamSatisfaction: number;         // 1-10
@@ -243,23 +267,23 @@ export interface satisfactionMetrics{
 }
 
 
-export interface performanceReviews{
-fecha: string; 
-puntuación: number; // 1-10
-fortalezas: string[]; 
-áreasDeMejora: string[]; 
-objetivos: string[]; 
-objetivosLogrados?: number;           // % de objetivos cumplidos
+export interface performanceReviews {
+  fecha: string;
+  puntuación: number; // 1-10
+  fortalezas: string[];
+  áreasDeMejora: string[];
+  objetivos: string[];
+  objetivosLogrados?: number;           // % de objetivos cumplidos
 }
 
 export interface MetricaSatisfaccion {
-satisfaccionGeneral: number; // 1-10 ⚠️ CRÍTICO
-satisfaccionLaboral: number; // 1-10
-satisfaccionEquipo: number; // 1-10
-satisfaccionLiderazgo: number; // 1-10
-equilibrioVidaLaboral: number; // 1-10 ⚠️ CRÍTICO
-satisfaccionCrecimientoProfesional: number; // 1-10
-fechaUltimaEncuesta: string;
+  satisfaccionGeneral: number; // 1-10 ⚠️ CRÍTICO
+  satisfaccionLaboral: number; // 1-10
+  satisfaccionEquipo: number; // 1-10
+  satisfaccionLiderazgo: number; // 1-10
+  equilibrioVidaLaboral: number; // 1-10 ⚠️ CRÍTICO
+  satisfaccionCrecimientoProfesional: number; // 1-10
+  fechaUltimaEncuesta: string;
 }
 
 export interface CriticalEvents {
@@ -311,7 +335,7 @@ export interface Employee {
   office: Office;
   officeId: number | null;
   condicionLaboral: CondicionLaboral;
- AcademicFormation: AcademicFormation[];
+  AcademicFormation: AcademicFormation[];
   languages: Language[];
   workExperience: WorkExperience[];
   certifications: certifications[];
@@ -340,9 +364,9 @@ export interface Employee {
   messages: Message[];
 
 
- softSkills: SoftSkill[];
- skillStatus?: SkillStatus[];
-  softSkillsArray?: number[]; 
+  softSkills: SoftSkill[];
+  skillStatus?: SkillStatus[];
+  softSkillsArray?: number[];
   technicalSkills: TechnicalSkill[];
   notificaciones: Notification[];
   performanceReviews: performanceReviews[];
@@ -357,9 +381,9 @@ export interface Department {
   nivel_jerarquico: number;
   jefeId?: number | null;
   parentId?: number | null;
-  habilidades_requeridas?:TechnicalSkill[];
+  habilidades_requeridas?: TechnicalSkill[];
   offices: Office[];
-  
+  employees?: Employee[];
 }
 
 export interface AcademicFormation {
@@ -376,11 +400,11 @@ export interface AcademicFormation {
 
 // Interfaces para Languages (Idiomas)
 export interface Language {
-  id: number ;
+  id: number;
   language: string;
   level: string;
   certification: string; // Nombre de la certificación (ej: TOEFL, DELE)
-  attachment: File | string | null ; // Certificado o comprobante
+  attachment: File | string | null; // Certificado o comprobante
 }
 
 // Interfaces para Work Experience (Experiencia Laboral)
@@ -412,6 +436,7 @@ export interface Office {
   jefeId?: number | null;
   empleadosIds?: number[];
   departmentId: number;
+  parentDepartmentId?: number | null; // Nuevo campo para jerarquía
   habilidades_requeridas?: TechnicalSkill[];
 }
 
@@ -495,6 +520,7 @@ export interface EntityFormData {
   parentId?: number | null;
   // Campos específicos de Office
   empleadosIds?: number[];
+  parentDepartmentId?: number | null; // Nuevo campo para jerarquía de oficina
 }
 
 export interface ModalContext {
@@ -541,7 +567,7 @@ export interface OrgNode extends OrgData {
   children?: OrgNode[];
 }
 
-export interface  OrgStatsType {
+export interface OrgStatsType {
   totalNodos: number;
   maxNivel: number;
   nivelesUnicos: number[];
@@ -601,7 +627,7 @@ export interface Skill {
   id: number;
   name: string;
   description: string;
-  status: 'validated'|'pending'|'locked';
+  status: 'validated' | 'pending' | 'locked';
   level: number;
   unlockDate: string | null;
 }
@@ -626,6 +652,7 @@ export interface SkillTestDialogProps {
 export type Page =
   | "estadisticas"
   | "recursos-humanos"
+  | "configuracion-licencias"
   | "ia"
   | "organigrama"
   | "editar-perfil"
@@ -635,47 +662,47 @@ export type Page =
   | "admin";
 
 
-export type MotivoSalida = 
-  | 'Renuncia voluntaria' 
-  | 'Despido' 
-  | 'Jubilación' 
+export type MotivoSalida =
+  | 'Renuncia voluntaria'
+  | 'Despido'
+  | 'Jubilación'
   | 'Mejor oferta laboral'
   | 'Reubicación geográfica'
   | 'Motivos personales'
   | 'Conflicto laboral'
   | 'Otro';
-  
+
 export interface ExEmpleado {
-// Información básica
-id: number; 
-nombre: string; 
-dni: string; 
-puesto: string; 
-departamento: string; 
-idDepartamento: number; 
+  // Información básica
+  id: number;
+  nombre: string;
+  dni: string;
+  puesto: string;
+  departamento: string;
+  idDepartamento: number;
 
-// Fechas
-fechaInicio: string; 
-fechaFin: string; 
-duracionTrabajo: number; // Meses
+  // Fechas
+  fechaInicio: string;
+  fechaFin: string;
+  duracionTrabajo: number; // Meses
 
-// Datos de la salida
-motivoSalida: MotivoSalida; 
-entrevistaSalida: string; 
-volveriaARecrutar: boolean; 
+  // Datos de la salida
+  motivoSalida: MotivoSalida;
+  entrevistaSalida: string;
+  volveriaARecrutar: boolean;
 
-// Indicadores antes de la salida
-ultimaPuntuacionProductividad: number; 
-ultimaPuntuacionSatisfaccion: number; 
-ultimaPuntuacionCompromiso: number; 
-totalLicencias: number; 
-totalAusencias: number; 
+  // Indicadores antes de la salida
+  ultimaPuntuacionProductividad: number;
+  ultimaPuntuacionSatisfaccion: number;
+  ultimaPuntuacionCompromiso: number;
+  totalLicencias: number;
+  totalAusencias: number;
 
-// Eventos previos a la salida
-tuvoConflictosRecientes: boolean; 
-tuvoProblemasSalariales: boolean; 
-tuvoCambioDeJefe: boolean; 
-solicitoOtrosPuestos: boolean;
+  // Eventos previos a la salida
+  tuvoConflictosRecientes: boolean;
+  tuvoProblemasSalariales: boolean;
+  tuvoCambioDeJefe: boolean;
+  solicitoOtrosPuestos: boolean;
 }
 
 export interface DepartmentAnalysis {
@@ -693,11 +720,11 @@ export interface DepartmentAnalysis {
   color: string;
   skillsGap?: skillsGap[];
 }
-export interface  skillsGap {
-    id: number
-    nombre: string
-    nivel: string
-  };
+export interface skillsGap {
+  id: number
+  nombre: string
+  nivel: string
+};
 
 export interface BaseMetrics {
   avgProductivity: number;
