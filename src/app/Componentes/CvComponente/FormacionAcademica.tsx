@@ -2,14 +2,16 @@ import React from 'react';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { DynamicSection } from '@/app/Componentes/Perfil/DynamicSectionCv';
 import { AcademicFormation } from "@/app/Interfas/Interfaces"
+import { argentinianDegrees } from "@/app/util/degrees";
 
 export interface CvFormacionProps {
   data: AcademicFormation[];
   updateData: (updates: AcademicFormation[]) => void;
   isEditing: boolean;
+  employeeId: number;
 }
 
-export default function FormacionAcademica({ data, updateData, isEditing }: CvFormacionProps) {
+export default function FormacionAcademica({ data, updateData, isEditing, employeeId }: CvFormacionProps) {
 
   const handleChange = (id: string | number, field: string, value: string | number | boolean | File | null) => {
     const newData = data.map((item) => {
@@ -31,10 +33,10 @@ export default function FormacionAcademica({ data, updateData, isEditing }: CvFo
 
  const handleRemove = async (id: string | number) => {
   try {
-    // 1️⃣ Confirmar (opcional)
-    if (!confirm("¿Seguro que deseas eliminar esta formación académica?")) return;
+    // Confirmar
+    if (!confirm("Seguro que deseas eliminar esta formacion academica?")) return;
 
-    // 2️⃣ Llamar al backend
+    // Llamar al backend
     const res = await fetch(`http://127.0.0.1:8000/employee/Academic/${id}`, {
       method: "DELETE",
     });
@@ -43,14 +45,14 @@ export default function FormacionAcademica({ data, updateData, isEditing }: CvFo
       throw new Error("No se pudo eliminar el registro en el servidor.");
     }
 
-    // 3️⃣ Actualizar el estado local
+    // Actualizar el estado local
     const newData = data.filter((item) => item.id !== id);
     updateData(newData);
 
-    console.log(`Formación académica con id ${id} eliminada exitosamente.`);
+    console.log(`Formacion academica con id ${id} eliminada exitosamente.`);
   } catch (error) {
-    console.error("Error eliminando formación académica:", error);
-    alert("Ocurrió un error al eliminar el registro.");
+    console.error("Error eliminando formacion academica:", error);
+    alert("Ocurrio un error al eliminar el registro.");
   }
 };
 
@@ -84,7 +86,7 @@ export default function FormacionAcademica({ data, updateData, isEditing }: CvFo
 
   return (
     <Accordion activeIndex={0}>
-      <AccordionTab header="2. Formación Académica">
+      <AccordionTab header="2. Formacion Academica">
         <DynamicSection
           sectionName="AcademicFormation"
           items={safeData}
@@ -94,14 +96,15 @@ export default function FormacionAcademica({ data, updateData, isEditing }: CvFo
           fields={[
             {
               name: "title",
-              label: "Título Obtenido",
-              type: "text",
+              label: "Titulo Obtenido / Carrera",
+              type: "select",
+              options: argentinianDegrees,
               required: true,
               grid: "md:col-span-2",
             },
             {
               name: "institution",
-              label: "Institución Educativa",
+              label: "Institucion Educativa",
               type: "text",
               required: true,
               grid: "md:col-span-2",
@@ -130,7 +133,7 @@ export default function FormacionAcademica({ data, updateData, isEditing }: CvFo
             { name: "startDate", label: "Fecha de Inicio", type: "date", required: true },
             { 
               name: "endDate", 
-              label: "Fecha de Fin (opcional si está cursando)", 
+              label: "Fecha de Fin (opcional si esta cursando)", 
               type: "date"
             },
             {

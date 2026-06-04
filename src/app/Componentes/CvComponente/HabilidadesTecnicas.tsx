@@ -1,262 +1,262 @@
-
 import React, { useState, useEffect } from 'react';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Message } from 'primereact/message';
-import { AVAILABLE_SKILLS, initialProfessions} from '@/app/api/prueba2';
 import { SkillCard } from '@/app/util/UiRRHH';
-import { TechnicalSkill, SkillStatus,Skill,SoftSkillCatalog} from "@/app/Interfas/Interfaces"
+import { TechnicalSkill, SkillStatus, Skill, AcademicFormation, EmployeeTechnicalSkill } from "@/app/Interfas/Interfaces"
 import { SkillTestDialog} from './SkillTest';
-
-
+import TestModal from '@/app/Componentes/Validaciones/TestModal';
 
 // Props del componente HabilidadesTecnicas
 export type HabilidadesTecnicasProps = {
-  data: TechnicalSkill[];
+  data: EmployeeTechnicalSkill[];
   skillStatus: SkillStatus[];
-  updateData: (technicalSkills: TechnicalSkill[], skillStatus: SkillStatus[]) => void;
+  academicFormation: AcademicFormation[];
+  updateData: (technicalSkills: EmployeeTechnicalSkill[], skillStatus: SkillStatus[]) => void;
   isEditing: boolean;
   position: string;
+  employeeId: number;
 };
-
-// Props para el SkillCard component
-export interface SkillCardProps {
-  skill: Skill;
-  onStartTest: (skill: Skill) => void;
-}
-
-
 
 export default function HabilidadesTecnicas({ 
     data, 
     skillStatus, 
+    academicFormation = [],
     updateData, 
     isEditing, 
-    position 
+    position,
+    employeeId 
 }: HabilidadesTecnicasProps) {
     const [skills, setSkills] = useState<Skill[]>([]);
+    const [dbSkills, setDbSkills] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
     const [isTestModalVisible, setIsTestModalVisible] = useState(false);
     const [selectedSkillForTest, setSelectedSkillForTest] = useState<Skill | null>(null);
     
-  
+    // Estado para el TestModal (validacion con IA via API)
+    const [testModalVisible, setTestModalVisible] = useState(false);
+    const [selectedSkillForAITest, setSelectedSkillForAITest] = useState<{ id: number; nombre: string } | null>(null);
+
+    // Mapeo especial para títulos específicos
+    const SPECIAL_TITLE_MAPPINGS: Record<string, string> = {
+        "Bachiller": "Administración Pública",
+        "Bachillerato": "Administración Pública",
+        "Administración Pública": "Administración Pública",
+    };
+
+    // 1. Cargar habilidades disponibles desde la DB
+    const fetchDbSkills = async () => {
+        if (!employeeId) return;
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://127.0.0.1:8000/tests/skills/${employeeId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const resData = await response.json();
+            if (resData.skills) {
+                setDbSkills(resData.skills);
+            }
+        } catch (error) {
+            console.error("Error cargando habilidades de la DB:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        if (!position) {
-            setSkills([]);
-            return;
-        }
+        fetchDbSkills();
+    }, [employeeId]);
 
-        // Obtener los IDs de habilidades relevantes para esta posición
-        const relevantSkillIds = initialProfessions[position.trim()] || [];
+    // 2. Calcular habilidades relevantes basadas en títulos y posición
+    useEffect(() => {
+        if (loading) return;
+
+        // Títulos a buscar (Posición + Títulos Académicos)
+        const titlesToMap = new Set<string>();
+        if (position) titlesToMap.add(position.trim());
         
-        if (relevantSkillIds.length === 0) {
-            console.warn(`No se encontraron habilidades específicas para el puesto: "${position}"`);
-            setSkills([]);
-            return;
-        }
-
-        // Mapear cada ID a la información completa de la habilidad
-        const processedSkills: Skill[] = relevantSkillIds.map((skillId: number) => {
-            const skillDetail = (AVAILABLE_SKILLS as SoftSkillCatalog[]).find(s => s.id === skillId);
-            
-            if (!skillDetail) {
-                console.warn(`Habilidad con ID ${skillId} no encontrada en AVAILABLE_SKILLS`);
-                return null;
+        academicFormation.forEach(record => {
+            if (record.title) {
+                // Aplicar mapeo especial si existe, sino usar el título original
+                const mappedTitle = SPECIAL_TITLE_MAPPINGS[record.title.trim()] || record.title.trim();
+                titlesToMap.add(mappedTitle);
             }
+        });
 
-            // Verificar si ya está validada (existe en data)
-            const validatedSkill = data.find(ts => ts.id === skillId);
-            if (validatedSkill) {
-                return {
-                    id: skillId,
-                    name: skillDetail.nombre,
-                    description: `Habilidad técnica para ${position}`,
-                    status: 'validated' as const,
-                    level: validatedSkill.level,
-                    unlockDate: null
-                };
-            }
+        // Habilidades finales a mostrar
+        const finalSkills: Skill[] = [];
+        const processedSkillNames = new Set<string>();
 
-            // Verificar si está bloqueada
-            const statusInfo = skillStatus.find(ss => ss.skill_id === skillId);
-            if (statusInfo?.status === 'locked' && statusInfo.unlockDate) {
-                const unlockDate = new Date(statusInfo.unlockDate);
-                if (new Date() < unlockDate) {
-                    return {
-                        id: skillId,
-                        name: skillDetail.nombre,
-                        description: `Habilidad técnica para ${position}`,
-                        status: 'locked' as const,
+        // A. Buscar coincidencias en la DB
+        titlesToMap.forEach(title => {
+            const dbSkill = dbSkills.find(s => 
+                s.nombre.toLowerCase() === title.toLowerCase() || 
+                s.profession?.toLowerCase() === title.toLowerCase()
+            );
+
+            if (dbSkill) {
+                processedSkillNames.add(dbSkill.nombre.toLowerCase());
+                
+                // Verificar si ya está validada (existe en 'data' que viene del profile)
+                const validatedSkill = data?.find(ts => ts.technicalSkillId === dbSkill.id);
+                
+                finalSkills.push({
+                    id: dbSkill.id,
+                    name: dbSkill.nombre,
+                    description: dbSkill.description || `Validación para ${dbSkill.nombre}`,
+                    status: validatedSkill?.certified ? 'validated' : 'pending',
+                    level: 0,
+                    unlockDate: null,
+                    isVirtual: false
+                });
+            } else {
+                // B. Si no existe en DB, crear una habilidad "VIRTUAL"
+                // Solo si no la procesamos ya (evitar duplicados si título y posición son iguales)
+                if (!processedSkillNames.has(title.toLowerCase())) {
+                    finalSkills.push({
+                        id: Math.floor(Math.random() * -10000), // ID temporal negativo
+                        name: title,
+                        description: `Test generado por IA para: ${title}`,
+                        status: 'pending',
                         level: 0,
-                        unlockDate: statusInfo.unlockDate
-                    };
+                        unlockDate: null,
+                        isVirtual: true
+                    });
+                    processedSkillNames.add(title.toLowerCase());
                 }
             }
+        });
 
-            // Habilidad disponible para evaluar
-           return {
-        id: skillId,
-        name: skillDetail.nombre,
-        description: `Habilidad técnica para ${position}`,
-        status: 'pending' as const,
-        level: 0,
-        unlockDate: null
-         } as Skill; 
-        }).filter((skill): skill is Skill => skill !== null); 
-        console.log(`Habilidades procesadas para ${position}:`, processedSkills);
-        setSkills(processedSkills);
-    }, [position, data, skillStatus]);
-
-    const handleStartTest = (skill: Skill) => {
-        if (skill.status === 'locked') {
-            console.log('Esta habilidad está bloqueada hasta:', skill.unlockDate);
-            return;
+        // Si no hay ninguna habilidad relevante, mostrar todas las de la DB (fallback)
+        if (finalSkills.length === 0 && dbSkills.length > 0) {
+            dbSkills.forEach(dbSkill => {
+                const validatedSkill = data?.find(ts => ts.technicalSkillId === dbSkill.id);
+                finalSkills.push({
+                    id: dbSkill.id,
+                    name: dbSkill.nombre,
+                    description: dbSkill.description || `Validación para ${dbSkill.nombre}`,
+                    status: (validatedSkill?.certified || dbSkill.certified) ? 'validated' : 'pending',
+                    level: 0,
+                    unlockDate: null,
+                    isVirtual: false
+                });
+            });
         }
-        setSelectedSkillForTest(skill);
-        setIsTestModalVisible(true);
+
+        setSkills(finalSkills);
+    }, [position, academicFormation, dbSkills, data, loading]);
+
+    const handleStartTest = async (skill: Skill) => {
+        if (skill.status === 'locked') return;
+
+        let finalSkillId = skill.id;
+        let finalSkillName = skill.name;
+
+        // Si la habilidad es VIRTUAL, debemos asegurarla en la DB primero
+        if (skill.isVirtual) {
+            try {
+                const res = await fetch('/api/technical-skills/ensure', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: skill.name })
+                });
+                const result = await res.json();
+                if (result.success && result.skill) {
+                    finalSkillId = result.skill.id;
+                    finalSkillName = result.skill.nombre;
+                } else {
+                    throw new Error("No se pudo crear la habilidad en la DB");
+                }
+            } catch (error) {
+                console.error("Error asegurando habilidad:", error);
+                return;
+            }
+        }
+
+        // Abrir el TestModal con el ID real de la DB
+        setSelectedSkillForAITest({ id: finalSkillId, nombre: finalSkillName });
+        setTestModalVisible(true);
     };
 
     const handleTestComplete = (skill: Skill, score: number) => {
-        const newTechnicalSkills = [...data];
-        const newSkillStatus = skillStatus.filter(ss => ss.skill_id !== skill.id);
-        
-        // Determinar si aprobó (score >= 70 equivale a "Bueno" o "Avanzado")
-        const success = score >= 70;
-        
-        if (success) {
-            // Determinar el nivel basado en el score
-            let level: number;
-            if (score >= 90) {
-                level = 9; // Avanzado
-            } else if (score >= 80) {
-                level = 8; // Bueno alto
-            } else {
-                level = 7; // Bueno
-            }
-
-            // Agregar o actualizar la habilidad validada
-            const existingSkillIndex = newTechnicalSkills.findIndex(ts => ts.id === skill.id);
-            const newSkill: TechnicalSkill = { 
-                id: skill.id, 
-                nombre: skill.name, 
-                level: level 
-            };
-
-            if (existingSkillIndex >= 0) {
-                newTechnicalSkills[existingSkillIndex] = newSkill;
-            } else {
-                newTechnicalSkills.push(newSkill);
-            }
-
-            // Marcar como aprobada y bloquear por 3 meses
-            const unlockDate = new Date();
-            unlockDate.setMonth(unlockDate.getMonth() + 3);
-            
-            const newStatus: SkillStatus = {
-                id: Date.now(), // Generar un ID temporal
-                employee_id: 1, // Debería venir del contexto del empleado actual
-                skill_id: skill.id, 
-                status: 'passed', // Agregamos 'passed' al tipo SkillStatus
-                unlockDate: unlockDate.toISOString()
-            };
-            
-            newSkillStatus.push(newStatus);
-        } else {
-            // Falló el test, bloquear por 3 meses sin validar
-            const unlockDate = new Date();
-            unlockDate.setMonth(unlockDate.getMonth() + 3);
-            
-            const newStatus: SkillStatus = {
-                id: Date.now(), // Generar un ID temporal
-                employee_id: 1, // Debería venir del contexto del empleado actual
-                skill_id: skill.id, 
-                status: 'locked', 
-                unlockDate: unlockDate.toISOString() 
-            };
-            
-            newSkillStatus.push(newStatus);
-        }
-
-        updateData(newTechnicalSkills, newSkillStatus);
+        // Implementación simplificada para el test local si se llega a usar
         setIsTestModalVisible(false);
         setSelectedSkillForTest(null);
+        // Recargar habilidades o actualizar estado según sea necesario
     };
 
-    // Separar habilidades validadas de las pendientes
     const validatedSkills = skills.filter(s => s.status === 'validated');
     const pendingSkills = skills.filter(s => s.status !== 'validated');
 
     return (
         <>
             <Accordion activeIndex={0}>
-                <AccordionTab header="5. Habilidades Técnicas">
+                <AccordionTab header="5. Habilidades Tecnicas">
                     <div className="p-4">
                         {!isEditing && (
                             <Message 
                                 severity="info" 
-                                text="Activa el modo de edición para validar nuevas habilidades." 
+                                text="Activa el modo de edicion para validar nuevas habilidades." 
                                 className="mb-6 w-full" 
                             />
                         )}
 
-                        {/* Sección de Habilidades Validadas */}
-                        <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                            Habilidades Validadas
-                        </h3>
-                        {validatedSkills.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {validatedSkills.map(skill => (
-                                    <SkillCard 
-                                        key={skill.id} 
-                                        skill={skill} 
-                                        onStartTest={handleStartTest} 
-                                    />
-                                ))}
-                            </div>
+                        {loading ? (
+                            <p className="text-gray-500 italic">Cargando habilidades...</p>
                         ) : (
-                            <p className="text-gray-500 italic mb-6">
-                                Aún no tienes habilidades validadas.
-                            </p>
-                        )}
-
-                        {/* Sección de Habilidades por Validar (solo en modo edición) */}
-                        {isEditing && (
-                            <div className="mt-8">
+                            <>
+                                {/* Seccion de Habilidades Validadas */}
                                 <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                                    Habilidades por Validar
+                                    Habilidades Validadas
                                 </h3>
-                                {pendingSkills.length > 0 ? (
+                                {validatedSkills.length > 0 ? (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {pendingSkills.map(skill => (
+                                        {validatedSkills.map(skill => (
                                             <SkillCard 
                                                 key={skill.id} 
                                                 skill={skill} 
-                                                onStartTest={handleStartTest}
+                                                onStartTest={handleStartTest} 
                                             />
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-gray-500 italic">
-                                        No hay más habilidades disponibles para validar en tu puesto.
+                                    <p className="text-gray-500 italic mb-6">
+                                        Aun no tienes habilidades validadas.
                                     </p>
                                 )}
-                            </div>
-                        )}
 
-                        {/* Mostrar información de debug en desarrollo */}
-                        {process.env.NODE_ENV === 'development' && (
-                            <div className="mt-6 p-4 bg-gray-100 rounded-lg text-sm">
-                                <p><strong>Debug Info:</strong></p>
-                                <p>Posición: {position}</p>
-                                <p>Habilidades para esta posición: {initialProfessions[position]?.join(', ') || 'Ninguna'}</p>
-                                <p>Total habilidades cargadas: {skills.length}</p>
-                                <p>Validadas: {validatedSkills.length}, Pendientes: {pendingSkills.length}</p>
-                            </div>
+                                {/* Seccion de Habilidades por Validar (solo en modo edicion) */}
+                                {isEditing && (
+                                    <div className="mt-8">
+                                        <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                                            Habilidades por Validar
+                                        </h3>
+                                        {pendingSkills.length > 0 ? (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {pendingSkills.map(skill => (
+                                                    <SkillCard 
+                                                        key={skill.id} 
+                                                        skill={skill} 
+                                                        onStartTest={handleStartTest}
+                                                    />
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-gray-500 italic">
+                                                No hay mas habilidades disponibles para validar.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
                 </AccordionTab>
             </Accordion>
             
-            {/* Modal de Test */}
+            {/* Modal de Test local (SkillTestDialog) */}
             <SkillTestDialog 
                 isVisible={isTestModalVisible}
                 skill={selectedSkillForTest}
@@ -267,6 +267,22 @@ export default function HabilidadesTecnicas({
                 }}
                 onTestComplete={handleTestComplete}
             />
+
+            {/* Modal de Test con IA (TestModal) */}
+            {selectedSkillForAITest && (
+                <TestModal
+                    visible={testModalVisible}
+                    onHide={() => {
+                        setTestModalVisible(false);
+                        setSelectedSkillForAITest(null);
+                    }}
+                    onSuccess={() => {
+                        fetchDbSkills();
+                    }}
+                    technicalSkill={selectedSkillForAITest}
+                    employeeId={employeeId}
+                />
+            )}
         </>
     );
 }

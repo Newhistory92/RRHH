@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { FileText, Edit, Save } from 'lucide-react';
 import { SectionTitle } from '@/app/util/UiCv';
 import { EMPLOYEES_DATA, SOFT_SKILLS_CATALOG } from '@/app/api/prueba2';
@@ -20,11 +21,45 @@ interface EmployeeCVProps {
 }
 
 export default function EmployeeCV({ employeeData, globalSettings = {} }: EmployeeCVProps) {
+  const router = useRouter();
   const [cvData, setCvData] = useState<Employee | null>(employeeData);
   const [originalCvData, setOriginalCvData] = useState<Employee | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   console.log(cvData)
+
+  // Validar acceso: si no hay token O si se accede directamente por URL (sin employeeData),
+  // redirigir a la pagina principal que maneja auth + carga de datos
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token || !employeeData) {
+      router.push('/');
+      return;
+    }
+    setIsAuthenticated(true);
+  }, [router, employeeData]);
+
+  // Sincronizar employeeData cuando llega desde el componente padre
+  useEffect(() => {
+    if (employeeData) {
+      setCvData(employeeData);
+    }
+  }, [employeeData]);
+
+  // Mientras se valida la autenticacion
+  if (isAuthenticated === null) {
+    return (
+      <div className="bg-gray-100 font-sans min-h-screen flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-md">
+          <div className="flex justify-center mb-4">
+            <i className="pi pi-spin pi-spinner text-4xl text-blue-500"></i>
+          </div>
+          <p className="text-gray-700 text-center">Verificando sesion...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Manejar el caso donde el empleado no se encuentra
   if (!cvData) {
@@ -36,12 +71,12 @@ export default function EmployeeCV({ employeeData, globalSettings = {} }: Employ
               <div className="flex justify-center mb-4">
                 <i className="pi pi-spin pi-spinner text-4xl text-blue-500"></i>
               </div>
-              <p className="text-gray-700 text-center">Cargando información del empleado...</p>
+              <p className="text-gray-700 text-center">Cargando informacion del empleado...</p>
             </>
           ) : (
             <>
               <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
-              <p className="text-gray-700">No se pudo encontrar la información del empleado.</p>
+              <p className="text-gray-700">No se pudo encontrar la informacion del empleado.</p>
             </>
           )}
         </div>
@@ -115,6 +150,7 @@ export default function EmployeeCV({ employeeData, globalSettings = {} }: Employ
               data={cvData.AcademicFormation}
               updateData={(AcademicFormation) => updateCvData({ AcademicFormation })}
               isEditing={isEditing}
+              employeeId={cvData.id}
             />
           )}
 
@@ -139,8 +175,10 @@ export default function EmployeeCV({ employeeData, globalSettings = {} }: Employ
               data={cvData.technicalSkills}
               skillStatus={cvData.skillStatus || []}
               position={cvData.position}
+              academicFormation={cvData.AcademicFormation}
               updateData={(technicalSkills, skillStatus) => updateCvData({ technicalSkills, skillStatus })}
               isEditing={isEditing}
+              employeeId={cvData.id}
             />
           )}
 

@@ -6,7 +6,7 @@ import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
-import { LicenseHistory} from "@/app/Interfas/Interfaces"
+import { LicenseHistory } from "@/app/Interfas/Interfaces"
 
 
 
@@ -125,7 +125,7 @@ export const ApprovalModal: React.FC<ApprovalModalProps> = ({
           <div>
             <h4 className="font-bold mb-2">Mensaje Del Solicitante:</h4>
             <pre className="w-full p-3 border rounded-lg bg-gray-50 font-sans text-sm whitespace-pre-wrap">
-              {request.originalMessage}
+              {request.mensajeOriginal}
             </pre>
           </div>
 

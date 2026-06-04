@@ -35,6 +35,7 @@ interface DynamicSectionProps {
   onChange: (id: string | number, field: string, value: number | string | boolean | File | null) => void;
   onRemove: (id: string | number) => void;
   onAdd: () => void;
+  onVerify?: (item: DynamicItem) => void;
   fields: Field[];
   sectionName: string;
   isEditing: boolean;
@@ -45,6 +46,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
   onChange,
   onRemove,
   onAdd,
+  onVerify,
   fields,
   sectionName,
   isEditing,
@@ -129,9 +131,16 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                         }
                         placeholder={`Seleccionar ${field.label.toLowerCase()}`}
                         disabled={!isEditing}
-                        className="w-full"
+                        className="w-full relative"
                         optionLabel="label"
                         optionValue="value"
+                        filter={(field.options?.length || 0) > 5}
+                        filterMatchMode="contains"
+                        filterPlaceholder="Buscar..."
+                        emptyFilterMessage="No hay resultados"
+                        pt={{
+                          wrapper: { className: "max-h-60" },
+                        }}
                       />
                     </div>
                   );
@@ -183,13 +192,29 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
             </div>
 
             {isEditing && (
-              <button
-                onClick={() => onRemove(item.id)}
-                className="absolute top-3 right-3 p-1 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full"
-                title="Eliminar registro"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
+              <div className="absolute top-3 right-3 flex flex-col gap-2">
+                {typeof item.isVerified !== 'undefined' && item.isVerified === true && (
+                  <span className="p-1 px-2 text-xs font-bold text-green-700 bg-green-100 rounded shadow-sm flex items-center justify-center gap-1" title="Esta formación ha sido verificada.">
+                    ✓ Verificado
+                  </span>
+                )}
+                {typeof item.isVerified !== 'undefined' && item.isVerified === false && onVerify && (
+                  <button
+                    onClick={() => onVerify(item)}
+                    className="p-1 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded bg-white shadow-sm text-xs font-semibold px-2"
+                    title="Realizar test para validar esta formación"
+                  >
+                    Verificar
+                  </button>
+                )}
+                <button
+                  onClick={() => onRemove(item.id)}
+                  className="p-1 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full flex items-center justify-center bg-white shadow-sm"
+                  title="Eliminar registro"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
             )}
           </div>
         );

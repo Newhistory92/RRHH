@@ -1,9 +1,8 @@
 
-import{INTEGRATED_ORG_DATA ,EMPLOYMENT_STATUS,ACTIVITY_TYPES } from '@/app/api/prueba2';
 import { getScoreColor } from '@/app/util/UiRRHH';
 import { ChevronDown, ChevronUp,  Filter,  } from 'lucide-react';
 import React from 'react';
-import {  Employee, ProductivityRankingProps, SortableKey, SortDirection  } from '@/app/Interfas/Interfaces';
+import {  Employee, StatsProductivityRankingProps, SortableKey, SortDirection  } from '@/app/Interfas/Interfaces';
 import { Pagination} from '@/app/Componentes/Pagination/pagination';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { DataTable } from 'primereact/datatable';
@@ -18,53 +17,56 @@ export const ProductivityRanking = ({
   sortConfig, 
   onSortChange,
   currentPage,
-  onPageChange
-}: ProductivityRankingProps) => {
+  onPageChange,
+  metadata
+}: StatsProductivityRankingProps) => {
   const itemsPerPage = 10;
-
-  // Preparar opciones de departamentos desde INTEGRATED_ORG_DATA
+console.log('Metadata recibida en ProductivityRanking:',  employees);
+  // Preparar opciones de departamentos desde metadata
   const departmentOptions = React.useMemo(() => {
     const options = [{ label: 'Todos los Departamentos', value: 'all' }];
     
-    INTEGRATED_ORG_DATA.forEach(dept => {
-      // Agregar el departamento principal
-      options.push({ label: dept.nombre, value: dept.nombre });
-      
-      // Agregar las oficinas como sub-opciones (si existen)
-      if (dept.oficinas && dept.oficinas.length > 0) {
-        dept.oficinas.forEach(oficina => {
-          options.push({ 
-            label: `   • ${oficina.nombre}`, 
-            value: oficina.nombre 
-          });
-        });
-      }
-    });
+    if (metadata && metadata.departments) {
+      metadata.departments.forEach(dept => {
+        if (dept.startsWith('   - ')) {
+          const cleanName = dept.replace('   - ', '');
+          options.push({ label: `   • ${cleanName}`, value: cleanName });
+        } else {
+          options.push({ label: dept, value: dept });
+        }
+      });
+    }
     
     return options;
-  }, []);
+  }, [metadata]);
 
-  // Opciones para tipo de actividad
+  // Opciones para tipo de actividad desde metadata
   const activityTypeOptions = React.useMemo(() => {
-    return [
-      { label: 'Todas las Actividades', value: 'all' },
-      ...ACTIVITY_TYPES.map(a => ({ label: a, value: a }))
-    ];
-  }, []);
+    const options = [{ label: 'Todas las Actividades', value: 'all' }];
+    if (metadata && metadata.activityTypes) {
+      metadata.activityTypes.forEach(act => {
+        options.push({ label: act, value: act });
+      });
+    }
+    return options;
+  }, [metadata]);
 
-  // Opciones para estado
+  // Opciones para estado desde metadata
   const statusOptions = React.useMemo(() => {
-    return [
-      { label: 'Toda Condición Laboral', value: 'all' },
-      ...EMPLOYMENT_STATUS.map(s => ({ label: s, value: s }))
-    ];
-  }, []);
+    const options = [{ label: 'Toda Condición Laboral', value: 'all' }];
+    if (metadata && metadata.employmentStatuses) {
+      metadata.employmentStatuses.forEach(stat => {
+        options.push({ label: stat, value: stat });
+      });
+    }
+    return options;
+  }, [metadata]);
 
   const filteredEmployees = React.useMemo(() => {
     return employees
-      .filter(e => filters.department === 'all' || e.department === filters.department)
-      .filter(e => filters.activityType === 'all' || e.activityType === filters.activityType)
-      .filter(e => filters.employmentStatus === 'all' || e.employmentStatus === filters.employmentStatus)
+      .filter(e => filters.department === 'all' || e.department === filters.department || (e as any).office === filters.department)
+      .filter(e => filters.activityType === 'all' || (e as any).activityType === filters.activityType)
+      .filter(e => filters.employmentStatus === 'all' || (e as any).employmentStatus === filters.employmentStatus)
   }, [employees, filters]);
 
 
@@ -215,7 +217,13 @@ export const ProductivityRanking = ({
           headerClassName="hidden md:table-cell"
         />
         <Column 
-          field="category" 
+          field="tipoContrato" 
+          header="Condicion Laboral"
+          className="hidden md:table-cell"
+          headerClassName="hidden md:table-cell"
+        />
+        <Column 
+          field="categoria" 
           header="Categoría"
           className="hidden lg:table-cell"
           headerClassName="hidden lg:table-cell"

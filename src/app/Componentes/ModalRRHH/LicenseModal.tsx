@@ -1,8 +1,8 @@
 "use client"
 
-import  { useState,  useRef } from 'react';
-import {  User,  Clock, Calendar, CheckCircle, XCircle, Printer } from 'lucide-react';
-import {  Employee, LicenseHistory, ProcessedMessage} from '@/app/Interfas/Interfaces';
+import { useState, useRef } from 'react';
+import { User, Clock, Calendar, CheckCircle, XCircle, Printer } from 'lucide-react';
+import { Employee, LicenseHistory, ProcessedMessage } from '@/app/Interfas/Interfaces';
 import { printLicense } from './LicensePrintTemplate';
 import { Toast } from 'primereact/toast';
 import { InputMask } from 'primereact/inputmask';
@@ -87,7 +87,7 @@ export const ApplyLicenseModal = ({
 };
 
 
-export const PermissionModal = ({ employee,onClose }: PermissionModalProps) => {
+export const PermissionModal = ({ employee, onClose }: PermissionModalProps) => {
   const [salida, setSalida] = useState<string>("");
   const [retorno, setRetorno] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -97,7 +97,7 @@ export const PermissionModal = ({ employee,onClose }: PermissionModalProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!salida || !retorno) {
       toast.current?.show({
         severity: 'warn',
@@ -137,7 +137,7 @@ export const PermissionModal = ({ employee,onClose }: PermissionModalProps) => {
           body: JSON.stringify(data),
         }
       );
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
@@ -146,7 +146,7 @@ export const PermissionModal = ({ employee,onClose }: PermissionModalProps) => {
       }
 
       await response.json()
-      
+
       toast.current?.show({
         severity: 'success',
         summary: 'Permiso registrado',
@@ -164,8 +164,8 @@ export const PermissionModal = ({ employee,onClose }: PermissionModalProps) => {
       toast.current?.show({
         severity: 'error',
         summary: 'Error',
-        detail: error instanceof Error 
-          ? error.message 
+        detail: error instanceof Error
+          ? error.message
           : 'No se pudo guardar el permiso. Por favor, inténtelo de nuevo.',
         life: 5000
       });
@@ -195,13 +195,13 @@ export const PermissionModal = ({ employee,onClose }: PermissionModalProps) => {
               <XCircle size={24} />
             </button>
           </div>
-          
+
           <div className="space-y-4">
             <p className="bg-blue-50 p-3 rounded-md border border-blue-200">
               <strong className="text-gray-700">Empleado/a:</strong>{" "}
               <span className="text-gray-900">{employee.name}</span>
             </p>
-            
+
             <div>
               <label
                 htmlFor="salida"
@@ -214,14 +214,14 @@ export const PermissionModal = ({ employee,onClose }: PermissionModalProps) => {
                 value={salida}
                 onChange={(e) => setSalida(e.value || '')}
                 mask="99:99"
-              
+
                 required
                 className="w-full text-lg p-3"
                 style={{ fontSize: '1.125rem' }}
                 disabled={isLoading}
               />
             </div>
-            
+
             <div>
               <label
                 htmlFor="retorno"
@@ -234,7 +234,7 @@ export const PermissionModal = ({ employee,onClose }: PermissionModalProps) => {
                 value={retorno}
                 onChange={(e) => setRetorno(e.value || '')}
                 mask="99:99"
-               
+
                 required
                 className="w-full text-lg p-3"
                 style={{ fontSize: '1.125rem' }}
@@ -242,7 +242,7 @@ export const PermissionModal = ({ employee,onClose }: PermissionModalProps) => {
               />
             </div>
           </div>
-          
+
           <div className="mt-6 flex justify-end space-x-3">
             <Button
               type="button"
@@ -250,13 +250,13 @@ export const PermissionModal = ({ employee,onClose }: PermissionModalProps) => {
               onClick={onClose}
               className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading}
-             severity="secondary" text raised 
+              severity="secondary" text raised
             ></Button>
             <Button
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading}
-               text raised
+              text raised
             >
               {isLoading ? (
                 <>
@@ -285,7 +285,7 @@ export const LicenseDetailModal = ({ license, onClose }: LicenseDetailModalProps
   const handlePrint = () => {
     printLicense(license);
   };
-  
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
       <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -297,8 +297,8 @@ export const LicenseDetailModal = ({ license, onClose }: LicenseDetailModalProps
               </h3>
               <p className="text-sm text-gray-500">Comprobante de respaldo</p>
             </div>
-            <button 
-              onClick={onClose} 
+            <button
+              onClick={onClose}
               className="text-gray-500 hover:text-gray-800 transition-colors"
             >
               <XCircle size={24} />
@@ -314,23 +314,22 @@ export const LicenseDetailModal = ({ license, onClose }: LicenseDetailModalProps
                 </div>
                 <p className="text-gray-900 font-semibold">{license.type}</p>
               </div>
-              
+
               <div className="bg-gray-50 p-4 rounded-lg border">
                 <div className="flex items-center mb-2">
                   <CheckCircle size={16} className="text-green-600 mr-2" />
                   <span className="text-sm font-medium text-gray-700">Estado</span>
                 </div>
-                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                  license.status === "Aprobada"
+                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${license.status === "Aprobada"
                     ? "bg-green-100 text-green-800"
                     : license.status === "Rechazada"
-                    ? "bg-red-100 text-red-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}>
+                      ? "bg-red-100 text-red-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}>
                   {license.status}
                 </span>
               </div>
-              
+
               <div className="bg-gray-50 p-4 rounded-lg border">
                 <div className="flex items-center mb-2">
                   <Calendar size={16} className="text-purple-600 mr-2" />
@@ -338,7 +337,7 @@ export const LicenseDetailModal = ({ license, onClose }: LicenseDetailModalProps
                 </div>
                 <p className="text-gray-900 font-semibold">{license.startDate} al {license.endDate}</p>
               </div>
-              
+
               <div className="bg-gray-50 p-4 rounded-lg border">
                 <div className="flex items-center mb-2">
                   <Clock size={16} className="text-orange-600 mr-2" />
@@ -348,7 +347,7 @@ export const LicenseDetailModal = ({ license, onClose }: LicenseDetailModalProps
               </div>
             </div>
 
-            {license.originalMessage && (
+            {license.mensajeOriginal && (
               <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <h4 className="font-semibold text-blue-900 mb-2 flex items-center">
                   <CheckCircle size={16} className="mr-2" />
@@ -368,14 +367,14 @@ export const LicenseDetailModal = ({ license, onClose }: LicenseDetailModalProps
         </div>
 
         <div className="mt-6 flex justify-end space-x-3 pt-4 border-t">
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
           >
             Cerrar
           </button>
-          <button 
-            onClick={handlePrint} 
+          <button
+            onClick={handlePrint}
             className="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors flex items-center"
           >
             <Printer size={18} className="mr-2" />

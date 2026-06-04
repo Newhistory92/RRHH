@@ -94,6 +94,7 @@ export const EmployeeDetailView = ({
         {activeTab === "licencias" && (
           <LicenseHistoryTab
             licenses={employee.licenses}
+            employee={employee}
             onRowClick={onLicenseClick}
           />
         )}

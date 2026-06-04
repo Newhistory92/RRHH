@@ -4,15 +4,18 @@ import { Plus, Trash2 } from 'lucide-react';
 import { Card } from 'primereact/card';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
+import { Dialog } from 'primereact/dialog';
 import { Test, TestsByProfession } from "@/app/Interfas/Interfaces";
 import { CreateTestModal } from './CreateTestModal';
+import { argentinianDegrees } from "@/app/util/degrees";
 
 interface TechnicalTestsProps {
   testsByProfession: TestsByProfession;
   professions: { [key: string]: number[] };
   selectedProfession: string;
+  argentinianDegrees: { [key: string]: number[] };
   onSelectedProfessionChange: (profession: string) => void;
-  onAddProfession: (profession:{ [key: string]: number[] }) => void;
+  onAddProfession: (profession: { [key: string]: number[] }) => void;
   onSaveTest: (test: Test) => void;
   onDeleteTest?: (testId: string) => void;
 }
@@ -27,12 +30,15 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
   onDeleteTest
 }) => {
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
+  const [isAddProfessionOpen, setIsAddProfessionOpen] = useState(false);
+  const [newProfessionSelection, setNewProfessionSelection] = useState<string>("");
 
   const handleAddNewProfession = () => {
-    const newProfession = prompt("Ingrese el nombre de la nueva profesión:");
-    if (newProfession && !(newProfession in professions)) {
-      onAddProfession({ [newProfession]: [] });
-      onSelectedProfessionChange(newProfession);
+    if (newProfessionSelection && !(newProfessionSelection in professions)) {
+      onAddProfession({ [newProfessionSelection]: [] });
+      onSelectedProfessionChange(newProfessionSelection);
+      setIsAddProfessionOpen(false);
+      setNewProfessionSelection("");
     }
   };
 
@@ -43,10 +49,10 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
 
   const currentTests = testsByProfession[selectedProfession] || [];
 
- const professionOptions = Object.keys(professions).map(profession => ({
-  name: profession,
-  value: profession
-}));
+  const professionOptions = argentinianDegrees.map(profession => ({
+    name: profession.value,
+    value: profession.label
+  }));
 
 
   return (
@@ -74,8 +80,8 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
           <div className="flex gap-2">
             <Button
               type="button"
-              onClick={handleAddNewProfession}
-              severity="secondary" 
+              onClick={() => setIsAddProfessionOpen(true)}
+              severity="secondary"
               text
               className="whitespace-nowrap"
             >
@@ -85,8 +91,8 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
             <Button
               type="button"
               onClick={() => setIsTestModalOpen(true)}
-              text 
-              raised 
+              text
+              raised
               className="whitespace-nowrap"
             >
               Crear Nuevo Test
@@ -105,7 +111,7 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
             {currentTests.length} test{currentTests.length !== 1 ? 's' : ''}
           </span>
         </div>
-        
+
         <div className="space-y-4">
           {currentTests.length === 0 ? (
             <div className="text-center py-8">
@@ -145,11 +151,10 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
                   </div>
                   <div className="flex items-center gap-2 ml-4">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
-                        test.type === "multiple-choice"
-                          ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300"
-                          : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                      }`}
+                      className={`px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${test.type === "multiple-choice"
+                        ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300"
+                        : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                        }`}
                     >
                       {test.type === "multiple-choice"
                         ? "Multiple Choice"
@@ -180,6 +185,46 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
         onSave={handleSaveTest}
         profession={selectedProfession}
       />
+
+      {/* Modal para añadir nueva profesión */}
+      <Dialog
+        header="Añadir Nueva Profesión"
+        visible={isAddProfessionOpen}
+        style={{ width: '450px' }}
+        onHide={() => setIsAddProfessionOpen(false)}
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button label="Cancelar" icon="pi pi-times" onClick={() => setIsAddProfessionOpen(false)} className="p-button-text" />
+            <Button label="Añadir" icon="pi pi-check" onClick={handleAddNewProfession} disabled={!newProfessionSelection} autoFocus />
+          </div>
+        }
+      >
+        <div className="p-fluid">
+          <div className="field mb-4">
+            <label htmlFor="new-profession" className="block text-sm font-medium text-gray-700 mb-2">
+              Seleccione la Especialidad / Carrera
+            </label>
+            <Dropdown
+              id="new-profession"
+              value={newProfessionSelection}
+              onChange={(e) => setNewProfessionSelection(e.value)}
+              options={argentinianDegrees}
+              optionLabel="label"
+              optionValue="value"
+              filter
+              showClear
+              placeholder="Escribe para buscar..."
+              className="w-full"
+            />
+            {newProfessionSelection && (newProfessionSelection in professions) && (
+              <small className="p-error block mt-1">Esta profesión ya está en la lista.</small>
+            )}
+          </div>
+          <p className="text-xs text-gray-500 italic">
+            * Selecciona una carrera del listado oficial para mantener la consistencia con el CV de los empleados.
+          </p>
+        </div>
+      </Dialog>
     </div>
   );
 };

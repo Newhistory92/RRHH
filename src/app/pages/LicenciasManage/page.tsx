@@ -68,10 +68,12 @@ export default function LicenciasManage() {
         console.warn("No se pudieron cargar supervisores para derivación:", err);
       }
 
-      // Si es supervisor/admin, cargar solicitudes pendientes de aprobación
-      if (role === "admin" || role === "supervisor" || role === "rrhh") {
-        const pendientesReqs = await apiClient.get<any>('/licenses/requests?status=Pendiente');
+      // Consultar solicitudes pendientes donde ESTE EMPLEADO sea el supervisor
+      try {
+        const pendientesReqs = await apiClient.get<any>(`/licenses/requests?supervisor_emp_id=${empId}`);
         setSolicitudesPendientes(pendientesReqs.requests || []);
+      } catch (err) {
+        console.warn("Error al cargar pendientes de mi aprobación:", err);
       }
     } catch (err) {
       console.error("Error fetching licenses", err);
@@ -104,13 +106,23 @@ export default function LicenciasManage() {
   ) => {
     if (!solicitudId) return;
     try {
-      const status = accion === "aprobar" ? (data.siguienteSupervisorId ? "Pendiente Siguiente Aprobación" : "Aprobada") : "Rechazada";
+      // Limpiar objeto proveniente del Dropdown en caso de comportamientos por defecto
+      const rawSigSup = data.siguienteSupervisorId;
+      const sigSupId = typeof rawSigSup === 'object' ? (rawSigSup as any)?.value : rawSigSup;
+      const tieneSiguiente = !!sigSupId && sigSupId !== '';
 
-      await apiClient.patch(`/licenses/requests/${solicitudId}/status`, {
+      const status = accion === "aprobar" ? (tieneSiguiente ? "Pendiente Siguiente Aprobación" : "Aprobada") : "Rechazada";
+
+      const updateData = {
         status,
         observacion: data.observacion,
-        supervisorId: currentUser?.id
-      });
+        supervisorId: currentUser?.id,
+        siguienteSupervisorId: tieneSiguiente ? Number(sigSupId) : null
+      };
+      console.log("Payload sent to API:", updateData);
+
+      const response = await apiClient.patch(`/licenses/requests/${solicitudId}/status`, updateData);
+      console.log("Response from Server:", response);
 
       toast.current?.show({ severity: 'success', summary: 'Actualizado', detail: `Licencia ${status}` });
       fetchData();

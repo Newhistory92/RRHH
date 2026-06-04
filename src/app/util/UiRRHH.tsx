@@ -1214,7 +1214,7 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({ user, roles, onClo
         </Field>
         <Field label="Rol">
           <select name="role" value={form.role}
-            onChange={(e) => { set('role')(e); if (e.target.value) onRoleChange(user.id, e.target.value); }}
+            onChange={(e) => set('role')(e)}
             className={inputCls}>
             <option value="">Sin Rol Asignado</option>
             {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}

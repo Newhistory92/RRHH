@@ -1,8 +1,8 @@
 import { InfoCard, HoursDisplay } from "@/app/util/UiRRHH"
-import { User, Briefcase, Clock, Building, Calendar as CalendarIcon, CheckCircle, Phone, Home, Cake, AtSign, Handshake, CopyCheck, ChartColumnStacked } from 'lucide-react';
+import { User, Briefcase, Clock, Building, Calendar as CalendarIcon, CheckCircle, Phone, Home, Cake, AtSign, Handshake, CopyCheck, ChartColumnStacked, AlertCircle } from 'lucide-react';
 import { Employee, Licenses, LicenseHistory, Permit, EmploymentStatus } from '@/app/Interfas/Interfaces';
 import { Pagination } from '@/app/Componentes/Pagination/pagination';
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Calendar } from 'primereact/calendar';
@@ -11,12 +11,27 @@ import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
 import { InputMask } from 'primereact/inputmask';
 import { updateCondicionLaboral, updateHorario, timeStringToDecimal, decimalToTimeString } from './employeeApi';
+import { Dialog } from 'primereact/dialog';
+import DateRangePicker from '../../GestionLicencias/Calendario';
+import { apiClient } from '../../util/apiClient';
+import { getAvailableLicenses } from '../../util/licenseFilters';
+import { ProgressBar } from "primereact/progressbar";
+
 interface LicenseHistoryTabProps {
   licenses: Licenses;
+  employee: Employee;
   onRowClick: (license: LicenseHistory) => void;
+  onRefresh?: () => void;
 }
 
 
+// Interfaz para los tipos de licencia devueltos por el backend
+interface TipoDisponible {
+  nombre: string;
+  diasTotales: number;
+  consumidos: number;
+  disponibles: number;
+}
 
 const formatDate = (date: Date | null) => {
   if (!date) return '';
@@ -53,7 +68,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
       : null
   });
 
-
+  console.log(employee);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -358,28 +373,301 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
 
 
 
-export const LicenseHistoryTab = ({ licenses, onRowClick }: LicenseHistoryTabProps) => {
+const StepLabel = ({ n, label }: { n: number; label: string }) => (
+  <div className="flex items-center gap-2 mb-3">
+    <span className="w-6 h-6 rounded-full bg-cyan-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+      {n}
+    </span>
+    <h3 className="font-semibold text-gray-700 text-sm">{label}</h3>
+  </div>
+);
+
+const Section = ({ children }: { children: React.ReactNode }) => (
+  <div className="mb-4">
+    {children}
+  </div>
+);
+
+export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }: LicenseHistoryTabProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [loadingTypes, setLoadingTypes] = useState(false);
+  const [selectedType, setSelectedType] = useState<any>(null);
+
+  // Estados para las fechas y cálculo (única fuente de verdad)
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [diasCalculados, setDiasCalculados] = useState(0);
+
+  const [observaciones, setObservaciones] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const toast = useRef<Toast>(null);
+  const [error, setError] = useState('');
+  const [tiposData, setTiposData] = useState<Record<string, TipoDisponible>>({});
+
   const itemsPerPage = 10;
+
+  // Ahora leemos el "mode" (habiles/corrido) directamente del tipo seleccionado que vino del backend
+  const licenseMeta = useMemo(() => {
+    if (!selectedType) return { mode: 'habiles' as const };
+    // Cambia "selectedType.mode" por el nombre exacto de la propiedad que envía tu backend
+    return { mode: selectedType.mode || 'habiles' };
+  }, [selectedType]);
+
+  const typeKey = selectedType?.name || selectedType?.nombre;
+
+  const maxDaysAvailable = useMemo(() => {
+    if (!typeKey || !tiposData[typeKey]) return 0;
+    return tiposData[typeKey].disponibles;
+  }, [typeKey, tiposData]);
+
+  const canAddManual = true;
+
+  const openManualModal = async () => {
+    setIsManualModalOpen(true);
+    setLoadingTypes(true);
+    try {
+      const [tiposRes, saldosRes] = await Promise.all([
+        apiClient.get<any>(`/licenses/tipos-disponibles?employee_id=${employee.id}`),
+        apiClient.get<any>(`/licenses/saldos?employee_id=${employee.id}`)
+      ]);
+
+
+      const tiposArray = tiposRes.tipos || tiposRes || [];
+      console.log("tiposArray", tiposArray);
+      // Guardamos los saldos en el estado para el diccionario de UI
+      if (Array.isArray(tiposArray)) {
+        const tiposRecord = tiposArray.reduce((acc, curr) => {
+          const key = curr.nombre;
+          if (key) acc[key] = curr;
+          return acc;
+        }, {} as Record<string, TipoDisponible>);
+        setTiposData(tiposRecord);
+      }
+    } catch (err) {
+      console.error("Error cargando tipos", err);
+    } finally {
+      setLoadingTypes(false);
+    }
+  };
+
+  const handleDateChange = (start: Date | null, end: Date | null, dias: number) => {
+    if (licenseMeta.mode === 'habiles') {
+      setStartDate(start);
+      setEndDate(end);
+      setDiasCalculados(dias);
+    }
+    setError('');
+  };
+
+  const handleManualSubmit = async () => {
+    if (!selectedType || !startDate || !endDate || diasCalculados <= 0) {
+      toast.current?.show({ severity: 'warn', summary: 'Faltan datos', detail: 'Complete todos los campos.' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        solicitanteId: employee.id,
+        type: selectedType.nombre || selectedType.name,
+        startDate: startDate,
+        endDate: endDate,
+        duration: diasCalculados,
+        status: "Aprobada",
+        mensajeOriginal: observaciones || `Carga manual realizada por departamento de RRHH.`,
+        tiposLicencia: {}
+      };
+
+      await apiClient.post('/licenses/request', payload);
+      toast.current?.show({ severity: 'success', summary: 'Licencia Registrada', detail: 'La licencia se guardó como Aprobada.' });
+      setIsManualModalOpen(false);
+
+      // Limpiamos correctamente los estados únicos
+      setSelectedType(null);
+      setStartDate(null);
+      setEndDate(null);
+      setDiasCalculados(0);
+      setObservaciones("");
+
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      console.error("Error guardando licencia manual", err);
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar la licencia.' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    // Scroll suave hacia arriba al cambiar de página
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Cálculos de paginación
-  const aprobaciones = Array.isArray(licenses)
-    ? licenses.flatMap(l => l.aprobaciones || [])
-    : []
-  const totalItems = aprobaciones.length;
+  // Mapear las licencias directamente del array devuelto por el backend.
+  // Cada elemento ya es un objeto License con: id, type, startDate, endDate, status, duracion, etc.
+  const licenseList: LicenseHistory[] = useMemo(() => {
+    const raw = Array.isArray(licenses) ? licenses : [];
+    // Filtrar entradas nulas (el backend envía [NULL_LICENSE] cuando no hay datos)
+    return raw
+      .filter((l: any) => l && l.id !== null && l.id !== undefined)
+      .map((l: any) => ({
+        id: l.id,
+        solicitanteId: employee.id,
+        name: employee.name,
+        type: l.type,
+        supervisorId: 0,
+        startDate: l.startDate,
+        endDate: l.endDate,
+        status: l.status,
+        duration: l.duracion,
+        mensajeOriginal: l.mensajeOriginal,
+        createdAt: l.createdAt,
+        aprobaciones: l.aprobaciones,
+        tiposLicencia: {},
+      }));
+  }, [licenses, employee]);
+
+  const totalItems = licenseList.length;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = aprobaciones.slice(startIndex, endIndex);
+  const currentItems = licenseList.slice(startIndex, endIndex);
+
+  const handleTypeChange = (newType: { name: string, nombre?: string } | null) => {
+    setSelectedType(newType);
+    setStartDate(null);
+    setEndDate(null);
+    setDiasCalculados(0);
+    setError('');
+  };
+
 
   return (
     <div className="mt-4 flow-root">
+      <Toast ref={toast} />
       <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-bold text-gray-800">Historial de Licencias</h2>
+          {canAddManual && (
+            <Button
+              label="Carga Manual"
+              icon="pi pi-plus"
+              className="p-button-sm p-button-info"
+              onClick={openManualModal}
+            />
+          )}
+        </div>
+
+        <Dialog
+          header="Registrar Licencia Manual"
+          visible={isManualModalOpen}
+          style={{ width: '90vw', maxWidth: '600px' }}
+          onHide={() => setIsManualModalOpen(false)}
+          footer={(
+            <div className="flex justify-end gap-2 px-4 pb-4">
+              <Button label="Cancelar" icon="pi pi-times" className="p-button-text" onClick={() => setIsManualModalOpen(false)} />
+              <Button label="Guardar y Aprobar" icon="pi pi-check" className="p-button-primary" onClick={handleManualSubmit} loading={isSubmitting} />
+            </div>
+          )}
+        >
+          <div className="space-y-4 py-2">
+            <div className="bg-blue-50 border border-blue-100 p-3 rounded-lg text-xs text-blue-700">
+              <span className="font-bold">Modo RRHH:</span> Esta licencia no requiere aprobación del supervisor y se guardará directamente como <strong>Aprobada</strong> en el historial, descontando los saldos correspondientes.
+            </div>
+
+            <Section>
+              <StepLabel n={2} label="Tipo de licencia" />
+              <Dropdown
+                value={selectedType}
+                onChange={e => handleTypeChange(e.value)}
+                options={Object.values(tiposData)}
+                optionLabel="nombre"
+                showClear
+                placeholder="Seleccioná un tipo..."
+                className="w-full mb-4"
+              />
+
+              <div className="space-y-3">
+                {/* Mostrar saldo disponible del tipo seleccionado */}
+                {typeKey && tiposData[typeKey] && (
+                  <div className="border border-gray-100 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-semibold">{typeKey}</span>
+                      <span className="text-xs text-gray-500">
+                        {tiposData[typeKey].consumidos}/{tiposData[typeKey].diasTotales} consumidos
+                      </span>
+                    </div>
+                    <ProgressBar
+                      value={tiposData[typeKey].diasTotales > 0
+                        ? (tiposData[typeKey].consumidos / tiposData[typeKey].diasTotales) * 100
+                        : 0}
+                      showValue={false}
+                      style={{ height: 6 }}
+                      color="#06b6d4"
+                    />
+                    <p className="text-xs text-cyan-600 mt-1 font-medium">
+                      Disponibles: {tiposData[typeKey].disponibles} días
+                    </p>
+                  </div>
+                )}
+                {typeKey && !tiposData[typeKey] && (
+                  <p className="text-center text-xs text-gray-400 py-4 border border-dashed rounded-xl">
+                    No hay saldo disponible para esta categoría.
+                  </p>
+                )}
+              </div>
+            </Section>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-gray-700">Periodo de Licencia</label>
+              <div className="border border-gray-200 rounded-lg p-2 bg-gray-50">
+                <Section>
+                  <StepLabel n={1} label="Rango de fechas" />
+                  {licenseMeta.mode === 'corrido' ? (
+                    <div className="space-y-4">
+                      <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded-lg border border-amber-100 flex items-center gap-2">
+                        <AlertCircle size={14} />
+                        Esta licencia es de 90 días de corrido (calendario).
+                      </p>
+                      <div className="field">
+                        <label className="block text-xs font-semibold text-gray-500 mb-1">Fecha de Inicio</label>
+                        <Calendar
+                          value={startDate}
+                          onChange={(e) => setStartDate(e.value as Date)}
+                          inline
+                          locale="es"
+                          className="w-full"
+                        />
+                      </div>
+                      {endDate && (
+                        <div className="p-3 bg-cyan-50 border border-cyan-100 rounded-xl">
+                          <p className="text-xs font-semibold text-cyan-700">Período Calculado:</p>
+                          <p className="text-sm text-cyan-800 font-bold">
+                            {startDate?.toLocaleDateString()} al {endDate.toLocaleDateString()}
+                          </p>
+                          <p className="text-[10px] text-cyan-600 mt-1">90 días calendario automáticos.</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <DateRangePicker onDateChange={handleDateChange} maxDays={maxDaysAvailable} />
+                  )}
+                </Section>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-gray-700">Observaciones / Motivo</label>
+              <InputText
+                value={observaciones}
+                onChange={(e) => setObservaciones(e.target.value)}
+                placeholder="Ej: Licencia por LAR médica según certificado..."
+                className="w-full p-inputtext-sm"
+              />
+            </div>
+          </div>
+        </Dialog>
+
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <table className="min-w-full divide-y divide-gray-300">
@@ -439,10 +727,10 @@ export const LicenseHistoryTab = ({ licenses, onRowClick }: LicenseHistoryTabPro
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <span
                         className={`px-2 py-1 text-xs font-semibold rounded-full ${lic.status === "Aprobada"
-                            ? "bg-green-100 text-green-800"
-                            : lic.status === "Rechazada"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-gray-100 text-gray-800"
+                          ? "bg-green-100 text-green-800"
+                          : lic.status === "Rechazada"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-gray-100 text-gray-800"
                           }`}
                       >
                         {lic.status}
@@ -549,3 +837,4 @@ export const PermissionHistoryTab = ({ permisos }: { permisos: Permit[] }) => (
     </div>
   </div>
 );
+

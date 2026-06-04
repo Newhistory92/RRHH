@@ -134,7 +134,7 @@ export default function TestPage(){
                   Total Profesiones
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {professions.length}
+                  {Object.keys(professions).length}
                 </p>
               </div>
               <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">

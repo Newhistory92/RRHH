@@ -80,7 +80,7 @@ const Section = ({ title, icon, children }: { title: string; icon?: React.ReactN
 
 export default function ConteinerLicencia({ userData, saldos, misSolicitudes, solicitudesPendientes, onNewRequest, onManageRequest, supervisores }: Props) {
   const [selectedRequest, setSelectedRequest] = useState<LicenseHistory | null>(null);
-
+  console.log("saldos", saldos);
   const pendientes = useMemo<SolicitudParsed[]>(() =>
     solicitudesPendientes.map(s => ({ ...s, desde: new Date(s.startDate), hasta: new Date(s.endDate) })),
     [solicitudesPendientes],
@@ -178,8 +178,8 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
         </div>
       </div>
 
-      {/* ── Pendientes de aprobación (solo supervisor) ── */}
-      {userData.role === 'supervisor' && pendientes.length > 0 && (
+      {/* ── Pendientes de aprobación (solo para superiores asignados dinámicamente) ── */}
+      {pendientes.length > 0 && (
         <Section title="Pendientes de Mi Aprobación" icon={<Clock size={15} className="text-amber-500" />}>
           <div className="space-y-2">
             {pendientes.map(s => (

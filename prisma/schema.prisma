@@ -22,7 +22,7 @@ model Role {
 }
 
 model User {
-  id          Int            @id @default(autoincrement())
+  id          String         @id @default(uuid())
   usuario    String       @unique
   email       String         @unique
   password    String
@@ -51,7 +51,7 @@ model Employee {
   phone                 String?
   photo                 String? @db.Text
   status                String   @default("Activo")  // Activo, Licencia, etc.
-  productivityScore     Int?      // Puntuación de productividad general
+  productivityScore     Float?      // Puntuación de productividad general
   horas                 Float?
   departmentId          Int ?
   department            Department? @relation("DepartmentEmployees", fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -93,6 +93,8 @@ model Employee {
   areaChangeRequests    AreaChangeRequest[]
   feedbackGiven         FeedbackEvaluacion[] @relation("evaluatorFeedback")
   feedbackReceived      FeedbackEvaluacion[] @relation("evaluatedFeedback")
+  jornadaId Int?
+  jornada JornadaLaboral?  @relation(fields: [jornadaId], references: [id])
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
@@ -221,7 +223,7 @@ model EmployeeSoftSkill {
 
 model Skill {
   id            Int          @id @default(autoincrement())
-  nombre        String       @unique
+  nombre        String
   level         Int  
   departmentId           Int
   officeId               Int?
@@ -330,7 +332,7 @@ model License {
 model LicenseSupervisor {
   id          Int      @id @default(autoincrement())
   licenseId   Int
-  userId      Int
+  userId      String
   license     License  @relation(fields: [licenseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user        User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate:NoAction)
   createdAt   DateTime @default(now())
@@ -391,7 +393,7 @@ model Notification {
   id        Int      @id @default(autoincrement())
   text      String
   status    String   // license_approval, system_alert, etc.
-  userId    Int?
+  userId    String?
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -413,10 +415,12 @@ model AcademicRecord {
   endDate     DateTime?
   activo                Boolean   @default(true)
   attachment  String?   @db.Text
+  isVerified  Boolean   @default(false)
   employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeeId  Int
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  testAttempts TestAttempt[]
 
   @@index([employeeId])
   @@index([profession])
@@ -629,8 +633,9 @@ model CriticalEvents {
 model TestAttempt {
   id               Int            @id @default(autoincrement())
   employeeId       Int
-  technicalSkillId Int
-  /// Resultado estandarizado: "Malo" | "Bueno" | "Excelente"
+  technicalSkillId Int?
+  academicRecordId Int?
+  /// Resultado estandarizado: "Malo" | "Bueno" | "Excelente" o "Aprobado" | "Reprobado"
   score            String
   /// Porcentaje de respuestas correctas (0-100)
   correctPct       Float
@@ -639,11 +644,14 @@ model TestAttempt {
   takenAt          DateTime       @default(now())
 
   employee         Employee       @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  technicalSkill   TechnicalSkill @relation(fields: [technicalSkillId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  technicalSkill   TechnicalSkill? @relation(fields: [technicalSkillId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  academicRecord   AcademicRecord? @relation(fields: [academicRecordId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([employeeId, technicalSkillId, takenAt])
+  @@index([employeeId, academicRecordId, takenAt])
   @@index([employeeId])
   @@index([technicalSkillId])
+  @@index([academicRecordId])
   @@index([takenAt])
 }
 
@@ -705,4 +713,12 @@ model TokenBlacklist {
 
   @@index([token], map: "IX_TokenBlacklist_token")
   @@index([expires_at], map: "IX_TokenBlacklist_expires_at")
+}
+
+model JornadaLaboral {
+  id          Int      @id @default(autoincrement())
+  nombre      String   @unique
+  horasDia    Float
+
+  employees Employee[]
 }

@@ -30,6 +30,11 @@ export default function RecursosHumanosPage() {
   const [selectedLicense, setSelectedLicense] = useState<LicenseHistory | null>(null);
 
 useEffect(() => {
+  fetchEmployeeData().finally(() => setIsLoading(false));
+}, []);
+
+
+  // ── Función reutilizable para cargar datos de RRHH ──
   const fetchEmployeeData = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -39,61 +44,63 @@ useEffect(() => {
       if (!response.ok) {
         console.error('Error al obtener datos del empleado:', response.statusText);
         setEmployees([]);
-        setIsLoading(false);
         return;
       }
       const data = await response.json();
-      console.log("Fetched employee data:", data);
-
-      // Tomamos el array dentro de `data.employees`
       setEmployees(Array.isArray(data.employees) ? data.employees : []);
     } catch (error) {
       console.error('Error en la petición:', error);
       setEmployees([]);
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  fetchEmployeeData();
-}, []);
+  const handleApplyLicense = async (employeeId: number, message: Message) => {
+    console.log("Payload enviado a /licenses/aplicar:", { employeeId, message });
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://127.0.0.1:8000/licenses/aplicar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          employeeId,
+          messageId: message.id,
+          type: "Vacaciones",
+          startDate: message.startDate,
+          endDate: message.endDate,
+          days: message.days,
+          observacion: message.text
+        })
+      });
 
+      const result = await response.json();
+      console.log("Response from Server:", result);
 
-  const handleApplyLicense = (employeeId: number, message: Message) => {
-    setEmployees((prev) =>
-      prev.map((emp) => {
-        if (emp.id === employeeId) {
-          const newLicense = {
-            id: `L${Date.now()}`,
-            tipo: "Vacaciones",
-            inicio: message.startDate,
-            fin: message.endDate,
-            estado: "Aprobada",
-            duracion: message.days,
-            mensajeOriginal: message.text,
-            diasSolicitados: message.days,
-            fechasSolicitadas: `del ${message.startDate} al ${message.endDate}`,
-          };
-          return {
-            ...emp,
-            status: "De licencia" as EmployeeStatus,
-            licencias: [...emp.licenses.aprobaciones, newLicense],
-            mensajes: emp.messages.filter((m) => m.id !== message.id),
-          };
-        }
-        return emp;
-      })
-    );
-    setArchivedMessages((prev: ArchivedMessage[]) => [
-      ...prev,
-      {
-        ...message,
-        employeeId,
-        processedDate: new Date().toLocaleDateString("es-AR"),
-        employeeName: employees.find(e => e.id === employeeId)?.name || "",
-      },
-    ]);
-    alert("Licencia aplicada correctamente.");
+      if (!response.ok) {
+        alert(`Error al aplicar licencia: ${result.detail || 'Error desconocido'}`);
+        return;
+      }
+
+      // Archivar el mensaje en el historial local
+      setArchivedMessages((prev: ArchivedMessage[]) => [
+        ...prev,
+        {
+          ...message,
+          employeeId,
+          processedDate: new Date().toLocaleDateString("es-AR"),
+          employeeName: employees.find(e => e.id === employeeId)?.name || "",
+        },
+      ]);
+
+      // Re-fetchear datos reales del servidor para sincronizar la UI
+      await fetchEmployeeData();
+      alert("Licencia aplicada correctamente.");
+    } catch (error) {
+      console.error("Error al aplicar licencia:", error);
+      alert("Error de red al aplicar la licencia.");
+    }
   };
 
 

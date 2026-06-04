@@ -1,22 +1,22 @@
 "use client"
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Settings, 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  X, 
-  Check, 
-  AlertCircle,
-  Loader2,
-  Search,
-  ChevronDown,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown
+import {
+    Settings,
+    Plus,
+    Edit2,
+    Trash2,
+    X,
+    Check,
+    AlertCircle,
+    Loader2,
+    Search,
+    ChevronDown,
+    ArrowUpDown,
+    ArrowUp,
+    ArrowDown
 } from 'lucide-react';
 import { apiClient } from '@/app/util/apiClient';
-
+import { EmploymentStatus } from '@/app/Interfas/Interfaces';
 interface ConfiguracionLicencia {
     id: number;
     anio: number;
@@ -28,10 +28,10 @@ interface ConfiguracionLicencia {
 }
 
 const CONTRATOS = [
-    "Planta permanente",
-    "Contratado",
-    "Comisionado",
-    "Auditor médico"
+    { label: 'Planta Permanente', value: 'permanente' as EmploymentStatus },
+    { label: 'Contratado', value: 'contratado' as EmploymentStatus },
+    { label: 'Comisionado', value: 'comisionado' as EmploymentStatus },
+    { label: 'Auditor Medico', value: 'auditor_medico' as EmploymentStatus }
 ];
 
 const TIPOS_LICENCIA = [
@@ -65,7 +65,7 @@ export default function ConfiguracionLicencias() {
     const [configuraciones, setConfiguraciones] = useState<ConfiguracionLicencia[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
-    
+
     const [sortField, setSortField] = useState<SortField>('anio');
     const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
@@ -73,12 +73,13 @@ export default function ConfiguracionLicencias() {
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState<Partial<ConfiguracionLicencia>>({
         anio: new Date().getFullYear(),
-        tipo: "Planta permanente",
-        categoria: "Vacaciones",
-        diasTotales: 14
+        tipo: "",
+        categoria: "",
+        diasTotales: 0
     });
 
-    const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
+
+    const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
     const showToast = (message: string, type: 'success' | 'error') => {
         setNotification({ message, type });
@@ -139,7 +140,7 @@ export default function ConfiguracionLicencias() {
     };
 
     const sortedData = useMemo(() => {
-        const filtered = configuraciones.filter(c => 
+        const filtered = configuraciones.filter(c =>
             c.categoria.toLowerCase().includes(searchTerm.toLowerCase()) ||
             c.tipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
             c.anio.toString().includes(searchTerm)
@@ -150,13 +151,13 @@ export default function ConfiguracionLicencias() {
             const valB = b[sortField];
 
             if (typeof valA === 'string' && typeof valB === 'string') {
-                return sortOrder === 'asc' 
-                    ? valA.localeCompare(valB) 
+                return sortOrder === 'asc'
+                    ? valA.localeCompare(valB)
                     : valB.localeCompare(valA);
             }
-            
-            return sortOrder === 'asc' 
-                ? (valA as number) - (valB as number) 
+
+            return sortOrder === 'asc'
+                ? (valA as number) - (valB as number)
                 : (valB as number) - (valA as number);
         });
     }, [configuraciones, searchTerm, sortField, sortOrder]);
@@ -186,9 +187,8 @@ export default function ConfiguracionLicencias() {
     return (
         <div className="min-h-screen bg-gray-100 p-6 font-sans antialiased text-gray-900">
             {notification && (
-                <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-xl border animate-in fade-in slide-in-from-top-4 duration-300 ${
-                    notification.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'
-                }`}>
+                <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-xl border animate-in fade-in slide-in-from-top-4 duration-300 ${notification.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'
+                    }`}>
                     {notification.type === 'success' ? <Check size={18} /> : <AlertCircle size={18} />}
                     <span className="font-medium text-sm">{notification.message}</span>
                 </div>
@@ -208,15 +208,15 @@ export default function ConfiguracionLicencias() {
                 <div className="flex items-center gap-3">
                     <div className="relative group">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
-                        <input 
-                            type="text" 
-                            placeholder="Buscar regla..." 
+                        <input
+                            type="text"
+                            placeholder="Buscar regla..."
                             className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all w-full md:w-64 shadow-sm"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <button 
+                    <button
                         onClick={openCreate}
                         className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-indigo-100 active:scale-95"
                     >
@@ -257,13 +257,12 @@ export default function ConfiguracionLicencias() {
                                     <tr key={config.id} className="hover:bg-gray-50/80 transition-colors group">
                                         <td className="px-6 py-4 text-gray-500 font-medium">{config.anio}</td>
                                         <td className="px-6 py-4">
-                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                                                config.tipo === 'Contratado' ? 'bg-blue-50 text-blue-700' :
-                                                config.tipo === 'Comisionado' ? 'bg-amber-50 text-amber-700' :
-                                                config.tipo === 'Auditor médico' ? 'bg-emerald-50 text-emerald-700' :
-                                                'bg-indigo-50 text-indigo-700'
-                                            }`}>
-                                                {config.tipo}
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${config.tipo === 'contratado' ? 'bg-blue-50 text-blue-700' :
+                                                config.tipo === 'comisionado' ? 'bg-amber-50 text-amber-700' :
+                                                    config.tipo === 'auditor_medico' ? 'bg-emerald-50 text-emerald-700' :
+                                                        'bg-indigo-50 text-indigo-700'
+                                                }`}>
+                                                {CONTRATOS.find((c) => c.value === config.tipo)?.label || config.tipo}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 font-semibold text-gray-700">{config.categoria}</td>
@@ -274,14 +273,14 @@ export default function ConfiguracionLicencias() {
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button 
+                                                <button
                                                     onClick={() => openEdit(config)}
                                                     className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
                                                     title="Editar"
                                                 >
                                                     <Edit2 size={18} />
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={() => handleDelete(config.id)}
                                                     className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                                                     title="Eliminar"
@@ -308,7 +307,7 @@ export default function ConfiguracionLicencias() {
             {showModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowModal(false)} />
-                    
+
                     <div className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
                             <div>
@@ -324,7 +323,7 @@ export default function ConfiguracionLicencias() {
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="block text-sm font-bold text-gray-700 ml-1">Año Fiscal</label>
-                                    <input 
+                                    <input
                                         type="number"
                                         required
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none"
@@ -334,13 +333,13 @@ export default function ConfiguracionLicencias() {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="block text-sm font-bold text-gray-700 ml-1">Días Totales</label>
-                                    <input 
+                                    <input
                                         type="number"
                                         required
-                                        min="1"
+                                        min="0"
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none"
-                                        value={formData.diasTotales}
-                                        onChange={(e) => setFormData({ ...formData, diasTotales: parseInt(e.target.value) })}
+                                        value={formData.diasTotales === undefined ? '' : formData.diasTotales}
+                                        onChange={(e) => setFormData({ ...formData, diasTotales: e.target.value ? parseInt(e.target.value) : 0 })}
                                     />
                                 </div>
                             </div>
@@ -348,13 +347,20 @@ export default function ConfiguracionLicencias() {
                             <div className="space-y-2">
                                 <label className="block text-sm font-bold text-gray-700 ml-1">Tipo de Contrato</label>
                                 <div className="relative group">
-                                    <select 
+                                    <select
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none appearance-none cursor-pointer"
                                         value={formData.tipo}
-                                        onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, tipo: e.target.value as EmploymentStatus })
+                                        }
                                         required
                                     >
-                                        {CONTRATOS.map(c => <option key={c} value={c}>{c}</option>)}
+                                        <option value="">Seleccionar tipo</option>
+                                        {CONTRATOS.map((c) => (
+                                            <option key={c.value} value={c.value}>
+                                                {c.label}
+                                            </option>
+                                        ))}
                                     </select>
                                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-indigo-500" size={18} />
                                 </div>
@@ -363,7 +369,7 @@ export default function ConfiguracionLicencias() {
                             <div className="space-y-2">
                                 <label className="block text-sm font-bold text-gray-700 ml-1">Nombre de la Licencia</label>
                                 <div className="relative group">
-                                    <input 
+                                    <input
                                         list="license-types"
                                         required
                                         placeholder="Ej: Particular, LAR..."
@@ -378,14 +384,14 @@ export default function ConfiguracionLicencias() {
                             </div>
 
                             <div className="pt-4 flex items-center gap-3">
-                                <button 
+                                <button
                                     type="button"
                                     onClick={() => setShowModal(false)}
                                     className="flex-1 py-3 text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-2xl transition-all"
                                 >
                                     Cancelar
                                 </button>
-                                <button 
+                                <button
                                     type="submit"
                                     className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-sm shadow-xl shadow-indigo-100 transition-all active:scale-95"
                                 >

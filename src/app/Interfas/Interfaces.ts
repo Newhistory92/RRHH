@@ -41,10 +41,10 @@ export interface Filters {
 }
 
 export interface SortConfig {
-  key: keyof Employee | 'productivityScore' | 'completedTasks' | 'efficiency';
+  key: keyof Employee | 'productivityScore' | 'productivityAvg' | 'licensesCount' | 'complaintsCount' | 'timeBalance' | 'teamFeedback' | 'completedTasks' | 'efficiency';
   direction: 'ascending' | 'descending';
 }
-export type SortableKey = keyof Employee | 'productivityScore' | 'completedTasks' | 'efficiency';
+export type SortableKey = keyof Employee | 'productivityScore' | 'productivityAvg' | 'licensesCount' | 'complaintsCount' | 'timeBalance' | 'teamFeedback' | 'completedTasks' | 'efficiency';
 export type SortDirection = 'ascending' | 'descending';
 
 
@@ -106,7 +106,7 @@ export interface LicenseHistory {
   endDate: string;
   status: LicenseStatus;
   duration: number;
-  originalMessage: string;
+  mensajeOriginal: string;
   createdAt: string
   aprobaciones?: Aprobacion[]
   tiposLicencia: TiposLicencia
@@ -185,7 +185,7 @@ export interface LicenseRequestPayload {
   endDate: string;
   duration: number;
   tiposLicencia: TiposLicencia;
-  originalMessage: string;
+  mensajeOriginal: string;
   status: LicenseStatus;
 }
 
@@ -231,12 +231,24 @@ export interface SoftSkill {
 }
 
 
-// Technical skills
 export interface TechnicalSkill {
   id: number;
   nombre: string;
-  level: number;
-  SkillStatus?: SkillStatus;
+  description?: string;
+  testType?: string;
+  profession?: string;
+  activo?: boolean;
+}
+
+export interface EmployeeTechnicalSkill {
+  id: number;
+  employeeId: number;
+  technicalSkillId: number;
+  level: string | null;
+  certified: boolean;
+  technicalSkill?: TechnicalSkill;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface certifications {
@@ -367,7 +379,7 @@ export interface Employee {
   softSkills: SoftSkill[];
   skillStatus?: SkillStatus[];
   softSkillsArray?: number[];
-  technicalSkills: TechnicalSkill[];
+  technicalSkills: EmployeeTechnicalSkill[];
   notificaciones: Notification[];
   performanceReviews: performanceReviews[];
   satisfactionMetrics: satisfactionMetrics;
@@ -630,6 +642,7 @@ export interface Skill {
   status: 'validated' | 'pending' | 'locked';
   level: number;
   unlockDate: string | null;
+  isVirtual?: boolean;
 }
 
 export interface SkillStatus {
@@ -738,4 +751,178 @@ export interface BaseMetrics {
   recommendations: string[];
   keyInsights: string[];
   riskFactors: string[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MÓDULO DE ANÁLISIS ORGANIZACIONAL CON IA
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface OrgAnalysisEmployee {
+  id: number;
+  name: string;
+  dni: string;
+  status: string;
+  productivityScore: number;
+  departmentId: number;
+  departmentName: string;
+  officeId: number | null;
+  officeName: string | null;
+  managerId: number | null;
+  position: string | null;
+  tipoContrato: string | null;
+  fechaIngreso: string | null;
+  categoria: string | null;
+  softSkills: { nombre: string; level: number | null }[];
+  technicalSkills: { nombre: string; level: string | null }[];
+  licenses: Record<string, number>;
+  absences: Record<string, number>;
+  satisfactionMetrics: {
+    overallSatisfaction: number;
+    jobSatisfaction: number;
+    teamSatisfaction: number;
+    leadershipSatisfaction: number;
+    careerGrowthSatisfaction: number;
+  };
+}
+
+export interface OrgAnalysisDepartment {
+  id: number;
+  nombre: string;
+  description: string | null;
+  jefeId: number | null;
+  nivelJerarquico: number | null;
+  parentId: number | null;
+  habilidades_requeridas: { nombre: string; level: number }[];
+  offices: {
+    id: number;
+    nombre: string;
+    jefeId: number | null;
+    habilidades_requeridas: { nombre: string; level: number }[];
+  }[];
+}
+
+export interface OrgAnalysisData {
+  employees: OrgAnalysisEmployee[];
+  departments: OrgAnalysisDepartment[];
+}
+
+export interface RiskHeatMapEntry {
+  department: string;
+  riskLevel: 'Alto' | 'Medio' | 'Bajo';
+  mainRisk: string;
+  employeeCount: number;
+}
+
+export interface RelocationProposal {
+  employeeName: string;
+  employeeId: number;
+  currentDept: string;
+  suggestedDept: string;
+  reason: string;
+  benefit: string;
+}
+
+export interface SkillGapEntry {
+  department: string;
+  missingSkill: string;
+  requiredLevel: number;
+  riskDescription: string;
+}
+
+export interface SPOFEntry {
+  department: string;
+  criticalSkill: string;
+  soleHolder: string;
+  risk: string;
+}
+
+export interface OrgAnalysisReport {
+  executiveSummary: string;
+  riskHeatMap: RiskHeatMapEntry[];
+  relocationProposals: RelocationProposal[];
+  actionPlan: string[];
+  skillGaps: SkillGapEntry[];
+  singlePointsOfFailure: SPOFEntry[];
+  analysisDate: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MÓDULO ESTADÍSTICAS — shapes planos usados por ComponenteEstadistica
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Versión aplanada del empleado usada exclusivamente por el Panel Estadístico.
+ * `department` y `office` son strings (nombres), no objetos, para que los
+ * componentes de gráficos los puedan usar directamente como claves.
+ */
+export interface StatsEmployee {
+  id: number;
+  userId: string;
+  name: string;
+  dni: string;
+  email: string;
+  photo: string;
+  status: EmployeeStatus;
+  hours: number;
+  // Condición laboral aplanada
+  position: string;
+  category: string;
+  activityType: string;
+  employmentStatus: string;
+  startDate: string;
+  // Org
+  departmentId: number;
+  department: string;       // nombre del departamento
+  officeId: number | null;
+  office: string;           // nombre de la oficina
+  managerId: number | null;
+  role: EmployeeRole;
+  // Productividad
+  productivityScore: number;
+  productivityAvg: number;
+  overallProductivity: number;
+  monthlyHours: MonthlyHours[];
+  timeBalance: number;
+  tasks: Task[];
+  // Licencias / ausencias
+  licenses: Record<string, number>;   // { '2024': N, '2023': N, ... }
+  licensesCount: number;
+  absences: Record<string, number>;   // { '2024': N, '2023': N, ... }
+  // Feedback
+  complaints: { id: string; reason: string; status: string }[];
+  complaintsCount: number;
+  teamFeedback: number;
+  softSkills: { nombre: string; level: number }[];
+  technicalSkills: EmployeeTechnicalSkill[];
+}
+
+/** Fila agregada que devuelve la query sobre [ObraSocial].[dbo].[UsuarioAcceso] */
+export interface SessionMetrics {
+  usuario: string;
+  mes: number;
+  anio: number;
+  cantidadSesiones: number;
+  duracionTotalMinutos: number;
+  totalEventos: number;
+  primeraSesion: string;
+  ultimaSesion: string;
+}
+
+/** Datos de referencia para los filtros del Ranking de Productividad */
+export interface EstadisticasMetadata {
+  departments: string[];
+  employmentStatuses: string[];
+  activityTypes: string[];
+}
+
+export interface StatsProductivityRankingProps {
+  employees: StatsEmployee[];
+  onSelectEmployee: (employee: StatsEmployee | null) => void;
+  filters: Filters;
+  onFilterChange: (key: keyof Filters, value: string) => void;
+  sortConfig: SortConfig;
+  onSortChange: (sortConfig: SortConfig) => void;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  metadata: EstadisticasMetadata;
 }

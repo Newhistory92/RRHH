@@ -32,6 +32,7 @@ addLocale('es', {
 interface DateRangePickerProps {
   onDateChange: (start: Date | null, end: Date | null, dias: number) => void;
   maxDays?: number;
+  allowPastDates?: boolean;
 }
 
 
@@ -50,7 +51,7 @@ function useIsMobile() {
 
 // ─── Componente ───────────────────────────────────────────────────────────────
 
-export default function DateRangePicker({ onDateChange, maxDays }: DateRangePickerProps) {
+export default function DateRangePicker({ onDateChange, maxDays, allowPastDates }: DateRangePickerProps) {
   const [dates, setDates] = useState<[Date | null, Date | null] | null>(null);
   const [holidayMap, setHolidayMap] = useState<Map<string, PlainHoliday>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -109,7 +110,7 @@ export default function DateRangePicker({ onDateChange, maxDays }: DateRangePick
 
   // ── Límites del calendario ──────────────────────────────────────────────────
   const today = Temporal.Now.plainDateISO();
-  const minDate = toNativeDate(today);
+  const minDate = allowPastDates ? toNativeDate(today.with({ month: 1, day: 1 })) : toNativeDate(today);
   const maxDate = toNativeDate(today.with({ month: 12, day: 31 }));
 
   const exceedsMax = maxDays !== undefined && businessDays > maxDays;

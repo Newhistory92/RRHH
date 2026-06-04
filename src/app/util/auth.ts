@@ -11,7 +11,7 @@ export async function loginUser(username: string, password: string) {
   const res = await fetch("http://127.0.0.1:8000/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ username, password }),
+    body: new URLSearchParams({ username: username, password: password })
   });
 
   if (!res.ok) throw new Error("Login fallido");
@@ -19,7 +19,8 @@ export async function loginUser(username: string, password: string) {
   const data = await res.json();
 
   // Guardar el token en cookie segura (HttpOnly)
-  (await cookies()).set("token", data.access_token, {
+  const cookieStore = await cookies();
+  cookieStore.set("token", data.access_token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 6, // 6 horas
@@ -31,12 +32,13 @@ export async function loginUser(username: string, password: string) {
 
 // Cierre de sesión del lado del SERVIDOR (para Server Actions / API routes)
 export async function logoutUser() {
-  const token = (await cookies()).get("token")?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
   if (token) {
     await fetch("http://127.0.0.1:8000/auth/logout", {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     });
   }
-  (await cookies()).delete("token");
+  cookieStore.delete("token");
 }
