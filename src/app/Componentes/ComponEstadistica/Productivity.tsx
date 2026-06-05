@@ -9,6 +9,17 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Card } from 'primereact/card';
         
+const formatDisplayValue = (text: string | null | undefined): string => {
+  if (!text) return '';
+  const cleaned = text.replace(/_/g, ' ').replace(/[^\w\sáéíóúÁÉÍÓÚñÑ.-]/g, '');
+  return cleaned
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(word => word.length > 0)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
 export const ProductivityRanking = ({ 
   employees, 
   onSelectEmployee, 
@@ -30,9 +41,9 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
       metadata.departments.forEach(dept => {
         if (dept.startsWith('   - ')) {
           const cleanName = dept.replace('   - ', '');
-          options.push({ label: `   • ${cleanName}`, value: cleanName });
+          options.push({ label: `   • ${formatDisplayValue(cleanName)}`, value: cleanName });
         } else {
-          options.push({ label: dept, value: dept });
+          options.push({ label: formatDisplayValue(dept), value: dept });
         }
       });
     }
@@ -45,7 +56,7 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
     const options = [{ label: 'Todas las Actividades', value: 'all' }];
     if (metadata && metadata.activityTypes) {
       metadata.activityTypes.forEach(act => {
-        options.push({ label: act, value: act });
+        options.push({ label: formatDisplayValue(act), value: act });
       });
     }
     return options;
@@ -56,7 +67,7 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
     const options = [{ label: 'Toda Condición Laboral', value: 'all' }];
     if (metadata && metadata.employmentStatuses) {
       metadata.employmentStatuses.forEach(stat => {
-        options.push({ label: stat, value: stat });
+        options.push({ label: formatDisplayValue(stat), value: stat });
       });
     }
     return options;
@@ -66,7 +77,7 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
     return employees
       .filter(e => filters.department === 'all' || e.department === filters.department || (e as any).office === filters.department)
       .filter(e => filters.activityType === 'all' || (e as any).activityType === filters.activityType)
-      .filter(e => filters.employmentStatus === 'all' || (e as any).employmentStatus === filters.employmentStatus)
+      .filter(e => filters.employmentStatus === 'all' || (e as any).tipoContrato === filters.employmentStatus)
   }, [employees, filters]);
 
 
@@ -114,7 +125,7 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
         </div>
         <div>
           <p className="font-semibold text-gray-800 dark:text-gray-200">{employee.name}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 md:hidden">{employee.department}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 md:hidden">{formatDisplayValue((employee as any).department)}</p>
         </div>
       </div>
     );
@@ -213,18 +224,21 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
         <Column 
           field="department" 
           header="Departamento"
+          body={(rowData: Employee) => formatDisplayValue((rowData as any).department)}
           className="hidden md:table-cell"
           headerClassName="hidden md:table-cell"
         />
         <Column 
           field="tipoContrato" 
-          header="Condicion Laboral"
+          header="Condición Laboral"
+          body={(rowData: Employee) => formatDisplayValue((rowData as any).tipoContrato)}
           className="hidden md:table-cell"
           headerClassName="hidden md:table-cell"
         />
         <Column 
           field="categoria" 
           header="Categoría"
+          body={(rowData: Employee) => formatDisplayValue((rowData as any).categoria)}
           className="hidden lg:table-cell"
           headerClassName="hidden lg:table-cell"
         />

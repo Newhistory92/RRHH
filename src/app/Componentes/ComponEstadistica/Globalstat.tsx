@@ -4,78 +4,40 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { BarChart2, Award, Users, Frown, AlertTriangle, Clock } from 'lucide-react';
 import React from 'react';
 import { Card } from 'primereact/card';
-import type { StatsEmployee, EmployeeStatus } from '@/app/Interfas/Interfaces';
+import type { GlobalStatsData } from '@/app/Interfas/Interfaces';
+import { ProgressSpinner } from 'primereact/progressspinner';
 
-interface DepartmentProductivity { total: number; count: number }
-type DeptMap = Record<string, DepartmentProductivity>;
+interface GlobalStatsProps {
+  data: GlobalStatsData | null;
+  isLoading: boolean;
+  error: string | null;
+}
 
-interface GlobalStatsProps { employees: StatsEmployee[] }
+export const GlobalStats: React.FC<GlobalStatsProps> = ({ data, isLoading, error }) => {
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <ProgressSpinner />
+      </div>
+    );
+  }
 
-export const GlobalStats: React.FC<GlobalStatsProps> = ({ employees }) => {
-  const { bestDepartment, lowEfficiencyActivities, avgAbsences, avgLateness, statusDistribution } =
-    React.useMemo(() => {
-      if (employees.length === 0) {
-        return { bestDepartment: { name: 'N/A', avg: '0' }, lowEfficiencyActivities: [], avgAbsences: '0', avgLateness: '0', statusDistribution: [] };
-      }
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-64 text-red-500">
+        <AlertTriangle className="h-8 w-8 mr-2" />
+        <span>Error al cargar las estadísticas globales: {error}</span>
+      </div>
+    );
+  }
 
-      // Mejor departamento
-      const deptProd = employees.reduce<DeptMap>((acc, e) => {
-        acc[e.department] = acc[e.department] || { total: 0, count: 0 };
-        acc[e.department].total += e.productivityScore;
-        acc[e.department].count++;
-        return acc;
-      }, {});
+  if (!data) {
+    return null;
+  }
 
-      const bestDeptName = Object.keys(deptProd).reduce((a, b) =>
-        (deptProd[a].total / deptProd[a].count) > (deptProd[b].total / deptProd[b].count) ? a : b,
-      );
-
-      // Actividades con baja eficiencia
-      const actProd = employees.reduce<DeptMap>((acc, e) => {
-        acc[e.activityType] = acc[e.activityType] || { total: 0, count: 0 };
-        acc[e.activityType].total += e.productivityScore;
-        acc[e.activityType].count++;
-        return acc;
-      }, {});
-      const lowActivities = Object.entries(actProd)
-        .map(([name, data]) => ({ name, avg: data.total / data.count }))
-        .filter(item => item.avg < 7.5);
-
-      // Promedio de ausencias (año actual)
-      const currentYear = String(new Date().getFullYear());
-      const totalAbsences = employees.reduce((sum, e) => sum + (e.absences[currentYear] ?? 0), 0);
-
-      // Tardanzas: meses con hours negativos en monthlyHours
-      const totalLateness = employees.reduce(
-        (sum, e) => sum + e.monthlyHours.filter(m => m.hours < 0).length * 2, 0,
-      );
-
-      // Distribución por estado
-      const statusDist = employees.reduce<Record<string, number>>((acc, e) => {
-        acc[e.status] = (acc[e.status] || 0) + 1;
-        return acc;
-      }, {});
-
-      return {
-        bestDepartment: { name: bestDeptName, avg: (deptProd[bestDeptName].total / deptProd[bestDeptName].count).toFixed(1) },
-        lowEfficiencyActivities: lowActivities,
-        avgAbsences: (totalAbsences / employees.length).toFixed(1),
-        avgLateness: (totalLateness / employees.length).toFixed(1),
-        statusDistribution: Object.entries(statusDist).map(([name, value]) => ({ name, value })),
-      };
-    }, [employees]);
-
+  const { bestDepartment, lowEfficiencyActivities, avgAbsences, avgLateness, statusDistribution, departmentProductivity } = data;
   const PIE_COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
-
-  const departmentProductivityData = React.useMemo(() => {
-    const deptProd = employees.reduce<DeptMap>((acc, e) => {
-      acc[e.department] = acc[e.department] || { total: 0, count: 0 };
-      acc[e.department].total += e.productivityScore;
-      acc[e.department].count++;
-      return acc;
-    }, {});
-    return Object.entries(deptProd).map(([name, data]) => ({ name, productividad: data.total / data.count }));
-  }, [employees]);
+  const departmentProductivityData = departmentProductivity;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

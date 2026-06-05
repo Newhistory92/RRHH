@@ -7,6 +7,7 @@ import { Test,TestsByProfession, SoftSkill } from "@/app/Interfas/Interfaces";
 
 type ActiveTab = "technical" | "soft-skills";
 
+
 export default function TestPage(){
   // Tab State
   const [activeTab, setActiveTab] = useState<ActiveTab>("technical");

@@ -922,7 +922,15 @@ export interface StatsProductivityRankingProps {
   onFilterChange: (key: keyof Filters, value: string) => void;
   sortConfig: SortConfig;
   onSortChange: (sortConfig: SortConfig) => void;
-  currentPage: number;
   onPageChange: (page: number) => void;
   metadata: EstadisticasMetadata;
+}
+
+export interface GlobalStatsData {
+  bestDepartment: { name: string; avg: number };
+  lowEfficiencyActivities: { name: string; avg: number }[];
+  avgAbsences: number;
+  avgLateness: number;
+  statusDistribution: { name: string; value: number }[];
+  departmentProductivity: { name: string; productividad: number }[];
 }

@@ -16,6 +16,17 @@ interface CreateTestModalProps {
   profession: string;
 }
 
+const generateId = (): string => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
+};
+
+
 export const CreateTestModal: React.FC<CreateTestModalProps> = ({
   isOpen,
   onClose,
@@ -27,11 +38,11 @@ export const CreateTestModal: React.FC<CreateTestModalProps> = ({
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState<Question[]>([
     {
-      id: crypto.randomUUID(),
+      id: generateId(),
       text: "",
       answers: [
-        { id: crypto.randomUUID(), text: "", isCorrect: false },
-        { id: crypto.randomUUID(), text: "", isCorrect: false },
+        { id: generateId(), text: "", isCorrect: false },
+        { id: generateId(), text: "", isCorrect: false },
       ],
     },
   ]);
@@ -48,11 +59,11 @@ console.log(  questions)
       setDescription("");
       setQuestions([
         {
-          id: crypto.randomUUID(),
+          id: generateId(),
           text: "",
           answers: [
-            { id: crypto.randomUUID(), text: "", isCorrect: false },
-            { id: crypto.randomUUID(), text: "", isCorrect: false },
+            { id: generateId(), text: "", isCorrect: false },
+            { id: generateId(), text: "", isCorrect: false },
           ],
         },
       ]);
@@ -86,7 +97,7 @@ console.log(  questions)
   const addAnswer = (qIndex: number) => {
     const newQuestions = [...questions];
     newQuestions[qIndex].answers.push({
-      id: crypto.randomUUID(),
+      id: generateId(),
       text: "",
       isCorrect: false,
     });
@@ -108,11 +119,11 @@ console.log(  questions)
       setQuestions([
         ...questions,
         {
-          id: crypto.randomUUID(),
+          id: generateId(),
           text: "",
           answers: [
-            { id: crypto.randomUUID(), text: "", isCorrect: false },
-            { id: crypto.randomUUID(), text: "", isCorrect: false },
+            { id: generateId(), text: "", isCorrect: false },
+            { id: generateId(), text: "", isCorrect: false },
           ],
         },
       ]);
@@ -173,7 +184,7 @@ console.log(  questions)
       }
 
       newTest = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         name,
         description,
         type: "multiple-choice",
@@ -187,7 +198,7 @@ console.log(  questions)
       }
 
       newTest = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         name,
         description,
         type: "case-study",

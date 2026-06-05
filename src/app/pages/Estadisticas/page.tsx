@@ -21,6 +21,7 @@ import type {
   EstadisticasMetadata,
   Filters,
   SortConfig,
+  GlobalStatsData,
 } from '@/app/Interfas/Interfaces';
 
 const ANTI_SPAM_MS = 3_000;
@@ -34,6 +35,7 @@ export default function EstadisticasPage() {
 
   const [employees, setEmployees]         = React.useState<StatsEmployee[]>([]);
   const [metadata, setMetadata]           = React.useState<EstadisticasMetadata>({ departments: [], employmentStatuses: [], activityTypes: [] });
+  const [globalStats, setGlobalStats]     = React.useState<GlobalStatsData | null>(null);
   const [isLoading, setIsLoading]         = React.useState(true);
   const [error, setError]                 = React.useState<string | null>(null);
 
@@ -50,22 +52,27 @@ export default function EstadisticasPage() {
       const token = localStorage.getItem('token');
       const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
 
-      const [dashboardRes, metaRes] = await Promise.all([
+      const [dashboardRes, metaRes, globalRes] = await Promise.all([
         fetch('http://127.0.0.1:8000/stats/dashboard', { headers }),
         fetch('http://127.0.0.1:8000/stats/metadata', { headers }),
+        fetch('http://127.0.0.1:8000/stats/global-stats', { headers }),
       ]);
 
       if (!dashboardRes.ok) throw new Error(`Dashboard API: ${dashboardRes.status}`);
       if (!metaRes.ok)      throw new Error(`Metadata API: ${metaRes.status}`);
+      if (!globalRes.ok)    throw new Error(`Global Stats API: ${globalRes.status}`);
 
       const dashboardJson = await dashboardRes.json() as { success: boolean; data: StatsEmployee[]; error?: string };
       const metaJson      = await metaRes.json()      as { success: boolean; data: EstadisticasMetadata; error?: string };
+      const globalJson    = await globalRes.json()    as { success: boolean; data: GlobalStatsData; error?: string };
 
       if (!dashboardJson.success) throw new Error(dashboardJson.error ?? 'Error al cargar el dashboard');
       if (!metaJson.success)      throw new Error(metaJson.error ?? 'Error al cargar metadata');
+      if (!globalJson.success)    throw new Error(globalJson.error ?? 'Error al cargar global stats');
 
       setEmployees(dashboardJson.data);
       setMetadata(metaJson.data);
+      setGlobalStats(globalJson.data);
 
       lastFetchTs.current = Date.now();
     } catch (err) {
@@ -161,7 +168,7 @@ export default function EstadisticasPage() {
               metadata={metadata}
             />
           ) : (
-            <GlobalStats employees={employees} />
+            <GlobalStats data={globalStats} isLoading={isLoading} error={error} />
           )}
         </main>
 

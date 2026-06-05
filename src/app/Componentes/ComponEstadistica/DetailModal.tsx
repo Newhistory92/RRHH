@@ -54,8 +54,6 @@ export const EmployeeDetailModal: React.FC<{
 
         const data = await response.json();
 
-        console.log("✅ Empleado remoto:", data);
-
         setRemoteEmployee(data);
 
       } catch {
@@ -76,7 +74,6 @@ export const EmployeeDetailModal: React.FC<{
   }, [employee]);
 
   if (!employee) {
-    console.log("⛔ RETURN NULL");
     return null;
   }
 
