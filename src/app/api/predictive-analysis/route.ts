@@ -5,9 +5,9 @@ import { PredictiveAnalysisSchema } from "@/app/lib/schemasPredictive";
 import { DepartmentAnalyzer } from "@/app/lib/department-analyzer";
 import { ExecutiveSummaryGenerator } from "@/app/lib/executive-summary-generator";
 import { groupEmployeesByDepartment } from "@/app/lib/data-grouping";
-import { INTEGRATED_ORG_DATA } from "@/app/api/prueba2";
 import { Tool } from "ai";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
 
 export async function POST(request: NextRequest) {
   let mcpClient = null;
@@ -18,9 +18,29 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log("Datos recibidos para análisis:", body);
     const validatedData = PredictiveAnalysisSchema.parse(body);
-    const { employees, analysisType, timeframe } = validatedData;
+    const { analysisType, timeframe } = validatedData;
 
-    console.log(`Analizando ${employees.length} empleados`);
+    // ── Obtener token del header (forward desde el cliente) ──────────────
+    const authHeader = request.headers.get("authorization") || "";
+
+    // ── Obtener datos reales del backend ─────────────────────────────────
+    const backendResponse = await fetch(`${BACKEND_URL}/rrhh/org-analysis-data`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": authHeader,
+      },
+    });
+
+    if (!backendResponse.ok) {
+      const errorBody = await backendResponse.text();
+      console.error("❌ Error obteniendo datos del backend:", errorBody);
+      throw new Error(`Backend respondió con status ${backendResponse.status}`);
+    }
+
+    const { employees, departments } = await backendResponse.json();
+    console.log(`📊 Datos reales recibidos: ${employees.length} empleados, ${departments.length} departamentos`);
+
     console.log(`Tipo de análisis: ${analysisType}, Marco temporal: ${timeframe}`);
 
     // Crear cliente MCP
@@ -37,8 +57,8 @@ export async function POST(request: NextRequest) {
     // Agrupar empleados por departamento
     const departmentGroups = groupEmployeesByDepartment(employees);
 
-    // Analizar cada departamento
-    const analyzer = new DepartmentAnalyzer(mcpTools  , INTEGRATED_ORG_DATA);
+    // Analizar cada departamento con datos reales del backend
+    const analyzer = new DepartmentAnalyzer(mcpTools, departments);
     const departmentAnalyses = await analyzer.analyzeAll(
       departmentGroups,
       analysisType,
@@ -91,4 +111,4 @@ export async function POST(request: NextRequest) {
       }
     }
   }
-}
+}

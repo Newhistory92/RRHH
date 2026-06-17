@@ -1,15 +1,15 @@
 import React from 'react';
-import { SOFT_SKILLS_CATALOG } from '@/app/api/prueba2';
 import {SoftSkill} from "@/app/Interfas/Interfaces"
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
 export interface CvFormacionProps {
   data: SoftSkill[];
-   selectedSkills: number[];
+  selectedSkills: number[];
+  softSkillsCatalog: { id: number; nombre: string; descripcion: string }[];
   updateData: (updates: SoftSkill[], selectedSkills: number[]) => void;
   isEditing: boolean;
 }
-export default function HabilidadesBlandas({ data, selectedSkills, updateData, isEditing }: CvFormacionProps) {
+export default function HabilidadesBlandas({ data, selectedSkills, softSkillsCatalog, updateData, isEditing }: CvFormacionProps) {
   const handleSoftSkillChange = (skillId:number) => {
     if (!isEditing) return;
     
@@ -25,7 +25,7 @@ export default function HabilidadesBlandas({ data, selectedSkills, updateData, i
     <Accordion activeIndex={0}>
      <AccordionTab header="6. Habilidades Blandas">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {SOFT_SKILLS_CATALOG.map((skill) => (
+        {softSkillsCatalog.map((skill) => (
           <label
             key={skill.id}
             className={`flex items-start p-3 border rounded-lg ${

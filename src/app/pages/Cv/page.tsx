@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FileText, Edit, Save } from 'lucide-react';
 import { SectionTitle } from '@/app/util/UiCv';
-import { EMPLOYEES_DATA, SOFT_SKILLS_CATALOG } from '@/app/api/prueba2';
+import { apiClient } from '@/app/util/apiClient';
 import DatosPersonales from '@/app/Componentes/CvComponente/DatosPersonales';
 import FormacionAcademica from '@/app/Componentes/CvComponente/FormacionAcademica';
 import ExperienciaLaboral from '@/app/Componentes/CvComponente/ExperienciaLaboral';
@@ -26,6 +26,7 @@ export default function EmployeeCV({ employeeData, globalSettings = {} }: Employ
   const [originalCvData, setOriginalCvData] = useState<Employee | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [softSkillsCatalog, setSoftSkillsCatalog] = useState<{ id: number; nombre: string; descripcion: string }[]>([]);
 
   console.log(cvData)
 
@@ -46,6 +47,19 @@ export default function EmployeeCV({ employeeData, globalSettings = {} }: Employ
       setCvData(employeeData);
     }
   }, [employeeData]);
+
+  // Cargar catálogo de habilidades blandas desde el backend
+  useEffect(() => {
+    const fetchSoftSkillsCatalog = async () => {
+      try {
+        const catalog = await apiClient.get<{ id: number; nombre: string; descripcion: string }[]>('/configtest/soft');
+        setSoftSkillsCatalog(catalog);
+      } catch (err) {
+        console.error('Error al cargar catálogo de habilidades blandas:', err);
+      }
+    };
+    fetchSoftSkillsCatalog();
+  }, []);
 
   // Mientras se valida la autenticacion
   if (isAuthenticated === null) {
@@ -186,6 +200,7 @@ export default function EmployeeCV({ employeeData, globalSettings = {} }: Employ
             <HabilidadesBlandas
               data={cvData.softSkills}
               selectedSkills={cvData.softSkillsArray || []}
+              softSkillsCatalog={softSkillsCatalog}
               updateData={(softSkills, softSkillsArray) => updateCvData({ softSkills, softSkillsArray })}
               isEditing={isEditing}
             />

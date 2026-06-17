@@ -1,28 +1,46 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TechnicalTests } from '@/app/Componentes/TestComponent/TechnicalTests';
 import { SoftSkills } from '@/app/Componentes/TestComponent/SoftSkills';
-import { initialProfessions, initialTestsByProfession,SOFT_SKILLS_CATALOG} from '@/app/api/prueba2';
-import { Test,TestsByProfession, SoftSkill } from "@/app/Interfas/Interfaces";
+import { Test, TestsByProfession, SoftSkill } from "@/app/Interfas/Interfaces";
+import { apiClient } from '@/app/util/apiClient';
 
 type ActiveTab = "technical" | "soft-skills";
-
 
 export default function TestPage(){
   // Tab State
   const [activeTab, setActiveTab] = useState<ActiveTab>("technical");
 
+  // Loading State
+  const [loading, setLoading] = useState<boolean>(true);
+
   // Technical Tests State
-  const [testsByProfession, setTestsByProfession] = useState<TestsByProfession>(
-    initialTestsByProfession
-  );
-  const [professions, setProfessions] = useState<{ [key: string]: number[] }>(initialProfessions);
-  const [selectedProfession, setSelectedProfession] = useState<string>(
-    Object.keys(initialProfessions)[0]
-  );
+  const [testsByProfession, setTestsByProfession] = useState<TestsByProfession>({});
+  const [professions, setProfessions] = useState<{ [key: string]: number[] }>({});
+  const [selectedProfession, setSelectedProfession] = useState<string>("Abogado");
 
   // Soft Skills State
-  const [softSkills, setSoftSkills] = useState<SoftSkill[]>(SOFT_SKILLS_CATALOG);
+  const [softSkills, setSoftSkills] = useState<SoftSkill[]>([]);
+
+  // Fetch data on mount
+  useEffect(() => {
+    Promise.all([
+      apiClient.get<{ professions: { [key: string]: number[] }, testsByProfession: TestsByProfession }>("/configtest/technical"),
+      apiClient.get<SoftSkill[]>("/configtest/soft")
+    ]).then(([techData, softData]) => {
+      setProfessions(techData.professions);
+      setTestsByProfession(techData.testsByProfession);
+      const keys = Object.keys(techData.professions);
+      if (keys.length > 0) {
+        setSelectedProfession(keys[0]);
+      }
+      setSoftSkills(softData);
+      setLoading(false);
+    }).catch(err => {
+      console.error("Error fetching test configuration:", err);
+      setLoading(false);
+    });
+  }, []);
 
   // Technical Tests Handlers
   const handleSelectedProfessionChange = (profession: string) => {
@@ -39,30 +57,85 @@ export default function TestPage(){
   };
 
   const handleSaveTest = (test: Test) => {
-    setTestsByProfession(prev => ({
-      ...prev,
-      [selectedProfession]: [...(prev[selectedProfession] || []), test],
-    }));
+    apiClient.post<{ success: boolean, id: number }>(`/configtest/technical?profession=${encodeURIComponent(selectedProfession)}`, test)
+      .then(res => {
+        const savedTest = { ...test, id: String(res.id) };
+        setTestsByProfession(prev => {
+          const current = prev[selectedProfession] || [];
+          // If updating, replace existing test; otherwise append
+          const exists = current.some(t => t.id === test.id);
+          const updated = exists 
+            ? current.map(t => t.id === test.id ? savedTest : t)
+            : [...current, savedTest];
+          return {
+            ...prev,
+            [selectedProfession]: updated
+          };
+        });
+      })
+      .catch(err => {
+        console.error("Error saving test:", err);
+        alert("Error al guardar el test: " + err.message);
+      });
   };
 
   const handleDeleteTest = (testId: string) => {
-    setTestsByProfession(prev => ({
-      ...prev,
-      [selectedProfession]: (prev[selectedProfession] || []).filter(
-        test => test.id !== testId
-      ),
-    }));
+    apiClient.delete(`/configtest/technical/${testId}`)
+      .then(() => {
+        setTestsByProfession(prev => ({
+          ...prev,
+          [selectedProfession]: (prev[selectedProfession] || []).filter(
+            test => test.id !== testId
+          ),
+        }));
+      })
+      .catch(err => {
+        console.error("Error deleting test:", err);
+        alert("Error al eliminar el test: " + err.message);
+      });
   };
 
   // Soft Skills Handlers
   const handleAddSoftSkill = (skill: SoftSkill) => {
-    setSoftSkills(prev => [...prev, skill]);
+    apiClient.post<{ success: boolean, id: number }>("/configtest/soft", skill)
+      .then(res => {
+        const savedSkill = { ...skill, id: res.id };
+        setSoftSkills(prev => [...prev, savedSkill]);
+      })
+      .catch(err => {
+        console.error("Error adding soft skill:", err);
+        alert("Error al guardar la habilidad blanda: " + err.message);
+      });
   };
 
   const handleDeleteSoftSkill = (index: number) => {
-    setSoftSkills(prev => prev.filter((_, i) => i !== index));
+    const skillToDelete = softSkills[index];
+    if (!skillToDelete || !skillToDelete.id) {
+      // If no ID (fallback), delete locally
+      setSoftSkills(prev => prev.filter((_, i) => i !== index));
+      return;
+    }
+
+    apiClient.delete(`/configtest/soft/${skillToDelete.id}`)
+      .then(() => {
+        setSoftSkills(prev => prev.filter((_, i) => i !== index));
+      })
+      .catch(err => {
+        console.error("Error deleting soft skill:", err);
+        alert("Error al eliminar la habilidad blanda: " + err.message);
+      });
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center">
+        <div className="text-center bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1ABCD7] mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400 font-semibold">Cargando configuración...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
@@ -78,52 +151,50 @@ export default function TestPage(){
         </div>
 
         {/* Tab Navigation */}
-        
-          <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
-             <button
-          onClick={() => setActiveTab("technical")}
-          className={`px-4 py-2 font-semibold transition-colors duration-200 ${
-            activeTab === "technical"
-              ? "border-b-2 border-[#2ecbe7] text-[#1ABCD7]  text-shadow-md"
-              : "text-gray-500 hover:text-blue-500 text-shadow-md"
-          }`}
-         >
-          🧪 Tests Técnicos
-         </button>
-         <button
-          onClick={() => setActiveTab("soft-skills")}
-          className={`px-4 py-2 font-semibold transition-colors duration-200 ${
-            activeTab === "soft-skills"
-              ? "border-b-2 border-[#2ecbe7] text-[#1ABCD7]  text-shadow-md"
-              : "text-gray-500 hover:text-blue-500 text-shadow-md"
-          }`}
-         >
-         🎯 Habilidades Blandas
-         </button>
-          </div>
+        <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
+          <button
+            onClick={() => setActiveTab("technical")}
+            className={`px-4 py-2 font-semibold transition-colors duration-200 ${
+              activeTab === "technical"
+                ? "border-b-2 border-[#2ecbe7] text-[#1ABCD7]  text-shadow-md"
+                : "text-gray-500 hover:text-blue-500 text-shadow-md"
+            }`}
+          >
+            🧪 Tests Técnicos
+          </button>
+          <button
+            onClick={() => setActiveTab("soft-skills")}
+            className={`px-4 py-2 font-semibold transition-colors duration-200 ${
+              activeTab === "soft-skills"
+                ? "border-b-2 border-[#2ecbe7] text-[#1ABCD7]  text-shadow-md"
+                : "text-gray-500 hover:text-blue-500 text-shadow-md"
+            }`}
+          >
+            🎯 Habilidades Blandas
+          </button>
+        </div>
 
-          {/* Tab Content */}
-          <div className="p-6">
-            {activeTab === "technical" && (
-              <TechnicalTests
-                testsByProfession={testsByProfession}
-                professions={professions}
-                selectedProfession={selectedProfession}
-                onSelectedProfessionChange={handleSelectedProfessionChange}
-                onAddProfession={handleAddProfession}
-                onSaveTest={handleSaveTest}
-                onDeleteTest={handleDeleteTest}
-              />
-            )}
+        {/* Tab Content */}
+        <div className="p-6">
+          {activeTab === "technical" && (
+            <TechnicalTests
+              testsByProfession={testsByProfession}
+              professions={professions}
+              selectedProfession={selectedProfession}
+              onSelectedProfessionChange={handleSelectedProfessionChange}
+              onAddProfession={handleAddProfession}
+              onSaveTest={handleSaveTest}
+              onDeleteTest={handleDeleteTest}
+            />
+          )}
 
-            {activeTab === "soft-skills" && (
-              <SoftSkills
-                softSkills={softSkills}
-                onAddSoftSkill={handleAddSoftSkill}
-                onDeleteSoftSkill={handleDeleteSoftSkill}
-              />
-            )}
-          
+          {activeTab === "soft-skills" && (
+            <SoftSkills
+              softSkills={softSkills}
+              onAddSoftSkill={handleAddSoftSkill}
+              onDeleteSoftSkill={handleDeleteSoftSkill}
+            />
+          )}
         </div>
 
         {/* Stats Summary */}
@@ -179,4 +250,4 @@ export default function TestPage(){
       </div>
     </div>
   );
-};
+}

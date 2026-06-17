@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, AlertTriangle, Users,   Target, Brain, Zap, CheckCircle, Lightbulb, ShieldAlert } from 'lucide-react';
-import { EMPLOYEES_DATA } from '@/app/api/prueba2';
 import {  DepartmentAnalysis } from '@/app/Interfas/Interfaces';
 import { StatCard,RiskBadge,InfoList} from '@/app/util/UiRRHH';
 import { ProgressBar } from 'primereact/progressbar';
@@ -20,13 +19,14 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
       setLoading(true);
       
       try {
+        const token = localStorage.getItem('token');
         const response = await fetch('/api/predictive-analysis', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify({
-            employees:EMPLOYEES_DATA,
             analysisType: 'full',
             timeframe: '3months'
           })

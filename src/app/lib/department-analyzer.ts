@@ -7,13 +7,12 @@ import { Employee,DepartmentAnalysis,skillsGap  } from "@/app/Interfas/Interface
 import { MetricsCalculator } from "./metrics-calculator";
 import { PromptBuilder } from "./prompt-builder";
 import { parseAIResponse } from "./ai-response-parser";
-import { INTEGRATED_ORG_DATA } from "@/app/api/prueba2";
 import { Tool } from "ai";
 
 export class DepartmentAnalyzer {
   constructor(
     private mcpTools: Record<string, Tool<any, any>>,
-    private orgData: typeof INTEGRATED_ORG_DATA
+    private orgData: any[]
   ) {}
 
 
