@@ -8,8 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/app/util/apiClient';
-import { Header } from '@/app/Componentes/Navbar/Header';
-import { Sidebar } from '@/app/Componentes/Navbar/Sidebar';
+import { AppLayout } from '@/app/Componentes/Shell/AppLayout';
 import EstadisticasPage from '@/app/screens/Estadisticas/Screen';
 import RecursosHumanosPage from '@/app/screens/RRHH/Screen';
 import IAPage from '@/app/screens/IA/Screen';
@@ -37,7 +36,6 @@ export default function App() {
   // ── Estado de autenticación (se llena desde localStorage en useEffect) ──────
   const [roleId, setRoleId] = useState<number | null>(null);
   const [page, setPage] = useState<Page>('estadisticas');
-  const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [employeeData, setEmployeeData] = useState<Employee | null>(null);
   const [globalSettings, setGlobalSettings] = useState<Record<string, boolean>>({});
@@ -172,29 +170,15 @@ export default function App() {
   }
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
-      <PrimeReactProvider>
-        <Header setPage={handlePageChange} employeeData={employeeData} />
-        {/* Sidebar se oculta automáticamente para USER (roleId 2) */}
-        <Sidebar
-          activePage={page}
-          setPage={handlePageChange}
-          onCollapseChange={setSidebarCollapsed}
-          roleId={roleId}
-        />
-        <main
-          className={`pt-20 pr-4 md:pr-8 pb-8 transition-all duration-300 ${
-            // Sin sidebar para USER → sin padding izquierdo
-            !roleId || roleId === ROLE_ID.USER
-              ? 'pl-4 md:pl-8'
-              : isSidebarCollapsed
-                ? 'md:pl-24'
-                : 'md:pl-72'
-            }`}
-        >
-          {renderPage()}
-        </main>
-      </PrimeReactProvider>
-    </div>
+    <PrimeReactProvider>
+      <AppLayout
+        activePage={page}
+        setPage={handlePageChange}
+        roleId={roleId}
+        employeeData={employeeData}
+      >
+        {renderPage()}
+      </AppLayout>
+    </PrimeReactProvider>
   );
 }
