@@ -1,18 +1,19 @@
 
-import { experimental_createMCPClient} from "ai";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { dynamicTool, jsonSchema, Tool } from "ai";
 import path from "path";
 import fs from "fs";
 import { MCPClient } from "@/app/Interfas/Interfaces";
 import { PathManager } from "./directory-config";
-import { Experimental_StdioMCPTransport } from "ai/mcp-stdio";
 
 export class MCPClientService {
   private static readonly MCP_SERVER_PATH = path.join(
-    process.cwd(), 
-    "node_modules", 
-    "@modelcontextprotocol", 
-    "server-filesystem", 
-    "dist", 
+    process.cwd(),
+    "node_modules",
+    "@modelcontextprotocol",
+    "server-filesystem",
+    "dist",
     "index.js"
   );
 
@@ -31,12 +32,43 @@ export class MCPClientService {
       console.log(`Configurando MCP para el directorio: ${workingDirectory}`);
 
       const transport = this.createTransport(workingDirectory);
-      
+
       console.log("Creando cliente MCP...");
-      const client = await experimental_createMCPClient({ transport });
-      
+      const client = new Client({ name: "rrhh-mcp-client", version: "1.0.0" });
+      await client.connect(transport);
+
       console.log("Cliente MCP creado exitosamente");
-      return client as MCPClient;
+
+      return {
+        tools: async (): Promise<Record<string, unknown>> => {
+          const { tools } = await client.listTools();
+          const result: Record<string, Tool<unknown, unknown>> = {};
+
+          for (const mcpTool of tools) {
+            result[mcpTool.name] = dynamicTool({
+              description: mcpTool.description ?? "",
+              inputSchema: jsonSchema(
+                (mcpTool.inputSchema as Record<string, unknown>) ?? {
+                  type: "object",
+                  properties: {},
+                }
+              ),
+              execute: async (input: unknown) => {
+                const callResult = await client.callTool({
+                  name: mcpTool.name,
+                  arguments: input as Record<string, unknown>,
+                });
+                return callResult;
+              },
+            });
+          }
+
+          return result;
+        },
+        close: async (): Promise<void> => {
+          await client.close();
+        },
+      };
     } catch (error) {
       console.error("Error creating MCP client:", error);
       return null;
@@ -48,13 +80,13 @@ export class MCPClientService {
   }
 
   private static createTransport(workingDirectory: string) {
-    return new Experimental_StdioMCPTransport({
+    return new StdioClientTransport({
       command: process.execPath,
       args: [this.MCP_SERVER_PATH, workingDirectory],
       env: {
         ...process.env,
         NODE_PATH: path.join(process.cwd(), "node_modules"),
-      }
+      } as Record<string, string>,
     });
   }
 }
