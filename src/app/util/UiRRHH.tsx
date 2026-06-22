@@ -960,12 +960,10 @@ export const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ 
 };
 
 export const getScoreColor = (score?: number) => {
-  if (score === undefined) return 'bg-gray-200';
-  if (score >= 9) return 'bg-emerald-500';
-  if (score >= 7) return 'bg-lime-500';
-  if (score >= 5) return 'bg-yellow-500';
-  if (score >= 3) return 'bg-orange-500';
-  return 'bg-red-500';
+  if (score === undefined) return 'bg-muted';
+  if (score >= 7) return 'bg-success';
+  if (score >= 5) return 'bg-warning';
+  return 'bg-error';
 };
 
 export const SoftSkillBar = ({ skill, score }: { skill: string; score?: number }) => (
