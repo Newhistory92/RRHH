@@ -22,6 +22,14 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+  --color-success: #16a34a;
+  --color-success-foreground: #ffffff;
+  --color-warning: #d97706;
+  --color-warning-foreground: #ffffff;
+  --color-error: #dc2626;
+  --color-error-foreground: #ffffff;
+  --color-info: #2563eb;
+  --color-info-foreground: #ffffff;
 }
 
 .dark {
@@ -44,6 +52,14 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
+  --color-success: #22c55e;
+  --color-success-foreground: #052e16;
+  --color-warning: #f59e0b;
+  --color-warning-foreground: #451a03;
+  --color-error: #ef4444;
+  --color-error-foreground: #450a0a;
+  --color-info: #3b82f6;
+  --color-info-foreground: #172554;
 }
 
 @theme inline {
@@ -72,6 +88,14 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-success: var(--color-success);
+  --color-success-foreground: var(--color-success-foreground);
+  --color-warning: var(--color-warning);
+  --color-warning-foreground: var(--color-warning-foreground);
+  --color-error: var(--color-error);
+  --color-error-foreground: var(--color-error-foreground);
+  --color-info: var(--color-info);
+  --color-info-foreground: var(--color-info-foreground);
 }
 
 body {
