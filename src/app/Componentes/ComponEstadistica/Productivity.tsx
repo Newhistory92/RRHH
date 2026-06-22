@@ -7,7 +7,7 @@ import { Pagination} from '@/app/Componentes/Pagination/pagination';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { Card } from 'primereact/card';
+import { Card, CardContent } from '@/components/ui/card';
         
 const formatDisplayValue = (text: string | null | undefined): string => {
   if (!text) return '';
@@ -120,12 +120,12 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
   const employeeBodyTemplate = (employee: Employee) => {
     return (
       <div className="flex items-center">
-        <div className="w-10 h-10 rounded-full mr-4 flex items-center justify-center bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 font-bold">
+        <div className="w-10 h-10 rounded-full mr-4 flex items-center justify-center bg-warm-contrast text-warm-contrast-foreground font-bold">
           {employee.name.charAt(0)}
         </div>
         <div>
-          <p className="font-semibold text-gray-800 dark:text-gray-200">{employee.name}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 md:hidden">{formatDisplayValue((employee as any).department)}</p>
+          <p className="font-semibold text-foreground">{employee.name}</p>
+          <p className="text-sm text-muted-foreground md:hidden">{formatDisplayValue((employee as any).department)}</p>
         </div>
       </div>
     );
@@ -136,7 +136,7 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
     return (
       <div className="flex items-center">
         <div className={`w-3 h-3 rounded-full mr-3 ${getScoreColor(employee.productivityScore)}`}></div>
-        <span className="font-bold text-lg text-gray-800 dark:text-gray-200">
+        <span className="font-bold text-lg text-foreground">
           {employee.productivityScore.toFixed(1)}
         </span>
       </div>
@@ -155,7 +155,7 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
           sortConfig.direction === 'descending' ? 
             <ChevronDown className="ml-1 h-4 w-4" /> : 
             <ChevronUp className="ml-1 h-4 w-4" />
-        ) : <ChevronDown className="ml-1 h-4 w-4 text-gray-300" />}
+        ) : <ChevronDown className="ml-1 h-4 w-4 text-muted-foreground" />}
       </div>
     );
   };
@@ -164,9 +164,9 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
   const emptyMessageTemplate = () => {
     return (
       <div className="text-center py-12">
-        <Filter className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Sin resultados</h3>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Ajusta los filtros para encontrar empleados.</p>
+        <Filter className="mx-auto h-12 w-12 text-muted-foreground" />
+        <h3 className="mt-2 text-sm font-medium text-foreground">Sin resultados</h3>
+        <p className="mt-1 text-sm text-muted-foreground">Ajusta los filtros para encontrar empleados.</p>
       </div>
     );
   };
@@ -175,9 +175,10 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
 
   return (
     <Card className="col-span-1 lg:col-span-3">
+      <CardContent>
       <div className="mb-6">
         <div className="flex flex-wrap items-center gap-4">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white flex-shrink-0 mr-4">
+          <h2 className="text-xl font-bold text-foreground flex-shrink-0 mr-4">
             Ranking de Productividad
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full md:w-auto flex-grow">
@@ -249,12 +250,13 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
           style={{ minWidth: '150px' }}
         />
       </DataTable>
-            <Pagination 
+            <Pagination
                 totalItems={sortedEmployees.length}
                 itemsPerPage={itemsPerPage}
                 currentPage={currentPage}
                 onPageChange={onPageChange}
             />
+      </CardContent>
         </Card>
     );
 };
