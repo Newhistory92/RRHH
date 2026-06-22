@@ -115,3 +115,8 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+:root {
+  --primary-color: #E7717D;
+  --primary-color-text: #FFFFFF;
+}

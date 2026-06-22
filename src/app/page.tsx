@@ -18,7 +18,7 @@ import LicenciasManage from '@/app/screens/LicenciasManage/Screen';
 import AdminPage from '@/app/screens/Admin/Screen';
 import ConfiguracionLicencias from '@/app/screens/ConfiguracionLicencias/Screen';
 import { PrimeReactProvider } from 'primereact/api';
-import "primereact/resources/themes/lara-light-cyan/theme.css";
+import "primereact/resources/themes/lara-light-pink/theme.css";
 import 'primeicons/primeicons.css';
 import TestPage from './screens/TestConfig/Screen';
 import FeedbackTab from './screens/Feedback/Screen';
