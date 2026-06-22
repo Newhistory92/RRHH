@@ -94,8 +94,8 @@ export default function EstadisticasPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <div className="w-12 h-12 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin" />
-        <p className="text-gray-500 dark:text-gray-400">Cargando datos estadísticos…</p>
+        <div className="w-12 h-12 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+        <p className="text-muted-foreground">Cargando datos estadísticos…</p>
       </div>
     );
   }
@@ -104,12 +104,12 @@ export default function EstadisticasPage() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center px-4">
-        <AlertCircle className="w-14 h-14 text-red-400" />
-        <h2 className="text-xl font-bold text-gray-800 dark:text-white">No se pudieron cargar los datos</h2>
-        <p className="text-gray-500 dark:text-gray-400 max-w-md">{error}</p>
+        <AlertCircle className="w-14 h-14 text-error" />
+        <h2 className="text-xl font-bold text-foreground">No se pudieron cargar los datos</h2>
+        <p className="text-muted-foreground max-w-md">{error}</p>
         <button
           onClick={() => fetchData(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary hover:opacity-90 text-primary-foreground rounded-lg transition-colors"
         >
           <RefreshCw className="w-4 h-4" /> Reintentar
         </button>
@@ -118,25 +118,25 @@ export default function EstadisticasPage() {
   }
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen font-sans text-gray-900 dark:text-gray-100">
+    <div className="bg-background min-h-screen font-sans text-foreground">
       <div className="container mx-auto p-4 sm:p-6 lg:p-8">
         <header className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Panel Estadístico de Personal</h1>
-            <p className="text-gray-600 dark:text-gray-400">Visualización y análisis de datos de empleados.</p>
+            <h1 className="font-heading text-3xl font-bold text-foreground">Panel Estadístico de Personal</h1>
+            <p className="text-muted-foreground">Visualización y análisis de datos de empleados.</p>
           </div>
           <button
             onClick={() => fetchData(true)}
             title="Actualizar datos"
-            className="flex items-center gap-2 px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-card border border-border rounded-lg hover:bg-muted transition-colors"
           >
-            <RefreshCw className="w-4 h-4 text-gray-500" />
-            <span className="hidden sm:inline text-gray-600 dark:text-gray-300">Actualizar</span>
+            <RefreshCw className="w-4 h-4 text-muted-foreground" />
+            <span className="hidden sm:inline text-muted-foreground">Actualizar</span>
           </button>
         </header>
 
         {/* Tabs */}
-        <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="mb-6 border-b border-border">
           <nav className="-mb-px flex space-x-6" aria-label="Tabs">
             {([
               { id: 'ranking',  label: 'Ranking de Productividad', Icon: User },
@@ -145,8 +145,8 @@ export default function EstadisticasPage() {
               <button key={id} onClick={() => setActiveTab(id)}
                 className={`flex items-center px-4 py-2 font-semibold transition-colors duration-200 ${
                   activeTab === id
-                    ? 'border-b-2 border-[#2ecbe7] text-[#1ABCD7]'
-                    : 'text-gray-500 hover:text-blue-500'
+                    ? 'border-b-2 border-primary text-primary'
+                    : 'text-muted-foreground hover:text-primary'
                 }`}>
                 <Icon className="mr-2 h-5 w-5" /> {label}
               </button>
