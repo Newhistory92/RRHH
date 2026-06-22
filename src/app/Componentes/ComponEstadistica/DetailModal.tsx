@@ -3,7 +3,7 @@
 import {getScoreColor, SoftSkillBar } from '@/app/util/UiRRHH';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, } from 'recharts';
 import {  X,  BarChart2, Star,  Briefcase, Calendar, MessageSquareWarning, } from 'lucide-react';
-import { Card } from 'primereact/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Employee } from '@/app/Interfas/Interfaces';
 import { useEffect, useState } from 'react';
 export const EmployeeDetailModal: React.FC<{
@@ -14,10 +14,10 @@ export const EmployeeDetailModal: React.FC<{
   const [remoteEmployee, setRemoteEmployee] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
- 
+
   // Hooks SIEMPRE arriba
   useEffect(() => {
-    
+
     if (!employee) {
       return;
     }
@@ -78,14 +78,16 @@ export const EmployeeDetailModal: React.FC<{
   }
 
 const currentYear = String(new Date().getFullYear());
+const tooltipStyle = { backgroundColor: 'var(--popover)', border: 'none', borderRadius: '0.5rem', color: 'var(--popover-foreground)' };
+const tooltipTextStyle = { color: 'var(--popover-foreground)' };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
-      <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative">
+      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative">
 
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
         >
           <X size={24} />
         </button>
@@ -96,36 +98,36 @@ const currentYear = String(new Date().getFullYear());
           <div className="flex flex-col md:flex-row items-center mb-6">
 
             <div className={`p-2 rounded-full ${getScoreColor(remoteEmployee?.productivityScore)} mr-6`}>
-              <div className="bg-white dark:bg-gray-800 rounded-full w-24 h-24 flex items-center justify-center text-3xl font-bold text-gray-800 dark:text-white">
+              <div className="bg-card rounded-full w-24 h-24 flex items-center justify-center text-3xl font-bold text-foreground">
                 {remoteEmployee?.productivityScore.toFixed(1)}
               </div>
             </div>
 
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl font-bold text-foreground">
                  {remoteEmployee?.name}
               </h2>
 
-              <p className="text-lg text-gray-600 dark:text-gray-400">
+              <p className="text-lg text-muted-foreground">
     {remoteEmployee?.department?.nombre ?? "Depende Directamente"}
     {" / "}
     {remoteEmployee?.office?.nombre ?? "Depende Directamente"}
   </p>
 
-  <p className="text-sm text-indigo-500 font-semibold">
+  <p className="text-sm text-primary font-semibold">
     Categoría: {remoteEmployee?.condicionLaboral?.categoria ?? "-"}
     {" • "}
     {remoteEmployee?.licenciaActiva?.status ?? "-"}
   </p>
 
               {loading && (
-                <p className="text-sm text-blue-500 mt-2">
+                <p className="text-sm text-primary mt-2">
                   Cargando datos...
                 </p>
               )}
 
               {error && (
-                <p className="text-sm text-red-500 mt-2">
+                <p className="text-sm text-error mt-2">
                   {error}
                 </p>
               )}
@@ -136,15 +138,14 @@ const currentYear = String(new Date().getFullYear());
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
             {/* Horas */}
-            <Card
-              className="lg:col-span-2"
-              title={
-                <div className="flex items-center gap-2">
-                  <BarChart2 className="text-blue-500" />
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart2 className="text-primary" />
                   Horas a Favor/Contra por Mes
-                </div>
-              }
-            >
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
               <ResponsiveContainer width="100%" height={250}>
 
                 <BarChart
@@ -157,14 +158,9 @@ const currentYear = String(new Date().getFullYear());
                   <YAxis />
 
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'rgba(31, 41, 55, 0.8)',
-                      border: 'none',
-                      borderRadius: '0.5rem',
-                      color: '#ffffff'
-                    }}
-                    labelStyle={{ color: '#ffffff' }}
-                    itemStyle={{ color: '#ffffff' }}
+                    contentStyle={tooltipStyle}
+                    labelStyle={tooltipTextStyle}
+                    itemStyle={tooltipTextStyle}
                   />
 
                   <Bar dataKey="hours" name="Horas">
@@ -173,7 +169,7 @@ const currentYear = String(new Date().getFullYear());
                       (entry: { hours: number }, index: number) => (
                         <Cell
                           key={`cell-${index}`}
-                          fill={entry.hours >= 0 ? '#10b981' : '#ef4444'}
+                          fill={entry.hours >= 0 ? 'var(--color-success)' : 'var(--color-error)'}
                         />
                       )
                     )}
@@ -183,17 +179,18 @@ const currentYear = String(new Date().getFullYear());
                 </BarChart>
 
               </ResponsiveContainer>
+              </CardContent>
             </Card>
 
             {/* Feedback */}
-            <Card
-              title={
-                <div className="flex items-center gap-2 text-lg">
-                  <Star className="text-yellow-500" />
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Star className="text-warm-contrast" />
                   Feedback del Equipo
-                </div>
-              }
-            >
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
 
               {(remoteEmployee?.softSkills || []).length > 0 ? (
                 (remoteEmployee?.softSkills || []).map(
@@ -206,22 +203,23 @@ const currentYear = String(new Date().getFullYear());
                   )
                 )
               ) : (
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-muted-foreground">
                   Sin feedback registrado.
                 </p>
               )}
 
+              </CardContent>
             </Card>
 
             {/* Productividad */}
-            <Card
-              title={
-                <div className="flex items-center gap-2 text-lg">
-                  <Briefcase className="text-green-500" />
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Briefcase className="text-accent" />
                   Productividad por Tarea
-                </div>
-              }
-            >
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
 
               {(remoteEmployee?.tasks || []).length > 0 ? (
                 <ul>
@@ -231,9 +229,9 @@ const currentYear = String(new Date().getFullYear());
 
                       <li
                         key={task.name}
-                        className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700"
+                        className="flex justify-between items-center py-2 border-b border-border"
                       >
-                        <span className="text-gray-600 dark:text-gray-300">
+                        <span className="text-muted-foreground">
                           {task.name}
                         </span>
 
@@ -247,46 +245,47 @@ const currentYear = String(new Date().getFullYear());
 
                 </ul>
               ) : (
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-muted-foreground">
                   Sin tareas registradas.
                 </p>
               )}
 
+              </CardContent>
             </Card>
 
             {/* Licencias */}
-            <Card
-              title={
-                <div className="flex items-center gap-2 text-lg">
-                  <Calendar className="text-purple-500" />
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Calendar className="text-primary" />
                   Licencias y Faltas (Anual)
-                </div>
-              }
-            >
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
 
               <div className="space-y-4">
 
                 <div>
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     Licencias tomadas
                   </p>
 
-                  <p className="text-2xl font-bold text-gray-800 dark:text-white">
+                  <p className="text-2xl font-bold text-foreground">
   {remoteEmployee?.licenses?.[currentYear] || 0}
-  <span className="text-base font-normal text-gray-500">
+  <span className="text-base font-normal text-muted-foreground">
     {' '}en {currentYear}
   </span>
 </p>
                 </div>
 
                 <div>
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     Faltas
                   </p>
 
-                  <p className="text-2xl font-bold text-gray-800 dark:text-white">
+                  <p className="text-2xl font-bold text-foreground">
                     {remoteEmployee?.absences?.['2024'] || 0}
-                    <span className="text-base font-normal text-gray-500">
+                    <span className="text-base font-normal text-muted-foreground">
                       {' '}en 2024
                     </span>
                   </p>
@@ -294,25 +293,26 @@ const currentYear = String(new Date().getFullYear());
 
               </div>
 
+              </CardContent>
             </Card>
 
             {/* Quejas */}
-            <Card
-              title={
-                <div className="flex items-center gap-2 text-lg">
-                  <MessageSquareWarning className="text-orange-500" />
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <MessageSquareWarning className="text-error" />
                   Quejas Recibidas
-                </div>
-              }
-            >
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
 
-              <p className="text-4xl font-bold text-orange-500 mb-2">
+              <p className="text-4xl font-bold text-error mb-2">
                 {(remoteEmployee?.complaints || []).length}
               </p>
 
               {(remoteEmployee?.complaints || []).length > 0 ? (
 
-                <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1">
+                <ul className="list-disc list-inside text-muted-foreground space-y-1">
 
                   {(remoteEmployee?.complaints || []).map(
                     (c: { id: string | number; reason: string }) => (
@@ -326,12 +326,13 @@ const currentYear = String(new Date().getFullYear());
 
               ) : (
 
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-muted-foreground">
                   Sin quejas registradas.
                 </p>
 
               )}
 
+              </CardContent>
             </Card>
 
           </div>
