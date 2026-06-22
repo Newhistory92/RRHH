@@ -59,13 +59,13 @@ export function AppSidebar({
   return (
     <TooltipProvider delayDuration={200}>
       <aside
-        className={`bg-surface border-r border-border fixed top-0 left-0 h-full z-30 hidden md:flex flex-col transition-all duration-300 ease-in-out ${
+        className={`bg-muted border-r border-border fixed top-0 left-0 h-full z-30 hidden md:flex flex-col transition-all duration-300 ease-in-out ${
           isCollapsed ? "w-16" : "w-64"
         }`}
       >
         <div className="flex items-center h-16 px-4 border-b border-border">
           {!isCollapsed && (
-            <span className="text-lg font-semibold text-foreground">Talexa</span>
+            <span className="font-heading text-xl font-semibold text-foreground">Talexa</span>
           )}
         </div>
 
@@ -99,7 +99,7 @@ export function AppSidebar({
                       }}
                       className={`flex items-center px-3 py-2 rounded-md text-sm transition-colors ${
                         isActive
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-warm-contrast text-warm-contrast-foreground"
                           : "text-foreground hover:bg-surface-muted"
                       } ${isCollapsed ? "justify-center" : ""}`}
                     >
