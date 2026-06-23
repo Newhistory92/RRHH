@@ -829,12 +829,12 @@ const labelCls = "block text-sm font-medium text-gray-300 mb-1";
 
 export const StatusBadge = ({ status }: { status: string }) => {
   const map: Record<string, string> = {
-    'Activo': 'bg-green-100 text-green-800',
-    'De licencia': 'bg-yellow-100 text-yellow-800',
-    'Parte médico': 'bg-red-100 text-red-800',
+    'Activo': 'bg-success-soft text-success-soft-foreground',
+    'De licencia': 'bg-warning-soft text-warning-soft-foreground',
+    'Parte médico': 'bg-error-soft text-error-soft-foreground',
   };
   return (
-    <span className={`px-3 py-1 text-xs font-medium rounded-full inline-block ${map[status] ?? 'bg-gray-100 text-gray-800'}`}>
+    <span className={`px-3 py-1 text-xs font-medium rounded-full inline-block ${map[status] ?? 'bg-muted text-muted-foreground'}`}>
       {status}
     </span>
   );
@@ -843,18 +843,18 @@ export const StatusBadge = ({ status }: { status: string }) => {
 export const HoursDisplay = ({ hours }: { hours: number | null }) => {
   const h = hours ?? 0;
   return (
-    <span className={`font-semibold ${h >= 0 ? 'text-blue-600' : 'text-orange-600'}`}>
+    <span className={`font-semibold ${h >= 0 ? 'text-success' : 'text-error'}`}>
       {h > 0 ? '+' : ''}{h.toFixed(2)}hs
     </span>
   );
 };
 
 export const InfoCard = ({ icon: Icon, title, children }: InfoCardProps) => (
-  <div className="bg-gray-50 rounded-xl p-4 flex items-start gap-3 h-full shadow-sm border border-gray-100">
-    <Icon className="text-gray-400 mt-0.5 flex-shrink-0" size={18} />
+  <div className="bg-muted rounded-xl p-4 flex items-start gap-3 h-full shadow-sm border border-border">
+    <Icon className="text-muted-foreground mt-0.5 flex-shrink-0" size={18} />
     <div className="flex-1 min-w-0">
-      <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">{title}</h4>
-      <div className="text-gray-800 text-sm">{children}</div>
+      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">{title}</h4>
+      <div className="text-foreground text-sm">{children}</div>
     </div>
   </div>
 );
