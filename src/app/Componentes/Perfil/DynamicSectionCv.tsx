@@ -64,7 +64,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
         {isEditing && (
           <button
             onClick={onAdd}
-            className="flex items-center gap-2 px-4 py-2 border border-dashed border-gray-400 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="flex items-center gap-2 px-4 py-2 border border-dashed border-border rounded-md text-sm font-medium text-foreground hover:bg-muted"
           >
             <Plus className="w-4 h-4" /> Añadir nuevo registro
           </button>
@@ -82,7 +82,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
               (item.level === "Universitario" || item.level === "Posgrado") &&
               item.status === "Completo" && (
                 <div
-                  className="absolute top-4 right-12 text-yellow-400"
+                  className="absolute top-4 right-12 text-warning"
                   title="Formación destacada"
                 >
                   <Star className="w-6 h-6 fill-current" />
@@ -96,7 +96,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                 if (field.type === "checkbox") {
                   return (
                     <div key={field.name} className={`${gridClass} flex items-end`}>
-                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <label className="flex items-center gap-2 text-sm font-medium text-foreground">
                         <input
                           type="checkbox"
                           checked={!!item[field.name]}
@@ -105,7 +105,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                             onChange(item.id, field.name, e.target.checked);
                             if (e.target.checked) onChange(item.id, "endDate", "");
                           }}
-                          className={`h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${!isEditing ? "cursor-not-allowed" : ""
+                          className={`h-4 w-4 rounded border-border text-primary focus:ring-primary ${!isEditing ? "cursor-not-allowed" : ""
                             }`}
                           disabled={!isEditing}
                         />
@@ -118,9 +118,9 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                 if (field.type === "select") {
                   return (
                     <div key={field.name} className={`${gridClass} flex flex-col gap-2`}>
-                      <label htmlFor={`${field.name}-${item.id}`} className="text-sm font-medium text-gray-700">
+                      <label htmlFor={`${field.name}-${item.id}`} className="text-sm font-medium text-foreground">
                         {field.label}
-                        {field.required && <span className="text-red-500 ml-1">*</span>}
+                        {field.required && <span className="text-error ml-1">*</span>}
                       </label>
                       <Dropdown
                         id={`${field.name}-${item.id}`}
@@ -149,9 +149,9 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                 if (field.type === "file") {
                   return (
                     <div key={field.name} className={`${gridClass} flex flex-col gap-2`}>
-                      <label htmlFor={`${field.name}-${item.id}`} className="text-sm font-medium text-gray-700">
+                      <label htmlFor={`${field.name}-${item.id}`} className="text-sm font-medium text-foreground">
                         {field.label}
-                        {field.required && <span className="text-red-500 ml-1">*</span>}
+                        {field.required && <span className="text-error ml-1">*</span>}
                       </label>
                       <input
                         id={`${field.name}-${item.id}`}
@@ -161,7 +161,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                         }
                         accept={field.accept}
                         disabled={!isEditing}
-                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:cursor-not-allowed"
+                        className="w-full p-2 border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-muted disabled:cursor-not-allowed"
                       />
                     </div>
                   );
@@ -169,9 +169,9 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
 
                 return (
                   <div key={field.name} className={`${gridClass} flex flex-col gap-2`}>
-                    <label htmlFor={`${field.name}-${item.id}`} className="text-sm font-medium text-gray-700">
+                    <label htmlFor={`${field.name}-${item.id}`} className="text-sm font-medium text-foreground">
                       {field.label}
-                      {field.required && <span className="text-red-500 ml-1">*</span>}
+                      {field.required && <span className="text-error ml-1">*</span>}
                     </label>
                     <InputText
                       id={`${field.name}-${item.id}`}
@@ -194,14 +194,14 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
             {isEditing && (
               <div className="absolute top-3 right-3 flex flex-col gap-2">
                 {typeof item.isVerified !== 'undefined' && item.isVerified === true && (
-                  <span className="p-1 px-2 text-xs font-bold text-green-700 bg-green-100 rounded shadow-sm flex items-center justify-center gap-1" title="Esta formación ha sido verificada.">
+                  <span className="p-1 px-2 text-xs font-bold bg-success-soft text-success-soft-foreground rounded shadow-sm flex items-center justify-center gap-1" title="Esta formación ha sido verificada.">
                     ✓ Verificado
                   </span>
                 )}
                 {typeof item.isVerified !== 'undefined' && item.isVerified === false && onVerify && (
                   <button
                     onClick={() => onVerify(item)}
-                    className="p-1 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded bg-white shadow-sm text-xs font-semibold px-2"
+                    className="p-1 text-primary hover:opacity-80 hover:bg-primary/10 rounded bg-card shadow-sm text-xs font-semibold px-2"
                     title="Realizar test para validar esta formación"
                   >
                     Verificar
@@ -209,7 +209,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                 )}
                 <button
                   onClick={() => onRemove(item.id)}
-                  className="p-1 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full flex items-center justify-center bg-white shadow-sm"
+                  className="p-1 text-error hover:opacity-80 hover:bg-error-soft rounded-full flex items-center justify-center bg-card shadow-sm"
                   title="Eliminar registro"
                 >
                   <Trash2 className="w-5 h-5" />
@@ -223,7 +223,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
       {isEditing && (
         <button
           onClick={onAdd}
-          className="flex items-center gap-2 px-4 py-2 border border-dashed border-gray-400 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="flex items-center gap-2 px-4 py-2 border border-dashed border-border rounded-md text-sm font-medium text-foreground hover:bg-muted"
         >
           <Plus className="w-4 h-4" /> Añadir nuevo registro
         </button>
