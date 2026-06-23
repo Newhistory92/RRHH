@@ -11,19 +11,21 @@ Como en las fases anteriores, este spec es **puramente visual** — no se toca l
 - **`SkillCard`** (componente compartido en `UiRRHH.tsx`, usado solo por CV): migra de `Card` de PrimeReact a `Card`/`CardHeader`/`CardTitle`/`CardContent`/`CardFooter` de shadcn — mismo componente instalado en la fase de Estadísticas. `Tag`/`Button`/`ProgressBar` de PrimeReact dentro de `SkillCard` se mantienen sin cambios.
 - **`TestModal.tsx`** (en `Componentes/Validaciones/`, fuera de la carpeta `CvComponente/` pero parte del flujo de validación de habilidades abierto desde `HabilidadesTecnicas.tsx`): incluido en este spec.
 - **`UiCv.tsx`**: solo `SectionTitle` se retemea (es el único export realmente usado, por `Screen.tsx`). `Card`, `Accordion`, `Input`, `Select`, `FieldLabel` son código muerto (ningún archivo de `CvComponente/` los importa) — no se tocan, mismo criterio que el código comentado de `UiRRHH.tsx` en la fase de RRHH.
+- **`DynamicSectionCv.tsx`** (en `Componentes/Perfil/`, fuera de `CvComponente/` pero usado por 4 de los 7 componentes — `FormacionAcademica`, `ExperienciaLaboral`, `Idiomas`, `CertificacionesCursos` delegan todo su renderizado de campos a este componente compartido): agregado al alcance tras revisión — sin él, esas 4 secciones quedarían sin retematizar. Incluido en este spec.
 
 ## Archivos afectados
 
 - `src/app/screens/Cv/Screen.tsx`
 - `src/app/Componentes/CvComponente/DatosPersonales.tsx`
-- `src/app/Componentes/CvComponente/FormacionAcademica.tsx`
-- `src/app/Componentes/CvComponente/ExperienciaLaboral.tsx`
-- `src/app/Componentes/CvComponente/Idiomas.tsx`
+- `src/app/Componentes/CvComponente/FormacionAcademica.tsx` (sin cambios directos — ver `DynamicSectionCv.tsx`)
+- `src/app/Componentes/CvComponente/ExperienciaLaboral.tsx` (sin cambios directos — ver `DynamicSectionCv.tsx`)
+- `src/app/Componentes/CvComponente/Idiomas.tsx` (sin cambios directos — ver `DynamicSectionCv.tsx`)
 - `src/app/Componentes/CvComponente/HabilidadesTecnicas.tsx`
 - `src/app/Componentes/CvComponente/HabilidadesBlandas.tsx`
-- `src/app/Componentes/CvComponente/CertificacionesCursos.tsx`
+- `src/app/Componentes/CvComponente/CertificacionesCursos.tsx` (sin cambios directos — ver `DynamicSectionCv.tsx`)
 - `src/app/Componentes/CvComponente/SkillTest.tsx`
 - `src/app/Componentes/Validaciones/TestModal.tsx`
+- `src/app/Componentes/Perfil/DynamicSectionCv.tsx`
 - `src/app/util/UiCv.tsx` (solo `SectionTitle`)
 - `src/app/util/UiRRHH.tsx` (solo `SkillCard` y `ProfilePictureUploader`)
 
@@ -64,7 +66,21 @@ Ambos archivos implementan el mismo flujo (examen de opción múltiple con resul
 
 Los tokens `bg-success-soft`/`bg-error-soft` (y sus `-foreground`) ya existen desde la fase de RRHH — no se crean tokens nuevos en este spec.
 
-### 5. `ProfilePictureUploader`
+### 5. `DynamicSectionCv.tsx` (renderizado compartido de campos)
+
+| Elemento | Antes | Después |
+|---|---|---|
+| Botón "Añadir nuevo registro" (2 ocurrencias) | `border-dashed border-gray-400 text-gray-700 hover:bg-gray-50` | `border-dashed border-border text-foreground hover:bg-muted` |
+| Labels de campo (texto/select/file, 3 ocurrencias) | `text-gray-700` | `text-foreground` |
+| Asterisco de campo requerido (2 ocurrencias) | `text-red-500` | `text-error` |
+| Checkbox | `border-gray-300 text-blue-600 focus:ring-blue-500` | `border-border text-primary focus:ring-primary` |
+| Input de archivo | `border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50` | `border-border focus:ring-primary focus:border-primary disabled:bg-muted` |
+| Badge "✓ Verificado" | `text-green-700 bg-green-100` | `bg-success-soft text-success-soft-foreground` |
+| Botón "Verificar" | `text-blue-500 hover:text-blue-700 hover:bg-blue-50 bg-white` | `text-primary hover:opacity-80 hover:bg-primary/10 bg-card` |
+| Botón eliminar (ícono papelera) | `text-red-500 hover:text-red-700 hover:bg-red-100 bg-white` | `text-error hover:opacity-80 hover:bg-error-soft bg-card` |
+| Ícono "Formación destacada" (estrella) | `text-yellow-400` | `text-warning` |
+
+### 6. `ProfilePictureUploader`
 
 `border-4 border-white` (anillo del avatar) → `border-4 border-card`. El overlay de hover (`bg-black/50`, ícono/texto blanco) se mantiene igual — es un scrim sobre la foto, no un color de superficie del tema.
 
