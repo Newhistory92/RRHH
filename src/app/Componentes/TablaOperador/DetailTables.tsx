@@ -188,8 +188,8 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
       <Toast ref={toast} />
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+          <div className="bg-card p-6 rounded-lg shadow-sm">
+            <h3 className="font-heading text-lg font-bold text-foreground mb-4 border-b border-border pb-2">
               Datos Personales
             </h3>
             <div className="space-y-4">
@@ -208,9 +208,9 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex justify-between items-center mb-4 border-b pb-2">
-              <h3 className="text-lg font-bold text-gray-800">
+          <div className="bg-card p-6 rounded-lg shadow-sm">
+            <div className="flex justify-between items-center mb-4 border-b border-border pb-2">
+              <h3 className="font-heading text-lg font-bold text-foreground">
                 Condición Laboral
               </h3>
               {!isEditing && (
@@ -218,7 +218,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
                   icon="pi pi-pencil"
                   className="p-button-text p-button-sm"
                   onClick={() => setIsEditing(true)}
-                  style={{ color: '#2563eb' }}
+                  style={{ color: 'var(--primary)' }}
                 />
               )}
             </div>
@@ -313,8 +313,8 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+          <div className="bg-card p-6 rounded-lg shadow-sm">
+            <h3 className="font-heading text-lg font-bold text-foreground mb-4 border-b border-border pb-2">
               Detalles Adicionales
             </h3>
             <div className="space-y-4">
@@ -346,7 +346,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
                       placeholder="09:00"
                       className="p-inputtext-sm w-20"
                     />
-                    <span className="text-gray-500 flex-shrink-0">—</span>
+                    <span className="text-muted-foreground flex-shrink-0">—</span>
                     <InputMask
                       value={formData.scheduleEnd}
                       onChange={(e) => setFormData({ ...formData, scheduleEnd: e.value || '' })}
@@ -375,10 +375,10 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
 
 const StepLabel = ({ n, label }: { n: number; label: string }) => (
   <div className="flex items-center gap-2 mb-3">
-    <span className="w-6 h-6 rounded-full bg-cyan-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+    <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center flex-shrink-0">
       {n}
     </span>
-    <h3 className="font-semibold text-gray-700 text-sm">{label}</h3>
+    <h3 className="font-semibold text-foreground text-sm">{label}</h3>
   </div>
 );
 
@@ -545,9 +545,9 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
   return (
     <div className="mt-4 flow-root">
       <Toast ref={toast} />
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-card p-6 rounded-lg shadow-sm">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-bold text-gray-800">Historial de Licencias</h2>
+          <h2 className="font-heading text-lg font-bold text-foreground">Historial de Licencias</h2>
           {canAddManual && (
             <Button
               label="Carga Manual"
@@ -571,7 +571,7 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
           )}
         >
           <div className="space-y-4 py-2">
-            <div className="bg-blue-50 border border-blue-100 p-3 rounded-lg text-xs text-blue-700">
+            <div className="bg-primary/10 border border-primary/20 p-3 rounded-lg text-xs text-primary">
               <span className="font-bold">Modo RRHH:</span> Esta licencia no requiere aprobación del supervisor y se guardará directamente como <strong>Aprobada</strong> en el historial, descontando los saldos correspondientes.
             </div>
 
@@ -590,10 +590,10 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
               <div className="space-y-3">
                 {/* Mostrar saldo disponible del tipo seleccionado */}
                 {typeKey && tiposData[typeKey] && (
-                  <div className="border border-gray-100 rounded-xl p-4">
+                  <div className="border border-border rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-semibold">{typeKey}</span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-muted-foreground">
                         {tiposData[typeKey].consumidos}/{tiposData[typeKey].diasTotales} consumidos
                       </span>
                     </div>
@@ -603,15 +603,15 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
                         : 0}
                       showValue={false}
                       style={{ height: 6 }}
-                      color="#06b6d4"
+                      color="var(--primary)"
                     />
-                    <p className="text-xs text-cyan-600 mt-1 font-medium">
+                    <p className="text-xs text-primary mt-1 font-medium">
                       Disponibles: {tiposData[typeKey].disponibles} días
                     </p>
                   </div>
                 )}
                 {typeKey && !tiposData[typeKey] && (
-                  <p className="text-center text-xs text-gray-400 py-4 border border-dashed rounded-xl">
+                  <p className="text-center text-xs text-muted-foreground py-4 border border-dashed border-border rounded-xl">
                     No hay saldo disponible para esta categoría.
                   </p>
                 )}
@@ -619,18 +619,18 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
             </Section>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-gray-700">Periodo de Licencia</label>
-              <div className="border border-gray-200 rounded-lg p-2 bg-gray-50">
+              <label className="text-sm font-semibold text-foreground">Periodo de Licencia</label>
+              <div className="border border-border rounded-lg p-2 bg-muted">
                 <Section>
                   <StepLabel n={1} label="Rango de fechas" />
                   {licenseMeta.mode === 'corrido' ? (
                     <div className="space-y-4">
-                      <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded-lg border border-amber-100 flex items-center gap-2">
+                      <p className="text-xs text-warning bg-warning-soft p-2 rounded-lg border border-border flex items-center gap-2">
                         <AlertCircle size={14} />
                         Esta licencia es de 90 días de corrido (calendario).
                       </p>
                       <div className="field">
-                        <label className="block text-xs font-semibold text-gray-500 mb-1">Fecha de Inicio</label>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-1">Fecha de Inicio</label>
                         <Calendar
                           value={startDate}
                           onChange={(e) => setStartDate(e.value as Date)}
@@ -640,12 +640,12 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
                         />
                       </div>
                       {endDate && (
-                        <div className="p-3 bg-cyan-50 border border-cyan-100 rounded-xl">
-                          <p className="text-xs font-semibold text-cyan-700">Período Calculado:</p>
-                          <p className="text-sm text-cyan-800 font-bold">
+                        <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl">
+                          <p className="text-xs font-semibold text-primary">Período Calculado:</p>
+                          <p className="text-sm text-primary font-bold">
                             {startDate?.toLocaleDateString()} al {endDate.toLocaleDateString()}
                           </p>
-                          <p className="text-[10px] text-cyan-600 mt-1">90 días calendario automáticos.</p>
+                          <p className="text-[10px] text-primary mt-1">90 días calendario automáticos.</p>
                         </div>
                       )}
                     </div>
@@ -657,7 +657,7 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-gray-700">Observaciones / Motivo</label>
+              <label className="text-sm font-semibold text-foreground">Observaciones / Motivo</label>
               <InputText
                 value={observaciones}
                 onChange={(e) => setObservaciones(e.target.value)}
@@ -670,67 +670,67 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
 
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <table className="min-w-full divide-y divide-gray-300">
+            <table className="min-w-full divide-y divide-border">
               <thead>
                 <tr>
                   <th
                     scope="col"
-                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-foreground sm:pl-0"
                   >
                     Tipo
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-foreground"
                   >
                     Inicio
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-foreground"
                   >
                     Fin
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-foreground"
                   >
                     Duración
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-foreground"
                   >
                     Estado
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-border">
                 {currentItems.map((lic: LicenseHistory) => (
                   <tr
                     key={lic.id}
                     onClick={() => onRowClick(lic)}
-                    className="cursor-pointer hover:bg-gray-50"
+                    className="cursor-pointer hover:bg-muted"
                   >
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-foreground sm:pl-0">
                       {lic.type}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                       {lic.startDate}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                       {lic.endDate}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                       {lic.duration} días
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                       <span
                         className={`px-2 py-1 text-xs font-semibold rounded-full ${lic.status === "Aprobada"
-                          ? "bg-green-100 text-green-800"
+                          ? "bg-success-soft text-success-soft-foreground"
                           : lic.status === "Rechazada"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-gray-100 text-gray-800"
+                            ? "bg-error-soft text-error-soft-foreground"
+                            : "bg-muted text-muted-foreground"
                           }`}
                       >
                         {lic.status}
@@ -740,7 +740,7 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
                 ))}
                 {totalItems === 0 && (
                   <tr>
-                    <td colSpan={5} className="text-center py-8 text-gray-500">
+                    <td colSpan={5} className="text-center py-8 text-muted-foreground">
                       No hay historial de licencias.
                     </td>
                   </tr>
@@ -770,52 +770,52 @@ export const PermissionHistoryTab = ({ permisos }: { permisos: Permit[] }) => (
   console.log(permisos),
 
   <div className="mt-4 flow-root">
-    <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="bg-card p-6 rounded-lg shadow-sm">
       <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <table className="min-w-full divide-y divide-gray-300">
+          <table className="min-w-full divide-y divide-border">
             <thead>
               <tr>
                 <th
                   scope="col"
-                  className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+                  className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-foreground sm:pl-0"
                 >
                   Fecha
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-foreground"
                 >
                   Hora Salida
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-foreground"
                 >
                   Hora Retorno
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-foreground"
                 >
                   Horas Adeudadas
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-border">
               {Array.isArray(permisos) && permisos.length > 0 ? (
                 permisos.map((p, index) => (
                   <tr key={p.id ?? index}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-foreground sm:pl-0">
                       {formatDate(p.date) ?? "Sin fecha"}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                       {decimalToTimeString(p.exitTime) ?? "—"}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                       {decimalToTimeString(p.returnTime) ?? "—"}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                       <HoursDisplay hours={p.hours ?? 0} />
                     </td>
                   </tr>
@@ -824,7 +824,7 @@ export const PermissionHistoryTab = ({ permisos }: { permisos: Permit[] }) => (
                 <tr>
                   <td
                     colSpan={4}
-                    className="text-center text-sm text-gray-500 py-4"
+                    className="text-center text-sm text-muted-foreground py-4"
                   >
                     No hay permisos registrados
                   </td>
