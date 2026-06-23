@@ -46,7 +46,7 @@ export const GlobalStats: React.FC<GlobalStatsProps> = ({ data, isLoading, error
         className="flex flex-col items-center justify-center text-center text-primary-foreground border-none"
         style={{ background: 'linear-gradient(to bottom right, var(--primary), var(--warm-contrast))' }}
       >
-        <CardHeader className="items-center">
+        <CardHeader className="items-center justify-items-center">
           <Award className="h-12 w-12 opacity-80" />
           <CardTitle className="text-sm font-light uppercase tracking-widest text-primary-foreground">Mejor Departamento</CardTitle>
         </CardHeader>
@@ -60,7 +60,7 @@ export const GlobalStats: React.FC<GlobalStatsProps> = ({ data, isLoading, error
         className="flex flex-col items-center justify-center text-center border-none"
         style={{ background: 'linear-gradient(to bottom right, var(--secondary), var(--muted))' }}
       >
-        <CardHeader className="items-center">
+        <CardHeader className="items-center justify-items-center">
           <Frown className="h-12 w-12 opacity-80 text-foreground" />
           <CardTitle className="text-sm font-light uppercase tracking-widest text-foreground">Ausencias (Promedio/Año)</CardTitle>
         </CardHeader>
@@ -69,8 +69,8 @@ export const GlobalStats: React.FC<GlobalStatsProps> = ({ data, isLoading, error
         </CardContent>
       </Card>
 
-      <Card className="flex flex-col items-center justify-center bg-card">
-        <CardHeader className="items-center">
+      <Card className="flex flex-col items-center justify-center text-center bg-card">
+        <CardHeader className="items-center justify-items-center">
           <Clock className="h-12 w-12 text-muted-foreground" />
           <CardTitle className="text-sm font-light uppercase tracking-widest text-muted-foreground">Tardanzas (Promedio/Año)</CardTitle>
         </CardHeader>

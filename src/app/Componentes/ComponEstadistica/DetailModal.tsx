@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import {getScoreColor, SoftSkillBar } from '@/app/util/UiRRHH';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, } from 'recharts';
 import {  X,  BarChart2, Star,  Briefcase, Calendar, MessageSquareWarning, } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Employee } from '@/app/Interfas/Interfaces';
@@ -78,8 +77,6 @@ export const EmployeeDetailModal: React.FC<{
   }
 
 const currentYear = String(new Date().getFullYear());
-const tooltipStyle = { backgroundColor: 'var(--popover)', border: 'none', borderRadius: '0.5rem', color: 'var(--popover-foreground)' };
-const tooltipTextStyle = { color: 'var(--popover-foreground)' };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
@@ -142,43 +139,31 @@ const tooltipTextStyle = { color: 'var(--popover-foreground)' };
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart2 className="text-primary" />
-                  Horas a Favor/Contra por Mes
+                  Horas a Favor/Contra
                 </CardTitle>
               </CardHeader>
               <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-
-                <BarChart
-                  data={remoteEmployee?.monthlyHours || []}
-                  margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
-                >
-
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-
-                  <Tooltip
-                    contentStyle={tooltipStyle}
-                    labelStyle={tooltipTextStyle}
-                    itemStyle={tooltipTextStyle}
-                  />
-
-                  <Bar dataKey="hours" name="Horas">
-
-                    {(remoteEmployee?.monthlyHours || []).map(
-                      (entry: { hours: number }, index: number) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={entry.hours >= 0 ? 'var(--color-success)' : 'var(--color-error)'}
-                        />
-                      )
-                    )}
-
-                  </Bar>
-
-                </BarChart>
-
-              </ResponsiveContainer>
+                {(() => {
+                  const horas = remoteEmployee?.horas;
+                  if (horas === null || horas === undefined) {
+                    return (
+                      <p className="text-muted-foreground">
+                        Sin saldo de horas registrado.
+                      </p>
+                    );
+                  }
+                  const isPositive = horas >= 0;
+                  return (
+                    <div className="flex items-baseline gap-3">
+                      <span className={`text-4xl font-bold ${isPositive ? 'text-success' : 'text-error'}`}>
+                        {isPositive ? '+' : ''}{horas.toFixed(1)}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {isPositive ? 'horas a favor' : 'horas en contra'}
+                      </span>
+                    </div>
+                  );
+                })()}
               </CardContent>
             </Card>
 
