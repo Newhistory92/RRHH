@@ -105,7 +105,7 @@ export const EmployeeTableView = ({
 
     return (
       <th
-        className="cursor-pointer hover:bg-gray-50"
+        className="cursor-pointer hover:bg-muted"
         onClick={() => handleSort(columnKey)}
       >
         <div className="flex items-center gap-2">
@@ -156,19 +156,19 @@ export const EmployeeTableView = ({
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="sm:flex sm:items-center sm:justify-between">
         <div className="sm:flex-auto">
-          <h1 className="text-2xl font-bold leading-6 text-gray-900">
+          <h1 className="font-heading text-2xl font-bold leading-6 text-foreground">
             Lista de Empleados
           </h1>
         </div>
         <div className="mt-4 sm:mt-0">
           <button
             onClick={onShowMessages}
-            className="flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             <Bell size={16} className="mr-2" />
             Solicitudes de Licencias
             {totalMessages > 0 && (
-              <span className="ml-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+              <span className="ml-2 bg-error text-error-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center">
                 {totalMessages}
               </span>
             )}
@@ -181,12 +181,12 @@ export const EmployeeTableView = ({
         <div className="sm:col-span-3">
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <Search className="h-5 w-5 text-gray-400" aria-hidden="true" />
+              <Search className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
             </div>
             <input
               type="text"
               placeholder="Buscar por nombre, DNI, departamento..."
-              className="block w-full rounded-md shadow-xl border-0 py-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm"
+              className="block w-full rounded-md shadow-xl border-0 py-2 pl-10 text-foreground ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm"
               value={filters.searchTerm}
               onChange={(e) => {
                 setFilters({ ...filters, searchTerm: e.target.value });
@@ -197,7 +197,7 @@ export const EmployeeTableView = ({
         </div>
         <div className="sm:col-span-1">
           <select
-            className="block w-full px-3 rounded-md border-0 py-2.5 text-gray-900 shadow-xl ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm"
+            className="block w-full px-3 rounded-md border-0 py-2.5 text-foreground shadow-xl ring-1 ring-inset ring-border focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm"
             value={filters.estado}
             onChange={(e) => {
               setFilters({ ...filters, estado: e.target.value });
@@ -214,7 +214,7 @@ export const EmployeeTableView = ({
         </div>
         <div className="sm:col-span-2">
           <select
-            className="block w-full px-3 rounded-md border-0 py-2.5 text-gray-900 shadow-xl ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm"
+            className="block w-full px-3 rounded-md border-0 py-2.5 text-foreground shadow-xl ring-1 ring-inset ring-border focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm"
             value={filters.departamento}
             onChange={(e) => {
               setFilters({ ...filters, departamento: e.target.value });
@@ -240,18 +240,18 @@ export const EmployeeTableView = ({
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-border">
+                <thead className="bg-muted">
                   <tr>
                     <th
                       scope="col"
-                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-foreground sm:pl-6"
                     >
                       Nombre Completo
                     </th>
                     <th
                       scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-foreground"
                     >
                       DNI
                     </th>
@@ -262,52 +262,52 @@ export const EmployeeTableView = ({
                     <SortableHeader columnKey="hours">Horas</SortableHeader>
                     <th
                       scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-foreground"
                     >
                       Acción
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
+                <tbody className="divide-y divide-border bg-card">
                   {paginatedEmployees.map((employee) => (
                     <tr key={employee.id}>
                       <td
-                        className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 hover:bg-gray-50 cursor-pointer"
+                        className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-foreground sm:pl-6 hover:bg-muted cursor-pointer"
                         onClick={() => onSelectEmployee(employee.id)}
                       >
                         {employee.name}
                       </td>
                       <td
-                        className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hover:bg-gray-50 cursor-pointer"
+                        className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground hover:bg-muted cursor-pointer"
                         onClick={() => onSelectEmployee(employee.id)}
                       >
                         {employee.dni}
                       </td>
                       <td
-                        className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hover:bg-gray-50 cursor-pointer"
+                        className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground hover:bg-muted cursor-pointer"
                         onClick={() => onSelectEmployee(employee.id)}
                       >
                         <StatusBadge status={employee.status} />
                       </td>
                       <td
-                        className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hover:bg-gray-50 cursor-pointer"
+                        className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground hover:bg-muted cursor-pointer"
                         onClick={() => onSelectEmployee(employee.id)}
                       >
                         {getDepartmentName(employee.department)}
                       </td>
                       <td
-                        className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 hover:bg-gray-50 cursor-pointer"
+                        className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground hover:bg-muted cursor-pointer"
                         onClick={() => onSelectEmployee(employee.id)}
                       >
                         <HoursDisplay hours={employee.hours} />
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             onOpenPermissionModal(employee.id);
                           }}
-                          className="text-indigo-600 hover:text-indigo-900 font-medium flex items-center gap-1"
+                          className="text-primary hover:opacity-80 font-medium flex items-center gap-1"
                         >
                           <LogOut size={14} /> Permiso Salida
                         </button>
@@ -317,8 +317,8 @@ export const EmployeeTableView = ({
                 </tbody>
               </table>
               {filteredAndSortedEmployees.length === 0 && (
-                <div className="text-center py-12 text-gray-500 bg-white">
-                  <AlertTriangle size={40} className="mx-auto text-gray-400" />
+                <div className="text-center py-12 text-muted-foreground bg-card">
+                  <AlertTriangle size={40} className="mx-auto text-muted-foreground" />
                   <p className="mt-2 font-semibold">
                     No se encontraron empleados
                   </p>
