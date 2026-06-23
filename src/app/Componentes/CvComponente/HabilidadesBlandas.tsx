@@ -28,15 +28,15 @@ export default function HabilidadesBlandas({ data, selectedSkills, softSkillsCat
         {softSkillsCatalog.map((skill) => (
           <label
             key={skill.id}
-            className={`flex items-start p-3 border rounded-lg ${
+            className={`flex items-start p-3 border border-border rounded-lg ${
               isEditing
-                ? "cursor-pointer hover:bg-gray-50"
-                : "cursor-not-allowed bg-gray-50"
+                ? "cursor-pointer hover:bg-muted"
+                : "cursor-not-allowed bg-muted"
             }`}
           >
             <input
               type="checkbox"
-              className={`h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-1 ${
+              className={`h-5 w-5 rounded border-border text-primary focus:ring-primary mt-1 ${
                 !isEditing ? "cursor-not-allowed" : ""
               }`}
               checked={selectedSkills.includes(skill.id)}
@@ -44,10 +44,10 @@ export default function HabilidadesBlandas({ data, selectedSkills, softSkillsCat
               disabled={!isEditing}
             />
             <div className="ml-3 text-sm">
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-foreground">
                 {skill.nombre}
               </span>
-              <p className="text-gray-500">{skill.descripcion}</p>
+              <p className="text-muted-foreground">{skill.descripcion}</p>
             </div>
           </label>
         ))}
