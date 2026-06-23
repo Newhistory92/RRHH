@@ -110,10 +110,10 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
 
    if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center">
-          <i className="pi pi-spin pi-spinner text-4xl text-blue-500 mb-4"></i>
-          <p className="text-gray-600 dark:text-gray-400">Cargando...</p>
+          <i className="pi pi-spin pi-spinner text-4xl text-primary mb-4"></i>
+          <p className="text-muted-foreground">Cargando...</p>
         </div>
       </div>
     );
@@ -164,7 +164,7 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
           .no-print { display: none !important; }
         }
       `}</style>
-      <div className="bg-white min-h-screen font-sans shadow-2xl">
+      <div className="bg-background min-h-screen font-sans">
         <main>
           {renderContent()}
           <PermissionModal
