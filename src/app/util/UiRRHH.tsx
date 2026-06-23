@@ -795,7 +795,7 @@
 import { ReactElement, ReactNode, useState, useEffect, useRef, ChangeEvent } from 'react';
 import Image from "next/image";
 import { TechnicalSkill, Employee, Skill, Usuario, Role } from '@/app/Interfas/Interfaces';
-import { Card } from 'primereact/card';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { ProgressBar } from 'primereact/progressbar';
 import { Button } from 'primereact/button';
 import { Camera, CheckCircle, Activity, TrendingDown, AlertTriangle, Plus, SquarePen } from "lucide-react";
@@ -898,25 +898,27 @@ export const SkillCard = ({ skill, onStartTest }: { skill: Skill; onStartTest: (
   const fmt = (d: string) => new Date(d).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
 
   return (
-    <Card
-      title={skill.name}
-      footer={!isValidated && (
-        <div className="flex justify-end">
+    <Card className="h-full flex flex-col">
+      <CardHeader>
+        <CardTitle>{skill.name}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex-1">
+        <p className="text-muted-foreground text-sm mb-3">{skill.description}</p>
+        {isValidated && (
+          <>
+            <Tag severity="success" value="Validado" icon="pi pi-check-circle" className="mb-2" />
+            <ProgressBar value={skill.level * 10} style={{ height: 6 }} showValue={false} />
+            <small className="text-muted-foreground mt-1 block">Nivel: {skill.level}/10</small>
+          </>
+        )}
+        {isLocked && skill.unlockDate && (
+          <Tag severity="danger" icon="pi pi-lock" value={`Bloqueado hasta: ${fmt(skill.unlockDate)}`} />
+        )}
+      </CardContent>
+      {!isValidated && (
+        <CardFooter className="flex justify-end">
           <Button label="Comenzar Prueba" icon="pi pi-bolt" onClick={() => onStartTest(skill)} disabled={!!isLocked} size="small" />
-        </div>
-      )}
-      className="h-full flex flex-col"
-    >
-      <p className="text-gray-500 text-sm mb-3">{skill.description}</p>
-      {isValidated && (
-        <>
-          <Tag severity="success" value="Validado" icon="pi pi-check-circle" className="mb-2" />
-          <ProgressBar value={skill.level * 10} style={{ height: 6 }} showValue={false} />
-          <small className="text-gray-400 mt-1 block">Nivel: {skill.level}/10</small>
-        </>
-      )}
-      {isLocked && skill.unlockDate && (
-        <Tag severity="danger" icon="pi pi-lock" value={`Bloqueado hasta: ${fmt(skill.unlockDate)}`} />
+        </CardFooter>
       )}
     </Card>
   );
