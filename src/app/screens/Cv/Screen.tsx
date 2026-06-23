@@ -64,12 +64,12 @@ export default function EmployeeCV({ employeeData, globalSettings = {} }: Employ
   // Mientras se valida la autenticacion
   if (isAuthenticated === null) {
     return (
-      <div className="bg-gray-100 font-sans min-h-screen flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-md">
+      <div className="bg-background font-sans min-h-screen flex items-center justify-center">
+        <div className="bg-card p-8 rounded-lg shadow-sm">
           <div className="flex justify-center mb-4">
-            <i className="pi pi-spin pi-spinner text-4xl text-blue-500"></i>
+            <i className="pi pi-spin pi-spinner text-4xl text-primary"></i>
           </div>
-          <p className="text-gray-700 text-center">Verificando sesion...</p>
+          <p className="text-foreground text-center">Verificando sesion...</p>
         </div>
       </div>
     );
@@ -78,19 +78,19 @@ export default function EmployeeCV({ employeeData, globalSettings = {} }: Employ
   // Manejar el caso donde el empleado no se encuentra
   if (!cvData) {
     return (
-      <div className="bg-gray-100 font-sans min-h-screen flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-md">
+      <div className="bg-background font-sans min-h-screen flex items-center justify-center">
+        <div className="bg-card p-8 rounded-lg shadow-sm">
           {employeeData === null ? (
             <>
               <div className="flex justify-center mb-4">
-                <i className="pi pi-spin pi-spinner text-4xl text-blue-500"></i>
+                <i className="pi pi-spin pi-spinner text-4xl text-primary"></i>
               </div>
-              <p className="text-gray-700 text-center">Cargando informacion del empleado...</p>
+              <p className="text-foreground text-center">Cargando informacion del empleado...</p>
             </>
           ) : (
             <>
-              <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
-              <p className="text-gray-700">No se pudo encontrar la informacion del empleado.</p>
+              <h2 className="text-xl font-semibold text-error mb-2">Error</h2>
+              <p className="text-foreground">No se pudo encontrar la informacion del empleado.</p>
             </>
           )}
         </div>
@@ -146,7 +146,7 @@ export default function EmployeeCV({ employeeData, globalSettings = {} }: Employ
   };
 
   return (
-    <div className="bg-gray-100 font-sans min-h-screen">
+    <div className="bg-background font-sans min-h-screen">
       <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
         <div className="flex justify-between items-start mb-6">
           <SectionTitle icon={FileText} title="Mis Datos" />

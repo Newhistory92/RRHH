@@ -29,8 +29,8 @@ export const Card = ({ children, className = '' }: CardProps) => (
 
 export const SectionTitle = ({ icon: Icon, title }: SectionTitleProps) => (
   <div className="flex items-center gap-3 mb-6">
-    <Icon className="w-6 h-6 text-[#1ABCD7]" />
-    <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+    <Icon className="w-6 h-6 text-primary" />
+    <h2 className="font-heading text-xl font-bold text-foreground">{title}</h2>
   </div>
 );
 
