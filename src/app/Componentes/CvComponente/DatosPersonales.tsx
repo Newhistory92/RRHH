@@ -74,7 +74,7 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
 
           {/* Nombre Completo */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="name" className="text-sm font-medium text-gray-700">
+            <label htmlFor="name" className="text-sm font-medium text-foreground">
               Nombre Completo
             </label>
             <InputText
@@ -87,7 +87,7 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
 
           {/* DNI */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="dni" className="text-sm font-medium text-gray-700">
+            <label htmlFor="dni" className="text-sm font-medium text-foreground">
               DNI
             </label>
             <InputText
@@ -100,7 +100,7 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
 
           {/* Fecha de Nacimiento */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="birthDate" className="text-sm font-medium text-gray-700">
+            <label htmlFor="birthDate" className="text-sm font-medium text-foreground">
               Fecha de Nacimiento
             </label>
             {isEditing ? (
@@ -124,7 +124,7 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
           </div>
           {/* Género */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="gender" className="text-sm font-medium text-gray-700">
+            <label htmlFor="gender" className="text-sm font-medium text-foreground">
               Género (opcional)
             </label>
             <Dropdown
@@ -142,7 +142,7 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
 
           {/* Dirección */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="address" className="text-sm font-medium text-gray-700">
+            <label htmlFor="address" className="text-sm font-medium text-foreground">
               Dirección
             </label>
             <InputText
@@ -158,7 +158,7 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
           
           {/* Teléfono */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="phone" className="text-sm font-medium text-gray-700">
+            <label htmlFor="phone" className="text-sm font-medium text-foreground">
               Teléfono
             </label>
             <InputText
@@ -175,7 +175,7 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
 
           {/* Email */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="email" className="text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="text-sm font-medium text-foreground">
               Email
             </label>
               <InputText
