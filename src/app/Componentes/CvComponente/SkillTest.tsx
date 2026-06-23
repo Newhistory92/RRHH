@@ -36,7 +36,7 @@ export const SkillTestDialog: React.FC<SkillTestDialogProps> = ({
     const [userAnswers, setUserAnswers] = useState<Record<number, number>>({});
     const [score, setScore] = useState(0);
     const [testResult, setTestResult] = useState<'Malo' | 'Bueno' | 'Avanzado' | null>(null);
-
+   
  
 
     const resetTestState = () => {
@@ -271,7 +271,7 @@ IMPORTANTE:
             {testState === 'loading' && (
                 <div className="flex flex-col justify-center items-center p-8">
                     <ProgressSpinner />
-                    <p className="mt-4 text-gray-600">
+                    <p className="mt-4 text-muted-foreground">
                         Preparando tu evaluación de {skill?.name}...
                     </p>
                 </div>
@@ -283,10 +283,10 @@ IMPORTANTE:
                     {/* Progreso */}
                     <div>
                         <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm font-medium text-gray-600">
+                            <span className="text-sm font-medium text-muted-foreground">
                                 Pregunta {currentQuestionIndex + 1} de {questions.length}
                             </span>
-                            <span className="text-sm font-medium text-gray-600">
+                            <span className="text-sm font-medium text-muted-foreground">
                                 {Math.round(progress)}% completado
                             </span>
                         </div>
@@ -299,24 +299,24 @@ IMPORTANTE:
 
                     {/* Pregunta */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                        <h3 className="text-lg font-semibold text-foreground mb-4">
                             {currentQuestion.question}
                         </h3>
 
                         {/* Opciones */}
                         <div className="space-y-3">
                             {currentQuestion.options?.map((option, index) => (
-                                <div key={index} className="flex items-center p-3 rounded-lg hover:bg-gray-50 border border-gray-200">
-                                    <RadioButton 
-                                        inputId={`option${index}`} 
-                                        name={`question${currentQuestionIndex}`} 
+                                <div key={index} className="flex items-center p-3 rounded-lg hover:bg-muted border border-border">
+                                    <RadioButton
+                                        inputId={`option${index}`}
+                                        name={`question${currentQuestionIndex}`}
                                         value={index}
                                         onChange={(e) => handleAnswerSelect(currentQuestionIndex, e.value)}
-                                        checked={userAnswers[currentQuestionIndex] === index} 
+                                        checked={userAnswers[currentQuestionIndex] === index}
                                     />
-                                    <label 
-                                        htmlFor={`option${index}`} 
-                                        className="ml-3 cursor-pointer flex-1 text-gray-700"
+                                    <label
+                                        htmlFor={`option${index}`}
+                                        className="ml-3 cursor-pointer flex-1 text-foreground"
                                     >
                                         {option}
                                     </label>
@@ -342,26 +342,26 @@ IMPORTANTE:
                 <div className="text-center space-y-6 p-6">
                     {/* Icono de resultado */}
                     {score >= 70 ? (
-                        <CheckCircle className="w-20 h-20 text-green-500 mx-auto" />
+                        <CheckCircle className="w-20 h-20 text-success mx-auto" />
                     ) : (
-                        <XCircle className="w-20 h-20 text-red-500 mx-auto" />
+                        <XCircle className="w-20 h-20 text-error mx-auto" />
                     )}
 
                     {/* Título */}
-                    <h3 className="text-2xl font-bold text-gray-800">
+                    <h3 className="font-heading text-2xl font-bold text-foreground">
                         ¡Evaluación Completada!
                     </h3>
 
                     {/* Puntuación */}
                     <div className="space-y-2">
-                        <p className="text-3xl font-bold text-gray-900">
+                        <p className="text-3xl font-bold text-foreground">
                             {Math.round(score)}%
                         </p>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-lg text-muted-foreground">
                             Nivel obtenido: <span className={`font-semibold ${
-                                testResult === 'Avanzado' ? 'text-green-600' :
-                                testResult === 'Bueno' ? 'text-blue-600' :
-                                'text-red-600'
+                                testResult === 'Avanzado' ? 'text-success' :
+                                testResult === 'Bueno' ? 'text-primary' :
+                                'text-error'
                             }`}>
                                 {testResult}
                             </span>
@@ -370,20 +370,20 @@ IMPORTANTE:
 
                     {/* Mensaje de resultado */}
                     {score >= 70 ? (
-                        <div className="p-4 bg-green-50 rounded-lg">
-                            <p className="text-green-800 font-medium">
+                        <div className="p-4 bg-success-soft rounded-lg">
+                            <p className="text-success-soft-foreground font-medium">
                                 ¡Felicitaciones! Has aprobado la evaluación.
                             </p>
-                            <p className="text-green-700 text-sm mt-1">
+                            <p className="text-success-soft-foreground text-sm mt-1">
                                 Esta habilidad será validada en tu perfil.
                             </p>
                         </div>
                     ) : (
-                        <div className="p-4 bg-red-50 rounded-lg">
-                            <p className="text-red-800 font-medium">
+                        <div className="p-4 bg-error-soft rounded-lg">
+                            <p className="text-error-soft-foreground font-medium">
                                 No has alcanzado el puntaje mínimo para aprobar.
                             </p>
-                            <p className="text-red-700 text-sm mt-1">
+                            <p className="text-error-soft-foreground text-sm mt-1">
                                 Podrás intentar nuevamente en 3 meses.
                             </p>
                         </div>
