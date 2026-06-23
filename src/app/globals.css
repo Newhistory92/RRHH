@@ -108,6 +108,12 @@
   --color-error-foreground: var(--color-error-foreground);
   --color-info: var(--color-info);
   --color-info-foreground: var(--color-info-foreground);
+  --color-success-soft: color-mix(in srgb, var(--color-success) 20%, var(--background));
+  --color-success-soft-foreground: var(--color-success);
+  --color-warning-soft: color-mix(in srgb, var(--color-warning) 20%, var(--background));
+  --color-warning-soft-foreground: var(--color-warning);
+  --color-error-soft: color-mix(in srgb, var(--color-error) 20%, var(--background));
+  --color-error-soft-foreground: var(--color-error);
 }
 
 body {
