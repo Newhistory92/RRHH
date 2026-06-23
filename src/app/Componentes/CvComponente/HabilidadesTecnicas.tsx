@@ -204,25 +204,25 @@ export default function HabilidadesTecnicas({
                         )}
 
                         {loading ? (
-                            <p className="text-gray-500 italic">Cargando habilidades...</p>
+                            <p className="text-muted-foreground italic">Cargando habilidades...</p>
                         ) : (
                             <>
                                 {/* Seccion de Habilidades Validadas */}
-                                <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                                <h3 className="font-heading text-xl font-semibold text-foreground mb-4">
                                     Habilidades Validadas
                                 </h3>
                                 {validatedSkills.length > 0 ? (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {validatedSkills.map(skill => (
-                                            <SkillCard 
-                                                key={skill.id} 
-                                                skill={skill} 
-                                                onStartTest={handleStartTest} 
+                                            <SkillCard
+                                                key={skill.id}
+                                                skill={skill}
+                                                onStartTest={handleStartTest}
                                             />
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-gray-500 italic mb-6">
+                                    <p className="text-muted-foreground italic mb-6">
                                         Aun no tienes habilidades validadas.
                                     </p>
                                 )}
@@ -230,21 +230,21 @@ export default function HabilidadesTecnicas({
                                 {/* Seccion de Habilidades por Validar (solo en modo edicion) */}
                                 {isEditing && (
                                     <div className="mt-8">
-                                        <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                                        <h3 className="font-heading text-xl font-semibold text-foreground mb-4">
                                             Habilidades por Validar
                                         </h3>
                                         {pendingSkills.length > 0 ? (
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                                 {pendingSkills.map(skill => (
-                                                    <SkillCard 
-                                                        key={skill.id} 
-                                                        skill={skill} 
+                                                    <SkillCard
+                                                        key={skill.id}
+                                                        skill={skill}
                                                         onStartTest={handleStartTest}
                                                     />
                                                 ))}
                                             </div>
                                         ) : (
-                                            <p className="text-gray-500 italic">
+                                            <p className="text-muted-foreground italic">
                                                 No hay mas habilidades disponibles para validar.
                                             </p>
                                         )}
