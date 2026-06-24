@@ -26,34 +26,34 @@ interface Props {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const STATUS: Record<LicenseStatus, { cls: string; label: string }> = {
-  'Pendiente': { cls: 'bg-yellow-50 text-yellow-700 border-yellow-200', label: 'Pendiente' },
-  'Pendiente Siguiente Aprobación': { cls: 'bg-cyan-50 text-cyan-700 border-cyan-200', label: 'En revisión' },
-  'Aprobada': { cls: 'bg-green-50 text-green-700 border-green-200', label: 'Aprobada' },
-  'Rechazada': { cls: 'bg-red-50 text-red-700 border-red-200', label: 'Rechazada' },
+  'Pendiente': { cls: 'bg-warning-soft text-warning-soft-foreground border-warning', label: 'Pendiente' },
+  'Pendiente Siguiente Aprobación': { cls: 'bg-primary/15 text-primary border-primary/30', label: 'En revisión' },
+  'Aprobada': { cls: 'bg-success-soft text-success-soft-foreground border-success', label: 'Aprobada' },
+  'Rechazada': { cls: 'bg-error-soft text-error-soft-foreground border-error', label: 'Rechazada' },
 };
 
 // Mapa de íconos dinámico por tipo de licencia
 const ICONOS: Record<string, React.ReactNode> = {
-  Licencias: <Briefcase size={14} className="text-cyan-500" />,
-  Vacaciones: <Briefcase size={14} className="text-cyan-500" />,
-  Particulares: <Users size={14} className="text-cyan-500" />,
-  Particular: <Users size={14} className="text-cyan-500" />,
-  Articulos: <Award size={14} className="text-cyan-500" />,
-  Examen: <GraduationCap size={14} className="text-cyan-500" />,
-  'Lic por Examen': <GraduationCap size={14} className="text-cyan-500" />,
-  Estudio: <GraduationCap size={14} className="text-cyan-500" />,
-  Nacimiento: <Baby size={14} className="text-cyan-500" />,
-  Paternidad: <Baby size={14} className="text-cyan-500" />,
-  Maternidad: <Heart size={14} className="text-pink-500" />,
-  Embarazo: <Heart size={14} className="text-pink-500" />,
-  'Matrimonio del empleado': <Heart size={14} className="text-red-400" />,
-  'Matrimonio de su hijo': <Heart size={14} className="text-red-400" />,
-  Enfermedad: <AlertTriangle size={14} className="text-amber-500" />,
-  'Lic por Enfermedad': <AlertTriangle size={14} className="text-amber-500" />,
-  LAR: <Clock size={14} className="text-gray-500" />,
+  Licencias: <Briefcase size={14} className="text-primary" />,
+  Vacaciones: <Briefcase size={14} className="text-primary" />,
+  Particulares: <Users size={14} className="text-primary" />,
+  Particular: <Users size={14} className="text-primary" />,
+  Articulos: <Award size={14} className="text-primary" />,
+  Examen: <GraduationCap size={14} className="text-primary" />,
+  'Lic por Examen': <GraduationCap size={14} className="text-primary" />,
+  Estudio: <GraduationCap size={14} className="text-primary" />,
+  Nacimiento: <Baby size={14} className="text-primary" />,
+  Paternidad: <Baby size={14} className="text-primary" />,
+  Maternidad: <Heart size={14} className="text-warm-contrast" />,
+  Embarazo: <Heart size={14} className="text-warm-contrast" />,
+  'Matrimonio del empleado': <Heart size={14} className="text-error" />,
+  'Matrimonio de su hijo': <Heart size={14} className="text-error" />,
+  Enfermedad: <AlertTriangle size={14} className="text-warning" />,
+  'Lic por Enfermedad': <AlertTriangle size={14} className="text-warning" />,
+  LAR: <Clock size={14} className="text-muted-foreground" />,
 };
 
-const getIcon = (tipo: string) => ICONOS[tipo] || <FileText size={14} className="text-cyan-500" />;
+const getIcon = (tipo: string) => ICONOS[tipo] || <FileText size={14} className="text-primary" />;
 
 const fmt = (d: string | Date) => new Date(d).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
 
@@ -67,10 +67,10 @@ const StatusChip = ({ status, observacion }: { status: LicenseStatus; observacio
 };
 
 const Section = ({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) => (
-  <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-    <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-50">
+  <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+    <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border">
       {icon}
-      <h2 className="text-sm font-semibold text-gray-700">{title}</h2>
+      <h2 className="font-heading text-sm font-semibold text-foreground">{title}</h2>
     </div>
     <div className="p-5">{children}</div>
   </div>
