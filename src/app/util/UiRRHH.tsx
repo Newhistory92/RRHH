@@ -942,7 +942,7 @@ export const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ 
           src={photo || '/Default-avatar.webp'}
           alt="Foto de Perfil"
           width={144} height={144}
-          className="w-full h-full rounded-full object-cover object-center border-4 border-white shadow-lg"
+          className="w-full h-full rounded-full object-cover object-center border-4 border-card shadow-lg"
         />
         {isEditing && (
           <button
