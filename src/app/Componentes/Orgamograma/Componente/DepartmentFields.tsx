@@ -36,7 +36,7 @@ console.log(employees)
     <>
       {/* Nivel Jerárquico */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Nivel Jerárquico
         </label>
         <InputNumber 
@@ -54,7 +54,7 @@ console.log(employees)
 
       {/* Departamento Padre */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Depende de (Dpto. Padre)
         </label>
         <Dropdown
@@ -74,7 +74,7 @@ console.log(employees)
 
       {/* Jefe de Área */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Jefe de Área
         </label>
         <Dropdown
@@ -96,7 +96,7 @@ console.log(employees)
 
       {/* Empleados Asignados */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Empleados del Departamento
         </label>
         <MultiSelect
@@ -124,7 +124,7 @@ console.log(employees)
         {/* Avatares de empleados seleccionados */}
         {formData.empleadosIds && formData.empleadosIds.length > 0 && (
           <div className="mt-3">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Empleados Seleccionados:
             </label>
             <AvatarGroup>

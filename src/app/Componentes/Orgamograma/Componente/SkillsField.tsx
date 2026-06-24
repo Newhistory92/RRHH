@@ -19,7 +19,7 @@ export const SkillsField: React.FC<SkillsFieldProps> = ({
   return (
     <div>
       <div className="flex justify-between items-center mb-2">
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-foreground">
           Habilidades Requeridas
         </label>
         <Button

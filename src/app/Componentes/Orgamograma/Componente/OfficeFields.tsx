@@ -40,7 +40,7 @@ export const OfficeFields: React.FC<FormFieldProps> = ({
     <>
       {/* Departamento Padre (Jerarquía) */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Depende de (Dpto. Padre)
         </label>
         <Dropdown
@@ -62,7 +62,7 @@ export const OfficeFields: React.FC<FormFieldProps> = ({
 
       {/* Jefe de Oficina */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Jefe de Oficina
         </label>
         <Dropdown
@@ -86,7 +86,7 @@ export const OfficeFields: React.FC<FormFieldProps> = ({
 
       {/* Empleados Asignados */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Empleados Asignados
         </label>
         <MultiSelect
@@ -113,7 +113,7 @@ export const OfficeFields: React.FC<FormFieldProps> = ({
         {/* Avatares de empleados seleccionados */}
         {formData.empleadosIds && formData.empleadosIds.length > 0 && (
           <div className="mt-3">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Empleados Seleccionados:
             </label>
             <AvatarGroup>
