@@ -131,25 +131,25 @@ const handleSave = async (formData: EntityFormData): Promise<void> => {
 
 
   return (
-    <div className="bg-gray-100 font-sans min-h-screen">
+    <div className="bg-background font-sans min-h-screen">
       <div className="container mx-auto p-4 md:p-8">
         <header className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800">
+          <h1 className="font-heading text-4xl font-bold text-foreground">
             Gestión Organizacional
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-muted-foreground mt-1">
             Administra la estructura de tu empresa.
           </p>
         </header>
 
-        <div className="mb-6 border-b border-gray-200">
+        <div className="mb-6 border-b border-border">
           <nav className="-mb-px flex space-x-6">
             <button
   onClick={() => setActiveTab("gestion")}
   className={`flex items-center px-4 py-2 font-semibold transition-colors duration-200 ${
     activeTab === "gestion"
-      ? "border-b-2 border-[#2ecbe7] text-[#1ABCD7] text-shadow-md"
-      : "text-gray-500 hover:text-blue-500 text-shadow-md"
+      ? "border-b-2 border-primary text-primary text-shadow-md"
+      : "text-muted-foreground hover:text-primary text-shadow-md"
   }`}
 >
   <LayoutGrid className="h-5 w-5 mr-2" />
@@ -159,8 +159,8 @@ const handleSave = async (formData: EntityFormData): Promise<void> => {
               onClick={() => setActiveTab("organigrama")}
               className={`flex items-center px-4 py-2 font-semibold transition-colors duration-200 ${
     activeTab === "organigrama"
-      ? "border-b-2 border-[#2ecbe7] text-[#1ABCD7] text-shadow-md"
-      : "text-gray-500 hover:text-blue-500 text-shadow-md"
+      ? "border-b-2 border-primary text-primary text-shadow-md"
+      : "text-muted-foreground hover:text-primary text-shadow-md"
   }`}
             >
               <Sparkles className="mr-2 h-5 w-5" />
