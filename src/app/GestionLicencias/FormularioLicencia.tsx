@@ -51,15 +51,15 @@ export interface RequestFormProps {
 
 const StepLabel = ({ n, label }: { n: number; label: string }) => (
   <div className="flex items-center gap-2 mb-3">
-    <span className="w-6 h-6 rounded-full bg-cyan-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+    <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center flex-shrink-0">
       {n}
     </span>
-    <h3 className="font-semibold text-gray-700 text-sm">{label}</h3>
+    <h3 className="font-semibold text-foreground text-sm">{label}</h3>
   </div>
 );
 
 const Section = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`bg-white rounded-xl border border-gray-100 shadow-sm p-5 ${className}`}>
+  <div className={`bg-card rounded-xl border border-border shadow-sm p-5 ${className}`}>
     {children}
   </div>
 );
@@ -358,17 +358,17 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
   return (
     <div className="max-w-4xl mx-auto space-y-4 pb-8">
       <div className="flex items-center gap-3">
-        <button onClick={onCancel} className="p-2 rounded-lg hover:bg-gray-100 transition text-gray-500">
+        <button onClick={onCancel} className="p-2 rounded-lg hover:bg-muted transition text-muted-foreground">
           <ArrowLeft size={18} />
         </button>
         <div>
-          <h2 className="text-lg font-bold text-gray-800">Nueva Solicitud de Licencia</h2>
-          <p className="text-xs text-gray-400">{userData.name} · {userData.condicionLaboral?.tipoContrato}</p>
+          <h2 className="font-heading text-lg font-bold text-foreground">Nueva Solicitud de Licencia</h2>
+          <p className="text-xs text-muted-foreground">{userData.name} · {userData.condicionLaboral?.tipoContrato}</p>
         </div>
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+        <div className="flex items-center gap-2 p-3 bg-error-soft border border-error rounded-xl text-sm text-error-soft-foreground">
           <AlertCircle size={16} />
           {error}
         </div>
@@ -391,10 +391,10 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
           <div className="space-y-3">
             {/* Mostrar saldo disponible del tipo seleccionado */}
             {typeKey && tiposData[typeKey] && (
-              <div className="border border-gray-100 rounded-xl p-4">
+              <div className="border border-border rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-semibold">{typeKey}</span>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     {tiposData[typeKey].consumidos}/{tiposData[typeKey].diasTotales} consumidos
                   </span>
                 </div>
@@ -404,15 +404,15 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
                     : 0}
                   showValue={false}
                   style={{ height: 6 }}
-                  color="#06b6d4"
+                  color="var(--primary)"
                 />
-                <p className="text-xs text-cyan-600 mt-1 font-medium">
+                <p className="text-xs text-primary mt-1 font-medium">
                   Disponibles: {tiposData[typeKey].disponibles} días
                 </p>
               </div>
             )}
             {typeKey && !tiposData[typeKey] && (
-              <p className="text-center text-xs text-gray-400 py-4 border border-dashed rounded-xl">
+              <p className="text-center text-xs text-muted-foreground py-4 border border-dashed rounded-xl">
                 No hay saldo disponible para esta categoría.
               </p>
             )}
