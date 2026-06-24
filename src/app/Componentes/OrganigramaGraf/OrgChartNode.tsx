@@ -31,7 +31,7 @@ export const OrgChartNode: React.FC<OrgChartNodeProps> = ({ node, colorTheme }) 
           <div className="flex gap-8 pt-4">
             {node.children?.map((child) => (
               <div key={child.id} className="relative">
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-4 bg-gray-400 dark:bg-gray-500"></div>
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-4 bg-border"></div>
                 <div className="pt-4">
                   <OrgChartNode node={child} colorTheme={colorTheme} />
                 </div>

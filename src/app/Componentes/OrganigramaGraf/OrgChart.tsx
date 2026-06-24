@@ -18,7 +18,7 @@ export const OrgChart: React.FC<OrgChartProps> = ({
     const [colorTheme, setColorTheme] = useState<string>(options[0]);
 
 return (
-    <div className={`p-6 bg-gray-50 dark:bg-gray-900 min-h-screen ${className}`}>
+    <div className={`p-6 bg-background min-h-screen ${className}`}>
       <div className="max-w-7xl mx-auto relative">
         <div className="absolute top-0 right-0 z-10">
           <SelectButton 
@@ -43,7 +43,7 @@ return (
             </div>
           </div>
         </div>
-        <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+        <div className="mt-8 text-center text-sm text-muted-foreground">
           <p>Haz clic en los botones con chevrones para expandir/contraer las ramas del organigrama</p>
         </div>
       </div>

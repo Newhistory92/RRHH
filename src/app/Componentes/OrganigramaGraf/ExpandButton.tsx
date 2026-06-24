@@ -17,9 +17,9 @@ export const ExpandButton: React.FC<ExpandButtonProps> = ({
   return (
     <button 
       onClick={onToggle} 
-      className="mt-2 p-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 
-                 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-md
-                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      className="mt-2 p-2 bg-card border-2 border-border
+                 rounded-full hover:bg-muted transition-colors shadow-md
+                 focus:outline-none focus:ring-2 focus:ring-primary"
       aria-label={isOpen ? 'Contraer' : 'Expandir'}
     >
       {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}

@@ -7,7 +7,7 @@ interface OrgStatsProps {
 }
 
 export const OrgStats: React.FC<OrgStatsProps> = ({ stats }) => (
-  <div className="flex justify-center gap-6 text-sm text-gray-600 dark:text-gray-300">
+  <div className="flex justify-center gap-6 text-sm text-muted-foreground">
     <div className="flex items-center gap-2">
       <Users size={16} />
       <span>Total: {stats.totalNodos}</span>
