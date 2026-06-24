@@ -16,8 +16,8 @@ export const DepartmentHeader: React.FC<DepartmentHeaderProps> = ({
   return (
     <div className="flex justify-between items-start mb-6">
       <div>
-        <h2 className="text-3xl font-extrabold text-gray-900 flex items-center">
-          <Building2 className="w-8 h-8 mr-3 text-[#06B6D4]" />
+        <h2 className="font-heading text-3xl font-extrabold text-foreground flex items-center">
+          <Building2 className="w-8 h-8 mr-3 text-primary" />
           {department.nombre}
         </h2>
         <Tag 

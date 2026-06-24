@@ -15,9 +15,9 @@ export const DepartmentInfo: React.FC<DepartmentInfoProps> = ({
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      <Card className="bg-gray-50 p-4">
+      <Card className="bg-muted p-4">
         <h4 className="font-bold mb-2 flex items-center">
-          <Star className="w-5 h-5 mr-2 text-yellow-500" />
+          <Star className="w-5 h-5 mr-2 text-warning" />
           Jefe de Área
         </h4>
         <div className="flex items-center">
@@ -29,12 +29,12 @@ export const DepartmentInfo: React.FC<DepartmentInfoProps> = ({
               size="md"
             /> 
           ) : (
-            <span className="text-gray-500 italic">No asignado</span>
+            <span className="text-muted-foreground italic">No asignado</span>
           )}
         </div>
       </Card>
       
-      <Card className="bg-gray-50 p-4">
+      <Card className="bg-muted p-4">
         <h4 className="font-bold mb-2">Habilidades Clave</h4>
         <div className="flex flex-wrap gap-2">
           <SkillsDisplay selectedDepartment={department} />
