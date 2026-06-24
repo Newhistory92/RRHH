@@ -106,11 +106,11 @@ export const ApprovalModal: React.FC<ApprovalModalProps> = ({
         <div className="space-y-4">
           {/* Historial de Aprobaciones */}
           {request.aprobaciones && request.aprobaciones.length > 0 && (
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="font-bold text-blue-800 mb-2">
+            <div className="p-3 bg-primary/15 border border-primary/30 rounded-lg">
+              <h4 className="font-bold text-primary mb-2">
                 Historial de Aprobaciones
               </h4>
-              <ul className="list-disc list-inside text-sm text-blue-700">
+              <ul className="list-disc list-inside text-sm text-primary">
                 {request.aprobaciones.map((a) => (
                   <li key={a.supervisorId}>
                     Aprobado por {a.nombre} el{" "}
@@ -124,14 +124,14 @@ export const ApprovalModal: React.FC<ApprovalModalProps> = ({
           {/* Mensaje Original */}
           <div>
             <h4 className="font-bold mb-2">Mensaje Del Solicitante:</h4>
-            <pre className="w-full p-3 border rounded-lg bg-gray-50 font-sans text-sm whitespace-pre-wrap">
+            <pre className="w-full p-3 border rounded-lg bg-muted font-sans text-sm whitespace-pre-wrap">
               {request.mensajeOriginal}
             </pre>
           </div>
 
           {/* Acciones */}
-          <div className="p-3 bg-gray-50 border border-gray-300 rounded-lg">
-            <h4 className="font-bold text-[#1ABCD7]  mb-3">Tomar Decision</h4>
+          <div className="p-3 bg-muted border border-border rounded-lg">
+            <h4 className="font-bold text-primary mb-3">Tomar Decision</h4>
             <div className="space-y-4">
               {/* Dropdown para aprobar y derivar */}
               <div>
@@ -146,7 +146,7 @@ export const ApprovalModal: React.FC<ApprovalModalProps> = ({
                   placeholder="Seleccione un supervisor"
                   className="w-full"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Si no seleccionas a nadie, la solicitud quedará aprobada
                   definitivamente.
                 </p>
