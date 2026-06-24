@@ -25,7 +25,7 @@ export const DepartmentDetails: React.FC<DepartmentDetailsProps> = ({
         onOpenModal={onOpenModal}
       />
 
-      <p className="text-gray-600 mb-6">
+      <p className="text-muted-foreground mb-6">
         {department.descripcion}
       </p>
 
@@ -34,14 +34,14 @@ export const DepartmentDetails: React.FC<DepartmentDetailsProps> = ({
         employees={employees}
       />
       <div className="my-6">
-        <h3 className="text-xl font-bold mb-3 text-gray-800">Empleados del Departamento</h3>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+        <h3 className="font-heading text-xl font-bold mb-3 text-foreground">Empleados del Departamento</h3>
+        <div className="bg-card rounded-lg shadow-sm border border-border p-4">
           <div className="flex flex-wrap gap-3">
             {department.employees && department.employees.length > 0 ? (
               department.employees.map(emp => (
                 <div
                   key={emp.id}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-200"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted rounded-full border border-border"
                 >
                   <EmployeeAvatar
                     employeeId={emp.id}
@@ -52,7 +52,7 @@ export const DepartmentDetails: React.FC<DepartmentDetailsProps> = ({
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 italic">No hay empleados asignados directamente a este departamento.</p>
+              <p className="text-muted-foreground italic">No hay empleados asignados directamente a este departamento.</p>
             )}
           </div>
         </div>

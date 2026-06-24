@@ -20,7 +20,7 @@ export const OfficesList: React.FC<OfficesListProps> = ({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-2xl font-bold text-gray-800">
+        <h3 className="font-heading text-2xl font-bold text-foreground">
           Oficinas ({department.offices?.length || 0})
         </h3>
         <Button
@@ -45,8 +45,8 @@ export const OfficesList: React.FC<OfficesListProps> = ({
           />
         ))
       ) : (
-        <Card className="text-center py-8 border-2 border-dashed border-gray-300">
-          <p className="text-gray-600">
+        <Card className="text-center py-8 border-2 border-dashed border-border">
+          <p className="text-muted-foreground">
             Este departamento no tiene oficinas asignadas.
           </p>
         </Card>
