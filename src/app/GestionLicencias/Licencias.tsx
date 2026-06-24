@@ -105,18 +105,18 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
 
         {/* Saldos desglosados por tipo de licencia */}
         <div className="lg:col-span-2">
-          <Section title="Mis Licencias — Saldo por Tipo" icon={<CalendarRange size={15} className="text-cyan-500" />}>
+          <Section title="Mis Licencias — Saldo por Tipo" icon={<CalendarRange size={15} className="text-primary" />}>
             {!saldos ? (
               <div className="flex justify-center py-6">
-                <span className="w-6 h-6 rounded-full border-2 border-gray-200 border-t-cyan-500 animate-spin" />
+                <span className="w-6 h-6 rounded-full border-2 border-border border-t-primary animate-spin" />
               </div>
             ) : (
               <div className="space-y-2">
                 {Object.entries(saldos).map(([anio, valores]) => (
-                  <details key={anio} className="group rounded-lg border border-gray-100 overflow-hidden">
-                    <summary className="flex items-center justify-between px-4 py-2.5 bg-gray-50 cursor-pointer text-sm font-semibold text-gray-700 hover:bg-gray-100 transition list-none">
+                  <details key={anio} className="group rounded-lg border border-border overflow-hidden">
+                    <summary className="flex items-center justify-between px-4 py-2.5 bg-muted cursor-pointer text-sm font-semibold text-foreground hover:bg-border transition list-none">
                       Año {anio}
-                      <ChevronRight size={14} className="text-gray-400 group-open:rotate-90 transition-transform" />
+                      <ChevronRight size={14} className="text-muted-foreground group-open:rotate-90 transition-transform" />
                     </summary>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 px-4 py-3">
                       {Object.entries(valores).map(([tipo, datos]) => {
@@ -128,26 +128,26 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
                         const porcentaje = diasTotales > 0 ? (consumidos / diasTotales) * 100 : 0;
 
                         return (
-                          <div key={tipo} className="border border-gray-100 rounded-xl p-3 hover:border-cyan-200 transition">
-                            <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+                          <div key={tipo} className="border border-border rounded-xl p-3 hover:border-primary/40 transition">
+                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
                               {getIcon(tipo)}
                               <span className="font-medium truncate">{tipo}</span>
                             </div>
                             <div className="flex items-baseline gap-1 mb-1">
-                              <p className="text-xl font-bold text-cyan-600">{disponibles}</p>
-                              <span className="text-[10px] text-gray-400">/ {diasTotales} días</span>
+                              <p className="text-xl font-bold text-primary">{disponibles}</p>
+                              <span className="text-[10px] text-muted-foreground">/ {diasTotales} días</span>
                             </div>
                             {/* Barra de consumo */}
-                            <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
                               <div
                                 className="h-full rounded-full transition-all"
                                 style={{
                                   width: `${Math.min(porcentaje, 100)}%`,
-                                  backgroundColor: porcentaje > 80 ? '#ef4444' : porcentaje > 50 ? '#f59e0b' : '#06b6d4'
+                                  backgroundColor: porcentaje > 80 ? 'var(--color-error)' : porcentaje > 50 ? 'var(--color-warning)' : 'var(--primary)'
                                 }}
                               />
                             </div>
-                            <p className="text-[10px] text-gray-400 mt-1">
+                            <p className="text-[10px] text-muted-foreground mt-1">
                               {consumidos > 0 ? `${consumidos} consumidos` : 'Sin consumo'}
                             </p>
                           </div>
@@ -162,15 +162,15 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
         </div>
 
         {/* Nueva solicitud */}
-        <div className="bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl p-5 flex flex-col items-center justify-center text-center text-white shadow-sm">
-          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-3">
-            <Plus size={20} className="text-white" />
+        <div className="bg-gradient-to-br from-primary to-warm-contrast rounded-xl p-5 flex flex-col items-center justify-center text-center text-primary-foreground shadow-sm">
+          <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center mb-3">
+            <Plus size={20} className="text-primary-foreground" />
           </div>
           <h3 className="font-semibold text-sm mb-1">Nueva Solicitud</h3>
-          <p className="text-xs text-cyan-100 mb-4">Iniciá tu solicitud de licencia</p>
+          <p className="text-xs text-primary-foreground/80 mb-4">Iniciá tu solicitud de licencia</p>
           <button
             onClick={onNewRequest}
-            className="flex items-center gap-1.5 px-4 py-2 bg-white text-cyan-600 text-xs font-semibold rounded-full hover:bg-cyan-50 transition shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 bg-card text-primary text-xs font-semibold rounded-full hover:bg-muted transition shadow-sm"
           >
             <Send size={13} />
             Solicitar
@@ -180,23 +180,23 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
 
       {/* ── Pendientes de aprobación (solo para superiores asignados dinámicamente) ── */}
       {pendientes.length > 0 && (
-        <Section title="Pendientes de Mi Aprobación" icon={<Clock size={15} className="text-amber-500" />}>
+        <Section title="Pendientes de Mi Aprobación" icon={<Clock size={15} className="text-warning" />}>
           <div className="space-y-2">
             {pendientes.map(s => (
               <button
                 key={s.id}
                 onClick={() => setSelectedRequest(s)}
-                className="w-full text-left flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-cyan-200 hover:bg-cyan-50/50 transition group"
+                className="w-full text-left flex items-center justify-between p-3 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/10 transition group"
               >
                 <div>
-                  <p className="text-sm font-semibold text-gray-800">
-                    {s.name} · <span className="text-cyan-600">{s.type}</span> · {s.duration} días
+                  <p className="text-sm font-semibold text-foreground">
+                    {s.name} · <span className="text-primary">{s.type}</span> · {s.duration} días
                   </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     {fmt(s.desde)} → {fmt(s.hasta)}
                   </p>
                 </div>
-                <ChevronRight size={16} className="text-gray-300 group-hover:text-cyan-500 transition" />
+                <ChevronRight size={16} className="text-muted-foreground group-hover:text-primary transition" />
               </button>
             ))}
           </div>
@@ -206,23 +206,23 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
       {/* ── Historial completo de solicitudes ── */}
       <Section title="Historial de Solicitudes">
         {misSolicitudes.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-4">No tenés solicitudes registradas.</p>
+          <p className="text-sm text-muted-foreground text-center py-4">No tenés solicitudes registradas.</p>
         ) : (
           <div className="space-y-2">
             {misSolicitudes.map(s => (
-              <div key={s.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition">
+              <div key={s.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border border-border hover:bg-muted transition">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
                     {getIcon(s.type)}
-                    <p className="text-sm font-semibold text-gray-800">
+                    <p className="text-sm font-semibold text-foreground">
                       {s.duration} días · {s.type}
                     </p>
                   </div>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     {fmt(s.startDate)} → {fmt(s.endDate)}
                   </p>
                   {s.status === 'Rechazada' && s.observacion && (
-                    <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                    <p className="text-xs text-error flex items-center gap-1 mt-1">
                       <MessageSquare size={11} />
                       {s.observacion}
                     </p>
