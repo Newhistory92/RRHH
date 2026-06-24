@@ -29,15 +29,15 @@ export const EntityFormModal: React.FC<EntityFormModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
+      <div className="bg-card rounded-lg shadow-2xl p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
         >
           <X className="w-6 h-6" />
         </button>
-        
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">
+
+        <h2 className="font-heading text-2xl font-bold mb-6 text-foreground">
           {data ? "Editar" : "Crear"}{" "}
           {type === "department" ? "Departamento" : "Oficina"}
         </h2>
