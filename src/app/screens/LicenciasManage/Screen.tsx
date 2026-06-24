@@ -134,18 +134,18 @@ export default function LicenciasManage() {
 
   if (loading) {
     return (
-      <div className="bg-gray-100 min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-600"></div>
+      <div className="bg-background min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 p-4 font-sans min-h-screen">
+    <div className="bg-background p-4 font-sans min-h-screen">
       <Toast ref={toast} />
       <div className="flex items-center gap-3 py-4 px-4">
-        <FileText className="text-[#1ABCD7]" size={32} />
-        <h1 className="text-2xl font-bold text-gray-800">
+        <FileText className="text-primary" size={32} />
+        <h1 className="font-heading text-2xl font-bold text-foreground">
           Gestión de Licencias
         </h1>
       </div>
