@@ -43,7 +43,7 @@ export const DepartmentTree: React.FC<DepartmentTreeProps> = ({
   return (
     <Card className="h-fit">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-700">Departamentos</h2>
+        <h2 className="font-heading text-xl font-bold text-foreground">Departamentos</h2>
         <Button
           icon={<PlusCircle className="w-5 h-5" />}
           onClick={() => onOpenModal("department")}

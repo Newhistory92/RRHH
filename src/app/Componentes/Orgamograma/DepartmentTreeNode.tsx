@@ -13,12 +13,12 @@ export const DepartmentTreeNode: React.FC<DepartmentTreeNodeProps> = ({ node }) 
   return (
     <div className="flex items-center justify-between w-full p-2 min-h-[2.5rem]">
       <div className="flex items-center gap-2 min-w-0 flex-1">
-        <Building2 className="w-4 h-4 text-gray-500 flex-shrink-0" />
+        <Building2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
         <span className="font-medium text-sm truncate flex-1 min-w-0">
           {node.label}
         </span>
         {department.jefeId && (
-          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded flex-shrink-0 whitespace-nowrap">
+          <span className="text-xs bg-primary/15 text-primary px-2 py-1 rounded flex-shrink-0 whitespace-nowrap">
             Con jefe
           </span>
         )}
