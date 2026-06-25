@@ -8,6 +8,7 @@ import { Toast } from 'primereact/toast';
 import { InputMask } from 'primereact/inputmask';
 import { Button } from 'primereact/button';
 import { timeStringToDecimal } from '@/app/Componentes/TablaOperador/employeeApi';
+import { apiClient } from "@/app/util/apiClient";
 interface LicenseDetailModalProps {
   license: LicenseHistory | null;
   onClose: () => void;
@@ -127,25 +128,7 @@ export const PermissionModal = ({ employee, onClose }: PermissionModalProps) => 
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/rrhh/employee/${employee.id}/permission`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || `Error al guardar el permiso: ${response.status}`
-        );
-      }
-
-      await response.json()
+      await apiClient.post(`/rrhh/employee/${employee.id}/permission`, data);
 
       toast.current?.show({
         severity: 'success',

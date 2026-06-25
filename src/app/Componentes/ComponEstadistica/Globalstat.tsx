@@ -43,56 +43,56 @@ export const GlobalStats: React.FC<GlobalStatsProps> = ({ data, isLoading, error
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <Card
-        className="flex flex-col items-center justify-center text-center text-primary-foreground border-none"
+        className="flex flex-col items-center justify-center text-center text-primary-foreground border-none overflow-hidden"
         style={{ background: 'linear-gradient(to bottom right, var(--primary), var(--warm-contrast))' }}
       >
-        <CardHeader className="items-center justify-items-center">
+        <CardHeader className="flex flex-col items-center justify-center gap-2 pb-0">
           <Award className="h-12 w-12 opacity-80" />
-          <CardTitle className="text-sm font-light uppercase tracking-widest text-primary-foreground">Mejor Departamento</CardTitle>
+          <CardTitle className="text-sm font-light uppercase tracking-widest text-primary-foreground text-center">Mejor Departamento</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-3xl font-bold">{bestDepartment.name}</p>
+        <CardContent className="flex flex-col items-center justify-center w-full px-4">
+          <p className="text-3xl font-bold max-w-full truncate" title={bestDepartment.name}>{bestDepartment.name}</p>
           <p className="text-lg font-medium opacity-90">Promedio: {bestDepartment.avg}</p>
         </CardContent>
       </Card>
 
       <Card
-        className="flex flex-col items-center justify-center text-center border-none"
+        className="flex flex-col items-center justify-center text-center border-none overflow-hidden"
         style={{ background: 'linear-gradient(to bottom right, var(--secondary), var(--muted))' }}
       >
-        <CardHeader className="items-center justify-items-center">
+        <CardHeader className="flex flex-col items-center justify-center gap-2 pb-0">
           <Frown className="h-12 w-12 opacity-80 text-foreground" />
-          <CardTitle className="text-sm font-light uppercase tracking-widest text-foreground">Ausencias (Promedio/Año)</CardTitle>
+          <CardTitle className="text-sm font-light uppercase tracking-widest text-foreground text-center">Ausencias (Promedio/Año)</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-4xl font-bold text-foreground">{avgAbsences}</p>
+        <CardContent className="flex flex-col items-center justify-center w-full px-4">
+          <p className="text-4xl font-bold text-foreground max-w-full truncate">{avgAbsences}</p>
         </CardContent>
       </Card>
 
-      <Card className="flex flex-col items-center justify-center text-center bg-card">
-        <CardHeader className="items-center justify-items-center">
+      <Card className="flex flex-col items-center justify-center text-center bg-card overflow-hidden">
+        <CardHeader className="flex flex-col items-center justify-center gap-2 pb-0">
           <Clock className="h-12 w-12 text-muted-foreground" />
-          <CardTitle className="text-sm font-light uppercase tracking-widest text-muted-foreground">Tardanzas (Promedio/Año)</CardTitle>
+          <CardTitle className="text-sm font-light uppercase tracking-widest text-muted-foreground text-center">Tardanzas (Promedio/Año)</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-4xl font-bold text-foreground">{avgLateness}</p>
+        <CardContent className="flex flex-col items-center justify-center w-full px-4">
+          <p className="text-4xl font-bold text-foreground max-w-full truncate">{avgLateness}</p>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <AlertTriangle className="h-10 w-10 text-warm-contrast" />
-            Actividades de Baja Eficiencia
+            <AlertTriangle className="h-10 w-10 text-warm-contrast flex-shrink-0" />
+            <span className="truncate">Actividades de Baja Eficiencia</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           {lowEfficiencyActivities.length > 0 ? (
             <ul className="space-y-2">
               {lowEfficiencyActivities.map((act) => (
-                <li key={act.name} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{act.name}</span>
-                  <span className="font-bold text-error">{act.avg.toFixed(1)}</span>
+                <li key={act.name} className="flex justify-between text-sm items-center gap-2">
+                  <span className="text-muted-foreground truncate" title={act.name}>{act.name}</span>
+                  <span className="font-bold text-error flex-shrink-0">{act.avg.toFixed(1)}</span>
                 </li>
               ))}
             </ul>
@@ -100,7 +100,7 @@ export const GlobalStats: React.FC<GlobalStatsProps> = ({ data, isLoading, error
         </CardContent>
       </Card>
 
-      <Card className="md:col-span-2">
+      <Card className="md:col-span-2 overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart2 className="h-8 w-8 text-primary" />
@@ -121,7 +121,7 @@ export const GlobalStats: React.FC<GlobalStatsProps> = ({ data, isLoading, error
         </CardContent>
       </Card>
 
-      <Card className="md:col-span-2">
+      <Card className="md:col-span-2 overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-6 w-6 text-accent" />

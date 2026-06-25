@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { TechnicalSkill, EntityFormData } from '@/app/Interfas/Interfaces';
-import { SKILLS  } from "@/app/api/prueba2";
+
 
 export const useSkillManagement = (formData: EntityFormData,setFormData: React.Dispatch<React.SetStateAction<EntityFormData>>) => {
   
   const [showSkillDialog, setShowSkillDialog] = useState(false);
   const [newSkillName, setNewSkillName] = useState('');
-  const [availableSkills, setAvailableSkills] = useState<TechnicalSkill[]>(SKILLS);
+  const [availableSkills, setAvailableSkills] = useState<TechnicalSkill[]>();
 
+  
   const handleAddSkill = () => {
     if (newSkillName.trim()) {
       const newSkill: TechnicalSkill = {

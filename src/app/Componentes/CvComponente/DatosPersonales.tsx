@@ -110,7 +110,7 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
                 onChange={handleDateChange}
                 dateFormat="dd/mm/yy"
                 showIcon
-                className="w-full"
+                className="w-full --warm-contrast"
                 placeholder="Seleccione fecha"
               />
             ) : (

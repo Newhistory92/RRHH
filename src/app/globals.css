@@ -35,6 +35,26 @@
   --color-info-foreground: #ffffff;
 }
 
+.p-button {
+    background: var(--secondary) !important;
+    border-color: var(--border) !important;
+    color: white !important;
+}
+
+.p-button {
+    background: var(--accent)!important;
+    border-color: var(--border)!important;
+    color: white !important;
+}
+.p-button:focus,
+.p-button:focus-visible {
+    box-shadow: 0 0 0 .2rem var(--ring) !important;
+    border-color: var(--primary)!important;
+}
+ .p-button:active {
+    background:  var(--secondary) !important;
+    border-color: var(--border) !important;
+} 
 .dark {
   --background: #211B16;
   --foreground: #F0EBE6;

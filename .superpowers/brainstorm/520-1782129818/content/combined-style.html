@@ -1,0 +1,65 @@
+<h2>Vista combinada: redondeo moderado + Fraunces en títulos</h2>
+<p class="subtitle">Sidebar + header con el nivel de detalle final antes de pasar al spec</p>
+
+<div class="mockup">
+  <div class="mockup-header">Preview: Shell completo</div>
+  <div class="mockup-body">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <div style="display:flex;height:380px;font-family:'Inter',system-ui;border-radius:16px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.1);background:#fff">
+      <div style="width:220px;background:#C2CAD0;padding:20px 16px;display:flex;flex-direction:column;gap:6px">
+        <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:#5a4a3e;margin-bottom:18px">Talexa</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:#8a8378;margin:6px 0 2px 8px">General</div>
+        <div style="padding:10px 12px;border-radius:14px;background:#7E685A;color:#fff;font-size:13px;display:flex;align-items:center;gap:8px">📊 Estadísticas</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:#8a8378;margin:14px 0 2px 8px">Gente</div>
+        <div style="padding:10px 12px;border-radius:14px;color:#5a4a3e;font-size:13px;display:flex;align-items:center;gap:8px">👥 Recursos Humanos</div>
+        <div style="padding:10px 12px;border-radius:14px;color:#5a4a3e;font-size:13px;display:flex;align-items:center;gap:8px">💬 Feedback</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:#8a8378;margin:14px 0 2px 8px">Organización</div>
+        <div style="padding:10px 12px;border-radius:14px;color:#5a4a3e;font-size:13px;display:flex;align-items:center;gap:8px">🗂️ Organigrama</div>
+        <div style="padding:10px 12px;border-radius:14px;color:#5a4a3e;font-size:13px;display:flex;align-items:center;gap:8px">📄 Licencias</div>
+      </div>
+      <div style="flex:1;background:#FAF8F6;padding:20px;display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+          <div style="font-family:'Fraunces',serif;font-size:20px;color:#5a4a3e">Estadísticas</div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="width:34px;height:34px;border-radius:14px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center">🔔</div>
+            <div style="width:34px;height:34px;border-radius:50%;background:#AFD275"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;margin-bottom:14px">
+          <div style="flex:1;padding:16px;border-radius:16px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.06)">
+            <div style="font-size:11px;color:#8a8378;margin-bottom:6px">Empleados activos</div>
+            <div style="font-family:'Fraunces',serif;font-size:26px;color:#5a4a3e">128</div>
+          </div>
+          <div style="flex:1;padding:16px;border-radius:16px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.06)">
+            <div style="font-size:11px;color:#8a8378;margin-bottom:6px">Licencias activas</div>
+            <div style="font-family:'Fraunces',serif;font-size:26px;color:#E7717D">14</div>
+          </div>
+          <div style="flex:1;padding:16px;border-radius:16px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.06)">
+            <div style="font-size:11px;color:#8a8378;margin-bottom:6px">Productividad</div>
+            <div style="font-family:'Fraunces',serif;font-size:26px;color:#AFD275">92%</div>
+          </div>
+        </div>
+        <div style="flex:1;border-radius:16px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.06);padding:16px">
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <button style="padding:8px 16px;border-radius:12px;background:#E7717D;color:#fff;border:none;font-size:12px;font-family:'Inter',system-ui">Nueva licencia</button>
+            <button style="padding:8px 16px;border-radius:12px;background:#C2B9B0;color:#5a4a3e;border:none;font-size:12px;font-family:'Inter',system-ui">Exportar</button>
+          </div>
+          <div style="height:120px;border-radius:12px;background:#FAF8F6"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle">¿El radio de las tarjetas/botones (~14-16px) y el contraste Fraunces/Inter se sienten bien, o ajustamos algo?</p>
+
+<div class="options">
+  <div class="option" data-choice="approve" onclick="toggleSelect(this)">
+    <div class="letter">✓</div>
+    <div class="content"><h3>Me gusta, avancemos al spec</h3></div>
+  </div>
+  <div class="option" data-choice="adjust" onclick="toggleSelect(this)">
+    <div class="letter">✎</div>
+    <div class="content"><h3>Quiero ajustar algo (lo cuento en el chat)</h3></div>
+  </div>
+</div>
