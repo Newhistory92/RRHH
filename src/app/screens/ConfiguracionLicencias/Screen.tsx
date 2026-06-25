@@ -483,10 +483,10 @@ export default function ConfiguracionGeneral() {
                         {activeTab === 'profesiones' && (
                             <div>
                                 <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-lg font-bold text-gray-800">Catálogo de Profesiones y Cargos</h2>
+                                    <h2 className="font-heading text-lg font-bold text-foreground">Catálogo de Profesiones y Cargos</h2>
                                     <button
                                         onClick={() => { setProfessionForm({ nombre: "", descripcion: "" }); setIsEditingProfession(false); setShowProfessionModal(true); }}
-                                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-sm"
+                                        className="flex items-center gap-2 bg-primary hover:opacity-90 text-primary-foreground px-4 py-2 rounded-xl font-bold text-sm"
                                     >
                                         <Plus size={16} /> Nueva Profesión
                                     </button>
@@ -494,27 +494,27 @@ export default function ConfiguracionGeneral() {
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left border-collapse">
                                         <thead>
-                                            <tr className="bg-gray-50 border-b border-gray-100 uppercase tracking-wider text-[10px] text-gray-400 font-bold">
+                                            <tr className="bg-muted border-b border-border uppercase tracking-wider text-[10px] text-muted-foreground font-bold">
                                                 <th className="px-6 py-4">Profesión / Cargo</th>
                                                 <th className="px-6 py-4">Descripción</th>
                                                 <th className="px-6 py-4 text-right">Acciones</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-50 text-sm">
+                                        <tbody className="divide-y divide-border text-sm">
                                             {professions.length > 0 ? professions.map(p => (
-                                                <tr key={p.id} className="hover:bg-gray-50/50 group">
-                                                    <td className="px-6 py-4 font-bold text-gray-700">{p.nombre}</td>
-                                                    <td className="px-6 py-4 text-gray-500">{p.descripcion || 'Sin descripción.'}</td>
+                                                <tr key={p.id} className="hover:bg-muted group">
+                                                    <td className="px-6 py-4 font-bold text-foreground">{p.nombre}</td>
+                                                    <td className="px-6 py-4 text-muted-foreground">{p.descripcion || 'Sin descripción.'}</td>
                                                     <td className="px-6 py-4 text-right">
                                                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <button onClick={() => { setProfessionForm(p); setIsEditingProfession(true); setShowProfessionModal(true); }} className="p-2 text-gray-400 hover:text-indigo-600" title="Editar"><Edit2 size={16} /></button>
-                                                            <button onClick={() => p.id && handleDeleteProfession(p.id)} className="p-2 text-gray-400 hover:text-red-600" title="Desactivar"><Trash2 size={16} /></button>
+                                                            <button onClick={() => { setProfessionForm(p); setIsEditingProfession(true); setShowProfessionModal(true); }} className="p-2 text-muted-foreground hover:text-primary" title="Editar"><Edit2 size={16} /></button>
+                                                            <button onClick={() => p.id && handleDeleteProfession(p.id)} className="p-2 text-muted-foreground hover:text-error" title="Desactivar"><Trash2 size={16} /></button>
                                                         </div>
                                                     </td>
                                                 </tr>
                                             )) : (
                                                 <tr>
-                                                    <td colSpan={3} className="py-10 text-center text-gray-400 italic">No hay profesiones cargadas en el sistema.</td>
+                                                    <td colSpan={3} className="py-10 text-center text-muted-foreground italic">No hay profesiones cargadas en el sistema.</td>
                                                 </tr>
                                             )}
                                         </tbody>
@@ -538,24 +538,24 @@ export default function ConfiguracionGeneral() {
                                 {/* Jornadas Laborales */}
                                 <div>
                                     <div className="flex justify-between items-center mb-4">
-                                        <h3 className="font-bold text-gray-800">Jornadas Laborales (Contratos vs Horas)</h3>
+                                        <h3 className="font-heading font-bold text-foreground">Jornadas Laborales (Contratos vs Horas)</h3>
                                         <button
                                             onClick={() => { setJornadaForm({ nombre: "", horasDia: 8 }); setIsEditingJornada(false); setShowJornadaModal(true); }}
-                                            className="flex items-center gap-1.5 text-indigo-600 hover:bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                                            className="flex items-center gap-1.5 text-primary hover:bg-primary/10 border border-primary/30 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
                                         >
                                             <Plus size={14} /> Nueva Jornada
                                         </button>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         {jornadas.map(j => (
-                                            <div key={j.id} className="p-4 border border-gray-100 rounded-xl bg-gray-50 flex items-center justify-between shadow-sm">
+                                            <div key={j.id} className="p-4 border border-border rounded-xl bg-muted flex items-center justify-between shadow-sm">
                                                 <div>
-                                                    <h4 className="font-bold text-gray-900 text-sm">{j.nombre}</h4>
-                                                    <p className="text-xs text-gray-500 mt-1 font-mono">{j.horasDia} hrs/día</p>
+                                                    <h4 className="font-bold text-foreground text-sm">{j.nombre}</h4>
+                                                    <p className="text-xs text-muted-foreground mt-1 font-mono">{j.horasDia} hrs/día</p>
                                                 </div>
                                                 <div className="flex items-center gap-1">
-                                                    <button onClick={() => { setJornadaForm(j); setIsEditingJornada(true); setShowJornadaModal(true); }} className="p-1.5 text-gray-400 hover:text-indigo-600"><Edit2 size={14} /></button>
-                                                    <button onClick={() => j.id && handleDeleteJornada(j.id)} className="p-1.5 text-gray-400 hover:text-red-600"><Trash2 size={14} /></button>
+                                                    <button onClick={() => { setJornadaForm(j); setIsEditingJornada(true); setShowJornadaModal(true); }} className="p-1.5 text-muted-foreground hover:text-primary"><Edit2 size={14} /></button>
+                                                    <button onClick={() => j.id && handleDeleteJornada(j.id)} className="p-1.5 text-muted-foreground hover:text-error"><Trash2 size={14} /></button>
                                                 </div>
                                             </div>
                                         ))}
