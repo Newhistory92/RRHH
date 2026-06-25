@@ -72,56 +72,56 @@ export const HRChatbot = ({ onBack }: HRChatbotProps) => {
 
    return (
     <div className="animate-fade-in">
-      <button onClick={onBack} className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6 transition-colors">
+      <button onClick={onBack} className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors">
         <ArrowLeft size={20} />
         Volver
       </button>
-      <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Chatbot de RRHH</h2>
-      <p className="text-gray-500 dark:text-gray-400 mb-8">Tu asistente virtual para consultas de Recursos Humanos.</p>
+      <h2 className="font-heading text-3xl font-bold text-foreground mb-2">Chatbot de RRHH</h2>
+      <p className="text-muted-foreground mb-8">Tu asistente virtual para consultas de Recursos Humanos.</p>
       
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md h-[500px] flex flex-col">
+      <div className="bg-card rounded-lg shadow-md h-[500px] flex flex-col">
         <div className="flex-1 p-6 overflow-y-auto space-y-4">
           {messages.map((msg, index) => (
             <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl ${msg.role === 'user' ? 'bg-blue-500 text-white rounded-br-none' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-none'}`}>
+              <div className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl ${msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-none' : 'bg-muted text-foreground rounded-bl-none'}`}>
                 {msg.content}
               </div>
             </div>
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-none">
+              <div className="max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl bg-muted text-foreground rounded-bl-none">
                 <div className="flex items-center space-x-2">
                   <span className="text-sm">Escribiendo</span>
-                  <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0s' }}></div>
-                  <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                  <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-pulse" style={{ animationDelay: '0s' }}></div>
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                 </div>
               </div>
             </div>
           )}
           {error && (
             <div className="flex justify-start">
-              <div className="max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 rounded-bl-none">
+              <div className="max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl bg-error-soft text-error-soft-foreground rounded-bl-none">
                 <p className="font-bold text-sm">Error</p>
                 <p>{error}</p>
               </div>
             </div>
           )}
         </div>
-        <div className="p-4 border-t dark:border-gray-700 flex items-center gap-4">
+        <div className="p-4 border-t border-border flex items-center gap-4">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder={isLoading ? "Esperando respuesta..." : "Escribe tu pregunta..."}
-            className="flex-1 bg-gray-100 dark:bg-gray-900 border-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent rounded-full py-2 px-4 outline-none disabled:opacity-50"
+            className="flex-1 bg-muted border-transparent focus:ring-2 focus:ring-primary focus:border-transparent rounded-full py-2 px-4 outline-none disabled:opacity-50"
             disabled={isLoading}
           />
-          <button 
-            onClick={handleSend} 
-            className="bg-blue-500 text-white rounded-full p-3 hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 disabled:bg-blue-300 dark:disabled:bg-blue-800 disabled:cursor-not-allowed"
+          <button
+            onClick={handleSend}
+            className="bg-primary text-primary-foreground rounded-full p-3 hover:opacity-90 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
             disabled={isLoading}
           >
             <Send size={20} />
