@@ -981,11 +981,11 @@ export const SoftSkillBar = ({ skill, score }: { skill: string; score?: number }
 );
 
 export const StatCard: React.FC<StatCardProps> = ({ icon, title, value, colorClass }) => (
-  <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md hover:border-cyan-300 transition-all">
+  <div className="bg-card p-5 rounded-xl shadow-sm border border-border hover:shadow-md hover:border-primary/40 transition-all">
     <div className="flex items-center justify-between">
       <div>
-        <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">{title}</p>
-        <p className="text-3xl font-bold text-slate-800 dark:text-slate-100">{value}</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">{title}</p>
+        <p className="text-3xl font-bold text-foreground">{value}</p>
       </div>
       <div className={`p-3 rounded-xl ${colorClass}`}>{icon}</div>
     </div>
@@ -994,10 +994,10 @@ export const StatCard: React.FC<StatCardProps> = ({ icon, title, value, colorCla
 
 export const RiskBadge: React.FC<RiskBadgeProps> = ({ risk, score }) => {
   const styles: Record<RiskLevel, string> = {
-    "Bajo": "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
-    "Medio": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300",
-    "Alto": "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
-    "Crítico": "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
+    "Bajo": "bg-success-soft text-success-soft-foreground",
+    "Medio": "bg-warning-soft text-warning-soft-foreground",
+    "Alto": "bg-warning-soft text-warning-soft-foreground",
+    "Crítico": "bg-error-soft text-error-soft-foreground",
   };
   const icons: Record<RiskLevel, ReactNode> = {
     "Bajo": <CheckCircle size={14} />, "Medio": <Activity size={14} />,
@@ -1016,13 +1016,13 @@ export const InfoList: React.FC<InfoListProps> = ({ title, items, icon, colorCla
   <div>
     <div className="flex items-center gap-2 mb-3">
       {React.cloneElement(icon, { className: `w-4 h-4 ${colorClass}` })}
-      <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-200">{title}</h4>
+      <h4 className="text-sm font-semibold text-foreground">{title}</h4>
     </div>
     <ul className="space-y-2 pl-1">
       {items.map((item, i) => (
         <li key={i} className="flex items-start gap-2.5">
           <span className={`mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0 ${colorClass.replace("text-", "bg-")}`} />
-          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{item}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{item}</p>
         </li>
       ))}
     </ul>

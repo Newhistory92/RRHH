@@ -53,11 +53,11 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
 
   if (loading) {
     return (
-      <div className="bg-slate-50 dark:bg-slate-900 flex items-center justify-center min-h-screen p-4">
+      <div className="bg-background flex items-center justify-center min-h-screen p-4">
         <div className="text-center">
-          <Brain className="w-20 h-20 text-cyan-500 animate-pulse mx-auto mb-6" />
-          <h2 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">Analizando Datos con IA</h2>
-          <p className="text-slate-500 dark:text-slate-400">Procesando patrones y generando predicciones...</p>
+          <Brain className="w-20 h-20 text-primary animate-pulse mx-auto mb-6" />
+          <h2 className="text-2xl font-bold text-foreground mb-2">Analizando Datos con IA</h2>
+          <p className="text-muted-foreground">Procesando patrones y generando predicciones...</p>
         </div>
       </div>
     );
@@ -65,25 +65,25 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
 
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-900 min-h-screen p-4 sm:p-6 lg:p-8 font-sans">
+    <div className="bg-background min-h-screen p-4 sm:p-6 lg:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="bg-cyan-100 dark:bg-cyan-900/50 p-2 rounded-lg">
-                <Zap className="text-[#1ABCD7]" size={28} />
+              <div className="bg-primary/15 p-2 rounded-lg">
+                <Zap className="text-primary" size={28} />
               </div>
-              <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Análisis Predictivo de Riesgos</h1>
+              <h1 className="font-heading text-3xl font-bold text-foreground">Análisis Predictivo de Riesgos</h1>
             </div>
-            <p className="text-slate-500 dark:text-slate-400">
+            <p className="text-muted-foreground">
               Predicción de rotación y productividad con IA para una gestión proactiva.
             </p>
           </div>
           <button
             onClick={onBack}
-            className="flex items-center justify-center gap-2 text-sm font-semibold border-2 border-[#2ecbe7] text-[#1ABCD7] px-4 py-2 rounded-lg transition-all hover:bg-[#2ecbe7] hover:text-white self-start sm:self-center"
+            className="flex items-center justify-center gap-2 text-sm font-semibold border-2 border-primary text-primary px-4 py-2 rounded-lg transition-all hover:bg-primary hover:text-primary-foreground self-start sm:self-center"
           >
             <ArrowLeft size={16} />
             Volver al Dashboard
@@ -92,23 +92,23 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
 
         {/* Resumen Ejecutivo con StatCards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-          <StatCard 
-            icon={<Users size={24} className="text-cyan-500" />}
+          <StatCard
+            icon={<Users size={24} className="text-primary" />}
             title="Empleados Analizados"
             value={analysis.reduce((sum, d) => sum + d.employees, 0)}
-            colorClass="bg-cyan-100 dark:bg-cyan-900/50"
+            colorClass="bg-primary/15"
           />
-          <StatCard 
-            icon={<AlertTriangle size={24} className="text-red-500" />}
+          <StatCard
+            icon={<AlertTriangle size={24} className="text-error" />}
             title="Departamentos en Riesgo"
             value={analysis.filter(d => d.turnoverRisk === 'Alto' || d.turnoverRisk === 'Crítico').length}
-            colorClass="bg-red-100 dark:bg-red-900/50"
+            colorClass="bg-error-soft"
           />
-          <StatCard 
-            icon={<Target size={24} className="text-green-500" />}
+          <StatCard
+            icon={<Target size={24} className="text-accent" />}
             title="Productividad Promedio"
             value={`${(analysis.reduce((sum, d) => sum + d.avgProductivity, 0) / analysis.length).toFixed(1)}/10`}
-            colorClass="bg-green-100 dark:bg-green-900/50"
+            colorClass="bg-accent/15"
           />
         </div>
 
@@ -117,15 +117,15 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
           {analysis.map((dept) => (
             <div
               key={dept.name}
-              className="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 transition-all hover:shadow-xl hover:border-[#2ecbe7] overflow-hidden"
+              className="bg-card rounded-xl shadow-md border border-border transition-all hover:shadow-xl hover:border-primary overflow-hidden"
             >
               <div className={`h-2 w-full bg-${dept.color}-500`}></div>
               <div className="p-6">
                 {/* Header de la tarjeta */}
                 <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4 mb-6">
                   <div>
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1">{dept.name}</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <h3 className="text-xl font-bold text-foreground mb-1">{dept.name}</h3>
+                    <p className="text-sm text-muted-foreground">
                       {dept.employees} empleados
                     </p>
                   </div>
@@ -136,8 +136,8 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
   <div>
     <div className="flex justify-between items-baseline mb-1">
-      <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Productividad</span>
-      <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
+      <span className="text-sm font-medium text-muted-foreground">Productividad</span>
+      <span className="text-sm font-bold text-foreground">
         {dept.avgProductivity} / 10
       </span>
     </div>
@@ -151,8 +151,8 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
 
   <div>
     <div className="flex justify-between items-baseline mb-1">
-      <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Satisfacción</span>
-      <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
+      <span className="text-sm font-medium text-muted-foreground">Satisfacción</span>
+      <span className="text-sm font-bold text-foreground">
         {dept.avgSatisfaction} / 10
       </span>
     </div>
@@ -166,10 +166,10 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
 </div>
 {dept.skillsGap && dept.skillsGap.length > 0 && (
   <div className="col-span-2 mt-4 mb-3">
-    <h4 className="text-sm font-semibold text-red-600 dark:text-red-400 mb-2">
+    <h4 className="text-sm font-semibold text-error mb-2">
       Brechas de Habilidades Detectadas
     </h4>
-    <ul className="list-disc pl-5 text-sm text-slate-700 dark:text-slate-300">
+    <ul className="list-disc pl-5 text-sm text-foreground">
       {dept.skillsGap.map((skill, idx) => (
         <li key={idx}>{skill.nombre} (nivel {skill.nivel})</li>
       ))}
@@ -177,10 +177,10 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
   </div>
 )}
                 {/* Detalles del análisis */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 border-t border-slate-200 dark:border-slate-700 pt-6">
-                  {dept.riskFactors.length > 0 && <InfoList title="Factores de Riesgo" items={dept.riskFactors} icon={<ShieldAlert/>} colorClass="text-orange-500" />}
-                  {dept.keyInsights.length > 0 && <InfoList title="Perspectivas Clave" items={dept.keyInsights} icon={<Lightbulb/>} colorClass="text-yellow-500" />}
-                  {dept.recommendations.length > 0 && <InfoList title="Recomendaciones IA" items={dept.recommendations} icon={<CheckCircle/>} colorClass="text-cyan-500" />}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 border-t border-border pt-6">
+                  {dept.riskFactors.length > 0 && <InfoList title="Factores de Riesgo" items={dept.riskFactors} icon={<ShieldAlert/>} colorClass="text-warning" />}
+                  {dept.keyInsights.length > 0 && <InfoList title="Perspectivas Clave" items={dept.keyInsights} icon={<Lightbulb/>} colorClass="text-warning" />}
+                  {dept.recommendations.length > 0 && <InfoList title="Recomendaciones IA" items={dept.recommendations} icon={<CheckCircle/>} colorClass="text-primary" />}
                 </div>
               </div>
             </div>
@@ -188,8 +188,8 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
         </div>
 
         {/* Footer */}
-        <div className="mt-12 p-5 text-center bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl mx-auto">
+        <div className="mt-12 p-5 text-center bg-card rounded-lg border border-border">
+          <p className="text-xs text-muted-foreground max-w-3xl mx-auto">
             <strong>Metodología:</strong> El análisis se basa en un modelo de IA que evalúa 15+ variables, incluyendo satisfacción, productividad histórica, ausentismo, y evaluaciones de desempeño. La precisión del modelo se re-evalúa continuamente con nuevos datos.
           </p>
         </div>
