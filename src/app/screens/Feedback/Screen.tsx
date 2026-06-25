@@ -184,10 +184,10 @@ export default function FeedbackPage() {
   // ── Render ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <RefreshCw className="mx-auto mb-4 text-indigo-400 animate-spin" size={48} />
-          <p className="text-gray-600 text-lg">Cargando compañeros del área...</p>
+          <RefreshCw className="mx-auto mb-4 text-primary animate-spin" size={48} />
+          <p className="text-muted-foreground text-lg">Cargando compañeros del área...</p>
         </div>
       </div>
     );
@@ -195,13 +195,13 @@ export default function FeedbackPage() {
 
   if (error || !currentUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center bg-white p-8 rounded-xl shadow-md max-w-md">
-          <User className="mx-auto mb-4 text-red-400" size={48} />
-          <p className="text-red-600 font-semibold text-lg mb-4">{error ?? 'Usuario no encontrado'}</p>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center bg-card p-8 rounded-xl shadow-md max-w-md">
+          <User className="mx-auto mb-4 text-error" size={48} />
+          <p className="text-error font-semibold text-lg mb-4">{error ?? 'Usuario no encontrado'}</p>
           <button
             onClick={loadPeers}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-colors"
           >
             Reintentar
           </button>
@@ -211,12 +211,12 @@ export default function FeedbackPage() {
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen font-sans text-gray-800 p-4 sm:p-8">
+    <div className="bg-background min-h-screen font-sans text-foreground p-4 sm:p-8">
       <Toast ref={toast} />
       <div className="max-w-7xl mx-auto">
         <header className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Sistema de Feedback 360°</h1>
-          <p className="text-lg text-gray-600">
+          <h1 className="font-heading text-4xl font-bold text-foreground mb-2">Sistema de Feedback 360°</h1>
+          <p className="text-lg text-muted-foreground">
             Evaluá las habilidades blandas de tus compañeros del mismo departamento de forma anónima.
           </p>
         </header>
@@ -234,21 +234,21 @@ export default function FeedbackPage() {
           <div className="space-y-6">
             <Card title={
               <div className="flex items-center">
-                <BarChart className="mr-2 text-indigo-500" />
+                <BarChart className="mr-2 text-primary" />
                 <span>Tu progreso</span>
               </div>
             }>
               <div className="space-y-3">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-muted-foreground">
                   Compañeros evaluables:{' '}
-                  <span className="font-semibold text-indigo-600">{allUsers.length - 1}</span>
+                  <span className="font-semibold text-primary">{allUsers.length - 1}</span>
                 </div>
-                <div className="text-sm text-gray-500 italic">
+                <div className="text-sm text-muted-foreground italic">
                   Las evaluaciones son anónimas. Solo el sistema registra los conteos generales.
                 </div>
                 <button
                   onClick={loadPeers}
-                  className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors border border-indigo-200"
+                  className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-primary/15 text-primary rounded-lg hover:bg-primary/20 transition-colors border border-primary/30"
                 >
                   <RefreshCw size={14} />
                   Recargar compañeros
