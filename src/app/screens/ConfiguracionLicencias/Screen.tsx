@@ -154,8 +154,8 @@ export default function ConfiguracionGeneral() {
             onClick={() => { setActiveTab(id); setSearchTerm(""); }}
             className={`flex items-center gap-2 whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === id
-                    ? 'border-indigo-600 text-indigo-600 bg-indigo-50/50'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-primary text-primary bg-primary/10'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
             }`}
         >
             <Icon size={16} />
@@ -323,10 +323,10 @@ export default function ConfiguracionGeneral() {
     
 
     return (
-        <div className="min-h-screen bg-gray-100 p-6 font-sans antialiased text-gray-900">
+        <div className="min-h-screen bg-background p-6 font-sans antialiased text-foreground">
             {notification && (
                 <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-xl border animate-in fade-in slide-in-from-top-4 duration-300 ${
-                    notification.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'
+                    notification.type === 'success' ? 'bg-success-soft border-success text-success-soft-foreground' : 'bg-error-soft border-error text-error-soft-foreground'
                 }`}>
                     {notification.type === 'success' ? <Check size={18} /> : <AlertCircle size={18} />}
                     <span className="font-medium text-sm">{notification.message}</span>
@@ -336,18 +336,18 @@ export default function ConfiguracionGeneral() {
             {/* Header */}
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
-                    <div className="p-3 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-200">
-                        <Settings className="text-white" size={28} />
+                    <div className="p-3 bg-primary rounded-xl shadow-lg shadow-primary/20">
+                        <Settings className="text-primary-foreground" size={28} />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Configuración General</h1>
-                        <p className="text-gray-500 text-sm">Parámetros globales del sistema de Recursos Humanos</p>
+                        <h1 className="font-heading text-2xl font-bold text-foreground tracking-tight">Configuración General</h1>
+                        <p className="text-muted-foreground text-sm">Parámetros globales del sistema de Recursos Humanos</p>
                     </div>
                 </div>
             </div>
 
             {/* Tabs Navigation */}
-            <div className="max-w-7xl mx-auto mb-6 bg-white border border-gray-200 rounded-xl p-1 shadow-sm">
+            <div className="max-w-7xl mx-auto mb-6 bg-card border border-border rounded-xl p-1 shadow-sm">
                 <nav className="flex space-x-1 overflow-x-auto">
                     <TabButton id="licencias" label="Reglas de Licencias" icon={Settings} />
                     <TabButton id="contratos" label="Tipos de Contrato" icon={Briefcase} />
