@@ -451,27 +451,27 @@ export default function ConfiguracionGeneral() {
                         {activeTab === 'contratos' && (
                             <div>
                                 <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-lg font-bold text-gray-800">Tipos de Contrato Disponibles</h2>
+                                    <h2 className="font-heading text-lg font-bold text-foreground">Tipos de Contrato Disponibles</h2>
                                     <button
                                         onClick={() => { setContractForm({ nombre: "", key: "", descripcion: "" }); setIsEditingContract(false); setShowContractModal(true); }}
-                                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-sm"
+                                        className="flex items-center gap-2 bg-primary hover:opacity-90 text-primary-foreground px-4 py-2 rounded-xl font-bold text-sm"
                                     >
                                         <Plus size={16} /> Nuevo Contrato
                                     </button>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {contracts.map(c => (
-                                        <div key={c.id} className="p-5 border border-gray-200 rounded-2xl bg-white shadow-sm flex flex-col justify-between hover:border-indigo-200 transition-all">
+                                        <div key={c.id} className="p-5 border border-border rounded-2xl bg-card shadow-sm flex flex-col justify-between hover:border-primary/40 transition-all">
                                             <div>
                                                 <div className="flex items-center justify-between mb-2">
-                                                    <h3 className="font-bold text-gray-900">{c.nombre}</h3>
-                                                    <span className="px-2 py-0.5 text-[9px] bg-indigo-50 text-indigo-700 rounded-md font-mono font-bold uppercase">{c.key}</span>
+                                                    <h3 className="font-bold text-foreground">{c.nombre}</h3>
+                                                    <span className="px-2 py-0.5 text-[9px] bg-primary/15 text-primary rounded-md font-mono font-bold uppercase">{c.key}</span>
                                                 </div>
-                                                <p className="text-sm text-gray-500 line-clamp-3 mb-4">{c.descripcion || 'Sin descripción disponible.'}</p>
+                                                <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{c.descripcion || 'Sin descripción disponible.'}</p>
                                             </div>
-                                            <div className="flex justify-end gap-2 border-t border-gray-100 pt-3">
-                                                <button onClick={() => { setContractForm(c); setIsEditingContract(true); setShowContractModal(true); }} className="flex items-center gap-1 text-xs text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded-md transition-all font-semibold"><Edit2 size={12} /> Editar</button>
-                                                <button onClick={() => c.id && handleDeleteContract(c.id)} className="flex items-center gap-1 text-xs text-red-600 hover:bg-red-50 px-2 py-1 rounded-md transition-all font-semibold"><Trash2 size={12} /> Desactivar</button>
+                                            <div className="flex justify-end gap-2 border-t border-border pt-3">
+                                                <button onClick={() => { setContractForm(c); setIsEditingContract(true); setShowContractModal(true); }} className="flex items-center gap-1 text-xs text-primary hover:bg-primary/10 px-2 py-1 rounded-md transition-all font-semibold"><Edit2 size={12} /> Editar</button>
+                                                <button onClick={() => c.id && handleDeleteContract(c.id)} className="flex items-center gap-1 text-xs text-error hover:bg-error-soft px-2 py-1 rounded-md transition-all font-semibold"><Trash2 size={12} /> Desactivar</button>
                                             </div>
                                         </div>
                                     ))}
