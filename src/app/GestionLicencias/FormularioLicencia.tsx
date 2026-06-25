@@ -421,17 +421,17 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
         <Section>
           <StepLabel n={2} label="Rango de fechas" />
           {!selectedType ? (
-            <div className="p-4 text-center border-2 border-dashed border-gray-200 rounded-xl text-gray-400">
+            <div className="p-4 text-center border-2 border-dashed border-border rounded-xl text-muted-foreground">
               <p className="text-sm">Por favor, seleccioná primero el tipo de licencia.</p>
             </div>
           ) : licenseMeta.mode === 'corrido' ? (
             <div className="space-y-4">
-              <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded-lg border border-amber-100 flex items-center gap-2">
+              <p className="text-xs text-warning bg-warning-soft p-2 rounded-lg border border-warning flex items-center gap-2">
                 <AlertCircle size={14} />
                 Esta licencia es de 90 días de corrido (calendario).
               </p>
               <div className="field">
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Fecha de Inicio</label>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">Fecha de Inicio</label>
                 <Calendar
                   value={startDate}
                   onChange={(e) => setStartDate(e.value as Date)}
@@ -441,12 +441,12 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
                 />
               </div>
               {endDate && (
-                <div className="p-3 bg-cyan-50 border border-cyan-100 rounded-xl">
-                  <p className="text-xs font-semibold text-cyan-700">Período Calculado:</p>
-                  <p className="text-sm text-cyan-800 font-bold">
+                <div className="p-3 bg-primary/15 border border-primary/30 rounded-xl">
+                  <p className="text-xs font-semibold text-primary">Período Calculado:</p>
+                  <p className="text-sm text-primary font-bold">
                     {startDate?.toLocaleDateString()} al {endDate.toLocaleDateString()}
                   </p>
-                  <p className="text-[10px] text-cyan-600 mt-1">90 días calendario automáticos.</p>
+                  <p className="text-[10px] text-primary mt-1">90 días calendario automáticos.</p>
                 </div>
               )}
             </div>
@@ -458,16 +458,16 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
         <Section className="lg:col-span-1">
           <StepLabel n={3} label="Tu Aprobador" />
           {supervisorData ? (
-            <div className="p-3 bg-gray-50 rounded-lg flex items-center gap-3">
-              <div className="w-10 h-10 bg-cyan-100 text-cyan-700 rounded-full flex items-center justify-center font-bold">
+            <div className="p-3 bg-muted rounded-lg flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary/15 text-primary rounded-full flex items-center justify-center font-bold">
                 {supervisorData.name.charAt(0)}
               </div>
               <div className="text-sm">
                 <p className="font-semibold">{supervisorData.name}</p>
-                <p className="text-xs text-gray-500">Superior Directo</p>
+                <p className="text-xs text-muted-foreground">Superior Directo</p>
               </div>
             </div>
-          ) : <p className="text-xs italic text-gray-400">Consultando jerarquía...</p>}
+          ) : <p className="text-xs italic text-muted-foreground">Consultando jerarquía...</p>}
         </Section>
 
         <Section>
@@ -477,18 +477,18 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
             onChange={(e) => setMensaje(e.target.value)}
             rows={15}
             autoResize
-            className="w-full text-xs text-gray-600 border-none bg-gray-50 rounded-lg p-3"
+            className="w-full text-xs text-foreground border-none bg-muted rounded-lg p-3"
           />
         </Section>
       </div>
 
       <div className="flex items-center justify-between pt-4">
-        <button onClick={onCancel} className="text-sm text-gray-500 font-medium px-4 py-2 rounded-lg hover:bg-gray-100">
+        <button onClick={onCancel} className="text-sm text-muted-foreground font-medium px-4 py-2 rounded-lg hover:bg-muted">
           Cancelar
         </button>
         <button
           onClick={handleSubmit}
-          className="flex items-center gap-2 px-6 py-2.5 bg-cyan-500 hover:bg-cyan-600 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-semibold rounded-xl transition shadow-sm disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:opacity-90 disabled:bg-muted disabled:text-muted-foreground text-primary-foreground text-sm font-semibold rounded-xl transition shadow-sm disabled:cursor-not-allowed"
         >
           Enviar Solicitud
           <Send size={15} />
