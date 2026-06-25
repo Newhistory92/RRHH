@@ -647,23 +647,23 @@ export default function ConfiguracionGeneral() {
             {showProfessionModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowProfessionModal(false)} />
-                    <div className="relative bg-white w-full max-w-lg rounded-3xl border border-gray-100 shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
-                        <div className="flex justify-between items-center mb-6 pb-3 border-b border-gray-100">
-                            <h3 className="text-lg font-bold text-gray-900">{isEditingProfession ? 'Editar Profesión' : 'Nueva Profesión / Cargo'}</h3>
-                            <button onClick={() => setShowProfessionModal(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+                    <div className="relative bg-card w-full max-w-lg rounded-3xl border border-border shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-6 pb-3 border-b border-border">
+                            <h3 className="font-heading text-lg font-bold text-foreground">{isEditingProfession ? 'Editar Profesión' : 'Nueva Profesión / Cargo'}</h3>
+                            <button onClick={() => setShowProfessionModal(false)} className="text-muted-foreground hover:text-foreground"><X size={20} /></button>
                         </div>
                         <form onSubmit={handleSaveProfession} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Nombre del Cargo / Profesión</label>
+                                <label className="block text-sm font-bold text-foreground mb-1">Nombre del Cargo / Profesión</label>
                                 <input type="text" required placeholder="Ej: Desarrollador Backend" className="w-full px-3 py-2 border rounded-xl" value={professionForm.nombre} onChange={e => setProfessionForm({ ...professionForm, nombre: e.target.value })} />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Descripción</label>
+                                <label className="block text-sm font-bold text-foreground mb-1">Descripción</label>
                                 <textarea placeholder="Breve descripción del alcance del cargo" className="w-full px-3 py-2 border rounded-xl" rows={3} value={professionForm.descripcion} onChange={e => setProfessionForm({ ...professionForm, descripcion: e.target.value })} />
                             </div>
                             <div className="flex gap-3 pt-4">
-                                <button type="button" onClick={() => setShowProfessionModal(false)} className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-bold">Cancelar</button>
-                                <button type="submit" className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold">Guardar</button>
+                                <button type="button" onClick={() => setShowProfessionModal(false)} className="flex-1 py-2 bg-muted hover:bg-border rounded-xl text-sm font-bold">Cancelar</button>
+                                <button type="submit" className="flex-1 py-2 bg-primary hover:opacity-90 text-primary-foreground rounded-xl text-sm font-bold">Guardar</button>
                             </div>
                         </form>
                     </div>
@@ -674,26 +674,26 @@ export default function ConfiguracionGeneral() {
             {showJornadaModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowJornadaModal(false)} />
-                    <div className="relative bg-white w-full max-w-lg rounded-3xl border border-gray-100 shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
-                        <div className="flex justify-between items-center mb-6 pb-3 border-b border-gray-100">
-                            <h3 className="text-lg font-bold text-gray-900">{isEditingJornada ? 'Editar Jornada Laboral' : 'Nueva Jornada Laboral'}</h3>
-                            <button onClick={() => setShowJornadaModal(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+                    <div className="relative bg-card w-full max-w-lg rounded-3xl border border-border shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-6 pb-3 border-b border-border">
+                            <h3 className="font-heading text-lg font-bold text-foreground">{isEditingJornada ? 'Editar Jornada Laboral' : 'Nueva Jornada Laboral'}</h3>
+                            <button onClick={() => setShowJornadaModal(false)} className="text-muted-foreground hover:text-foreground"><X size={20} /></button>
                         </div>
                         <form onSubmit={handleSaveJornada} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Nombre (Tipo de Contrato)</label>
+                                <label className="block text-sm font-bold text-foreground mb-1">Nombre (Tipo de Contrato)</label>
                                 <select required className="w-full px-3 py-2 border rounded-xl" value={jornadaForm.nombre} onChange={e => setJornadaForm({ ...jornadaForm, nombre: e.target.value })}>
                                     <option value="">Seleccionar contrato relacionado</option>
                                     {contracts.map(c => <option key={c.key} value={c.nombre}>{c.nombre}</option>)}
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Horas Diarias</label>
+                                <label className="block text-sm font-bold text-foreground mb-1">Horas Diarias</label>
                                 <input type="number" required min="1" max="24" className="w-full px-3 py-2 border rounded-xl" value={jornadaForm.horasDia} onChange={e => setJornadaForm({ ...jornadaForm, horasDia: parseFloat(e.target.value) })} />
                             </div>
                             <div className="flex gap-3 pt-4">
-                                <button type="button" onClick={() => setShowJornadaModal(false)} className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-bold">Cancelar</button>
-                                <button type="submit" className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold">Guardar</button>
+                                <button type="button" onClick={() => setShowJornadaModal(false)} className="flex-1 py-2 bg-muted hover:bg-border rounded-xl text-sm font-bold">Cancelar</button>
+                                <button type="submit" className="flex-1 py-2 bg-primary hover:opacity-90 text-primary-foreground rounded-xl text-sm font-bold">Guardar</button>
                             </div>
                         </form>
                     </div>
