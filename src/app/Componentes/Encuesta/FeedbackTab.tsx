@@ -137,8 +137,8 @@ export const FeedbackTab: React.FC<FeedbackTabProps> = ({
   
   const cardTitle = (
     <div className="flex items-center">
-      <MessageSquare className="mr-3 text-green-500" />
-      <span className="text-2xl font-bold text-gray-800">Evaluacion del Equipo de Trabajo</span>
+      <MessageSquare className="mr-3 text-primary" />
+      <span className="font-heading text-2xl font-bold text-foreground">Evaluacion del Equipo de Trabajo</span>
     </div>
   );
 
@@ -175,19 +175,19 @@ export const FeedbackTab: React.FC<FeedbackTabProps> = ({
 
   return (
     <Card title={cardTitle}>
-      <span className=" text-base font-bold text-gray-500 sm:ml-2">
+      <span className=" text-base font-bold text-muted-foreground sm:ml-2">
         Tu Opinión es Totalmente Anónima
       </span>
       <div className='mt-4'>
         <div className="flex justify-between items-center mb-3">
-          <span className="text-sm font-semibold text-gray-700">Progreso de Evaluaciones</span>
+          <span className="text-sm font-semibold text-foreground">Progreso de Evaluaciones</span>
         </div>
-        <ProgressBar 
-          value={progressPercentage} 
-          displayValueTemplate={() => `${progress.evaluated}/${progress.total}`} 
+        <ProgressBar
+          value={progressPercentage}
+          displayValueTemplate={() => `${progress.evaluated}/${progress.total}`}
         />
-        <div className="mt-2 mb-5 text-xs text-gray-600">
-          {progress.total > 0 
+        <div className="mt-2 mb-5 text-xs text-muted-foreground">
+          {progress.total > 0
             ? `${Math.round(progressPercentage)}% completado`
             : 'Sin evaluaciones disponibles'
           }
@@ -196,23 +196,23 @@ export const FeedbackTab: React.FC<FeedbackTabProps> = ({
 
       {survey ? (
         <div className="space-y-6">
-          <Card className="p-1 rounded-lg border border-indigo-200 ">
-            <p className="text-lg text-gray-700 mb-3">
+          <Card className="p-1 rounded-lg border border-primary/30 ">
+            <p className="text-lg text-foreground mb-3">
               ¿Consideras que tu compañero/a{' '}
-              <span className="font-bold text-indigo-600">{survey.evaluado}</span>{' '}
+              <span className="font-bold text-primary">{survey.evaluado}</span>{' '}
               tiene la habilidad de...
             </p>
             <div >
-              <p className="text-xl font-semibold text-indigo-700">
+              <p className="text-xl font-semibold text-primary">
                 &quot;{survey.softSkills.nombre}&quot;
               </p>
             </div>
           </Card>
-          
+
           <div className="flex justify-center">
-            <SelectButton 
-              value={selectedResponse} 
-              onChange={(e) => setSelectedResponse(e.value)} 
+            <SelectButton
+              value={selectedResponse}
+              onChange={(e) => setSelectedResponse(e.value)}
               options={feedbackOptions}
             />
           </div>
@@ -226,13 +226,13 @@ export const FeedbackTab: React.FC<FeedbackTabProps> = ({
         </div>
       ) : (
         <div className="text-center py-8">
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <MessageSquare className="mx-auto mb-4 text-gray-400" size={48} />
-            <p className="text-gray-600 mb-4">
+          <div className="bg-muted p-6 rounded-lg border border-border">
+            <MessageSquare className="mx-auto mb-4 text-muted-foreground" size={48} />
+            <p className="text-muted-foreground mb-4">
               {getNoSurveyMessage()}
             </p>
             {currentUser.lastCompleteFeedback && (
-              <div className="text-sm text-gray-500 bg-gray-100 p-2 rounded">
+              <div className="text-sm text-muted-foreground bg-muted p-2 rounded">
                 Última evaluación completa: {new Date(currentUser.lastCompleteFeedback).toLocaleDateString()}
               </div>
             )}
