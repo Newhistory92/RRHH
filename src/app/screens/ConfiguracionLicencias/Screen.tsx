@@ -573,39 +573,39 @@ export default function ConfiguracionGeneral() {
             {showLicenciaModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowLicenciaModal(false)} />
-                    <div className="relative bg-white w-full max-w-lg rounded-3xl border border-gray-100 shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
-                        <div className="flex justify-between items-center mb-6 pb-3 border-b border-gray-100">
-                            <h3 className="text-lg font-bold text-gray-900">{isEditingLicencia ? 'Editar Regla de Licencia' : 'Nueva Regla Anual'}</h3>
-                            <button onClick={() => setShowLicenciaModal(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+                    <div className="relative bg-card w-full max-w-lg rounded-3xl border border-border shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-6 pb-3 border-b border-border">
+                            <h3 className="font-heading text-lg font-bold text-foreground">{isEditingLicencia ? 'Editar Regla de Licencia' : 'Nueva Regla Anual'}</h3>
+                            <button onClick={() => setShowLicenciaModal(false)} className="text-muted-foreground hover:text-foreground"><X size={20} /></button>
                         </div>
                         <form onSubmit={handleSaveLicencia} className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Año Fiscal</label>
+                                    <label className="block text-sm font-bold text-foreground mb-1">Año Fiscal</label>
                                     <input type="number" required className="w-full px-3 py-2 border rounded-xl" value={licenciaForm.anio} onChange={e => setLicenciaForm({ ...licenciaForm, anio: parseInt(e.target.value) })} />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Días Totales</label>
+                                    <label className="block text-sm font-bold text-foreground mb-1">Días Totales</label>
                                     <input type="number" required min="0" className="w-full px-3 py-2 border rounded-xl" value={licenciaForm.diasTotales || 0} onChange={e => setLicenciaForm({ ...licenciaForm, diasTotales: parseInt(e.target.value) })} />
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Tipo de Contrato</label>
+                                <label className="block text-sm font-bold text-foreground mb-1">Tipo de Contrato</label>
                                 <select required className="w-full px-3 py-2 border rounded-xl" value={licenciaForm.tipo} onChange={e => setLicenciaForm({ ...licenciaForm, tipo: e.target.value })}>
                                     <option value="">Seleccionar tipo</option>
                                     {contracts.map(c => <option key={c.key} value={c.key}>{c.nombre}</option>)}
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Nombre de la Licencia</label>
+                                <label className="block text-sm font-bold text-foreground mb-1">Nombre de la Licencia</label>
                                 <input list="license-types" required placeholder="Ej: Particular, Vacaciones" className="w-full px-3 py-2 border rounded-xl" value={licenciaForm.categoria} onChange={e => setLicenciaForm({ ...licenciaForm, categoria: e.target.value })} />
                                 <datalist id="license-types">
                                     {TIPOS_LICENCIA_DEFAULT.map(t => <option key={t} value={t} />)}
                                 </datalist>
                             </div>
                             <div className="flex gap-3 pt-4">
-                                <button type="button" onClick={() => setShowLicenciaModal(false)} className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-bold">Cancelar</button>
-                                <button type="submit" className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold">Guardar</button>
+                                <button type="button" onClick={() => setShowLicenciaModal(false)} className="flex-1 py-2 bg-muted hover:bg-border rounded-xl text-sm font-bold">Cancelar</button>
+                                <button type="submit" className="flex-1 py-2 bg-primary hover:opacity-90 text-primary-foreground rounded-xl text-sm font-bold">Guardar</button>
                             </div>
                         </form>
                     </div>
@@ -616,27 +616,27 @@ export default function ConfiguracionGeneral() {
             {showContractModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowContractModal(false)} />
-                    <div className="relative bg-white w-full max-w-lg rounded-3xl border border-gray-100 shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
-                        <div className="flex justify-between items-center mb-6 pb-3 border-b border-gray-100">
-                            <h3 className="text-lg font-bold text-gray-900">{isEditingContract ? 'Editar Contrato' : 'Nuevo Tipo de Contrato'}</h3>
-                            <button onClick={() => setShowContractModal(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+                    <div className="relative bg-card w-full max-w-lg rounded-3xl border border-border shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-6 pb-3 border-b border-border">
+                            <h3 className="font-heading text-lg font-bold text-foreground">{isEditingContract ? 'Editar Contrato' : 'Nuevo Tipo de Contrato'}</h3>
+                            <button onClick={() => setShowContractModal(false)} className="text-muted-foreground hover:text-foreground"><X size={20} /></button>
                         </div>
                         <form onSubmit={handleSaveContract} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Nombre del Contrato</label>
+                                <label className="block text-sm font-bold text-foreground mb-1">Nombre del Contrato</label>
                                 <input type="text" required placeholder="Ej: Contrato Eventual" className="w-full px-3 py-2 border rounded-xl" value={contractForm.nombre} onChange={e => setContractForm({ ...contractForm, nombre: e.target.value })} />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Clave de Referencia (Key)</label>
-                                <input type="text" required placeholder="Ej: eventual" disabled={isEditingContract} className="w-full px-3 py-2 border rounded-xl disabled:bg-gray-100" value={contractForm.key} onChange={e => setContractForm({ ...contractForm, key: e.target.value.toLowerCase().replace(/\s+/g, '_') })} />
+                                <label className="block text-sm font-bold text-foreground mb-1">Clave de Referencia (Key)</label>
+                                <input type="text" required placeholder="Ej: eventual" disabled={isEditingContract} className="w-full px-3 py-2 border rounded-xl disabled:bg-muted" value={contractForm.key} onChange={e => setContractForm({ ...contractForm, key: e.target.value.toLowerCase().replace(/\s+/g, '_') })} />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Descripción</label>
+                                <label className="block text-sm font-bold text-foreground mb-1">Descripción</label>
                                 <textarea placeholder="Detalles de este tipo de régimen contractual" className="w-full px-3 py-2 border rounded-xl" rows={3} value={contractForm.descripcion} onChange={e => setContractForm({ ...contractForm, descripcion: e.target.value })} />
                             </div>
                             <div className="flex gap-3 pt-4">
-                                <button type="button" onClick={() => setShowContractModal(false)} className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-bold">Cancelar</button>
-                                <button type="submit" className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold">Guardar</button>
+                                <button type="button" onClick={() => setShowContractModal(false)} className="flex-1 py-2 bg-muted hover:bg-border rounded-xl text-sm font-bold">Cancelar</button>
+                                <button type="submit" className="flex-1 py-2 bg-primary hover:opacity-90 text-primary-foreground rounded-xl text-sm font-bold">Guardar</button>
                             </div>
                         </form>
                     </div>
