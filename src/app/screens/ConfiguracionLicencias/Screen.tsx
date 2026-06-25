@@ -307,8 +307,8 @@ export default function ConfiguracionGeneral() {
     }, [configuraciones, searchTerm, sortField, sortOrder]);
 
     const SortIcon = ({ field }: { field: typeof sortField }) => {
-        if (sortField !== field) return <ArrowUpDown size={14} className="ml-1 text-gray-300" />;
-        return sortOrder === 'asc' ? <ArrowUp size={14} className="ml-1 text-indigo-500" /> : <ArrowDown size={14} className="ml-1 text-indigo-500" />;
+        if (sortField !== field) return <ArrowUpDown size={14} className="ml-1 text-muted-foreground" />;
+        return sortOrder === 'asc' ? <ArrowUp size={14} className="ml-1 text-primary" /> : <ArrowDown size={14} className="ml-1 text-primary" />;
     };
 
     const toggleSort = (field: typeof sortField) => {
@@ -360,25 +360,25 @@ export default function ConfiguracionGeneral() {
             {/* Main Area */}
             <div className="max-w-7xl mx-auto">
                 {loading ? (
-                    <div className="p-20 flex flex-col items-center justify-center gap-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
-                        <Loader2 className="animate-spin text-indigo-500" size={40} />
-                        <p className="text-gray-400 font-medium animate-pulse">Cargando datos...</p>
+                    <div className="p-20 flex flex-col items-center justify-center gap-4 bg-card rounded-2xl border border-border shadow-sm">
+                        <Loader2 className="animate-spin text-primary" size={40} />
+                        <p className="text-muted-foreground font-medium animate-pulse">Cargando datos...</p>
                     </div>
                 ) : (
-                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-6">
+                    <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden p-6">
                         
                         {/* ── TAB 1: LICENCIAS ────────────────────────────────────────── */}
                         {activeTab === 'licencias' && (
                             <div>
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                                    <h2 className="text-lg font-bold text-gray-800">Cupos de Licencias Anuales</h2>
+                                    <h2 className="font-heading text-lg font-bold text-foreground">Cupos de Licencias Anuales</h2>
                                     <div className="flex items-center gap-3">
                                         <div className="relative group">
-                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                                             <input
                                                 type="text"
                                                 placeholder="Buscar regla..."
-                                                className="pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all w-60"
+                                                className="pl-9 pr-4 py-2 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all w-60"
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
                                             />
@@ -389,7 +389,7 @@ export default function ConfiguracionGeneral() {
                                                 setIsEditingLicencia(false);
                                                 setShowLicenciaModal(true);
                                             }}
-                                            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all"
+                                            className="flex items-center gap-2 bg-primary hover:opacity-90 text-primary-foreground px-4 py-2 rounded-xl font-bold text-sm transition-all"
                                         >
                                             <Plus size={16} /> Nueva Regla
                                         </button>
@@ -398,47 +398,47 @@ export default function ConfiguracionGeneral() {
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left border-collapse">
                                         <thead>
-                                            <tr className="bg-gray-50 border-b border-gray-100 uppercase tracking-wider text-[10px] text-gray-400 font-bold">
-                                                <th className="px-6 py-4 cursor-pointer hover:text-indigo-500" onClick={() => toggleSort('anio')}>
+                                            <tr className="bg-muted border-b border-border uppercase tracking-wider text-[10px] text-muted-foreground font-bold">
+                                                <th className="px-6 py-4 cursor-pointer hover:text-primary" onClick={() => toggleSort('anio')}>
                                                     <div className="flex items-center">Año <SortIcon field="anio" /></div>
                                                 </th>
-                                                <th className="px-6 py-4 cursor-pointer hover:text-indigo-500" onClick={() => toggleSort('tipo')}>
+                                                <th className="px-6 py-4 cursor-pointer hover:text-primary" onClick={() => toggleSort('tipo')}>
                                                     <div className="flex items-center">Contrato / Perfil <SortIcon field="tipo" /></div>
                                                 </th>
-                                                <th className="px-6 py-4 cursor-pointer hover:text-indigo-500" onClick={() => toggleSort('categoria')}>
+                                                <th className="px-6 py-4 cursor-pointer hover:text-primary" onClick={() => toggleSort('categoria')}>
                                                     <div className="flex items-center">Tipo de Licencia <SortIcon field="categoria" /></div>
                                                 </th>
-                                                <th className="px-6 py-4 text-center cursor-pointer hover:text-indigo-500" onClick={() => toggleSort('diasTotales')}>
+                                                <th className="px-6 py-4 text-center cursor-pointer hover:text-primary" onClick={() => toggleSort('diasTotales')}>
                                                     <div className="flex items-center justify-center">Cupo <SortIcon field="diasTotales" /></div>
                                                 </th>
                                                 <th className="px-6 py-4 text-right">Acciones</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-50 text-sm">
+                                        <tbody className="divide-y divide-border text-sm">
                                             {sortedLicencias.length > 0 ? sortedLicencias.map((config) => (
-                                                <tr key={config.id} className="hover:bg-gray-50/50 group">
-                                                    <td className="px-6 py-4 text-gray-500 font-medium">{config.anio}</td>
+                                                <tr key={config.id} className="hover:bg-muted group">
+                                                    <td className="px-6 py-4 text-muted-foreground font-medium">{config.anio}</td>
                                                     <td className="px-6 py-4">
-                                                        <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700">
+                                                        <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/15 text-primary">
                                                             {contracts.find(c => c.key === config.tipo)?.nombre || config.tipo}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 font-semibold text-gray-700">{config.categoria}</td>
+                                                    <td className="px-6 py-4 font-semibold text-foreground">{config.categoria}</td>
                                                     <td className="px-6 py-4 text-center">
-                                                        <span className="font-mono bg-gray-100 px-2.5 py-1 rounded text-gray-600 border border-gray-200">
+                                                        <span className="font-mono bg-muted px-2.5 py-1 rounded text-foreground border border-border">
                                                             {config.diasTotales} {config.diasTotales === 1 ? 'día' : 'días'}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 text-right">
                                                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <button onClick={() => { setLicenciaForm(config); setIsEditingLicencia(true); setShowLicenciaModal(true); }} className="p-2 text-gray-400 hover:text-indigo-600" title="Editar"><Edit2 size={16} /></button>
-                                                            <button onClick={() => handleDeleteLicencia(config.id)} className="p-2 text-gray-400 hover:text-red-600" title="Eliminar"><Trash2 size={16} /></button>
+                                                            <button onClick={() => { setLicenciaForm(config); setIsEditingLicencia(true); setShowLicenciaModal(true); }} className="p-2 text-muted-foreground hover:text-primary" title="Editar"><Edit2 size={16} /></button>
+                                                            <button onClick={() => handleDeleteLicencia(config.id)} className="p-2 text-muted-foreground hover:text-error" title="Eliminar"><Trash2 size={16} /></button>
                                                         </div>
                                                     </td>
                                                 </tr>
                                             )) : (
                                                 <tr>
-                                                    <td colSpan={5} className="py-10 text-center text-gray-400 italic">No se encontraron reglas configuradas.</td>
+                                                    <td colSpan={5} className="py-10 text-center text-muted-foreground italic">No se encontraron reglas configuradas.</td>
                                                 </tr>
                                             )}
                                         </tbody>
