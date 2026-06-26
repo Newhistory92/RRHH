@@ -38,9 +38,9 @@ interface DepartmentOptimizationProps {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const riskColors: Record<string, { bg: string; text: string; border: string; dot: string }> = {
-  Alto:  { bg: "bg-red-100 dark:bg-red-900/30",    text: "text-red-700 dark:text-red-300",    border: "border-red-300 dark:border-red-700",    dot: "bg-red-500" },
-  Medio: { bg: "bg-yellow-100 dark:bg-yellow-900/30", text: "text-yellow-700 dark:text-yellow-300", border: "border-yellow-300 dark:border-yellow-700", dot: "bg-yellow-500" },
-  Bajo:  { bg: "bg-green-100 dark:bg-green-900/30",  text: "text-green-700 dark:text-green-300",  border: "border-green-300 dark:border-green-700",  dot: "bg-green-500" },
+  Alto:  { bg: "bg-error-soft",   text: "text-error-soft-foreground",   border: "border-error",   dot: "bg-error" },
+  Medio: { bg: "bg-warning-soft", text: "text-warning-soft-foreground", border: "border-warning", dot: "bg-warning" },
+  Bajo:  { bg: "bg-success-soft", text: "text-success-soft-foreground", border: "border-success", dot: "bg-success" },
 };
 
 function RiskBadge({ level }: { level: string }) {
@@ -73,23 +73,23 @@ function Section({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden transition-all">
+    <div className="bg-card rounded-xl shadow-md border border-border overflow-hidden transition-all">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+        className="w-full flex items-center justify-between px-6 py-4 hover:bg-muted transition-colors"
       >
         <div className="flex items-center gap-3">
           {icon}
-          <h3 className="text-lg font-bold text-slate-800 dark:text-white">{title}</h3>
+          <h3 className="text-lg font-bold text-foreground">{title}</h3>
           {count !== undefined && (
-            <span className="bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-300 text-xs font-bold px-2.5 py-0.5 rounded-full">
+            <span className="bg-primary/15 text-primary text-xs font-bold px-2.5 py-0.5 rounded-full">
               {count}
             </span>
           )}
         </div>
-        {open ? <ChevronUp size={20} className="text-slate-400" /> : <ChevronDown size={20} className="text-slate-400" />}
+        {open ? <ChevronUp size={20} className="text-muted-foreground" /> : <ChevronDown size={20} className="text-muted-foreground" />}
       </button>
-      {open && <div className="px-6 pb-6 border-t border-slate-100 dark:border-slate-700">{children}</div>}
+      {open && <div className="px-6 pb-6 border-t border-border">{children}</div>}
     </div>
   );
 }
@@ -146,20 +146,20 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
       <div className="flex items-center justify-center min-h-[60vh] p-4">
         <div className="text-center">
           <div className="relative">
-            <Brain className="w-20 h-20 text-cyan-500 mx-auto mb-6 animate-pulse" />
-            <div className="absolute -top-1 -right-1 w-6 h-6 bg-cyan-400 rounded-full animate-ping" />
+            <Brain className="w-20 h-20 text-primary mx-auto mb-6 animate-pulse" />
+            <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full animate-ping" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
             Analizando Estructura Organizacional
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+          <p className="text-muted-foreground max-w-md mx-auto">
             Procesando habilidades, brechas, riesgos y oportunidades de movilidad con IA...
           </p>
           <div className="mt-6 flex justify-center gap-1">
             {[0, 1, 2, 3, 4].map(i => (
               <div
                 key={i}
-                className="w-2.5 h-2.5 bg-cyan-500 rounded-full animate-bounce"
+                className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce"
                 style={{ animationDelay: `${i * 0.15}s` }}
               />
             ))}
@@ -173,16 +173,16 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
   if (error) {
     return (
       <div className="animate-fade-in p-4">
-        <button onClick={onBack} className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6 transition-colors">
+        <button onClick={onBack} className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors">
           <ArrowLeft size={20} /> Volver
         </button>
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-red-700 dark:text-red-300 mb-2">Error en el Análisis</h3>
-          <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+        <div className="bg-error-soft border border-error rounded-xl p-8 text-center">
+          <AlertTriangle className="w-12 h-12 text-error mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-error-soft-foreground mb-2">Error en el Análisis</h3>
+          <p className="text-error mb-4">{error}</p>
           <button
             onClick={fetchAnalysis}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-error text-error-soft-foreground rounded-lg hover:opacity-90 transition-colors"
           >
             <RefreshCw size={16} /> Reintentar
           </button>
