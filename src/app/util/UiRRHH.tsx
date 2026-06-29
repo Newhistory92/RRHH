@@ -1031,12 +1031,12 @@ export const InfoList: React.FC<InfoListProps> = ({ title, items, icon, colorCla
 
 export const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onToggleStatus }) => {
   const cell = (inactive: boolean, extra = '') =>
-    `px-3 py-2 ${inactive ? 'text-gray-500' : 'text-gray-300'} ${extra}`;
+    `px-3 py-2 ${inactive ? 'text-muted-foreground' : 'text-foreground'} ${extra}`;
 
   return (
-    <div className="overflow-x-auto bg-gray-900 rounded-xl">
+    <div className="overflow-x-auto bg-card rounded-xl">
       <table className="min-w-full text-xs text-left">
-        <thead className="bg-gray-800 text-[11px] uppercase tracking-wide text-gray-400">
+        <thead className="bg-muted text-[11px] uppercase tracking-wide text-muted-foreground">
           <tr>
             {['Usuario', 'Nombre', 'DNI', 'Rol', 'Depto / Oficina', 'Estado', 'Acciones'].map((h, i) => (
               <th key={h} className={`px-3 py-2 font-semibold ${i === 0 ? '' : i === 1 ? 'hidden lg:table-cell' : i < 5 ? 'hidden md:table-cell' : i === 5 ? 'hidden sm:table-cell' : 'text-center'}`}>
@@ -1045,14 +1045,14 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onToggleS
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-700/40">
+        <tbody className="divide-y divide-border">
           {users.map(user => (
-            <tr key={user.id} className="hover:bg-gray-700/30 transition-colors">
+            <tr key={user.id} className="hover:bg-muted transition-colors">
               <td className="px-3 py-2 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <Image src={user.avatar || '/Default-avatar.webp'} alt={user.name} width={28} height={28}
                     className={`w-7 h-7 rounded-full object-cover flex-shrink-0 ${!user.activo ? 'grayscale opacity-50' : ''}`} />
-                  <span className={`font-medium ${!user.activo ? 'text-gray-500' : 'text-white'}`}>{user.usuario}</span>
+                  <span className={`font-medium ${!user.activo ? 'text-muted-foreground' : 'text-foreground'}`}>{user.usuario}</span>
                 </div>
               </td>
               <td className={cell(!user.activo, 'hidden lg:table-cell')}>{user.name}</td>
@@ -1060,7 +1060,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onToggleS
               <td className={cell(!user.activo, 'hidden md:table-cell')}>{user.role}</td>
               <td className={cell(!user.activo, 'hidden md:table-cell')}>{user.department || user.office || '—'}</td>
               <td className="px-3 py-2 hidden sm:table-cell">
-                <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${user.activo ? 'bg-green-900/50 text-green-300' : 'bg-gray-700 text-gray-400'}`}>
+                <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${user.activo ? 'bg-success-soft text-success-soft-foreground' : 'bg-muted text-muted-foreground'}`}>
                   {user.activo ? 'Activo' : 'Inactivo'}
                 </span>
               </td>
@@ -1068,12 +1068,12 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onToggleS
                 <div className="flex items-center justify-center gap-1.5">
                   {user.activo && onEdit && (
                     <button onClick={() => onEdit(user)}
-                      className="text-[11px] px-2 py-0.5 rounded border border-cyan-500/60 text-cyan-400 hover:bg-cyan-500/10 transition leading-tight">
+                      className="text-[11px] px-2 py-0.5 rounded border border-primary/60 text-primary hover:bg-primary/10 transition leading-tight">
                       Editar
                     </button>
                   )}
                   <button onClick={() => onToggleStatus(user.id)}
-                    className={`text-[11px] px-2 py-0.5 rounded transition leading-tight ${user.activo ? 'bg-red-600/70 hover:bg-red-600 text-white' : 'bg-green-600/70 hover:bg-green-600 text-white'}`}>
+                    className={`text-[11px] px-2 py-0.5 rounded transition leading-tight ${user.activo ? 'bg-error hover:opacity-90 text-error-soft-foreground' : 'bg-success hover:opacity-90 text-success-soft-foreground'}`}>
                     {user.activo ? 'Desactivar' : 'Activar'}
                   </button>
                 </div>
@@ -1081,7 +1081,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onToggleS
             </tr>
           ))}
           {users.length === 0 && (
-            <tr><td colSpan={7} className="py-10 text-center text-gray-500">No hay usuarios para mostrar.</td></tr>
+            <tr><td colSpan={7} className="py-10 text-center text-muted-foreground">No hay usuarios para mostrar.</td></tr>
           )}
         </tbody>
       </table>
@@ -1092,16 +1092,16 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onToggleS
 export const RolesGrid: React.FC<RolesGridProps> = ({ roles, onEdit }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     {roles.map(role => (
-      <div key={role.id} className="bg-gray-800 p-5 rounded-xl border border-gray-700 hover:border-gray-500 transition relative group">
-        <button onClick={() => onEdit(role)} className="absolute top-3 right-3 text-gray-500 hover:text-white transition">
+      <div key={role.id} className="bg-card p-5 rounded-xl border border-border hover:border-primary/40 transition relative group">
+        <button onClick={() => onEdit(role)} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition">
           <SquarePen size={16} />
         </button>
         <h3 className={`font-bold text-base text-${role.color}-400 mb-1`}>{role.name}</h3>
-        <p className="text-gray-400 text-sm pr-6">{role.description}</p>
+        <p className="text-muted-foreground text-sm pr-6">{role.description}</p>
       </div>
     ))}
     <button onClick={() => onEdit(null)}
-      className="border-2 border-dashed border-gray-700 rounded-xl flex flex-col items-center justify-center p-6 hover:border-cyan-500 hover:text-cyan-400 text-gray-500 transition cursor-pointer gap-2">
+      className="border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center p-6 hover:border-primary hover:text-primary text-muted-foreground transition cursor-pointer gap-2">
       <Plus size={20} />
       <span className="text-sm font-medium">Crear Nuevo Rol</span>
     </button>
