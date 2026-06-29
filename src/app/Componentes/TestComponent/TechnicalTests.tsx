@@ -62,7 +62,7 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
           <div className="flex-1 min-w-[200px]">
             <label
               htmlFor="profession-select"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              className="block text-sm font-medium text-foreground mb-2"
             >
               Seleccionar Profesión
             </label>
@@ -103,11 +103,11 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
 
       <Card>
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-xl text-gray-700 dark:text-gray-200">
+          <h3 className="font-heading font-bold text-xl text-foreground">
             Tests para{" "}
-            <span className="text-blue-500">{selectedProfession}</span>
+            <span className="text-primary">{selectedProfession}</span>
           </h3>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-muted-foreground">
             {currentTests.length} test{currentTests.length !== 1 ? 's' : ''}
           </span>
         </div>
@@ -115,16 +115,16 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
         <div className="space-y-4">
           {currentTests.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400 mb-2">
+              <p className="text-muted-foreground mb-2">
                 No hay tests para esta profesión.
               </p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 ¡Crea el primer test haciendo clic en &quot;Crear Nuevo Test&quot;!
               </p>
               <Button
                 onClick={() => setIsTestModalOpen(true)}
                 text
-                className="text-blue-500 hover:text-blue-600"
+                className="text-primary hover:opacity-80"
               >
                 Crear Primer Test
               </Button>
@@ -133,18 +133,18 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
             currentTests.map((test) => (
               <div
                 key={test.id}
-                className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/70 transition-colors"
+                className="p-4 bg-muted rounded-lg hover:bg-border transition-colors"
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <p className="font-semibold text-gray-800 dark:text-white mb-1">
+                    <p className="font-semibold text-foreground mb-1">
                       {test.name}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <p className="text-sm text-muted-foreground mb-2">
                       {test.description}
                     </p>
                     {test.type === 'multiple-choice' && (
-                      <p className="text-xs text-gray-500 dark:text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         {test.questions.length} pregunta{test.questions.length !== 1 ? 's' : ''}
                       </p>
                     )}
@@ -152,8 +152,8 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
                   <div className="flex items-center gap-2 ml-4">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${test.type === "multiple-choice"
-                        ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300"
-                        : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                        ? "bg-accent/15 text-accent"
+                        : "bg-warm-contrast/15 text-warm-contrast"
                         }`}
                     >
                       {test.type === "multiple-choice"
@@ -164,7 +164,7 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
                       <Button
                         type="button"
                         onClick={() => onDeleteTest(test.id)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-error hover:opacity-80"
                         text
                         size="small"
                       >
@@ -201,7 +201,7 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
       >
         <div className="p-fluid">
           <div className="field mb-4">
-            <label htmlFor="new-profession" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="new-profession" className="block text-sm font-medium text-foreground mb-2">
               Seleccione la Especialidad / Carrera
             </label>
             <Dropdown
@@ -220,7 +220,7 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
               <small className="p-error block mt-1">Esta profesión ya está en la lista.</small>
             )}
           </div>
-          <p className="text-xs text-gray-500 italic">
+          <p className="text-xs text-muted-foreground italic">
             * Selecciona una carrera del listado oficial para mantener la consistencia con el CV de los empleados.
           </p>
         </div>
