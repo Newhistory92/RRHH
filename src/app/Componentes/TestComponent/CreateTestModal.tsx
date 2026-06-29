@@ -218,14 +218,14 @@ console.log(  questions)
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
-        <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
-          <h3 className="text-xl font-bold text-gray-800 dark:text-white">
+      <div className="bg-card rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <div className="p-4 border-b border-border flex justify-between items-center">
+          <h3 className="font-heading text-xl font-bold text-foreground">
             Crear Nuevo Test para {profession}
           </h3>
-          <button 
+          <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="text-muted-foreground hover:text-foreground"
           >
             <CloseIcon size={24} />
           </button>
@@ -236,7 +236,7 @@ console.log(  questions)
             {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Nombre del Test *
                 </label>
                 <InputText 
@@ -249,7 +249,7 @@ console.log(  questions)
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Tipo de Test *
                 </label>
                 <Dropdown
@@ -264,7 +264,7 @@ console.log(  questions)
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Descripción *
               </label>
               <InputTextarea 
@@ -280,9 +280,9 @@ console.log(  questions)
 
             {/* Multiple Choice Questions */}
             {testType === "multiple-choice" && (
-              <div className="space-y-6 pt-4 border-t dark:border-gray-700">
+              <div className="space-y-6 pt-4 border-t border-border">
                 <div className="flex justify-between items-center">
-                  <h4 className="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                  <h4 className="text-lg font-semibold text-foreground">
                     Preguntas ({questions.length}/10)
                   </h4>
                   {questions.length < 10 && (
@@ -299,17 +299,17 @@ console.log(  questions)
                 </div>
 
                 {questions.map((q, qIndex) => (
-                  <Card key={q.id} className="p-4 border dark:border-gray-600">
+                  <Card key={q.id} className="p-4 border border-border">
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
-                        <label className="font-semibold text-gray-700 dark:text-gray-200">
+                        <label className="font-semibold text-foreground">
                           Pregunta {qIndex + 1}
                         </label>
                         {questions.length > 1 && (
                           <Button
                             type="button"
                             onClick={() => removeQuestion(qIndex)}
-                            className="text-red-500 hover:text-red-700"
+                            className="text-error hover:opacity-80"
                             text
                             size="small"
                           >
@@ -329,28 +329,28 @@ console.log(  questions)
                       />
 
                       <div className="pl-4 space-y-3">
-                        <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                        <label className="text-sm font-medium text-muted-foreground">
                           Respuestas:
                         </label>
                         {q.answers.map((ans, aIndex) => (
                           <div key={ans.id} className="flex items-center gap-3">
-                            <Checkbox 
-                              onChange={() => handleCorrectChange(qIndex, aIndex)} 
+                            <Checkbox
+                              onChange={() => handleCorrectChange(qIndex, aIndex)}
                               checked={ans.isCorrect}
                               className="flex-shrink-0"
                             />
-                            <InputText  
+                            <InputText
                               value={ans.text}
-                              onChange={(e) => handleAnswerChange(qIndex, aIndex, e.target.value)} 
+                              onChange={(e) => handleAnswerChange(qIndex, aIndex, e.target.value)}
                               className="flex-1 input-style"
                               placeholder={`Respuesta ${aIndex + 1}`}
-                              required  
+                              required
                             />
                             {q.answers.length > 2 && (
                               <Button
                                 type="button"
                                 onClick={() => removeAnswer(qIndex, aIndex)}
-                                className="text-red-500 hover:text-red-700 flex-shrink-0"
+                                className="text-error hover:opacity-80 flex-shrink-0"
                                 text
                                 size="small"
                               >
@@ -362,7 +362,7 @@ console.log(  questions)
                         <Button
                           type="button"
                           onClick={() => addAnswer(qIndex)}
-                          className="text-sm text-blue-600 hover:text-blue-800"
+                          className="text-sm text-primary hover:opacity-80"
                           text
                           size="small"
                         >
@@ -378,9 +378,9 @@ console.log(  questions)
 
             {/* Case Study Scenario */}
             {testType === "case-study" && (
-              <div className="space-y-4 pt-4 border-t dark:border-gray-700">
+              <div className="space-y-4 pt-4 border-t border-border">
                 <div className="flex justify-between items-center">
-                  <label className="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                  <label className="text-lg font-semibold text-foreground">
                     Escenario del Caso de Estudio
                   </label>
                   <Button
@@ -396,16 +396,16 @@ console.log(  questions)
 
                 {/* Error Display */}
                 {error && (
-                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                  <div className="bg-error-soft border border-error rounded-lg p-3">
                     <div className="flex items-center">
-                      <AlertCircle className="text-red-500 mr-2" size={16} />
-                      <span className="text-sm text-red-700 dark:text-red-300">
+                      <AlertCircle className="text-error mr-2" size={16} />
+                      <span className="text-sm text-error-soft-foreground">
                         {error}
                       </span>
                       <button
                         type="button"
                         onClick={clearError}
-                        className="ml-auto text-red-500 hover:text-red-700"
+                        className="ml-auto text-error hover:opacity-80"
                       >
                         <CloseIcon size={14} />
                       </button>
@@ -424,9 +424,9 @@ console.log(  questions)
                   disabled={isGenerating}
                 />    
                 
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                  <p className="text-xs text-blue-600 dark:text-blue-400">
-                    💡 <strong>Tip:</strong> Completa la descripción del test y luego usa el botón &quot;Generar con IA&quot; 
+                <div className="bg-primary/15 p-3 rounded-lg">
+                  <p className="text-xs text-primary">
+                    💡 <strong>Tip:</strong> Completa la descripción del test y luego usa el botón &quot;Generar con IA&quot;
                     para crear un caso de estudio personalizado para {profession}. La evaluación se realizará mediante IA.
                   </p>
                 </div>
@@ -435,8 +435,8 @@ console.log(  questions)
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="p-4 border-t border-border flex justify-between items-center bg-muted">
+            <div className="text-sm text-muted-foreground">
               {testType === 'multiple-choice' ? 
                 `${questions.length} pregunta${questions.length !== 1 ? 's' : ''} configurada${questions.length !== 1 ? 's' : ''}` :
                 'Caso de estudio listo para evaluación por IA'
