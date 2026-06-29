@@ -96,36 +96,36 @@ export default function TestPage(){
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center">
-        <div className="text-center bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1ABCD7] mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400 font-semibold">Cargando configuración...</p>
+      <div className="min-h-screen bg-background flex justify-center items-center">
+        <div className="text-center bg-card p-8 rounded-lg shadow-md">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground font-semibold">Cargando configuración...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2">
+          <h1 className="font-heading text-4xl font-bold text-foreground mb-2">
             Gestión de Tests
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-muted-foreground">
             Administra tests técnicos para diferentes profesiones
           </p>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
+        <div className="flex border-b border-border mb-6">
           <button
             onClick={() => setActiveTab("technical")}
             className={`px-4 py-2 font-semibold transition-colors duration-200 ${
               activeTab === "technical"
-                ? "border-b-2 border-[#2ecbe7] text-[#1ABCD7]  text-shadow-md"
-                : "text-gray-500 hover:text-blue-500 text-shadow-md"
+                ? "border-b-2 border-primary text-primary  text-shadow-md"
+                : "text-muted-foreground hover:text-primary text-shadow-md"
             }`}
           >
             🧪 Tests Técnicos
@@ -149,49 +149,49 @@ export default function TestPage(){
 
         {/* Stats Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+          <div className="bg-card rounded-lg p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-muted-foreground">
                   Total Profesiones
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-2xl font-bold text-foreground">
                   {Object.keys(professions).length}
                 </p>
               </div>
-              <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
+              <div className="bg-primary/15 p-3 rounded-full">
                 <span className="text-2xl">👥</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+          <div className="bg-card rounded-lg p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-muted-foreground">
                   Tests Técnicos
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-2xl font-bold text-foreground">
                   {Object.values(testsByProfession).flat().length}
                 </p>
               </div>
-              <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-full">
+              <div className="bg-accent/15 p-3 rounded-full">
                 <span className="text-2xl">🧪</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+          <div className="bg-card rounded-lg p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-muted-foreground">
                   Habilidades Blandas
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-2xl font-bold text-foreground">
                   {softSkills.length}
                 </p>
               </div>
-              <div className="bg-green-100 dark:bg-green-900 p-3 rounded-full">
+              <div className="bg-warm-contrast/15 p-3 rounded-full">
                 <span className="text-2xl">🎯</span>
               </div>
             </div>
