@@ -1,11 +1,10 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import { TechnicalTests } from '@/app/Componentes/TestComponent/TechnicalTests';
-import { SoftSkills } from '@/app/Componentes/TestComponent/SoftSkills';
 import { Test, TestsByProfession, SoftSkill } from "@/app/Interfas/Interfaces";
 import { apiClient } from '@/app/util/apiClient';
 
-type ActiveTab = "technical" | "soft-skills";
+type ActiveTab = "technical";
 
 export default function TestPage(){
   // Tab State
@@ -95,37 +94,6 @@ export default function TestPage(){
       });
   };
 
-  // Soft Skills Handlers
-  const handleAddSoftSkill = (skill: SoftSkill) => {
-    apiClient.post<{ success: boolean, id: number }>("/configtest/soft", skill)
-      .then(res => {
-        const savedSkill = { ...skill, id: res.id };
-        setSoftSkills(prev => [...prev, savedSkill]);
-      })
-      .catch(err => {
-        console.error("Error adding soft skill:", err);
-        alert("Error al guardar la habilidad blanda: " + err.message);
-      });
-  };
-
-  const handleDeleteSoftSkill = (index: number) => {
-    const skillToDelete = softSkills[index];
-    if (!skillToDelete || !skillToDelete.id) {
-      // If no ID (fallback), delete locally
-      setSoftSkills(prev => prev.filter((_, i) => i !== index));
-      return;
-    }
-
-    apiClient.delete(`/configtest/soft/${skillToDelete.id}`)
-      .then(() => {
-        setSoftSkills(prev => prev.filter((_, i) => i !== index));
-      })
-      .catch(err => {
-        console.error("Error deleting soft skill:", err);
-        alert("Error al eliminar la habilidad blanda: " + err.message);
-      });
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center">
@@ -146,7 +114,7 @@ export default function TestPage(){
             Gestión de Tests
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Administra tests técnicos y habilidades blandas para diferentes profesiones
+            Administra tests técnicos para diferentes profesiones
           </p>
         </div>
 
@@ -162,16 +130,6 @@ export default function TestPage(){
           >
             🧪 Tests Técnicos
           </button>
-          <button
-            onClick={() => setActiveTab("soft-skills")}
-            className={`px-4 py-2 font-semibold transition-colors duration-200 ${
-              activeTab === "soft-skills"
-                ? "border-b-2 border-[#2ecbe7] text-[#1ABCD7]  text-shadow-md"
-                : "text-gray-500 hover:text-blue-500 text-shadow-md"
-            }`}
-          >
-            🎯 Habilidades Blandas
-          </button>
         </div>
 
         {/* Tab Content */}
@@ -185,14 +143,6 @@ export default function TestPage(){
               onAddProfession={handleAddProfession}
               onSaveTest={handleSaveTest}
               onDeleteTest={handleDeleteTest}
-            />
-          )}
-
-          {activeTab === "soft-skills" && (
-            <SoftSkills
-              softSkills={softSkills}
-              onAddSoftSkill={handleAddSoftSkill}
-              onDeleteSoftSkill={handleDeleteSoftSkill}
             />
           )}
         </div>
