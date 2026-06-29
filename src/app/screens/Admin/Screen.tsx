@@ -286,8 +286,8 @@ export default function AdminPage() {
         <button
             onClick={() => setActiveTab(id)}
             className={`whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-colors ${activeTab === id
-                ? 'border-[#2ecbe7] text-[#2ecbe7] bg-cyan-500/10'
-                : 'border-transparent text-gray-400 hover:text-white'
+                ? 'border-primary text-primary bg-primary/10'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
         >
             {title}
@@ -295,23 +295,19 @@ export default function AdminPage() {
     );
 
     return (
-        <div className=" text-gray-200 antialiased min-h-screen">
+        <div className="bg-background text-foreground antialiased min-h-screen">
             <style jsx global>{`
                 body { font-family: 'Inter', sans-serif; }
-                ::-webkit-scrollbar { width: 8px; }
-                ::-webkit-scrollbar-track { background: #1f2937; }
-                ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
-                ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
             `}</style>
 
             <div className="container mx-auto p-4 sm:p-6 lg:p-8">
                 <header className="mb-8">
-                    <h1 className="text-3xl font-bold text-neutral-900 tracking-tight">Panel de Administración</h1>
-                    <p className="text-gray-400 mt-1">Gestiona usuarios, roles y perfiles de la aplicación.</p>
+                    <h1 className="font-heading text-3xl font-bold text-foreground tracking-tight">Panel de Administración</h1>
+                    <p className="text-muted-foreground mt-1">Gestiona usuarios, roles y perfiles de la aplicación.</p>
                 </header>
 
-                <main className="bg-gray-800 rounded-2xl shadow-2xl p-4 sm:p-6">
-                    <div className="border-b border-gray-700">
+                <main className="bg-card rounded-2xl shadow-2xl p-4 sm:p-6">
+                    <div className="border-b border-border">
                         <nav className="-mb-px flex space-x-2 sm:space-x-6 overflow-x-auto">
                             <TabButton id="active-users" title="Usuarios Activos" />
                             <TabButton id="inactive-users" title="Usuarios Inactivos" />
@@ -324,22 +320,22 @@ export default function AdminPage() {
                         {activeTab === 'active-users' && (
                             <div>
                                 <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-                                    <h2 className="text-xl font-semibold text-white">Listado de Usuarios Activos</h2>
+                                    <h2 className="text-xl font-semibold text-foreground">Listado de Usuarios Activos</h2>
                                     <div className="relative w-full sm:w-auto">
                                         <span className="p-input-icon-left w-full">
-                                            <UserRoundSearch className="absolute left-3 top-1/2 -translate-y-1/2  text-gray-400" size={20} />
+                                            <UserRoundSearch className="absolute left-3 top-1/2 -translate-y-1/2  text-muted-foreground" size={20} />
                                             <InputText
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
                                                 placeholder="Buscar por nombre o depto..."
-                                                className="w-full pl-10 bg-gray-700 border-gray-600 text-gray-200"
+                                                className="w-full pl-10 bg-muted border-border text-foreground"
                                                 style={{ paddingLeft: '3rem' }}
                                             />
                                         </span>
                                     </div>
                                 </div>
                                 {loading ? (
-                                    <div className="text-center py-8 text-gray-400">Cargando usuarios...</div>
+                                    <div className="text-center py-8 text-muted-foreground">Cargando usuarios...</div>
                                 ) : (
                                     <UsersTable users={activeUsers} onEdit={openUserModal} onToggleStatus={(userId: number) => {
                                         const user = users.find(u => u.id === userId);
@@ -350,7 +346,7 @@ export default function AdminPage() {
                         )}
                         {activeTab === 'inactive-users' && (
                             <div>
-                                <h2 className="text-xl font-semibold text-white mb-4">Listado de Usuarios Inactivos</h2>
+                                <h2 className="text-xl font-semibold text-foreground mb-4">Listado de Usuarios Inactivos</h2>
                                 <UsersTable users={inactiveUsers} onToggleStatus={(userId: number) => {
                                     const user = users.find(u => u.id === userId);
                                     if (user) handleToggleUserStatus(userId, user.activo);
