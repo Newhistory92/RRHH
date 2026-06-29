@@ -202,14 +202,14 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
         <div className="flex items-center gap-3 mb-2">
-            <div className="bg-cyan-100 dark:bg-cyan-900/50 p-2 rounded-lg">
-              <Zap className="text-[#1ABCD7]" size={28} />
+            <div className="bg-primary/15 p-2 rounded-lg">
+              <Zap className="text-primary" size={28} />
             </div>
-            <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
+            <h1 className="font-heading text-3xl font-bold text-foreground">
               Análisis Organizacional con IA
             </h1>
           </div>
-          <p className="text-slate-500 dark:text-slate-400">
+          <p className="text-muted-foreground">
             {metadata && `${metadata.totalEmployees} empleados · ${metadata.totalDepartments} departamentos · `}
             Generado el {new Date(report.analysisDate).toLocaleDateString("es-AR")}
           </p>
@@ -217,13 +217,13 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
         <div className="flex gap-2 self-start sm:self-center">
           <button
             onClick={fetchAnalysis}
-            className="flex items-center gap-2 text-sm font-semibold border-2 border-cyan-500 text-cyan-600 dark:text-cyan-400 px-4 py-2 rounded-lg transition-all hover:bg-cyan-500 hover:text-white"
+            className="flex items-center gap-2 text-sm font-semibold border-2 border-primary text-primary px-4 py-2 rounded-lg transition-all hover:bg-primary hover:text-primary-foreground"
           >
             <RefreshCw size={16} /> Regenerar
           </button>
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-sm font-semibold border-2 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 px-4 py-2 rounded-lg transition-all hover:bg-slate-200 dark:hover:bg-slate-700"
+            className="flex items-center gap-2 text-sm font-semibold border-2 border-border text-muted-foreground px-4 py-2 rounded-lg transition-all hover:bg-muted"
           >
             <ArrowLeft size={16} /> Volver
           </button>
@@ -239,9 +239,9 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
       </div>
 
       {/* 1. Resumen Ejecutivo */}
-      <Section title="Resumen Ejecutivo" icon={<FileText size={20} className="text-cyan-500" />} defaultOpen={true}>
-        <div className="mt-4 prose dark:prose-invert max-w-none">
-          <p className="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
+      <Section title="Resumen Ejecutivo" icon={<FileText size={20} className="text-primary" />} defaultOpen={true}>
+        <div className="mt-4 prose max-w-none">
+          <p className="text-foreground leading-relaxed whitespace-pre-line">
             {report.executiveSummary}
           </p>
         </div>
@@ -250,26 +250,26 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
       {/* 2. Mapa de Calor de Riesgos */}
       <Section
         title="Mapa de Calor de Riesgos"
-        icon={<ShieldAlert size={20} className="text-orange-500" />}
+        icon={<ShieldAlert size={20} className="text-warning" />}
         count={report.riskHeatMap.length}
       >
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b dark:border-slate-700">
-                <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Departamento</th>
-                <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Riesgo</th>
-                <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Empleados</th>
-                <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Detalle</th>
+              <tr className="border-b border-border">
+                <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Departamento</th>
+                <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Riesgo</th>
+                <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Empleados</th>
+                <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Detalle</th>
               </tr>
             </thead>
             <tbody>
               {report.riskHeatMap.map((entry: RiskHeatMapEntry, i: number) => (
-                <tr key={i} className="border-b dark:border-slate-700/50 last:border-b-0 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-                  <td className="p-3 font-medium text-slate-800 dark:text-white">{entry.department}</td>
+                <tr key={i} className="border-b border-border last:border-b-0 hover:bg-muted transition-colors">
+                  <td className="p-3 font-medium text-foreground">{entry.department}</td>
                   <td className="p-3"><RiskBadge level={entry.riskLevel} /></td>
-                  <td className="p-3 text-slate-600 dark:text-slate-400">{entry.employeeCount}</td>
-                  <td className="p-3 text-sm text-slate-500 dark:text-slate-400">{entry.mainRisk}</td>
+                  <td className="p-3 text-muted-foreground">{entry.employeeCount}</td>
+                  <td className="p-3 text-sm text-muted-foreground">{entry.mainRisk}</td>
                 </tr>
               ))}
             </tbody>
@@ -280,24 +280,24 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
       {/* 3. Brechas de Habilidades */}
       <Section
         title="Brechas de Habilidades"
-        icon={<TrendingUp size={20} className="text-red-500" />}
+        icon={<TrendingUp size={20} className="text-error" />}
         count={report.skillGaps.length}
         defaultOpen={false}
       >
         {report.skillGaps.length === 0 ? (
-          <p className="mt-4 text-slate-500 dark:text-slate-400 italic">No se detectaron brechas de habilidades.</p>
+          <p className="mt-4 text-muted-foreground italic">No se detectaron brechas de habilidades.</p>
         ) : (
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
             {report.skillGaps.map((gap: SkillGapEntry, i: number) => (
-              <div key={i} className="border border-red-200 dark:border-red-800/50 bg-red-50/50 dark:bg-red-900/10 rounded-lg p-3">
+              <div key={i} className="border border-error bg-error-soft rounded-lg p-3">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-semibold text-slate-800 dark:text-white">{gap.department}</span>
-                  <span className="text-xs bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-300 px-2 py-0.5 rounded-full">
+                  <span className="text-sm font-semibold text-foreground">{gap.department}</span>
+                  <span className="text-xs bg-error-soft text-error-soft-foreground px-2 py-0.5 rounded-full">
                     Nivel: {gap.requiredLevel}
                   </span>
                 </div>
-                <p className="text-sm text-red-600 dark:text-red-400 font-medium">Falta: {gap.missingSkill}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{gap.riskDescription}</p>
+                <p className="text-sm text-error font-medium">Falta: {gap.missingSkill}</p>
+                <p className="text-xs text-muted-foreground mt-1">{gap.riskDescription}</p>
               </div>
             ))}
           </div>
@@ -307,35 +307,35 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
       {/* 4. Propuestas de Reubicación */}
       <Section
         title="Propuestas de Reubicación"
-        icon={<ArrowRightLeft size={20} className="text-purple-500" />}
+        icon={<ArrowRightLeft size={20} className="text-warm-contrast" />}
         count={report.relocationProposals.length}
       >
         {report.relocationProposals.length === 0 ? (
-          <p className="mt-4 text-slate-500 dark:text-slate-400 italic">
+          <p className="mt-4 text-muted-foreground italic">
             No se generaron propuestas de reubicación. Esto puede significar que no hay brechas que se cubran con talento existente.
           </p>
         ) : (
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="border-b dark:border-slate-700">
-                  <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Empleado</th>
-                  <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Dept. Actual</th>
-                  <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Dept. Sugerido</th>
-                  <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Razón</th>
+                <tr className="border-b border-border">
+                  <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Empleado</th>
+                  <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dept. Actual</th>
+                  <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dept. Sugerido</th>
+                  <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Razón</th>
                 </tr>
               </thead>
               <tbody>
                 {report.relocationProposals.map((p: RelocationProposal, i: number) => (
-                  <tr key={i} className="border-b dark:border-slate-700/50 last:border-b-0 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-                    <td className="p-3 font-medium text-slate-800 dark:text-white">{p.employeeName}</td>
-                    <td className="p-3 text-slate-600 dark:text-slate-400">{p.currentDept}</td>
+                  <tr key={i} className="border-b border-border last:border-b-0 hover:bg-muted transition-colors">
+                    <td className="p-3 font-medium text-foreground">{p.employeeName}</td>
+                    <td className="p-3 text-muted-foreground">{p.currentDept}</td>
                     <td className="p-3">
-                      <span className="bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-xs font-bold px-2.5 py-1 rounded-full">
+                      <span className="bg-warm-contrast/15 text-warm-contrast text-xs font-bold px-2.5 py-1 rounded-full">
                         {p.suggestedDept}
                       </span>
                     </td>
-                    <td className="p-3 text-sm text-slate-500 dark:text-slate-400">{p.reason}</td>
+                    <td className="p-3 text-sm text-muted-foreground">{p.reason}</td>
                   </tr>
                 ))}
               </tbody>
@@ -347,22 +347,22 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
       {/* 5. Puntos Únicos de Fallo */}
       <Section
         title="Puntos Únicos de Fallo"
-        icon={<AlertTriangle size={20} className="text-amber-500" />}
+        icon={<AlertTriangle size={20} className="text-warning" />}
         count={report.singlePointsOfFailure.length}
         defaultOpen={false}
       >
         {report.singlePointsOfFailure.length === 0 ? (
-          <p className="mt-4 text-slate-500 dark:text-slate-400 italic">No se detectaron puntos únicos de fallo.</p>
+          <p className="mt-4 text-muted-foreground italic">No se detectaron puntos únicos de fallo.</p>
         ) : (
           <div className="mt-4 space-y-2">
             {report.singlePointsOfFailure.map((spof: SPOFEntry, i: number) => (
-              <div key={i} className="flex items-start gap-3 p-3 border border-amber-200 dark:border-amber-800/50 bg-amber-50/50 dark:bg-amber-900/10 rounded-lg">
-                <ShieldAlert size={18} className="text-amber-500 mt-0.5 shrink-0" />
+              <div key={i} className="flex items-start gap-3 p-3 border border-warning bg-warning-soft rounded-lg">
+                <ShieldAlert size={18} className="text-warning mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-slate-800 dark:text-white">
-                    {spof.department} — <span className="text-amber-600 dark:text-amber-400">{spof.criticalSkill}</span>
+                  <p className="text-sm font-semibold text-foreground">
+                    {spof.department} — <span className="text-warning">{spof.criticalSkill}</span>
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     Único poseedor: <strong>{spof.soleHolder}</strong> · {spof.risk}
                   </p>
                 </div>
@@ -373,22 +373,22 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
       </Section>
 
       {/* 6. Plan de Acción */}
-      <Section title="Plan de Acción" icon={<CheckCircle size={20} className="text-green-500" />} count={report.actionPlan.length}>
+      <Section title="Plan de Acción" icon={<CheckCircle size={20} className="text-success" />} count={report.actionPlan.length}>
         <div className="mt-4 space-y-3">
           {report.actionPlan.map((step: string, i: number) => (
-            <div key={i} className="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-700/30 rounded-lg">
-              <div className="w-8 h-8 rounded-full bg-cyan-500 text-white flex items-center justify-center text-sm font-bold shrink-0">
+            <div key={i} className="flex items-start gap-4 p-4 bg-muted rounded-lg">
+              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold shrink-0">
                 {i + 1}
               </div>
-              <p className="text-slate-700 dark:text-slate-300 pt-1">{step}</p>
+              <p className="text-foreground pt-1">{step}</p>
             </div>
           ))}
         </div>
       </Section>
 
       {/* Footer */}
-      <div className="p-5 text-center bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl mx-auto">
+      <div className="p-5 text-center bg-card rounded-lg border border-border">
+        <p className="text-xs text-muted-foreground max-w-3xl mx-auto">
           <strong>Metodología:</strong> Este análisis cruza habilidades requeridas por departamento contra competencias
           reales de empleados, detecta brechas, identifica talento subutilizado y genera propuestas de movilidad interna.
           El resumen ejecutivo y plan de acción son generados por IA (Gemini) a partir de datos reales.
@@ -404,20 +404,20 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
 
 function StatCard({ icon, color, label, value }: { icon: React.ReactNode; color: string; label: string; value: number | string }) {
   const colorMap: Record<string, string> = {
-    cyan: "bg-cyan-100 dark:bg-cyan-900/50 text-cyan-600",
-    green: "bg-green-100 dark:bg-green-900/50 text-green-600",
-    red: "bg-red-100 dark:bg-red-900/50 text-red-600",
-    purple: "bg-purple-100 dark:bg-purple-900/50 text-purple-600",
+    cyan: "bg-primary/15 text-primary",
+    green: "bg-accent/15 text-accent",
+    red: "bg-error-soft text-error",
+    purple: "bg-warm-contrast/15 text-warm-contrast",
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 flex items-center gap-4 shadow-sm">
+    <div className="bg-card rounded-xl border border-border p-4 flex items-center gap-4 shadow-sm">
       <div className={`p-2.5 rounded-lg ${colorMap[color]}`}>
         {icon}
       </div>
       <div>
-        <p className="text-2xl font-bold text-slate-800 dark:text-white">{value}</p>
-        <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+        <p className="text-2xl font-bold text-foreground">{value}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
       </div>
     </div>
   );
