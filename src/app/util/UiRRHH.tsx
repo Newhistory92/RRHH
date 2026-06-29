@@ -822,8 +822,8 @@ interface RiskBadgeProps { risk: RiskLevel; score: number }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const inputCls = "bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5 focus:outline-none focus:border-cyan-500 transition";
-const labelCls = "block text-sm font-medium text-gray-300 mb-1";
+const inputCls = "bg-muted border border-border text-foreground text-sm rounded-lg w-full p-2.5 focus:outline-none focus:border-primary transition";
+const labelCls = "block text-sm font-medium text-foreground mb-1";
 
 // ─── Componentes ──────────────────────────────────────────────────────────────
 
@@ -1146,16 +1146,16 @@ export const ProfileSettings: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 max-w-2xl mx-auto">
-      <h3 className="font-bold text-white mb-0.5">Configuración de Perfiles</h3>
-      <p className="text-gray-400 text-sm mb-5">Define los campos visibles en los perfiles de usuario.</p>
+    <div className="bg-card p-6 rounded-xl border border-border max-w-2xl mx-auto">
+      <h3 className="font-bold text-foreground mb-0.5">Configuración de Perfiles</h3>
+      <p className="text-muted-foreground text-sm mb-5">Define los campos visibles en los perfiles de usuario.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {Object.keys(toggles).map(setting => (
-          <div key={setting} className="flex items-center justify-between bg-gray-900/60 px-4 py-3 rounded-lg">
-            <span className="text-sm text-white font-medium">{setting}</span>
+          <div key={setting} className="flex items-center justify-between bg-muted px-4 py-3 rounded-lg">
+            <span className="text-sm text-foreground font-medium">{setting}</span>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" checked={toggles[setting]} onChange={() => handleToggle(setting)} className="sr-only peer" />
-              <div className="w-10 h-5 bg-gray-600 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
+              <div className="w-10 h-5 bg-border rounded-full peer peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-card after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
             </label>
           </div>
         ))}
@@ -1168,10 +1168,10 @@ export const ProfileSettings: React.FC = () => {
 
 const ModalShell = ({ children, title, onClose }: { children: ReactNode; title: string; onClose: () => void }) => (
   <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
-    <div className="bg-gray-800 rounded-xl shadow-2xl w-full max-w-md p-6 border border-gray-700">
+    <div className="bg-card rounded-xl shadow-2xl w-full max-w-md p-6 border border-border">
       <div className="flex items-center justify-between mb-5">
-        <h3 className="text-lg font-semibold text-white">{title}</h3>
-        <button onClick={onClose} className="text-gray-400 hover:text-white transition text-xl leading-none">&times;</button>
+        <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+        <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition text-xl leading-none">&times;</button>
       </div>
       {children}
     </div>
@@ -1221,8 +1221,8 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({ user, roles, onClo
           </select>
         </Field>
         <div className="flex justify-end gap-2 mt-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 text-sm rounded-lg bg-gray-700 hover:bg-gray-600 text-white transition">Cancelar</button>
-          <button type="submit" className="px-4 py-2 text-sm rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium transition">
+          <button type="button" onClick={onClose} className="px-4 py-2 text-sm rounded-lg bg-muted hover:bg-border text-foreground transition">Cancelar</button>
+          <button type="submit" className="px-4 py-2 text-sm rounded-lg bg-primary hover:opacity-90 text-primary-foreground font-medium transition">
             {user.employee_id ? 'Actualizar' : 'Guardar'}
           </button>
         </div>
@@ -1243,8 +1243,8 @@ export const RoleEditModal: React.FC<{ role: Role; onClose: () => void; onSave: 
           <textarea id="editRoleDescription" name="editRoleDescription" rows={3} defaultValue={role.description} className={inputCls} />
         </Field>
         <div className="flex justify-end gap-2 mt-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 text-sm rounded-lg bg-gray-700 hover:bg-gray-600 text-white transition">Cancelar</button>
-          <button type="submit" className="px-4 py-2 text-sm rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium transition">Guardar</button>
+          <button type="button" onClick={onClose} className="px-4 py-2 text-sm rounded-lg bg-muted hover:bg-border text-foreground transition">Cancelar</button>
+          <button type="submit" className="px-4 py-2 text-sm rounded-lg bg-primary hover:opacity-90 text-primary-foreground font-medium transition">Guardar</button>
         </div>
       </form>
     </ModalShell>
