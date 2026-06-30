@@ -16,6 +16,7 @@ interface LicenseDetailModalProps {
 interface PermissionModalProps {
   employee: Employee | null;  // Corregido: era 'license' ahora es 'employee'
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 
@@ -88,7 +89,7 @@ export const ApplyLicenseModal = ({
 };
 
 
-export const PermissionModal = ({ employee, onClose }: PermissionModalProps) => {
+export const PermissionModal = ({ employee, onClose, onSuccess }: PermissionModalProps) => {
   const [salida, setSalida] = useState<string>("");
   const [retorno, setRetorno] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -139,6 +140,7 @@ export const PermissionModal = ({ employee, onClose }: PermissionModalProps) => 
 
       // Esperar un momento para que se vea el toast antes de cerrar
       setTimeout(() => {
+        onSuccess?.(); // Re-fetchea los datos del servidor para sincronizar la UI
         onClose(); // Cierra el modal
       }, 1000);
 

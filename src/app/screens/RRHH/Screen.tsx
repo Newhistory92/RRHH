@@ -170,6 +170,7 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
           <PermissionModal
             employee={permissionModalEmployee}
             onClose={() => setPermissionModalEmployeeId(null)}
+            onSuccess={fetchEmployeeData}
           />
           <LicenseDetailModal
             license={selectedLicense}
