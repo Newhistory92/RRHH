@@ -99,6 +99,15 @@ export const PAGE_CONFIG: PageConfig[] = [
     accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
   },
   {
+    id: "documentos",
+    label: "Documentos",
+    icon: "Folder",
+    section: "Gente",
+    // USER accede via Header (menú perfil), no sidebar
+    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
+    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
+  },
+  {
     id: "feedback",
     label: "Feedback",
     icon: "MessageSquare",
