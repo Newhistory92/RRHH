@@ -1,6 +1,6 @@
 "use client"
 import { ArrowLeft } from "lucide-react";
-import {ProfileTab,LicenseHistoryTab,PermissionHistoryTab} from "./DetailTables"
+import {ProfileTab,LicenseHistoryTab,PermissionHistoryTab,DocumentsTab} from "./DetailTables"
 import {StatusBadge} from "@/app/util/UiRRHH"
 import { useState } from "react";
 import {  Employee, LicenseHistory} from '@/app/Interfas/Interfaces';
@@ -87,6 +87,16 @@ export const EmployeeDetailView = ({
           >
             Historial de Permisos
           </button>
+          <button
+            onClick={() => setActiveTab("documentos")}
+            className={`${
+              activeTab === "documentos"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+          >
+            Documentos
+          </button>
         </nav>
       </div>
       <div className="no-print">
@@ -101,6 +111,7 @@ export const EmployeeDetailView = ({
         {activeTab === "permisos" && (
           <PermissionHistoryTab permisos={employee.permisos} />
         )}
+        {activeTab === "documentos" && <DocumentsTab employee={employee} />}
       </div>
     </div>
   );
