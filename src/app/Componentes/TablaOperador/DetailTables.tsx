@@ -2,7 +2,7 @@ import { InfoCard, HoursDisplay } from "@/app/util/UiRRHH"
 import { User, Briefcase, Clock, Building, Calendar as CalendarIcon, CheckCircle, Phone, Home, Cake, AtSign, Handshake, CopyCheck, ChartColumnStacked, AlertCircle } from 'lucide-react';
 import { Employee, Licenses, LicenseHistory, Permit, EmploymentStatus } from '@/app/Interfas/Interfaces';
 import { Pagination } from '@/app/Componentes/Pagination/pagination';
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Calendar } from 'primereact/calendar';
@@ -870,4 +870,269 @@ export const PermissionHistoryTab = ({ permisos }: { permisos: Permit[] }) => (
     </div>
   </div>
 );
+
+// ---------------------------------------------------------------------------
+// Tab: Documentos adjuntos del legajo
+// ---------------------------------------------------------------------------
+
+interface EmployeeDocumentSummary {
+  id: number;
+  tipo: string;
+  descripcion: string | null;
+  fileName: string;
+  mimeType: string;
+  createdAt: string;
+}
+
+const DOCUMENT_TYPES = [
+  "DNI",
+  "CUIL",
+  "Resolución",
+  "Título Académico",
+  "Certificado Médico",
+  "Certificado de Antecedentes Penales",
+  "Constancia de CBU",
+  "Constancia de AFIP",
+  "Curriculum Vitae",
+  "Contrato de Trabajo",
+  "Recibo de Sueldo",
+  "Apto Psicofísico",
+  "Carnet de Obra Social",
+  "Licencia de Conducir",
+  "Foto Carnet",
+  "Declaración Jurada",
+  "Certificado de Estudios",
+  "Comprobante de Domicilio",
+  "Acta de Matrimonio",
+  "Otro",
+];
+
+export const DocumentsTab = ({ employee }: { employee: Employee }) => {
+  const [documents, setDocuments] = useState<EmployeeDocumentSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [tipo, setTipo] = useState<string | null>(null);
+  const [descripcion, setDescripcion] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const toast = useRef<Toast>(null);
+
+  const loadDocuments = async () => {
+    setLoading(true);
+    try {
+      const res = await apiClient.get<{ documents: EmployeeDocumentSummary[] }>(
+        `/rrhh/employee/${employee.id}/documents`
+      );
+      setDocuments(res.documents);
+    } catch (error) {
+      console.error("Error al cargar documentos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadDocuments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [employee.id]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedFile(e.target.files?.[0] || null);
+  };
+
+  const handleUpload = async () => {
+    if (!tipo || !selectedFile) {
+      toast.current?.show({
+        severity: "warn",
+        summary: "Campos incompletos",
+        detail: "Seleccioná un tipo de documento y un archivo.",
+        life: 3000,
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileData = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            // readAsDataURL produce "data:<mime>;base64,<data>" -- nos quedamos solo con el base64
+            resolve(reader.result.split(",")[1] || "");
+          } else {
+            reject(new Error("No se pudo leer el archivo"));
+          }
+        };
+        reader.onerror = () => reject(new Error("No se pudo leer el archivo"));
+        reader.readAsDataURL(selectedFile);
+      });
+
+      await apiClient.post(`/rrhh/employee/${employee.id}/documents`, {
+        tipo,
+        descripcion: descripcion || null,
+        fileName: selectedFile.name,
+        mimeType: selectedFile.type || "application/octet-stream",
+        fileData,
+      });
+
+      toast.current?.show({
+        severity: "success",
+        summary: "Documento cargado",
+        detail: "El documento se guardó correctamente.",
+        life: 3000,
+      });
+
+      setTipo(null);
+      setDescripcion("");
+      setSelectedFile(null);
+      await loadDocuments();
+    } catch (error) {
+      console.error("Error al subir documento:", error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: error instanceof Error ? error.message : "No se pudo subir el documento.",
+        life: 5000,
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleViewDocument = async (doc: EmployeeDocumentSummary) => {
+    try {
+      const full = await apiClient.get<{ fileData: string; mimeType: string }>(
+        `/rrhh/employee/${employee.id}/documents/${doc.id}/download`
+      );
+      const dataUrl = `data:${full.mimeType};base64,${full.fileData}`;
+      window.open(dataUrl, "_blank");
+    } catch (error) {
+      console.error("Error al abrir documento:", error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "No se pudo abrir el documento.",
+        life: 5000,
+      });
+    }
+  };
+
+  const handleDeleteDocument = async (doc: EmployeeDocumentSummary) => {
+    if (!confirm(`¿Eliminar el documento "${doc.fileName}"?`)) return;
+    try {
+      await apiClient.delete(`/rrhh/employee/${employee.id}/documents/${doc.id}`);
+      toast.current?.show({
+        severity: "success",
+        summary: "Documento eliminado",
+        life: 3000,
+      });
+      await loadDocuments();
+    } catch (error) {
+      console.error("Error al eliminar documento:", error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "No se pudo eliminar el documento.",
+        life: 5000,
+      });
+    }
+  };
+
+  return (
+    <div className="mt-6 space-y-6">
+      <Toast ref={toast} />
+
+      <div className="bg-card p-6 rounded-lg shadow-sm">
+        <h3 className="font-heading text-lg font-bold text-foreground mb-4 border-b border-border pb-2">
+          Cargar Documento
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-foreground">Tipo de Documento</label>
+            <Dropdown
+              value={tipo}
+              options={DOCUMENT_TYPES.map((t) => ({ label: t, value: t }))}
+              onChange={(e) => setTipo(e.value)}
+              placeholder="Seleccioná un tipo..."
+              className="w-full"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-foreground">Descripción (opcional)</label>
+            <InputText
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              className="w-full"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-foreground">Archivo (PDF/Imagen)</label>
+            <input
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={handleFileChange}
+              className="w-full p-2 border border-border rounded-md text-sm"
+            />
+          </div>
+        </div>
+        <div className="mt-4">
+          <Button
+            label={isUploading ? "Subiendo..." : "Subir documento"}
+            icon="pi pi-upload"
+            className="p-button-sm p-button-primary"
+            onClick={handleUpload}
+            loading={isUploading}
+            disabled={isUploading}
+          />
+        </div>
+      </div>
+
+      <div className="bg-card p-6 rounded-lg shadow-sm">
+        <h3 className="font-heading text-lg font-bold text-foreground mb-4 border-b border-border pb-2">
+          Documentos Cargados
+        </h3>
+        {loading ? (
+          <p className="text-muted-foreground text-sm">Cargando documentos...</p>
+        ) : documents.length === 0 ? (
+          <p className="text-muted-foreground text-sm italic">No hay documentos cargados.</p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-muted-foreground border-b border-border">
+                <th className="py-2">Tipo</th>
+                <th className="py-2">Descripción</th>
+                <th className="py-2">Archivo</th>
+                <th className="py-2">Fecha</th>
+                <th className="py-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {documents.map((doc) => (
+                <tr key={doc.id} className="border-b border-border">
+                  <td className="py-2 text-foreground">{doc.tipo}</td>
+                  <td className="py-2 text-foreground">{doc.descripcion || "—"}</td>
+                  <td className="py-2 text-foreground">{doc.fileName}</td>
+                  <td className="py-2 text-foreground">{formatDate(new Date(doc.createdAt))}</td>
+                  <td className="py-2 text-right whitespace-nowrap">
+                    <Button
+                      icon="pi pi-eye"
+                      className="p-button-text p-button-sm"
+                      onClick={() => handleViewDocument(doc)}
+                      style={{ color: "var(--primary)" }}
+                    />
+                    <Button
+                      icon="pi pi-trash"
+                      className="p-button-text p-button-sm"
+                      onClick={() => handleDeleteDocument(doc)}
+                      style={{ color: "var(--error)" }}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+};
 
