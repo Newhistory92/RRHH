@@ -56,7 +56,13 @@ interface Horario {
     horasTrabajo?: number;
 }
 
-type TabId = 'licencias' | 'contratos' | 'profesiones' | 'habilidades' | 'horarios';
+interface Feriado {
+    id: number;
+    fecha: string;
+    nombre: string;
+}
+
+type TabId = 'licencias' | 'contratos' | 'profesiones' | 'habilidades' | 'horarios' | 'feriados';
 
 const TIPOS_LICENCIA_DEFAULT = [
     "Vacaciones",
@@ -94,6 +100,9 @@ export default function ConfiguracionGeneral() {
     const [professions, setProfessions] = useState<Profession[]>([]);
     const [softSkills, setSoftSkills] = useState<SoftSkill[]>([]);
     const [jornadas, setJornadas] = useState<JornadaLaboral[]>([]);
+    const [feriados, setFeriados] = useState<Feriado[]>([]);
+    const [newFeriadoFecha, setNewFeriadoFecha] = useState("");
+    const [newFeriadoNombre, setNewFeriadoNombre] = useState("");
 
 
     // Sorting
@@ -125,18 +134,20 @@ export default function ConfiguracionGeneral() {
     const loadAllData = async () => {
         setLoading(true);
         try {
-            const [licRes, conRes, profRes, softRes, schedRes] = await Promise.all([
+            const [licRes, conRes, profRes, softRes, schedRes, ferRes] = await Promise.all([
                 apiClient.get<{ configuraciones: ConfiguracionLicencia[] }>('/licenses/configuracion'),
                 apiClient.get<{ types: ContractType[] }>('/contracts/types'),
                 apiClient.get<{ professions: Profession[] }>('/professions'),
                 apiClient.get<SoftSkill[]>('/configtest/soft'),
-                apiClient.get<{ jornadas: JornadaLaboral[], horarios: Horario[] }>('/schedules/regimes')
+                apiClient.get<{ jornadas: JornadaLaboral[], horarios: Horario[] }>('/schedules/regimes'),
+                apiClient.get<{ feriados: Feriado[] }>('/licenses/feriados')
             ]);
             setConfiguraciones(licRes.configuraciones || []);
             setContracts(conRes.types || []);
             setProfessions(profRes.professions || []);
             setSoftSkills(softRes || []);
             setJornadas(schedRes.jornadas || []);
+            setFeriados(ferRes.feriados || []);
         } catch (error: any) {
             showToast(error.message || "Error al cargar configuraciones", "error");
         } finally {
@@ -147,6 +158,30 @@ export default function ConfiguracionGeneral() {
     useEffect(() => {
         loadAllData();
     }, []);
+
+    // --- Feriados Handlers ---
+    const handleAddFeriado = async () => {
+        if (!newFeriadoFecha || !newFeriadoNombre.trim()) return;
+        try {
+            await apiClient.post('/licenses/feriados', { fecha: newFeriadoFecha, nombre: newFeriadoNombre.trim() });
+            showToast("Feriado creado", "success");
+            setNewFeriadoFecha("");
+            setNewFeriadoNombre("");
+            loadAllData();
+        } catch (error: any) {
+            showToast(error.message || "Error al guardar feriado", "error");
+        }
+    };
+
+    const handleDeleteFeriado = async (id: number) => {
+        try {
+            await apiClient.delete(`/licenses/feriados/${id}`);
+            showToast("Feriado eliminado", "success");
+            loadAllData();
+        } catch (error: any) {
+            showToast(error.message || "Error al eliminar feriado", "error");
+        }
+    };
 
     // --- Tab Button Component ---
     const TabButton = ({ id, label, icon: Icon }: { id: TabId, label: string, icon: any }) => (
@@ -354,6 +389,7 @@ export default function ConfiguracionGeneral() {
                     <TabButton id="profesiones" label="Profesiones y Cargos" icon={GraduationCap} />
                     <TabButton id="habilidades" label="Habilidades Blandas" icon={Award} />
                     <TabButton id="horarios" label="Régimen Horario" icon={ClockIcon} />
+                    <TabButton id="feriados" label="Feriados" icon={Settings} />
                 </nav>
             </div>
 
@@ -561,6 +597,68 @@ export default function ConfiguracionGeneral() {
                                         ))}
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {/* ── TAB 6: FERIADOS ─────────────────────────────────────────── */}
+                        {activeTab === 'feriados' && (
+                            <div>
+                                <h2 className="font-heading text-lg font-bold text-foreground mb-2">Feriados de Empresa</h2>
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    Fechas puntuales que se excluyen del conteo de días hábiles en el calendario de licencias, además de los feriados públicos.
+                                </p>
+
+                                <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                                    <input
+                                        type="date"
+                                        value={newFeriadoFecha}
+                                        onChange={(e) => setNewFeriadoFecha(e.target.value)}
+                                        className="px-3 py-2 rounded-md border border-border bg-background text-foreground"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Nombre (ej. Cierre administrativo)"
+                                        value={newFeriadoNombre}
+                                        onChange={(e) => setNewFeriadoNombre(e.target.value)}
+                                        className="flex-1 px-3 py-2 rounded-md border border-border bg-background text-foreground"
+                                    />
+                                    <button
+                                        onClick={handleAddFeriado}
+                                        className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 font-semibold"
+                                    >
+                                        Agregar
+                                    </button>
+                                </div>
+
+                                {feriados.length === 0 ? (
+                                    <p className="text-muted-foreground italic">No hay feriados de empresa configurados.</p>
+                                ) : (
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="text-left text-muted-foreground border-b border-border">
+                                                <th className="py-2">Fecha</th>
+                                                <th className="py-2">Nombre</th>
+                                                <th className="py-2"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {feriados.map(f => (
+                                                <tr key={f.id} className="border-b border-border">
+                                                    <td className="py-2 text-foreground">{f.fecha}</td>
+                                                    <td className="py-2 text-foreground">{f.nombre}</td>
+                                                    <td className="py-2 text-right">
+                                                        <button
+                                                            onClick={() => handleDeleteFeriado(f.id)}
+                                                            className="text-error hover:opacity-80"
+                                                        >
+                                                            Eliminar
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                )}
                             </div>
                         )}
                     </div>
