@@ -585,7 +585,13 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
                 showClear
                 placeholder="Seleccioná un tipo..."
                 className="w-full mb-4"
+                disabled={!loadingTypes && Object.keys(tiposData).length === 0}
               />
+              {!loadingTypes && Object.keys(tiposData).length === 0 && (
+                <p className="text-xs text-error -mt-3 mb-4">
+                  No hay licencias configuradas para la categoría contractual de este empleado. Cargalas en Configuración &gt; Licencias.
+                </p>
+              )}
 
               <div className="space-y-3">
                 {/* Mostrar saldo disponible del tipo seleccionado */}
