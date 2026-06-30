@@ -5,6 +5,7 @@ import { Temporal } from '@js-temporal/polyfill';
 import { Calendar } from 'primereact/calendar';
 import { addLocale, type LocaleOptions } from 'primereact/api';
 import { CalendarDays, X } from 'lucide-react';
+import { apiClient } from '@/app/util/apiClient';
 import {
   type HolidayApi,
   type PlainHoliday,
@@ -56,14 +57,20 @@ export default function DateRangePicker({ onDateChange, maxDays, allowPastDates 
   const [holidayMap, setHolidayMap] = useState<Map<string, PlainHoliday>>(new Map());
   const [loading, setLoading] = useState(true);
   const isMobile = useIsMobile();
-  // ── Fetch feriados ──────────────────────────────────────────────────────────
+  // ── Fetch feriados (públicos + de empresa) ────────────────────────────────────
   useEffect(() => {
     const year = Temporal.Now.plainDateISO().year;
 
-    fetch(`https://api.argentinadatos.com/v1/feriados/${year}`)
-      .then(r => { if (!r.ok) throw new Error('Error al obtener feriados'); return r.json(); })
-      .then((data: HolidayApi[]) => setHolidayMap(processHolidays(data)))
-      .catch(console.error)
+    Promise.all([
+      fetch(`https://api.argentinadatos.com/v1/feriados/${year}`)
+        .then(r => { if (!r.ok) throw new Error('Error al obtener feriados públicos'); return r.json(); })
+        .then((data: HolidayApi[]) => data)
+        .catch(err => { console.error(err); return [] as HolidayApi[]; }),
+      apiClient.get<{ feriados: { id: number; fecha: string; nombre: string }[] }>('/licenses/feriados')
+        .then(res => res.feriados.map(f => ({ fecha: f.fecha, tipo: 'Empresa', nombre: f.nombre } as HolidayApi)))
+        .catch(err => { console.error(err); return [] as HolidayApi[]; }),
+    ])
+      .then(([publicos, empresa]) => setHolidayMap(processHolidays([...publicos, ...empresa])))
       .finally(() => setLoading(false));
   }, []);
 
