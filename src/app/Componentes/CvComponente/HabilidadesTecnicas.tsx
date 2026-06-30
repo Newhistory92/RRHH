@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Message } from 'primereact/message';
 import { SkillCard } from '@/app/util/UiRRHH';
-import { TechnicalSkill, SkillStatus, Skill, AcademicFormation, EmployeeTechnicalSkill } from "@/app/Interfas/Interfaces"
+import { TechnicalSkill, SkillStatus, Skill, AcademicFormation, EmployeeTechnicalSkill, AcademicTitleMapping } from "@/app/Interfas/Interfaces"
 import { SkillTestDialog} from './SkillTest';
 import TestModal from '@/app/Componentes/Validaciones/TestModal';
+import { apiClient } from '@/app/util/apiClient';
 
 // Props del componente HabilidadesTecnicas
 export type HabilidadesTecnicasProps = {
@@ -36,12 +37,8 @@ export default function HabilidadesTecnicas({
     const [testModalVisible, setTestModalVisible] = useState(false);
     const [selectedSkillForAITest, setSelectedSkillForAITest] = useState<{ id: number; nombre: string } | null>(null);
 
-    // Mapeo especial para títulos específicos
-    const SPECIAL_TITLE_MAPPINGS: Record<string, string> = {
-        "Bachiller": "Administración Pública",
-        "Bachillerato": "Administración Pública",
-        "Administración Pública": "Administración Pública",
-    };
+    // Mapeo titulo academico -> profesion, cargado desde /configtest/academic-title-mappings
+    const [titleMappings, setTitleMappings] = useState<Record<string, string>>({});
 
     // 1. Cargar habilidades disponibles desde la DB
     const fetchDbSkills = async () => {
@@ -65,8 +62,21 @@ export default function HabilidadesTecnicas({
         }
     };
 
+    // 1b. Cargar el mapeo titulo academico -> profesion
+    const fetchTitleMappings = async () => {
+        try {
+            const res = await apiClient.get<{ mappings: AcademicTitleMapping[] }>('/configtest/academic-title-mappings');
+            const map: Record<string, string> = {};
+            res.mappings.forEach(m => { map[m.tituloAcademico] = m.profession; });
+            setTitleMappings(map);
+        } catch (error) {
+            console.error("Error cargando mapeo de titulos academicos:", error);
+        }
+    };
+
     useEffect(() => {
         fetchDbSkills();
+        fetchTitleMappings();
     }, [employeeId]);
 
     // 2. Calcular habilidades relevantes basadas en títulos y posición
@@ -79,8 +89,8 @@ export default function HabilidadesTecnicas({
         
         academicFormation.forEach(record => {
             if (record.title) {
-                // Aplicar mapeo especial si existe, sino usar el título original
-                const mappedTitle = SPECIAL_TITLE_MAPPINGS[record.title.trim()] || record.title.trim();
+                // Aplicar mapeo configurado (TestConfig) si existe, sino usar el título original
+                const mappedTitle = titleMappings[record.title.trim()] || record.title.trim();
                 titlesToMap.add(mappedTitle);
             }
         });
@@ -146,7 +156,7 @@ export default function HabilidadesTecnicas({
         }
 
         setSkills(finalSkills);
-    }, [position, academicFormation, dbSkills, data, loading]);
+    }, [position, academicFormation, dbSkills, data, loading, titleMappings]);
 
     const handleStartTest = async (skill: Skill) => {
         if (skill.status === 'locked') return;

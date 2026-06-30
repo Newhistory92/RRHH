@@ -230,6 +230,12 @@ export interface SoftSkill {
   SkillStatus?: SkillStatus;
 }
 
+export interface AcademicTitleMapping {
+  id: number;
+  tituloAcademico: string;
+  profession: string;
+}
+
 
 export interface TechnicalSkill {
   id: number;

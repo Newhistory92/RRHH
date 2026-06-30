@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import { TechnicalTests } from '@/app/Componentes/TestComponent/TechnicalTests';
-import { Test, TestsByProfession, SoftSkill } from "@/app/Interfas/Interfaces";
+import { Test, TestsByProfession, SoftSkill, AcademicTitleMapping } from "@/app/Interfas/Interfaces";
 import { apiClient } from '@/app/util/apiClient';
 
 type ActiveTab = "technical";
@@ -21,12 +21,18 @@ export default function TestPage(){
   // Soft Skills State
   const [softSkills, setSoftSkills] = useState<SoftSkill[]>([]);
 
+  // Academic Title Mappings State
+  const [titleMappings, setTitleMappings] = useState<AcademicTitleMapping[]>([]);
+  const [newTitulo, setNewTitulo] = useState("");
+  const [newProfession, setNewProfession] = useState("");
+
   // Fetch data on mount
   useEffect(() => {
     Promise.all([
       apiClient.get<{ professions: { [key: string]: number[] }, testsByProfession: TestsByProfession }>("/configtest/technical"),
-      apiClient.get<SoftSkill[]>("/configtest/soft")
-    ]).then(([techData, softData]) => {
+      apiClient.get<SoftSkill[]>("/configtest/soft"),
+      apiClient.get<{ mappings: AcademicTitleMapping[] }>("/configtest/academic-title-mappings")
+    ]).then(([techData, softData, mappingsData]) => {
       setProfessions(techData.professions);
       setTestsByProfession(techData.testsByProfession);
       const keys = Object.keys(techData.professions);
@@ -34,12 +40,42 @@ export default function TestPage(){
         setSelectedProfession(keys[0]);
       }
       setSoftSkills(softData);
+      setTitleMappings(mappingsData.mappings);
       setLoading(false);
     }).catch(err => {
       console.error("Error fetching test configuration:", err);
       setLoading(false);
     });
   }, []);
+
+  // Academic Title Mapping Handlers
+  const handleAddTitleMapping = () => {
+    if (!newTitulo.trim() || !newProfession.trim()) return;
+    apiClient.post<{ success: boolean }>("/configtest/academic-title-mappings", {
+      tituloAcademico: newTitulo.trim(),
+      profession: newProfession.trim(),
+    }).then(() => {
+      return apiClient.get<{ mappings: AcademicTitleMapping[] }>("/configtest/academic-title-mappings");
+    }).then(res => {
+      setTitleMappings(res.mappings);
+      setNewTitulo("");
+      setNewProfession("");
+    }).catch(err => {
+      console.error("Error al guardar mapeo:", err);
+      alert("Error al guardar el mapeo: " + err.message);
+    });
+  };
+
+  const handleDeleteTitleMapping = (id: number) => {
+    apiClient.delete(`/configtest/academic-title-mappings/${id}`)
+      .then(() => {
+        setTitleMappings(prev => prev.filter(m => m.id !== id));
+      })
+      .catch(err => {
+        console.error("Error al eliminar mapeo:", err);
+        alert("Error al eliminar el mapeo: " + err.message);
+      });
+  };
 
   // Technical Tests Handlers
   const handleSelectedProfessionChange = (profession: string) => {
@@ -144,6 +180,69 @@ export default function TestPage(){
               onSaveTest={handleSaveTest}
               onDeleteTest={handleDeleteTest}
             />
+          )}
+        </div>
+
+        {/* Academic Title Mappings */}
+        <div className="bg-card rounded-lg p-6 shadow-sm mb-8">
+          <h2 className="font-heading text-xl font-semibold text-foreground mb-2">
+            Alias de títulos académicos
+          </h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Define qué profesión corresponde a un título académico cuando el nombre no coincide literalmente (ej. "Bachiller" → "Administración Pública").
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 mb-4">
+            <input
+              type="text"
+              placeholder="Título académico (ej. Bachiller)"
+              value={newTitulo}
+              onChange={(e) => setNewTitulo(e.target.value)}
+              className="flex-1 px-3 py-2 rounded-md border border-border bg-background text-foreground"
+            />
+            <input
+              type="text"
+              placeholder="Profesión (ej. Administración Pública)"
+              value={newProfession}
+              onChange={(e) => setNewProfession(e.target.value)}
+              className="flex-1 px-3 py-2 rounded-md border border-border bg-background text-foreground"
+            />
+            <button
+              onClick={handleAddTitleMapping}
+              className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 font-semibold"
+            >
+              Agregar
+            </button>
+          </div>
+
+          {titleMappings.length === 0 ? (
+            <p className="text-muted-foreground italic">No hay mapeos configurados.</p>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-muted-foreground border-b border-border">
+                  <th className="py-2">Título académico</th>
+                  <th className="py-2">Profesión</th>
+                  <th className="py-2"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {titleMappings.map(m => (
+                  <tr key={m.id} className="border-b border-border">
+                    <td className="py-2 text-foreground">{m.tituloAcademico}</td>
+                    <td className="py-2 text-foreground">{m.profession}</td>
+                    <td className="py-2 text-right">
+                      <button
+                        onClick={() => handleDeleteTitleMapping(m.id)}
+                        className="text-error hover:opacity-80"
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
         </div>
 
