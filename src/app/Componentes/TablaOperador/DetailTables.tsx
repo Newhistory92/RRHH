@@ -1003,8 +1003,20 @@ export const DocumentsTab = ({ employee }: { employee: Employee }) => {
       const full = await apiClient.get<{ fileData: string; mimeType: string }>(
         `/rrhh/employee/${employee.id}/documents/${doc.id}/download`
       );
-      const dataUrl = `data:${full.mimeType};base64,${full.fileData}`;
-      window.open(dataUrl, "_blank");
+      // Los navegadores bloquean la navegacion de nivel superior a URLs "data:"
+      // (especialmente PDFs). Se decodifica el base64 a un Blob y se abre como
+      // URL "blob:", que si se puede navegar/imprimir.
+      const byteCharacters = atob(full.fileData);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: full.mimeType });
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, "_blank");
+      // Liberar el objeto despues de un tiempo prudencial para que la pestaña nueva alcance a cargarlo.
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
     } catch (error) {
       console.error("Error al abrir documento:", error);
       toast.current?.show({
