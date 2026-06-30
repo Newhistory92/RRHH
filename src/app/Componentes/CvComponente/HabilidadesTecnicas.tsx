@@ -3,7 +3,6 @@ import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Message } from 'primereact/message';
 import { SkillCard } from '@/app/util/UiRRHH';
 import { TechnicalSkill, SkillStatus, Skill, AcademicFormation, EmployeeTechnicalSkill, AcademicTitleMapping } from "@/app/Interfas/Interfaces"
-import { SkillTestDialog} from './SkillTest';
 import TestModal from '@/app/Componentes/Validaciones/TestModal';
 import { apiClient } from '@/app/util/apiClient';
 
@@ -32,9 +31,7 @@ export default function HabilidadesTecnicas({
     const [skills, setSkills] = useState<Skill[]>([]);
     const [dbSkills, setDbSkills] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [isTestModalVisible, setIsTestModalVisible] = useState(false);
-    const [selectedSkillForTest, setSelectedSkillForTest] = useState<Skill | null>(null);
-    
+
     // Estado para el TestModal (validacion con IA via API)
     const [testModalVisible, setTestModalVisible] = useState(false);
     const [selectedSkillForAITest, setSelectedSkillForAITest] = useState<{ id: number; nombre: string } | null>(null);
@@ -192,13 +189,6 @@ export default function HabilidadesTecnicas({
         setTestModalVisible(true);
     };
 
-    const handleTestComplete = (skill: Skill, score: number) => {
-        // Implementación simplificada para el test local si se llega a usar
-        setIsTestModalVisible(false);
-        setSelectedSkillForTest(null);
-        // Recargar habilidades o actualizar estado según sea necesario
-    };
-
     const validatedSkills = skills.filter(s => s.status === 'validated');
     const pendingSkills = skills.filter(s => s.status !== 'validated');
 
@@ -272,18 +262,6 @@ export default function HabilidadesTecnicas({
                     </div>
                 </AccordionTab>
             </Accordion>
-            
-            {/* Modal de Test local (SkillTestDialog) */}
-            <SkillTestDialog 
-                isVisible={isTestModalVisible}
-                skill={selectedSkillForTest}
-                position={position}
-                onClose={() => {
-                    setIsTestModalVisible(false);
-                    setSelectedSkillForTest(null);
-                }}
-                onTestComplete={handleTestComplete}
-            />
 
             {/* Modal de Test con IA (TestModal) */}
             {selectedSkillForAITest && (
