@@ -43,32 +43,42 @@ const formatDate = (date: Date | null) => {
     day: '2-digit'
   });
 };
+type ProfileSection = 'condicionLaboral' | 'detallesAdicionales';
+
+const buildFormData = (employee: Employee) => ({
+  position: employee.condicionLaboral.position,
+  scheduleStart: typeof employee.horario.horaInicio === 'number'
+    ? decimalToTimeString(employee.horario.horaInicio)
+    : employee.horario.horaInicio,
+  scheduleEnd: typeof employee.horario.horaFin === 'number'
+    ? decimalToTimeString(employee.horario.horaFin)
+    : employee.horario.horaFin,
+  employmentStatus: employee.condicionLaboral.tipoContrato,
+  startDate: employee.condicionLaboral?.fechaIngreso
+    ? new Date(employee.condicionLaboral.fechaIngreso)
+    : null,
+  permanentDate: employee.condicionLaboral.fechaPlanta
+    ? new Date(employee.condicionLaboral.fechaPlanta)
+    : null,
+  category: employee.condicionLaboral.categoria,
+  lastCategoryUpdate: employee.condicionLaboral.fechaCategoria
+    ? new Date(employee.condicionLaboral.fechaCategoria)
+    : null
+});
+
 export const ProfileTab = ({ employee }: { employee: Employee }) => {
-  const [isEditing, setIsEditing] = useState(false);
+  const [editingSection, setEditingSection] = useState<ProfileSection | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const toast = useRef<Toast>(null);
-  const [formData, setFormData] = useState({
-    position: employee.condicionLaboral.position,
-    scheduleStart: typeof employee.horario.horaInicio === 'number'
-      ? decimalToTimeString(employee.horario.horaInicio)
-      : employee.horario.horaInicio,
-    scheduleEnd: typeof employee.horario.horaFin === 'number'
-      ? decimalToTimeString(employee.horario.horaFin)
-      : employee.horario.horaFin,
-    employmentStatus: employee.condicionLaboral.tipoContrato,
-    startDate: employee.condicionLaboral?.fechaIngreso
-      ? new Date(employee.condicionLaboral.fechaIngreso)
-      : null,
-    permanentDate: employee.condicionLaboral.fechaPlanta
-      ? new Date(employee.condicionLaboral.fechaPlanta)
-      : null,
-    category: employee.condicionLaboral.categoria,
-    lastCategoryUpdate: employee.condicionLaboral.fechaCategoria
-      ? new Date(employee.condicionLaboral.fechaCategoria)
-      : null
-  });
+  const [formData, setFormData] = useState(buildFormData(employee));
+  const [originalFormData, setOriginalFormData] = useState<typeof formData | null>(null);
 
   console.log(employee);
+
+  const handleEdit = (section: ProfileSection) => {
+    setOriginalFormData(formData);
+    setEditingSection(section);
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -108,7 +118,8 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
         life: 3000
       });
 
-      setIsEditing(false);
+      setEditingSection(null);
+      setOriginalFormData(null);
     } catch (error) {
       console.error('Error al guardar los cambios:', error);
       toast.current?.show({
@@ -127,27 +138,11 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
 
 
   const handleCancel = () => {
-    setFormData({
-      position: employee.condicionLaboral.position,
-      scheduleStart: typeof employee.horario.horaInicio === 'number'
-        ? decimalToTimeString(employee.horario.horaInicio)
-        : employee.horario.horaInicio,
-      scheduleEnd: typeof employee.horario.horaFin === 'number'
-        ? decimalToTimeString(employee.horario.horaFin)
-        : employee.horario.horaFin,
-      employmentStatus: employee.condicionLaboral.tipoContrato,
-      startDate: employee.condicionLaboral?.fechaIngreso
-        ? new Date(employee.condicionLaboral.fechaIngreso)
-        : null,
-      permanentDate: employee.condicionLaboral.fechaPlanta
-        ? new Date(employee.condicionLaboral.fechaPlanta)
-        : null,
-      category: employee.condicionLaboral.categoria,
-      lastCategoryUpdate: employee.condicionLaboral.fechaCategoria
-        ? new Date(employee.condicionLaboral.fechaCategoria)
-        : null
-    });
-    setIsEditing(false);
+    if (originalFormData) {
+      setFormData(originalFormData);
+    }
+    setEditingSection(null);
+    setOriginalFormData(null);
   };
 
 
@@ -213,18 +208,19 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
               <h3 className="font-heading text-lg font-bold text-foreground">
                 Condición Laboral
               </h3>
-              {!isEditing && (
+              {editingSection !== 'condicionLaboral' && (
                 <Button
                   icon="pi pi-pencil"
                   className="p-button-text p-button-sm"
-                  onClick={() => setIsEditing(true)}
+                  onClick={() => handleEdit('condicionLaboral')}
+                  disabled={editingSection !== null}
                   style={{ color: 'var(--primary)' }}
                 />
               )}
             </div>
             <div className="space-y-4">
               <InfoCard icon={Handshake} title="Tipo de Contrato">
-                {isEditing ? (
+                {editingSection === 'condicionLaboral' ? (
                   <Dropdown
                     value={formData.employmentStatus}
                     options={employmentStatusOptions}
@@ -237,7 +233,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
               </InfoCard>
 
               <InfoCard icon={CalendarIcon} title="Fecha de Ingreso">
-                {isEditing ? (
+                {editingSection === 'condicionLaboral' ? (
                   <Calendar
                     value={formData.startDate}
                     onChange={(e) => setFormData({ ...formData, startDate: e.value as Date })}
@@ -249,9 +245,9 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
                 )}
               </InfoCard>
 
-              {(employee.condicionLaboral.fechaPlanta || isEditing) && (
+              {(employee.condicionLaboral.fechaPlanta || editingSection === 'condicionLaboral') && (
                 <InfoCard icon={CheckCircle} title="Ingreso a Planta">
-                  {isEditing ? (
+                  {editingSection === 'condicionLaboral' ? (
                     <Calendar
                       value={formData.permanentDate}
                       onChange={(e) => setFormData({ ...formData, permanentDate: e.value as Date })}
@@ -265,7 +261,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
               )}
 
               <InfoCard icon={User} title="Categoría">
-                {isEditing ? (
+                {editingSection === 'condicionLaboral' ? (
                   <InputText
                     value={formData.category ?? ''}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -277,7 +273,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
               </InfoCard>
 
               <InfoCard icon={CopyCheck} title="Ultima Recategorización">
-                {isEditing ? (
+                {editingSection === 'condicionLaboral' ? (
                   <Calendar
                     value={formData.lastCategoryUpdate}
                     onChange={(e) => setFormData({ ...formData, lastCategoryUpdate: e.value as Date })}
@@ -290,7 +286,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
               </InfoCard>
             </div>
 
-            {isEditing && (
+            {editingSection === 'condicionLaboral' && (
               <div className="flex gap-2 mt-4 pt-4 border-t">
                 <Button
                   label="Guardar"
@@ -314,12 +310,23 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
 
         <div className="space-y-6">
           <div className="bg-card p-6 rounded-lg shadow-sm">
-            <h3 className="font-heading text-lg font-bold text-foreground mb-4 border-b border-border pb-2">
-              Detalles Adicionales
-            </h3>
+            <div className="flex justify-between items-center mb-4 border-b border-border pb-2">
+              <h3 className="font-heading text-lg font-bold text-foreground">
+                Detalles Adicionales
+              </h3>
+              {editingSection !== 'detallesAdicionales' && (
+                <Button
+                  icon="pi pi-pencil"
+                  className="p-button-text p-button-sm"
+                  onClick={() => handleEdit('detallesAdicionales')}
+                  disabled={editingSection !== null}
+                  style={{ color: 'var(--primary)' }}
+                />
+              )}
+            </div>
             <div className="space-y-4">
               <InfoCard icon={Briefcase} title="Posición">
-                {isEditing ? (
+                {editingSection === 'detallesAdicionales' ? (
                   <Dropdown
                     value={formData.position}
                     options={positionOptions}
@@ -337,7 +344,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
               </InfoCard>
 
               <InfoCard icon={Clock} title="Horario Laboral">
-                {isEditing ? (
+                {editingSection === 'detallesAdicionales' ? (
                   <div className="flex gap-2 items-center w-full">
                     <InputMask
                       value={formData.scheduleStart}
@@ -364,6 +371,26 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
                 {employee.productivityScore} Promedio
               </InfoCard>
             </div>
+
+            {editingSection === 'detallesAdicionales' && (
+              <div className="flex gap-2 mt-4 pt-4 border-t">
+                <Button
+                  label="Guardar"
+                  icon="pi pi-check"
+                  className="p-button-sm p-button-success flex-1"
+                  onClick={handleSave}
+                  loading={isSaving}
+                  disabled={isSaving}
+                />
+                <Button
+                  label="Cancelar"
+                  icon="pi pi-times"
+                  className="p-button-sm p-button-secondary flex-1"
+                  onClick={handleCancel}
+                  disabled={isSaving}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
