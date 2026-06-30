@@ -7,9 +7,10 @@ export interface CvFormacionProps {
   data: certifications[];
   updateData: (updates: certifications[]) => void;
   isEditing: boolean;
+  headerActions?: React.ReactNode;
 }
 
-export default function CertificacionesCursos({ data, updateData, isEditing }: CvFormacionProps) {
+export default function CertificacionesCursos({ data, updateData, isEditing, headerActions }: CvFormacionProps) {
     const handleChange = (id:string | number,field: string, value: string | number | boolean | File | null) => {
     const newData = data.map((item) =>
       item.id === id ? { ...item, [field]: value } : item
@@ -37,7 +38,12 @@ export default function CertificacionesCursos({ data, updateData, isEditing }: C
   return (
     
      <Accordion activeIndex={0}>
-     <AccordionTab header="7. Certificaciones y Cursos">
+     <AccordionTab header={
+        <div className="flex items-center justify-between w-full pr-2">
+          <span>7. Certificaciones y Cursos</span>
+          {headerActions && <span onClick={(e) => e.stopPropagation()}>{headerActions}</span>}
+        </div>
+      }>
       <DynamicSection
         sectionName="certifications"
         items={data}

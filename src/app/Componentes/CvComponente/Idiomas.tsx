@@ -7,8 +7,9 @@ export interface CvFormacionProps {
   data: Language[];
   updateData: (updates: Language[]) => void;
   isEditing: boolean;
+  headerActions?: React.ReactNode;
 }
-export default function Idiomas({ data, updateData, isEditing }: CvFormacionProps) {
+export default function Idiomas({ data, updateData, isEditing, headerActions }: CvFormacionProps) {
 const handleChange = (id:string | number,field: string, value: string | number | boolean | File | null) => {
     const newData = data.map((item) =>
       item.id === id ? { ...item, [field]: value } : item
@@ -34,7 +35,12 @@ const handleChange = (id:string | number,field: string, value: string | number |
   return (
 
     <Accordion activeIndex={0}>
-    <AccordionTab header="4. Idiomas">
+    <AccordionTab header={
+        <div className="flex items-center justify-between w-full pr-2">
+          <span>4. Idiomas</span>
+          {headerActions && <span onClick={(e) => e.stopPropagation()}>{headerActions}</span>}
+        </div>
+      }>
       <DynamicSection
         sectionName="languages"
         items={data}

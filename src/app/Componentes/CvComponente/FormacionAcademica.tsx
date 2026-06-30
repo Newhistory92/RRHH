@@ -9,9 +9,10 @@ export interface CvFormacionProps {
   updateData: (updates: AcademicFormation[]) => void;
   isEditing: boolean;
   employeeId: number;
+  headerActions?: React.ReactNode;
 }
 
-export default function FormacionAcademica({ data, updateData, isEditing, employeeId }: CvFormacionProps) {
+export default function FormacionAcademica({ data, updateData, isEditing, employeeId, headerActions }: CvFormacionProps) {
 
   const handleChange = (id: string | number, field: string, value: string | number | boolean | File | null) => {
     const newData = data.map((item) => {
@@ -86,7 +87,12 @@ export default function FormacionAcademica({ data, updateData, isEditing, employ
 
   return (
     <Accordion activeIndex={0}>
-      <AccordionTab header="2. Formacion Academica">
+      <AccordionTab header={
+        <div className="flex items-center justify-between w-full pr-2">
+          <span>2. Formacion Academica</span>
+          {headerActions && <span onClick={(e) => e.stopPropagation()}>{headerActions}</span>}
+        </div>
+      }>
         <DynamicSection
           sectionName="AcademicFormation"
           items={safeData}

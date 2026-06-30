@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FileText, Edit, Save, Check, AlertCircle } from 'lucide-react';
+import { FileText, Edit, Save, X, Check, AlertCircle } from 'lucide-react';
 import { SectionTitle } from '@/app/util/UiCv';
 import { apiClient } from '@/app/util/apiClient';
 import DatosPersonales from '@/app/Componentes/CvComponente/DatosPersonales';
@@ -52,30 +52,43 @@ function SectionToolbar({ sectionKey, editingSection, isSaving, onEdit, onSave, 
   const isActive = editingSection === sectionKey;
   const isLocked = editingSection !== null && !isActive;
 
-  return (
-    <div className="flex justify-end mb-2">
-      {isActive ? (
-        <div className="flex gap-2">
-          <Button onClick={onCancel} label="Cancelar" severity="info" text raised disabled={isSaving} />
-          <Button
-            onClick={onSave}
-            label={isSaving ? "Guardando..." : "Guardar"}
-            icon={<Save className="w-4 h-4 mr-1" />}
-            raised
-            disabled={isSaving}
-          />
-        </div>
-      ) : (
+  if (isActive) {
+    return (
+      <div className="flex gap-1">
         <Button
-          onClick={() => onEdit(sectionKey)}
-          label="Editar"
-          icon={<Edit className="w-4 h-4 mr-1" />}
+          onClick={onCancel}
+          icon={<X className="w-3.5 h-3.5" />}
           severity="secondary"
           text
-          disabled={isLocked}
+          rounded
+          disabled={isSaving}
+          aria-label="Cancelar"
+          className="!w-7 !h-7"
         />
-      )}
-    </div>
+        <Button
+          onClick={onSave}
+          icon={<Save className="w-3.5 h-3.5" />}
+          text
+          rounded
+          disabled={isSaving}
+          aria-label={isSaving ? "Guardando..." : "Guardar"}
+          className="!w-7 !h-7"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <Button
+      onClick={() => onEdit(sectionKey)}
+      icon={<Edit className="w-3.5 h-3.5" />}
+      severity="secondary"
+      text
+      rounded
+      disabled={isLocked}
+      aria-label="Editar"
+      className="!w-7 !h-7"
+    />
   );
 }
 
@@ -226,133 +239,135 @@ export default function EmployeeCV({ employeeData, globalSettings = {} }: Employ
         </div>
 
         <div className="space-y-4">
-          <SectionToolbar
-            sectionKey="datosPersonales"
-            editingSection={editingSection}
-            isSaving={isSaving}
-            onEdit={handleEditSection}
-            onSave={handleSaveSection}
-            onCancel={handleCancelSection}
-          />
           <DatosPersonales
             data={cvData}
             updateData={updateCvData}
             isEditing={editingSection === 'datosPersonales'}
+            headerActions={
+              <SectionToolbar
+                sectionKey="datosPersonales"
+                editingSection={editingSection}
+                isSaving={isSaving}
+                onEdit={handleEditSection}
+                onSave={handleSaveSection}
+                onCancel={handleCancelSection}
+              />
+            }
           />
 
           {globalSettings["AcademicRecord"] !== false && (
-            <>
-              <SectionToolbar
-                sectionKey="academicFormation"
-                editingSection={editingSection}
-                isSaving={isSaving}
-                onEdit={handleEditSection}
-                onSave={handleSaveSection}
-                onCancel={handleCancelSection}
-              />
-              <FormacionAcademica
-                data={cvData.AcademicFormation}
-                updateData={(AcademicFormation) => updateCvData({ AcademicFormation })}
-                isEditing={editingSection === 'academicFormation'}
-                employeeId={cvData.id}
-              />
-            </>
+            <FormacionAcademica
+              data={cvData.AcademicFormation}
+              updateData={(AcademicFormation) => updateCvData({ AcademicFormation })}
+              isEditing={editingSection === 'academicFormation'}
+              employeeId={cvData.id}
+              headerActions={
+                <SectionToolbar
+                  sectionKey="academicFormation"
+                  editingSection={editingSection}
+                  isSaving={isSaving}
+                  onEdit={handleEditSection}
+                  onSave={handleSaveSection}
+                  onCancel={handleCancelSection}
+                />
+              }
+            />
           )}
 
           {globalSettings["WorkExperience"] !== false && (
-            <>
-              <SectionToolbar
-                sectionKey="workExperience"
-                editingSection={editingSection}
-                isSaving={isSaving}
-                onEdit={handleEditSection}
-                onSave={handleSaveSection}
-                onCancel={handleCancelSection}
-              />
-              <ExperienciaLaboral
-                data={cvData.workExperience}
-                updateData={(workExperience) => updateCvData({ workExperience })}
-                isEditing={editingSection === 'workExperience'}
-              />
-            </>
+            <ExperienciaLaboral
+              data={cvData.workExperience}
+              updateData={(workExperience) => updateCvData({ workExperience })}
+              isEditing={editingSection === 'workExperience'}
+              headerActions={
+                <SectionToolbar
+                  sectionKey="workExperience"
+                  editingSection={editingSection}
+                  isSaving={isSaving}
+                  onEdit={handleEditSection}
+                  onSave={handleSaveSection}
+                  onCancel={handleCancelSection}
+                />
+              }
+            />
           )}
 
           {globalSettings["Language"] !== false && (
-            <>
-              <SectionToolbar
-                sectionKey="languages"
-                editingSection={editingSection}
-                isSaving={isSaving}
-                onEdit={handleEditSection}
-                onSave={handleSaveSection}
-                onCancel={handleCancelSection}
-              />
-              <Idiomas
-                data={cvData.languages}
-                updateData={(languages) => updateCvData({ languages })}
-                isEditing={editingSection === 'languages'}
-              />
-            </>
+            <Idiomas
+              data={cvData.languages}
+              updateData={(languages) => updateCvData({ languages })}
+              isEditing={editingSection === 'languages'}
+              headerActions={
+                <SectionToolbar
+                  sectionKey="languages"
+                  editingSection={editingSection}
+                  isSaving={isSaving}
+                  onEdit={handleEditSection}
+                  onSave={handleSaveSection}
+                  onCancel={handleCancelSection}
+                />
+              }
+            />
           )}
 
           {globalSettings["TechnicalSkill"] !== false && (
-            <>
-              <SectionToolbar
-                sectionKey="technicalSkills"
-                editingSection={editingSection}
-                isSaving={isSaving}
-                onEdit={handleEditSection}
-                onSave={handleSaveSection}
-                onCancel={handleCancelSection}
-              />
-              <HabilidadesTecnicas
-                data={cvData.technicalSkills}
-                skillStatus={cvData.skillStatus || []}
-                position={cvData.position}
-                academicFormation={cvData.AcademicFormation}
-                updateData={(technicalSkills, skillStatus) => updateCvData({ technicalSkills, skillStatus })}
-                isEditing={editingSection === 'technicalSkills'}
-                employeeId={cvData.id}
-              />
-            </>
+            <HabilidadesTecnicas
+              data={cvData.technicalSkills}
+              skillStatus={cvData.skillStatus || []}
+              position={cvData.position}
+              academicFormation={cvData.AcademicFormation}
+              updateData={(technicalSkills, skillStatus) => updateCvData({ technicalSkills, skillStatus })}
+              isEditing={editingSection === 'technicalSkills'}
+              employeeId={cvData.id}
+              headerActions={
+                <SectionToolbar
+                  sectionKey="technicalSkills"
+                  editingSection={editingSection}
+                  isSaving={isSaving}
+                  onEdit={handleEditSection}
+                  onSave={handleSaveSection}
+                  onCancel={handleCancelSection}
+                />
+              }
+            />
           )}
 
           {globalSettings["SoftSkill"] !== false && (
-            <>
-              <SectionToolbar
-                sectionKey="softSkills"
-                editingSection={editingSection}
-                isSaving={isSaving}
-                onEdit={handleEditSection}
-                onSave={handleSaveSection}
-                onCancel={handleCancelSection}
-              />
-              <HabilidadesBlandas
-                data={cvData.softSkills}
-                selectedSkills={cvData.softSkillsArray || []}
-                softSkillsCatalog={softSkillsCatalog}
-                updateData={(softSkills, softSkillsArray) => updateCvData({ softSkills, softSkillsArray })}
-                isEditing={editingSection === 'softSkills'}
-              />
-            </>
+            <HabilidadesBlandas
+              data={cvData.softSkills}
+              selectedSkills={cvData.softSkillsArray || []}
+              softSkillsCatalog={softSkillsCatalog}
+              updateData={(softSkills, softSkillsArray) => updateCvData({ softSkills, softSkillsArray })}
+              isEditing={editingSection === 'softSkills'}
+              headerActions={
+                <SectionToolbar
+                  sectionKey="softSkills"
+                  editingSection={editingSection}
+                  isSaving={isSaving}
+                  onEdit={handleEditSection}
+                  onSave={handleSaveSection}
+                  onCancel={handleCancelSection}
+                />
+              }
+            />
           )}
 
           {globalSettings["Certification"] !== false && (
-            <>
-              <SectionToolbar
-                sectionKey="certifications"
-                editingSection={editingSection}
-                isSaving={isSaving}
-                onEdit={handleEditSection}
-                onSave={handleSaveSection}
-                onCancel={handleCancelSection}
-              />
-              <CertificacionesCursos
-                data={cvData.certifications}
-                updateData={(certifications) => updateCvData({ certifications })}
-                isEditing={editingSection === 'certifications'}
-              />
-            </>
+            <CertificacionesCursos
+              data={cvData.certifications}
+              updateData={(certifications) => updateCvData({ certifications })}
+              isEditing={editingSection === 'certifications'}
+              headerActions={
+                <SectionToolbar
+                  sectionKey="certifications"
+                  editingSection={editingSection}
+                  isSaving={isSaving}
+                  onEdit={handleEditSection}
+                  onSave={handleSaveSection}
+                  onCancel={handleCancelSection}
+                />
+              }
+            />
           )}
         </div>
       </main>

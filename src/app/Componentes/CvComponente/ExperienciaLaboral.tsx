@@ -7,9 +7,10 @@ export interface CvFormacionProps {
   data: WorkExperience[];
   updateData: (updates: WorkExperience[]) => void;
   isEditing: boolean;
+  headerActions?: React.ReactNode;
 }
 
-export default function ExperienciaLaboral({ data, updateData, isEditing }: CvFormacionProps) {
+export default function ExperienciaLaboral({ data, updateData, isEditing, headerActions }: CvFormacionProps) {
   
    const handleChange = (id:string | number,field: string, value: string | number | boolean | File | null) => {
     const newData = data.map((item) =>
@@ -41,7 +42,12 @@ export default function ExperienciaLaboral({ data, updateData, isEditing }: CvFo
   return (
    
 <Accordion activeIndex={0}>
-<AccordionTab header="3. Experiencia Laboral">
+<AccordionTab header={
+        <div className="flex items-center justify-between w-full pr-2">
+          <span>3. Experiencia Laboral</span>
+          {headerActions && <span onClick={(e) => e.stopPropagation()}>{headerActions}</span>}
+        </div>
+      }>
       <DynamicSection
         sectionName="workExperience"
         items={data}

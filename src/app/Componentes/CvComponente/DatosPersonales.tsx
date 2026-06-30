@@ -10,6 +10,7 @@ export interface CvProps {
   data: Employee;
   updateData: (updates: Partial<Employee>) => void;
   isEditing: boolean;
+  headerActions?: React.ReactNode;
 }
 interface GenderOption {
   value: string;
@@ -23,7 +24,7 @@ const genderOptions: GenderOption[] = [
   { value: "Otro", label: "Otro" },
 ];
 
-export default function DatosPersonales({ data, updateData, isEditing }: CvProps) {
+export default function DatosPersonales({ data, updateData, isEditing, headerActions }: CvProps) {
 
   
   const handleChange = (field: keyof Employee, value: Employee[keyof Employee]) => {
@@ -62,7 +63,12 @@ export default function DatosPersonales({ data, updateData, isEditing }: CvProps
 
   return (
     <Accordion activeIndex={0}>
-      <AccordionTab header="1. Datos Personales">
+      <AccordionTab header={
+        <div className="flex items-center justify-between w-full pr-2">
+          <span>1. Datos Personales</span>
+          {headerActions && <span onClick={(e) => e.stopPropagation()}>{headerActions}</span>}
+        </div>
+      }>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-3 flex justify-center">
             <ProfilePictureUploader

@@ -8,8 +8,9 @@ export interface CvFormacionProps {
   softSkillsCatalog: { id: number; nombre: string; descripcion: string }[];
   updateData: (updates: SoftSkill[], selectedSkills: number[]) => void;
   isEditing: boolean;
+  headerActions?: React.ReactNode;
 }
-export default function HabilidadesBlandas({ data, selectedSkills, softSkillsCatalog, updateData, isEditing }: CvFormacionProps) {
+export default function HabilidadesBlandas({ data, selectedSkills, softSkillsCatalog, updateData, isEditing, headerActions }: CvFormacionProps) {
   const handleSoftSkillChange = (skillId:number) => {
     if (!isEditing) return;
     
@@ -23,7 +24,12 @@ export default function HabilidadesBlandas({ data, selectedSkills, softSkillsCat
   return (
 
     <Accordion activeIndex={0}>
-     <AccordionTab header="6. Habilidades Blandas">
+     <AccordionTab header={
+        <div className="flex items-center justify-between w-full pr-2">
+          <span>6. Habilidades Blandas</span>
+          {headerActions && <span onClick={(e) => e.stopPropagation()}>{headerActions}</span>}
+        </div>
+      }>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {softSkillsCatalog.map((skill) => (
           <label

@@ -16,16 +16,18 @@ export type HabilidadesTecnicasProps = {
   isEditing: boolean;
   position: string;
   employeeId: number;
+  headerActions?: React.ReactNode;
 };
 
-export default function HabilidadesTecnicas({ 
-    data, 
-    skillStatus, 
+export default function HabilidadesTecnicas({
+    data,
+    skillStatus,
     academicFormation = [],
-    updateData, 
-    isEditing, 
+    updateData,
+    isEditing,
     position,
-    employeeId 
+    employeeId,
+    headerActions
 }: HabilidadesTecnicasProps) {
     const [skills, setSkills] = useState<Skill[]>([]);
     const [dbSkills, setDbSkills] = useState<any[]>([]);
@@ -203,7 +205,12 @@ export default function HabilidadesTecnicas({
     return (
         <>
             <Accordion activeIndex={0}>
-                <AccordionTab header="5. Habilidades Tecnicas">
+                <AccordionTab header={
+                    <div className="flex items-center justify-between w-full pr-2">
+                      <span>5. Habilidades Tecnicas</span>
+                      {headerActions && <span onClick={(e) => e.stopPropagation()}>{headerActions}</span>}
+                    </div>
+                  }>
                     <div className="p-4">
                         {!isEditing && (
                             <Message 
