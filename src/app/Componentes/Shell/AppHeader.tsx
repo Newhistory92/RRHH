@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare } from "lucide-react";
+import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare, Folder } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -106,6 +106,9 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setPage("licencias")}>
               <FileText size={16} className="mr-2" /> Licencias
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setPage("documentos")}>
+              <Folder size={16} className="mr-2" /> Documentos
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setPage("feedback")}>
               <MessageSquare size={16} className="mr-2" /> Encuesta

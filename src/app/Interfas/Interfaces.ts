@@ -677,6 +677,7 @@ export type Page =
   | "editar-perfil"
   | "feedback"
   | "licencias"
+  | "documentos"
   | "test"
   | "admin";
 
