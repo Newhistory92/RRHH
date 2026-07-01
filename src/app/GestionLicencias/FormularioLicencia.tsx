@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Send, ArrowLeft, AlertCircle } from 'lucide-react';
 import { Dropdown } from 'primereact/dropdown';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { ProgressBar } from 'primereact/progressbar';
 import { Calendar } from 'primereact/calendar';
+import { Toast } from 'primereact/toast';
 import { LicenseHistory, Saldo, Usuario, LicenseStatus, TiposLicencia, Employee } from "@/app/Interfas/Interfaces";
 import DateRangePicker from './Calendario';
 import { apiClient } from '@/app/util/apiClient';
@@ -75,7 +76,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
   const [tiposLicencia, setTiposLicencia] = useState<{ name: string }[]>([]);
   const [mensaje, setMensaje] = useState('');
   const [tiposData, setTiposData] = useState<Record<string, TipoDisponible>>({});
-  console.log("selectedType", saldos);
+  const toast = useRef<Toast>(null);
   // Obtener modo y días por defecto del tipo seleccionado (para licencias de duración fija)
   const licenseMeta = useMemo(() => {
     if (!selectedType) return { days: 0, mode: 'habiles' as const };
@@ -297,9 +298,6 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
     saldos
   ]);
   const handleSubmit = () => {
-    console.log("supervisor", supervisorData);
-    console.log("calculatedDays", diasCalculados);
-
     if (!startDate || !endDate) return setError('Seleccioná las fechas.');
     if (!supervisorData) return setError('No tenés un supervisor válido asignado.');
     if (totalDiasSolicitados <= 0) return setError('Asigná al menos un día.');
@@ -308,7 +306,9 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
       const month = startDate.getMonth() + 1;
       const validMonths = [10, 11, 12, 1, 2, 3, 4];
       if (!validMonths.includes(month)) {
-        return setError('Las vacaciones solo pueden tomarse entre el 1 de Octubre y el 30 de Abril.');
+        const detalle = 'Las vacaciones solo pueden tomarse entre el 1 de Octubre y el 30 de Abril.';
+        toast.current?.show({ severity: 'warn', summary: 'Fecha no permitida', detail: detalle, life: 6000 });
+        return setError(detalle);
       }
     }
 
@@ -357,6 +357,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
 
   return (
     <div className="max-w-4xl mx-auto space-y-4 pb-8">
+      <Toast ref={toast} />
       <div className="flex items-center gap-3">
         <button onClick={onCancel} className="p-2 rounded-lg hover:bg-muted transition text-muted-foreground">
           <ArrowLeft size={18} />
