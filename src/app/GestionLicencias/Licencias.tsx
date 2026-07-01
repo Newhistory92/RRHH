@@ -79,6 +79,9 @@ const Section = ({ title, icon, children }: { title: string; icon?: React.ReactN
 // ─── Componente ───────────────────────────────────────────────────────────────
 
 export default function ConteinerLicencia({ userData, saldos, misSolicitudes, solicitudesPendientes, onNewRequest, onManageRequest, supervisores }: Props) {
+  const tieneSolicitudPendiente = misSolicitudes.some(
+    s => s.status === 'Pendiente' || s.status === 'Pendiente Siguiente Aprobación'
+  );
   const [selectedRequest, setSelectedRequest] = useState<LicenseHistory | null>(null);
   console.log("saldos", saldos);
   const pendientes = useMemo<SolicitudParsed[]>(() =>
@@ -167,10 +170,16 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
             <Plus size={20} className="text-primary-foreground" />
           </div>
           <h3 className="font-semibold text-sm mb-1">Nueva Solicitud</h3>
-          <p className="text-xs text-primary-foreground/80 mb-4">Iniciá tu solicitud de licencia</p>
+          <p className="text-xs text-primary-foreground/80 mb-4">
+            {tieneSolicitudPendiente
+              ? 'Ya tenés una solicitud pendiente de aprobación'
+              : 'Iniciá tu solicitud de licencia'}
+          </p>
           <button
             onClick={onNewRequest}
-            className="flex items-center gap-1.5 px-4 py-2 bg-card text-primary text-xs font-semibold rounded-full hover:bg-muted transition shadow-sm"
+            disabled={tieneSolicitudPendiente}
+            title={tieneSolicitudPendiente ? 'Esperá la resolución de tu solicitud pendiente antes de crear otra.' : undefined}
+            className="flex items-center gap-1.5 px-4 py-2 bg-card text-primary text-xs font-semibold rounded-full hover:bg-muted transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-card"
           >
             <Send size={13} />
             Solicitar
