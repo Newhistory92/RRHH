@@ -176,7 +176,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
       }
 
       const aniosSorted = Object.keys(saldos)
-        .filter(a => a !== 'anio' && typeof saldos[a as any][typeToAllocate] === 'number')
+        .filter(a => a !== 'anio' && typeof (saldos[a as any][typeToAllocate] as any)?.disponibles === 'number')
         .sort((a, b) => Number(a) - Number(b));
 
       aniosSorted.forEach(anio => {
@@ -184,7 +184,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
           newDist[anio][typeToAllocate] = 0;
           return;
         }
-        const max = saldos[anio as any][typeToAllocate] as number;
+        const max = (saldos[anio as any][typeToAllocate] as any).disponibles as number;
         if (max > 0) {
           const allocate = Math.min(daysLeft, max);
           newDist[anio][typeToAllocate] = allocate;

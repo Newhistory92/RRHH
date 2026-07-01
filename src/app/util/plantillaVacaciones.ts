@@ -105,7 +105,7 @@ de este Organismo,
 
 Sr./Sra. ${emp}
 
-${dias_} días de la licencia anual reglamentaria correspondiente al/los año/s ..................
+${dias_} días de la licencia anual reglamentaria correspondiente al/los año/s ${anioLic}
 
 a partir de ${dsd}, conforme a lo establecido en los Artículos 3°, 4° y 5°
 de la Ley N° 6698.
