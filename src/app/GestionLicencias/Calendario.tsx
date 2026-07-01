@@ -36,27 +36,12 @@ interface DateRangePickerProps {
   allowPastDates?: boolean;
 }
 
-
-// Hook para detectar si es mobile
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 640px)');
-    setIsMobile(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-  return isMobile;
-}
-
 // ─── Componente ───────────────────────────────────────────────────────────────
 
 export default function DateRangePicker({ onDateChange, maxDays, allowPastDates }: DateRangePickerProps) {
   const [dates, setDates] = useState<[Date | null, Date | null] | null>(null);
   const [holidayMap, setHolidayMap] = useState<Map<string, PlainHoliday>>(new Map());
   const [loading, setLoading] = useState(true);
-  const isMobile = useIsMobile();
   // ── Fetch feriados (públicos + de empresa) ────────────────────────────────────
   useEffect(() => {
     const year = Temporal.Now.plainDateISO().year;
@@ -143,7 +128,7 @@ export default function DateRangePicker({ onDateChange, maxDays, allowPastDates 
           readOnlyInput
           inline
           locale="es"
-          numberOfMonths={isMobile ? 1 : 2}
+          numberOfMonths={1}
           minDate={minDate}
           maxDate={maxDate}
           disabledDays={[0, 6]}
