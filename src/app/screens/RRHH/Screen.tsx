@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Toast } from "primereact/toast";
 import { EmployeeDetailView } from "@/app/Componentes/TablaOperador/Perfildetail";
 import { MessagesView } from "@/app/Componentes/TablaOperador/MensajeDetail";
 import { EmployeeTableView } from "@/app/Componentes/TablaOperador/Table";
@@ -28,6 +29,7 @@ export default function RecursosHumanosPage() {
   const [currentView, setCurrentView] = useState<ViewState>({ name: "table" });
   const [permissionModalEmployeeId, setPermissionModalEmployeeId] = useState<number | null>(null);
   const [selectedLicense, setSelectedLicense] = useState<LicenseHistory | null>(null);
+  const toast = useRef<Toast>(null);
 
 useEffect(() => {
   fetchEmployeeData().finally(() => setIsLoading(false));
@@ -79,7 +81,7 @@ useEffect(() => {
       console.log("Response from Server:", result);
 
       if (!response.ok) {
-        alert(`Error al aplicar licencia: ${result.detail || 'Error desconocido'}`);
+        toast.current?.show({ severity: 'error', summary: 'Error', detail: `Error al aplicar licencia: ${result.detail || 'Error desconocido'}`, life: 5000 });
         return;
       }
 
@@ -96,10 +98,10 @@ useEffect(() => {
 
       // Re-fetchear datos reales del servidor para sincronizar la UI
       await fetchEmployeeData();
-      alert("Licencia aplicada correctamente.");
+      toast.current?.show({ severity: 'success', summary: 'Éxito', detail: 'Licencia aplicada correctamente.', life: 4000 });
     } catch (error) {
       console.error("Error al aplicar licencia:", error);
-      alert("Error de red al aplicar la licencia.");
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Error de red al aplicar la licencia.', life: 5000 });
     }
   };
 
@@ -164,6 +166,7 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
           .no-print { display: none !important; }
         }
       `}</style>
+      <Toast ref={toast} />
       <div className="bg-background min-h-screen font-sans">
         <main>
           {renderContent()}

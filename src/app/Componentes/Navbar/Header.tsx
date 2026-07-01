@@ -20,6 +20,7 @@ import { NotificationDialog } from "@/app/Componentes/Perfil/NotificationDialog"
 import { Notification, Page, Employee } from "@/app/Interfas/Interfaces";
 import Image from "next/image";
 import { logoutFromClient } from "@/app/util/authClient";
+import { apiClient } from "@/app/util/apiClient";
 
 interface HeaderProps {
   setPage: (page: Page) => void;
@@ -50,9 +51,14 @@ export function Header({ setPage, employeeData }: HeaderProps) {
   useEffect(() => {
     setUsuario(localStorage.getItem("usuario") ?? "");
     setRoleName(localStorage.getItem("roleName") ?? "");
-    // Las notificaciones reales vendrán de la API; por defecto vacío
-    // TODO: reemplazar por fetch a /notifications/{employeeId}
-    setNotifications([]);
+
+    const empId = Number(localStorage.getItem("employeeId"));
+    if (empId) {
+      apiClient
+        .get<{ notifications: Notification[] }>(`/licenses/notificaciones?employee_id=${empId}`)
+        .then(res => setNotifications(res.notifications || []))
+        .catch(err => console.error("Error al cargar notificaciones:", err));
+    }
   }, []);
 
   useEffect(() => {
