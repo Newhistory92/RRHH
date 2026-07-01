@@ -48,12 +48,14 @@ export function generarPlantillaVacaciones({
   const diasTotales = diasTotalesAnioActual !== undefined ? diasTotalesAnioActual.toString() : d(10);
   const totalDias = totalDiasSaldo !== undefined ? totalDiasSaldo.toString() : d(10);
 
-  // Líneas de licencias adeudadas (una por año anterior con saldo)
+  // Líneas de licencias adeudadas (una por año anterior con saldo).
+  // Si no hay deuda de años anteriores, se muestra el propio año de la
+  // licencia con el saldo restante (en vez de una fila vacía con puntos).
   const lineasAdeudadas = licenciasAdeudadas.length > 0
     ? licenciasAdeudadas
       .map(l => `Año: ${l.anio}          Días restantes: ${l.dias}`)
       .join('\n')
-    : `Año: ${d(4)}          Días restantes: ${d(4)}`;
+    : `Año: ${anioLic}          Días restantes: ${totalDias}`;
 
   return `                 SAN JUAN, ${diaHoy} de ${mesHoy} de ${anioHoy}
 
