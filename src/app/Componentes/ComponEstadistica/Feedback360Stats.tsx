@@ -31,8 +31,9 @@ export const Feedback360Stats = () => {
 
   useEffect(() => {
     apiClient
-      .get<Department[]>('/departments/')
-      .then((depts) => {
+      .get<{ departments: Department[] }>('/departments/')
+      .then((res) => {
+        const depts = res.departments;
         setDepartments(depts);
         if (depts.length > 0) setSelectedDeptId(depts[0].id);
         else setLoading(false);
@@ -84,8 +85,8 @@ export const Feedback360Stats = () => {
                 <PolarGrid />
                 <PolarAngleAxis dataKey="categoria" />
                 <PolarRadiusAxis angle={30} domain={[0, 5]} />
-                <Radar name="Área seleccionada" dataKey="promedioArea" stroke="#2563eb" fill="#2563eb" fillOpacity={0.3} />
-                <Radar name="Institucional" dataKey="promedioInstitucional" stroke="#16a34a" fill="#16a34a" fillOpacity={0.2} />
+                <Radar name="Área seleccionada" dataKey="promedioArea" stroke="var(--color-primary)" fill="var(--color-primary)" fillOpacity={0.3} />
+                <Radar name="Institucional" dataKey="promedioInstitucional" stroke="var(--color-success)" fill="var(--color-success)" fillOpacity={0.2} />
                 <Legend />
                 <Tooltip />
               </RadarChart>
