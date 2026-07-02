@@ -16,7 +16,8 @@ import {
     Briefcase,
     GraduationCap,
     Clock as ClockIcon,
-    Award
+    Award,
+    ShieldCheck
 } from 'lucide-react';
 import { apiClient } from '@/app/util/apiClient';
 import { SoftSkills } from '@/app/Componentes/TestComponent/SoftSkills';
@@ -62,7 +63,18 @@ interface Feriado {
     nombre: string;
 }
 
-type TabId = 'licencias' | 'contratos' | 'profesiones' | 'habilidades' | 'horarios' | 'feriados';
+type TabId = 'licencias' | 'contratos' | 'profesiones' | 'habilidades' | 'horarios' | 'feriados' | 'verificacionFeedback';
+
+interface ReglaVerificacion {
+    regla: string;
+    cumple: boolean;
+    detalle: string;
+}
+
+interface SiguienteFeedbackDemo {
+    evaluado: { id: number; name: string } | null;
+    pregunta: { id: number; texto: string; tipo: string; opcionesEscala: string[] | null } | null;
+}
 
 const TIPOS_LICENCIA_DEFAULT = [
     "Vacaciones",
@@ -103,6 +115,9 @@ export default function ConfiguracionGeneral() {
     const [feriados, setFeriados] = useState<Feriado[]>([]);
     const [newFeriadoFecha, setNewFeriadoFecha] = useState("");
     const [newFeriadoNombre, setNewFeriadoNombre] = useState("");
+    const [reporteReglas, setReporteReglas] = useState<ReglaVerificacion[] | null>(null);
+    const [demoSiguiente, setDemoSiguiente] = useState<SiguienteFeedbackDemo | null>(null);
+    const [verificando, setVerificando] = useState(false);
 
 
     // Sorting
@@ -180,6 +195,26 @@ export default function ConfiguracionGeneral() {
             loadAllData();
         } catch (error: any) {
             showToast(error.message || "Error al eliminar feriado", "error");
+        }
+    };
+
+    const handleVerificarFeedback = async () => {
+        setVerificando(true);
+        setReporteReglas(null);
+        setDemoSiguiente(null);
+        try {
+            const reglasRes = await apiClient.post<{ reglas: ReglaVerificacion[] }>('/feedback/verificar');
+            setReporteReglas(reglasRes.reglas);
+
+            const empId = Number(localStorage.getItem('employeeId'));
+            if (empId) {
+                const demoRes = await apiClient.get<SiguienteFeedbackDemo>(`/feedback/siguiente/${empId}`);
+                setDemoSiguiente(demoRes);
+            }
+        } catch (err) {
+            console.error('Error al verificar evaluacion de equipo:', err);
+        } finally {
+            setVerificando(false);
         }
     };
 
@@ -390,6 +425,7 @@ export default function ConfiguracionGeneral() {
                     <TabButton id="habilidades" label="Habilidades Blandas" icon={Award} />
                     <TabButton id="horarios" label="Régimen Horario" icon={ClockIcon} />
                     <TabButton id="feriados" label="Feriados" icon={Settings} />
+                    <TabButton id="verificacionFeedback" label="Verificar Evaluación de Equipo" icon={ShieldCheck} />
                 </nav>
             </div>
 
@@ -658,6 +694,57 @@ export default function ConfiguracionGeneral() {
                                             ))}
                                         </tbody>
                                     </table>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* ── TAB 7: VERIFICAR EVALUACIÓN DE EQUIPO (temporal) ────────────── */}
+                {activeTab === 'verificacionFeedback' && (
+                    <div>
+                        <h2 className="font-heading text-lg font-bold text-foreground mb-2">Verificar Evaluación de Equipo</h2>
+                        <p className="text-sm text-muted-foreground mb-4">
+                            Herramienta temporal para validar las reglas de negocio del módulo de Feedback 360°: chequea los datos reales en busca de repeticiones indebidas y de preguntas de liderazgo mal asignadas, y muestra una ronda de ejemplo de la rotación.
+                        </p>
+
+                        <button
+                            onClick={handleVerificarFeedback}
+                            disabled={verificando}
+                            className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 font-semibold disabled:opacity-50"
+                        >
+                            {verificando ? 'Verificando...' : 'Ejecutar verificación'}
+                        </button>
+
+                        {reporteReglas && (
+                            <div className="mt-6 space-y-3">
+                                <h3 className="font-semibold text-foreground">Reglas de negocio</h3>
+                                {reporteReglas.map((r, idx) => (
+                                    <div
+                                        key={idx}
+                                        className={`p-3 rounded-lg border ${r.cumple ? 'border-success bg-success-soft' : 'border-error bg-error-soft'}`}
+                                    >
+                                        <p className="font-semibold text-foreground">
+                                            {r.cumple ? '✅' : '❌'} {r.regla}
+                                        </p>
+                                        <p className="text-sm text-muted-foreground">{r.detalle}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {demoSiguiente && (
+                            <div className="mt-6">
+                                <h3 className="font-semibold text-foreground mb-2">Ronda de ejemplo (rotación)</h3>
+                                {demoSiguiente.pregunta ? (
+                                    <div className="p-3 rounded-lg border border-border bg-muted">
+                                        <p className="text-sm text-muted-foreground">
+                                            {demoSiguiente.evaluado ? `Evaluado: ${demoSiguiente.evaluado.name}` : 'Pregunta de ambiente laboral general'}
+                                        </p>
+                                        <p className="text-foreground font-medium mt-1">{demoSiguiente.pregunta.texto}</p>
+                                    </div>
+                                ) : (
+                                    <p className="text-muted-foreground italic">No hay pares pendientes para tu propio usuario en este período.</p>
                                 )}
                             </div>
                         )}
