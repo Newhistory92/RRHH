@@ -1148,3 +1148,103 @@ export const DocumentsTab = ({ employee }: { employee: Employee }) => {
   );
 };
 
+interface CategoriaPromedio {
+  categoria: string;
+  promedio: number;
+}
+
+interface FeedbackIndicadores {
+  employeeId: number;
+  fortalezas: CategoriaPromedio[];
+  debilidades: CategoriaPromedio[];
+  evolucion: {
+    periodoActual: string;
+    promedioActual: number | null;
+    periodoAnterior: string;
+    promedioAnterior: number | null;
+    diferencia: number | null;
+  };
+}
+
+export const FeedbackIndicatorsTab = ({ employee }: { employee: Employee }) => {
+  const [indicadores, setIndicadores] = useState<FeedbackIndicadores | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    apiClient
+      .get<FeedbackIndicadores>(`/feedback/received/${employee.id}`)
+      .then(setIndicadores)
+      .catch((err) => console.error("Error al cargar indicadores de Feedback 360:", err))
+      .finally(() => setLoading(false));
+  }, [employee.id]);
+
+  if (loading) {
+    return <div className="p-6 text-center text-muted-foreground">Cargando indicadores...</div>;
+  }
+
+  if (!indicadores || (indicadores.fortalezas.length === 0 && indicadores.debilidades.length === 0)) {
+    return (
+      <div className="p-6 text-center text-muted-foreground">
+        Este empleado todavía no recibió evaluaciones de Feedback 360°.
+      </div>
+    );
+  }
+
+  const { fortalezas, debilidades, evolucion } = indicadores;
+  const tieneComparacion = evolucion.diferencia !== null;
+
+  return (
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-card border border-border rounded-lg p-4">
+          <h3 className="font-heading font-semibold text-foreground mb-3">Fortalezas</h3>
+          {fortalezas.length === 0 ? (
+            <p className="text-sm text-muted-foreground italic">Sin datos suficientes.</p>
+          ) : (
+            <ul className="space-y-2">
+              {fortalezas.map((f) => (
+                <li key={f.categoria} className="flex justify-between text-sm">
+                  <span className="text-foreground">{f.categoria}</span>
+                  <span className="font-semibold text-success">{f.promedio.toFixed(2)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="bg-card border border-border rounded-lg p-4">
+          <h3 className="font-heading font-semibold text-foreground mb-3">Debilidades</h3>
+          {debilidades.length === 0 ? (
+            <p className="text-sm text-muted-foreground italic">Sin datos suficientes.</p>
+          ) : (
+            <ul className="space-y-2">
+              {debilidades.map((d) => (
+                <li key={d.categoria} className="flex justify-between text-sm">
+                  <span className="text-foreground">{d.categoria}</span>
+                  <span className="font-semibold text-error">{d.promedio.toFixed(2)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      <div className="bg-card border border-border rounded-lg p-4">
+        <h3 className="font-heading font-semibold text-foreground mb-3">Evolución</h3>
+        {tieneComparacion ? (
+          <p className="text-sm text-foreground">
+            {evolucion.diferencia! > 0 ? '↑' : evolucion.diferencia! < 0 ? '↓' : '='}{' '}
+            {evolucion.promedioAnterior} → {evolucion.promedioActual}{' '}
+            <span className={evolucion.diferencia! > 0 ? 'text-success' : evolucion.diferencia! < 0 ? 'text-error' : 'text-muted-foreground'}>
+              ({evolucion.diferencia! > 0 ? '+' : ''}{evolucion.diferencia})
+            </span>
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground italic">Sin datos suficientes para comparar.</p>
+        )}
+      </div>
+    </div>
+  );
+};
+

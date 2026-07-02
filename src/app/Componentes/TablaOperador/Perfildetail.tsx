@@ -1,6 +1,6 @@
 "use client"
 import { ArrowLeft } from "lucide-react";
-import {ProfileTab,LicenseHistoryTab,PermissionHistoryTab,DocumentsTab} from "./DetailTables"
+import {ProfileTab,LicenseHistoryTab,PermissionHistoryTab,DocumentsTab,FeedbackIndicatorsTab} from "./DetailTables"
 import {StatusBadge} from "@/app/util/UiRRHH"
 import { useState } from "react";
 import {  Employee, LicenseHistory} from '@/app/Interfas/Interfaces';
@@ -97,6 +97,16 @@ export const EmployeeDetailView = ({
           >
             Documentos
           </button>
+          <button
+            onClick={() => setActiveTab("feedback360")}
+            className={`${
+              activeTab === "feedback360"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+          >
+            Feedback 360°
+          </button>
         </nav>
       </div>
       <div className="no-print">
@@ -112,6 +122,7 @@ export const EmployeeDetailView = ({
           <PermissionHistoryTab permisos={employee.permisos} />
         )}
         {activeTab === "documentos" && <DocumentsTab employee={employee} />}
+        {activeTab === "feedback360" && <FeedbackIndicatorsTab employee={employee} />}
       </div>
     </div>
   );
