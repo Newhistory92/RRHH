@@ -12,10 +12,11 @@
  */
 
 import React from 'react';
-import { BarChart2, User, RefreshCw, AlertCircle } from 'lucide-react';
+import { BarChart2, User, RefreshCw, AlertCircle, Award } from 'lucide-react';
 import { ProductivityRanking } from '@/app/Componentes/ComponEstadistica/Productivity';
 import { GlobalStats }         from '@/app/Componentes/ComponEstadistica/Globalstat';
 import { EmployeeDetailModal } from '@/app/Componentes/ComponEstadistica/DetailModal';
+import { Feedback360Stats } from '@/app/Componentes/ComponEstadistica/Feedback360Stats';
 import type {
   StatsEmployee,
   EstadisticasMetadata,
@@ -27,7 +28,7 @@ import type {
 const ANTI_SPAM_MS = 3_000;
 
 export default function EstadisticasPage() {
-  const [activeTab, setActiveTab]         = React.useState<'ranking' | 'globales'>('ranking');
+  const [activeTab, setActiveTab]         = React.useState<'ranking' | 'globales' | 'feedback360'>('ranking');
   const [selectedEmployee, setSelectedEmployee] = React.useState<StatsEmployee | null>(null);
   const [currentPage, setCurrentPage]     = React.useState(1);
   const [filters, setFilters]             = React.useState<Filters>({ department: 'all', activityType: 'all', employmentStatus: 'all' });
@@ -139,8 +140,9 @@ export default function EstadisticasPage() {
         <div className="mb-6 border-b border-border">
           <nav className="-mb-px flex space-x-6" aria-label="Tabs">
             {([
-              { id: 'ranking',  label: 'Ranking de Productividad', Icon: User },
-              { id: 'globales', label: 'Estadísticas Globales',    Icon: BarChart2 },
+              { id: 'ranking',     label: 'Ranking de Productividad', Icon: User },
+              { id: 'globales',    label: 'Estadísticas Globales',    Icon: BarChart2 },
+              { id: 'feedback360', label: 'Feedback 360°',            Icon: Award },
             ] as const).map(({ id, label, Icon }) => (
               <button key={id} onClick={() => setActiveTab(id)}
                 className={`flex items-center px-4 py-2 font-semibold transition-colors duration-200 ${
@@ -155,7 +157,7 @@ export default function EstadisticasPage() {
         </div>
 
         <main>
-          {activeTab === 'ranking' ? (
+          {activeTab === 'ranking' && (
             <ProductivityRanking
               employees={employees}
               onSelectEmployee={setSelectedEmployee}
@@ -167,8 +169,12 @@ export default function EstadisticasPage() {
               onPageChange={setCurrentPage}
               metadata={metadata}
             />
-          ) : (
+          )}
+          {activeTab === 'globales' && (
             <GlobalStats data={globalStats} isLoading={isLoading} error={error} />
+          )}
+          {activeTab === 'feedback360' && (
+            <Feedback360Stats />
           )}
         </main>
 
