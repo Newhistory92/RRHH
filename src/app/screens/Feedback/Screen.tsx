@@ -1,55 +1,28 @@
 "use client"
 import { BarChart, User, RefreshCw } from 'lucide-react';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Dropdown } from 'primereact/dropdown';
-import { Toast } from 'primereact/toast';
 import { Card } from 'primereact/card';
-import { FeedbackTab } from '@/app/Componentes/Encuesta/FeedbackTab';
-import { UserData, FeedbackResponse } from '@/app/Componentes/Encuesta/FeedbackTab';
+import { Toast } from 'primereact/toast';
+import { apiClient } from '@/app/util/apiClient';
+import { FeedbackTab, SiguienteFeedback, FeedbackStatus } from '@/app/Componentes/Encuesta/FeedbackTab';
 
-// ── Constantes ────────────────────────────────────────────────────────────────
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
 
-// ── Helper: obtener token JWT de la cookie o sessionStorage ──────────────────
 function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null;
-  // El middleware de Next.js guarda el token en una cookie llamada "token"
   const match = document.cookie.match(/(?:^|;\s*)token=([^;]*)/);
   if (match) return decodeURIComponent(match[1]);
   return sessionStorage.getItem('token') || localStorage.getItem('token');
 }
 
-// ── Adaptar respuesta del backend al formato que espera FeedbackTab ──────────
-function adaptPeerToUserData(peer: {
-  id: number;
-  name: string;
-  department: string;
-  softSkills: { skillId: number; nombre: string; description: string; evaluated: boolean }[];
-}): UserData {
-  return {
-    id:         peer.id,
-    name:       peer.name,
-    department: peer.department ?? '',
-    softSkills: peer.softSkills.map((sk) => ({
-      nombre:      sk.nombre,
-      descripcion: sk.description ?? '',
-    })),
-    feedback_history: peer.softSkills
-      .filter((sk) => sk.evaluated)
-      .map((sk) => ({ evaluado: peer.name, softSkills: { nombre: sk.nombre, descripcion: sk.description ?? '' } })),
-  };
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 export default function FeedbackPage() {
-  const [employeeId, setEmployeeId]   = useState<number | null>(null);
-  const [allUsers, setAllUsers]       = useState<UserData[]>([]);
-  const [currentUser, setCurrentUser] = useState<UserData | null>(null);
-  const [loading, setLoading]         = useState(true);
-  const [error, setError]             = useState<string | null>(null);
+  const [employeeId, setEmployeeId] = useState<number | null>(null);
+  const [siguiente, setSiguiente] = useState<SiguienteFeedback | null>(null);
+  const [status, setStatus] = useState<FeedbackStatus | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const toast = useRef<Toast>(null);
 
-  // ── Obtener el employeeId del usuario logueado desde /auth/me ──────────────
   useEffect(() => {
     const token = getAuthToken();
     if (!token) {
@@ -57,10 +30,7 @@ export default function FeedbackPage() {
       setLoading(false);
       return;
     }
-
-    fetch(`${BACKEND_URL}/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(`${BACKEND_URL}/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((data) => {
         if (data.employeeId) {
@@ -76,35 +46,19 @@ export default function FeedbackPage() {
       });
   }, []);
 
-  // ── Cargar compañeros evaluables al conocer el employeeId ─────────────────
-  const loadPeers = useCallback(async () => {
+  const cargarDatos = useCallback(async () => {
     if (!employeeId) return;
     setLoading(true);
     setError(null);
-
-    const token = getAuthToken();
     try {
-      const res = await fetch(`${BACKEND_URL}/feedback/peers/${employeeId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-      const data = await res.json();
-
-      const peers: UserData[] = (data.peers ?? []).map(adaptPeerToUserData);
-
-      // El "usuario actual" para FeedbackTab es el empleado logueado como evaluador
-      const selfUser: UserData = {
-        id:               employeeId,
-        name:             'Yo',
-        department:       data.department ?? '',
-        softSkills:       [],
-        feedback_history: [],
-      };
-
-      setCurrentUser(selfUser);
-      setAllUsers([selfUser, ...peers]);
+      const [siguienteRes, statusRes] = await Promise.all([
+        apiClient.get<SiguienteFeedback>(`/feedback/siguiente/${employeeId}`),
+        apiClient.get<{ evaluatorId: number; periodo: string; total: number; completadas: number }>(`/feedback/status/${employeeId}`),
+      ]);
+      setSiguiente(siguienteRes);
+      setStatus({ total: statusRes.total, completadas: statusRes.completadas });
     } catch (e) {
-      setError('No se pudo cargar los compañeros del área. Intentá nuevamente.');
+      setError('No se pudieron cargar las evaluaciones pendientes. Intentá nuevamente.');
       console.error(e);
     } finally {
       setLoading(false);
@@ -112,95 +66,46 @@ export default function FeedbackPage() {
   }, [employeeId]);
 
   useEffect(() => {
-    loadPeers();
-  }, [loadPeers]);
+    cargarDatos();
+  }, [cargarDatos]);
 
-  // ── Guardar feedback: POST /feedback/submit ──────────────────────────────
-  const handleSaveFeedback = async (response: FeedbackResponse) => {
-    const token = getAuthToken();
-
-    // Buscar el skillId real del compañero
-    const evaluatedUser = allUsers.find((u) => u.name === response.evaluado);
-    const skillMatch    = evaluatedUser?.softSkills.find(
-      (sk) => sk.nombre === response.softSkills.nombre
-    );
-
-    if (!evaluatedUser || !skillMatch) {
-      toast.current?.show({ severity: 'warn', summary: 'Aviso', detail: 'No se encontró la habilidad evaluada', life: 3000 });
-      return;
-    }
-
-    // Convertir [0,0,1] → "Excelente"
-    const resultMap = ['Malo', 'Bueno', 'Excelente'];
-    const resultIndex = response.respuesta.findIndex((v) => v === 1);
-    const resultStr   = resultMap[resultIndex] ?? 'Malo';
-
+  const handleSubmit = async (valorEscala: number | null, textoLibre: string | null) => {
+    if (!employeeId || !siguiente?.pregunta) return;
     try {
-      const res = await fetch(`${BACKEND_URL}/feedback/submit`, {
-        method:  'POST',
-        headers: {
-          'Content-Type':  'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          evaluatorId:  employeeId,
-          evaluatedId:  evaluatedUser.id,
-          softSkillId:  (skillMatch as { skillId?: number; nombre: string }).skillId,
-          result:       resultStr,
-        }),
+      await apiClient.post('/feedback/submit', {
+        evaluadorId: employeeId,
+        evaluadoId: siguiente.evaluado?.id ?? null,
+        preguntaId: siguiente.pregunta.id,
+        valorEscala,
+        textoLibre,
       });
-
-      if (res.status === 409) {
-        toast.current?.show({ severity: 'warn', summary: 'Ya evaluado', detail: 'Ya evaluaste esta habilidad en el ciclo actual', life: 4000 });
-        return;
-      }
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-
-      toast.current?.show({ severity: 'success', summary: 'Enviado', detail: `Feedback "${resultStr}" registrado correctamente`, life: 3000 });
-
-      // Marcar la skill como evaluada localmente para actualizar el progreso
-      setAllUsers((prev) =>
-        prev.map((u) => {
-          if (u.id !== evaluatedUser.id) return u;
-          return {
-            ...u,
-            feedback_history: [
-              ...(u.feedback_history ?? []),
-              { evaluado: u.name, softSkills: response.softSkills },
-            ],
-          };
-        })
-      );
+      toast.current?.show({ severity: 'success', summary: 'Enviado', detail: 'Feedback registrado correctamente', life: 3000 });
+      await cargarDatos();
     } catch (e) {
       console.error(e);
       toast.current?.show({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar el feedback', life: 4000 });
     }
   };
 
-  const handleUpdateUser = (updatedUser: UserData) => {
-    setAllUsers((prev) => prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
-  };
-
-  // ── Render ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <RefreshCw className="mx-auto mb-4 text-primary animate-spin" size={48} />
-          <p className="text-muted-foreground text-lg">Cargando compañeros del área...</p>
+          <p className="text-muted-foreground text-lg">Cargando evaluaciones pendientes...</p>
         </div>
       </div>
     );
   }
 
-  if (error || !currentUser) {
+  if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center bg-card p-8 rounded-xl shadow-md max-w-md">
           <User className="mx-auto mb-4 text-error" size={48} />
-          <p className="text-error font-semibold text-lg mb-4">{error ?? 'Usuario no encontrado'}</p>
+          <p className="text-error font-semibold text-lg mb-4">{error}</p>
           <button
-            onClick={loadPeers}
+            onClick={cargarDatos}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-colors"
           >
             Reintentar
@@ -217,17 +122,17 @@ export default function FeedbackPage() {
         <header className="mb-8 text-center">
           <h1 className="font-heading text-4xl font-bold text-foreground mb-2">Sistema de Feedback 360°</h1>
           <p className="text-lg text-muted-foreground">
-            Evaluá las habilidades blandas de tus compañeros del mismo departamento de forma anónima.
+            Evaluá a tus compañeros y a tu superior directo de forma anónima.
           </p>
         </header>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           <div className="xl:col-span-2">
             <FeedbackTab
-              currentUser={currentUser}
-              usersData={allUsers}
-              onSaveFeedback={handleSaveFeedback}
-              onUpdateUser={handleUpdateUser}
+              siguiente={siguiente}
+              status={status}
+              loading={loading}
+              onSubmit={handleSubmit}
             />
           </div>
 
@@ -239,19 +144,15 @@ export default function FeedbackPage() {
               </div>
             }>
               <div className="space-y-3">
-                <div className="text-sm text-muted-foreground">
-                  Compañeros evaluables:{' '}
-                  <span className="font-semibold text-primary">{allUsers.length - 1}</span>
-                </div>
                 <div className="text-sm text-muted-foreground italic">
                   Las evaluaciones son anónimas. Solo el sistema registra los conteos generales.
                 </div>
                 <button
-                  onClick={loadPeers}
+                  onClick={cargarDatos}
                   className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-primary/15 text-primary rounded-lg hover:bg-primary/20 transition-colors border border-primary/30"
                 >
                   <RefreshCw size={14} />
-                  Recargar compañeros
+                  Recargar
                 </button>
               </div>
             </Card>
