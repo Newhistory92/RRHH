@@ -33,6 +33,16 @@ interface SolicitudRRHH {
   officeName: string | null;
   departmentIdActual: number | null;
   departmentName: string | null;
+  officeIdSugerido: number | null;
+  officeSugeridoName: string | null;
+  departmentIdSugerido: number | null;
+  departmentSugeridoName: string | null;
+  scoreCompatibilidad: number | null;
+  explicacionIA: string | null;
+  beneficios: string[];
+  riesgos: string[];
+  officeIdDestino: number | null;
+  departmentIdDestino: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -63,7 +73,10 @@ export default function ReubicacionTablero() {
 
   const [seleccionada, setSeleccionada] = useState<{ solicitud: SolicitudRRHH; accion: 'Aprobada' | 'Rechazada' } | null>(null);
   const [observacion, setObservacion] = useState('');
+  const [destinoSeleccionado, setDestinoSeleccionado] = useState<number | null>(null);
   const [guardando, setGuardando] = useState(false);
+  const [analizando, setAnalizando] = useState(false);
+  const [verRecomendacion, setVerRecomendacion] = useState<SolicitudRRHH | null>(null);
   const toast = useRef<Toast>(null);
 
   useEffect(() => {
@@ -75,6 +88,19 @@ export default function ReubicacionTablero() {
 
   const officeOptions = departments.flatMap((d) => d.offices.map((o) => ({ label: o.nombre, value: o.id })));
   const departmentOptions = departments.map((d) => ({ label: d.nombre, value: d.id }));
+
+  const findDepartmentIdForOffice = (officeId: number | null): number | null => {
+    if (!officeId) return null;
+    const dept = departments.find((d) => d.offices.some((o) => o.id === officeId));
+    return dept ? dept.id : null;
+  };
+
+  const scoreBadgeClase = (score: number) =>
+    score >= 70
+      ? 'bg-success-soft text-success-soft-foreground border-success'
+      : score >= 40
+      ? 'bg-warning-soft text-warning-soft-foreground border-warning'
+      : 'bg-error-soft text-error-soft-foreground border-error';
 
   const cargarSolicitudes = useCallback(async () => {
     setLoading(true);
@@ -102,18 +128,59 @@ export default function ReubicacionTablero() {
     cargarSolicitudes();
   }, [cargarSolicitudes]);
 
+  const analizarSolicitudes = async () => {
+    setAnalizando(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/reubicacion-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
+      const data: { analizadas: number; errores: { solicitudId: number; motivo: string }[] } = await response.json();
+      if (data.errores.length > 0) {
+        toast.current?.show({
+          severity: 'warn',
+          summary: 'Análisis parcial',
+          detail: `${data.analizadas} analizadas, ${data.errores.length} con error`,
+          life: 5000,
+        });
+      } else {
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Análisis completado',
+          detail: `${data.analizadas} solicitudes analizadas`,
+          life: 4000,
+        });
+      }
+      await cargarSolicitudes();
+    } catch (err) {
+      console.error('Error al analizar solicitudes:', err);
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: 'No se pudo completar el análisis', life: 4000 });
+    } finally {
+      setAnalizando(false);
+    }
+  };
+
   const abrirAccion = (solicitud: SolicitudRRHH, accion: 'Aprobada' | 'Rechazada') => {
     setSeleccionada({ solicitud, accion });
     setObservacion('');
+    setDestinoSeleccionado(solicitud.officeIdSugerido ?? null);
   };
 
   const confirmarAccion = async () => {
     if (!seleccionada) return;
     setGuardando(true);
     try {
+      const esAprobacion = seleccionada.accion === 'Aprobada';
       await apiClient.patch(`/reubicacion/${seleccionada.solicitud.id}/estado`, {
         estado: seleccionada.accion,
         observacion: observacion.trim() || null,
+        officeIdDestino: esAprobacion ? destinoSeleccionado : null,
+        departmentIdDestino: esAprobacion ? findDepartmentIdForOffice(destinoSeleccionado) : null,
       });
       toast.current?.show({ severity: 'success', summary: 'Actualizado', detail: `Solicitud ${seleccionada.accion.toLowerCase()}`, life: 3000 });
       setSeleccionada(null);
@@ -127,6 +194,7 @@ export default function ReubicacionTablero() {
   };
 
   const puedeAccionar = (estado: string) => estado === 'Pendiente' || estado === 'Recomendada';
+  const hayPendientes = solicitudes.some((s) => s.estado === 'Pendiente' || s.estado === 'En análisis');
 
   const AccionesSolicitud = ({ s }: { s: SolicitudRRHH }) => (
     puedeAccionar(s.estado) ? (
@@ -134,6 +202,17 @@ export default function ReubicacionTablero() {
         <Button label="Aprobar" icon="pi pi-check" severity="success" size="small" onClick={() => abrirAccion(s, 'Aprobada')} />
         <Button label="Rechazar" icon="pi pi-times" severity="danger" size="small" onClick={() => abrirAccion(s, 'Rechazada')} />
       </div>
+    ) : null
+  );
+
+  const VerRecomendacionBoton = ({ s }: { s: SolicitudRRHH }) => (
+    s.estado === 'Recomendada' && s.scoreCompatibilidad !== null ? (
+      <Button
+        label="Ver recomendación"
+        icon="pi pi-eye"
+        className="p-button-text p-button-sm mt-1"
+        onClick={() => setVerRecomendacion(s)}
+      />
     ) : null
   );
 
@@ -146,7 +225,14 @@ export default function ReubicacionTablero() {
             <h1 className="font-heading text-3xl font-bold text-foreground mb-1">Solicitudes de Reubicación</h1>
             <p className="text-muted-foreground">Tablero de RRHH para gestionar la movilidad interna.</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <Button
+              label="Analizar Solicitudes"
+              icon="pi pi-sparkles"
+              loading={analizando}
+              disabled={!hayPendientes}
+              onClick={analizarSolicitudes}
+            />
             <button
               onClick={() => setVista('kanban')}
               className={`p-2 rounded-lg border ${vista === 'kanban' ? 'bg-primary/15 border-primary text-primary' : 'border-border text-muted-foreground'}`}
@@ -221,6 +307,7 @@ export default function ReubicacionTablero() {
                     <p className="text-xs text-muted-foreground">{s.tipo}</p>
                     <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{s.motivo}</p>
                     <p className="text-xs text-muted-foreground mt-1">{formatDate(s.createdAt)}</p>
+                    <VerRecomendacionBoton s={s} />
                     <AccionesSolicitud s={s} />
                   </div>
                 ))}
@@ -254,7 +341,10 @@ export default function ReubicacionTablero() {
                       </span>
                     </td>
                     <td className="py-2 px-3 text-muted-foreground">{formatDate(s.createdAt)}</td>
-                    <td className="py-2 px-3"><AccionesSolicitud s={s} /></td>
+                    <td className="py-2 px-3">
+                      <VerRecomendacionBoton s={s} />
+                      <AccionesSolicitud s={s} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -274,6 +364,19 @@ export default function ReubicacionTablero() {
         modal
       >
         <div className="space-y-3">
+          {seleccionada?.accion === 'Aprobada' && (
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-1">Oficina destino (opcional)</label>
+              <Dropdown
+                value={destinoSeleccionado}
+                options={officeOptions}
+                onChange={(e) => setDestinoSeleccionado(e.value)}
+                showClear
+                placeholder="Sin destino"
+                className="w-full"
+              />
+            </div>
+          )}
           <label className="block text-sm font-semibold text-foreground">Observación (opcional)</label>
           <InputTextarea value={observacion} onChange={(e) => setObservacion(e.target.value)} rows={4} className="w-full" />
           <div className="flex justify-end gap-2 pt-2">
@@ -286,6 +389,47 @@ export default function ReubicacionTablero() {
             />
           </div>
         </div>
+      </Dialog>
+
+      <Dialog
+        header={verRecomendacion ? `Recomendación para ${verRecomendacion.employeeName}` : ''}
+        visible={!!verRecomendacion}
+        onHide={() => setVerRecomendacion(null)}
+        style={{ width: '32rem' }}
+        modal
+      >
+        {verRecomendacion && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Destino sugerido</p>
+                <p className="font-semibold text-foreground">
+                  {verRecomendacion.officeSugeridoName ?? 'Sin destino'} / {verRecomendacion.departmentSugeridoName ?? '—'}
+                </p>
+              </div>
+              <span className={`px-3 py-1 text-sm font-bold rounded-full border ${scoreBadgeClase(verRecomendacion.scoreCompatibilidad ?? 0)}`}>
+                {verRecomendacion.scoreCompatibilidad ?? 0}%
+              </span>
+            </div>
+            <p className="text-sm text-foreground">{verRecomendacion.explicacionIA}</p>
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-1">Beneficios esperados</p>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                {verRecomendacion.beneficios.map((b, i) => (
+                  <li key={i}>✓ {b}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-1">Riesgos</p>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                {verRecomendacion.riesgos.map((r, i) => (
+                  <li key={i}>⚠ {r}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
       </Dialog>
     </div>
   );
