@@ -16,6 +16,7 @@ import OrganigramaPage from '@/app/screens/Organigrama/Screen';
 import EmployeeCV from '@/app/screens/Cv/Screen';
 import MisDocumentos from '@/app/screens/MisDocumentos/Screen';
 import Reubicacion from '@/app/screens/Reubicacion/Screen';
+import ReubicacionTablero from '@/app/screens/ReubicacionTablero/Screen';
 import LicenciasManage from '@/app/screens/LicenciasManage/Screen';
 import AdminPage from '@/app/screens/Admin/Screen';
 import ConfiguracionLicencias from '@/app/screens/ConfiguracionLicencias/Screen';
@@ -139,7 +140,9 @@ export default function App() {
       case 'documentos':
         return <MisDocumentos employeeData={employeeData} />;
       case 'reubicacion':
-        return <Reubicacion employeeData={employeeData} />;
+        return roleId === ROLE_ID.ADMIN || roleId === ROLE_ID.RRHH
+          ? <ReubicacionTablero />
+          : <Reubicacion employeeData={employeeData} />;
       case 'feedback':
         if (globalSettings["Feedback"] === false) {
           return (
