@@ -179,7 +179,7 @@ const currentYear = String(new Date().getFullYear());
 
               {(remoteEmployee?.softSkills || []).length > 0 ? (
                 (remoteEmployee?.softSkills || []).map(
-                  (skill, index: number) => (
+                  (skill: any, index: number) => (
                     <SoftSkillBar
                       key={index}
                       skill={skill.nombre}
