@@ -678,6 +678,7 @@ export type Page =
   | "feedback"
   | "licencias"
   | "documentos"
+  | "reubicacion"
   | "test"
   | "admin";
 

@@ -142,6 +142,12 @@ export function Header({ setPage, employeeData }: HeaderProps) {
       className: "hover:bg-cyan-50",
       command: () => setPage("feedback"),
     },
+    {
+      label: "Reubicación",
+      icon: "pi pi-arrows-h",
+      className: "hover:bg-cyan-50",
+      command: () => setPage("reubicacion"),
+    },
     { separator: true },
     {
       label: "Cerrar Sesión",

@@ -116,6 +116,14 @@ export const PAGE_CONFIG: PageConfig[] = [
     accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
   },
   {
+    id: "reubicacion",
+    label: "Reubicación",
+    icon: "ArrowLeftRight",
+    section: "Gente",
+    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
+    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
+  },
+  {
     id: "admin",
     label: "Administración",
     icon: "Shield",

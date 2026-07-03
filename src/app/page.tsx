@@ -15,6 +15,7 @@ import IAPage from '@/app/screens/IA/Screen';
 import OrganigramaPage from '@/app/screens/Organigrama/Screen';
 import EmployeeCV from '@/app/screens/Cv/Screen';
 import MisDocumentos from '@/app/screens/MisDocumentos/Screen';
+import Reubicacion from '@/app/screens/Reubicacion/Screen';
 import LicenciasManage from '@/app/screens/LicenciasManage/Screen';
 import AdminPage from '@/app/screens/Admin/Screen';
 import ConfiguracionLicencias from '@/app/screens/ConfiguracionLicencias/Screen';
@@ -137,6 +138,8 @@ export default function App() {
         return <LicenciasManage />;
       case 'documentos':
         return <MisDocumentos employeeData={employeeData} />;
+      case 'reubicacion':
+        return <Reubicacion employeeData={employeeData} />;
       case 'feedback':
         if (globalSettings["Feedback"] === false) {
           return (
