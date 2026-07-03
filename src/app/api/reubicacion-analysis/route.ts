@@ -80,7 +80,13 @@ export async function POST(request: NextRequest) {
           const jsonMatch = (aiResponse.text || "").match(/\{[\s\S]*\}/);
           if (jsonMatch) {
             const parsed = JSON.parse(jsonMatch[0]);
-            if (parsed.explicacion && Array.isArray(parsed.beneficios) && Array.isArray(parsed.riesgos)) {
+            if (
+              parsed.explicacion &&
+              Array.isArray(parsed.beneficios) &&
+              Array.isArray(parsed.riesgos) &&
+              parsed.beneficios.every((b: unknown) => typeof b === "string") &&
+              parsed.riesgos.every((r: unknown) => typeof r === "string")
+            ) {
               recomendacion = parsed;
             }
           }
