@@ -35,7 +35,7 @@ Habilidades con déficit de personal en el destino: ${match.deficitSkills.join("
 
 Responde ESTRICTAMENTE con este JSON:
 {
-  "explicacion": "1-2 oraciones explicando por que se recomienda (o no) este destino, mencionando el % de compatibilidad y el deficit de personal si aplica. Si el score es bajo (menor a 50), se honesto y dilo explicitamente.",
+  "explicacion": "1-2 oraciones explicando por que se recomienda (o no) este destino, mencionando el % de compatibilidad y el deficit de personal si aplica. Si el score es bajo (menor a 70), se honesto y dilo explicitamente.",
   "beneficios": ["beneficio esperado 1", "beneficio esperado 2"],
   "riesgos": ["riesgo 1", "riesgo 2"]
 }
@@ -60,7 +60,7 @@ export function buildFallbackRecomendacion(match: MatchResult): RecomendacionIA 
   }
 
   const explicacion =
-    match.scoreCompatibilidad >= 50
+    match.scoreCompatibilidad >= 70
       ? `Se recomienda trasladar al empleado a ${destino} debido a que posee un ${match.scoreCompatibilidad}% de compatibilidad con las competencias requeridas${
           match.deficitSkills.length > 0
             ? " y actualmente existe un déficit de personal especializado en esa oficina"
