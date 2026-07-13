@@ -77,6 +77,9 @@ export default function ReubicacionTablero() {
   const [guardando, setGuardando] = useState(false);
   const [analizando, setAnalizando] = useState(false);
   const [verRecomendacion, setVerRecomendacion] = useState<SolicitudRRHH | null>(null);
+  const [paraEjecutar, setParaEjecutar] = useState<SolicitudRRHH | null>(null);
+  const [officeEjecucion, setOfficeEjecucion] = useState<number | null>(null);
+  const [ejecutando, setEjecutando] = useState(false);
   const toast = useRef<Toast>(null);
 
   useEffect(() => {
@@ -193,6 +196,29 @@ export default function ReubicacionTablero() {
     }
   };
 
+  const abrirEjecucion = (solicitud: SolicitudRRHH) => {
+    setParaEjecutar(solicitud);
+    setOfficeEjecucion(solicitud.officeIdDestino ?? null);
+  };
+
+  const confirmarEjecucion = async () => {
+    if (!paraEjecutar || !officeEjecucion) return;
+    setEjecutando(true);
+    try {
+      await apiClient.patch(`/reubicacion/${paraEjecutar.id}/ejecutar`, {
+        officeId: officeEjecucion,
+      });
+      toast.current?.show({ severity: 'success', summary: 'Ejecutada', detail: 'Reubicación ejecutada correctamente', life: 3000 });
+      setParaEjecutar(null);
+      await cargarSolicitudes();
+    } catch (err) {
+      console.error('Error al ejecutar la solicitud:', err);
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: 'No se pudo ejecutar la reubicación', life: 4000 });
+    } finally {
+      setEjecutando(false);
+    }
+  };
+
   const puedeAccionar = (estado: string) => estado === 'Pendiente' || estado === 'Recomendada';
   const hayPendientes = solicitudes.some((s) => s.estado === 'Pendiente' || s.estado === 'En análisis');
 
@@ -214,6 +240,19 @@ export default function ReubicacionTablero() {
         size="small"
         className="w-full mt-1"
         onClick={() => setVerRecomendacion(s)}
+      />
+    ) : null
+  );
+
+  const BotonEjecutar = ({ s }: { s: SolicitudRRHH }) => (
+    s.estado === 'Aprobada' ? (
+      <Button
+        label="Ejecutar"
+        icon="pi pi-directions"
+        severity="success"
+        size="small"
+        className="w-full mt-2"
+        onClick={() => abrirEjecucion(s)}
       />
     ) : null
   );
@@ -311,6 +350,7 @@ export default function ReubicacionTablero() {
                     <p className="text-xs text-muted-foreground mt-1">{formatDate(s.createdAt)}</p>
                     <VerRecomendacionBoton s={s} />
                     <AccionesSolicitud s={s} />
+                    <BotonEjecutar s={s} />
                   </div>
                 ))}
               </div>
@@ -346,6 +386,7 @@ export default function ReubicacionTablero() {
                     <td className="py-2 px-3">
                       <VerRecomendacionBoton s={s} />
                       <AccionesSolicitud s={s} />
+                      <BotonEjecutar s={s} />
                     </td>
                   </tr>
                 ))}
@@ -432,6 +473,38 @@ export default function ReubicacionTablero() {
             </div>
           </div>
         )}
+      </Dialog>
+
+      <Dialog
+        header={paraEjecutar ? `Ejecutar reubicación de ${paraEjecutar.employeeName}` : ''}
+        visible={!!paraEjecutar}
+        onHide={() => setParaEjecutar(null)}
+        style={{ width: '28rem' }}
+        modal
+      >
+        <div className="space-y-3">
+          <label className="block text-sm font-semibold text-foreground mb-1">Oficina destino</label>
+          <Dropdown
+            value={officeEjecucion}
+            options={officeOptions}
+            onChange={(e) => setOfficeEjecucion(e.value)}
+            placeholder="Seleccionar oficina"
+            className="w-full"
+          />
+          <p className="text-xs text-muted-foreground">
+            Se moverá al empleado a esta oficina/departamento y se actualizará el organigrama.
+          </p>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button label="Cancelar" className="p-button-text" onClick={() => setParaEjecutar(null)} />
+            <Button
+              label="Confirmar"
+              severity="success"
+              loading={ejecutando}
+              disabled={!officeEjecucion}
+              onClick={confirmarEjecucion}
+            />
+          </div>
+        </div>
       </Dialog>
     </div>
   );
