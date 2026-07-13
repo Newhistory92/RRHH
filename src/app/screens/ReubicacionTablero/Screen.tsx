@@ -198,9 +198,9 @@ export default function ReubicacionTablero() {
 
   const AccionesSolicitud = ({ s }: { s: SolicitudRRHH }) => (
     puedeAccionar(s.estado) ? (
-      <div className="flex gap-2 mt-2">
-        <Button label="Aprobar" icon="pi pi-check" severity="success" size="small" onClick={() => abrirAccion(s, 'Aprobada')} />
-        <Button label="Rechazar" icon="pi pi-times" severity="danger" size="small" onClick={() => abrirAccion(s, 'Rechazada')} />
+      <div className="flex flex-col gap-2 mt-2">
+        <Button label="Aprobar" icon="pi pi-check" severity="success" size="small" className="w-full" onClick={() => abrirAccion(s, 'Aprobada')} />
+        <Button label="Rechazar" icon="pi pi-times" severity="danger" size="small" className="w-full" onClick={() => abrirAccion(s, 'Rechazada')} />
       </div>
     ) : null
   );
@@ -210,7 +210,9 @@ export default function ReubicacionTablero() {
       <Button
         label="Ver recomendación"
         icon="pi pi-eye"
-        className="p-button-text p-button-sm mt-1"
+        text
+        size="small"
+        className="w-full mt-1"
         onClick={() => setVerRecomendacion(s)}
       />
     ) : null
