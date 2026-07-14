@@ -32,6 +32,7 @@ Score de compatibilidad: ${match.scoreCompatibilidad}%
 Habilidades que coinciden: ${match.matchedSkills.join(", ") || "ninguna"}
 Habilidades que le faltan: ${match.missingSkills.join(", ") || "ninguna"}
 Habilidades con déficit de personal en el destino: ${match.deficitSkills.join(", ") || "ninguna"}
+${match.capacidad != null ? `Vacantes disponibles en el destino: ${match.vacantes} de ${match.capacidad} (capacidad requerida configurada).` : "Capacidad requerida del destino: no configurada (dato no disponible)."}
 
 Responde ESTRICTAMENTE con este JSON:
 {
@@ -59,14 +60,21 @@ export function buildFallbackRecomendacion(match: MatchResult): RecomendacionIA 
     };
   }
 
+  const vacantesTexto =
+    match.capacidad != null && match.vacantes != null && match.vacantes > 0
+      ? ` Además, tiene ${match.vacantes} vacante${match.vacantes === 1 ? "" : "s"} disponible${
+          match.vacantes === 1 ? "" : "s"
+        } sobre una capacidad de ${match.capacidad}.`
+      : "";
+
   const explicacion =
     match.scoreCompatibilidad >= 70
       ? `Se recomienda trasladar al empleado a ${destino} debido a que posee un ${match.scoreCompatibilidad}% de compatibilidad con las competencias requeridas${
           match.deficitSkills.length > 0
             ? " y actualmente existe un déficit de personal especializado en esa oficina"
             : ""
-        }.`
-      : `La compatibilidad con ${destino} es baja (${match.scoreCompatibilidad}%): se recomienda evaluar con cautela antes de aprobar este traslado.`;
+        }.${vacantesTexto}`
+      : `La compatibilidad con ${destino} es baja (${match.scoreCompatibilidad}%): se recomienda evaluar con cautela antes de aprobar este traslado.${vacantesTexto}`;
 
   return {
     explicacion,

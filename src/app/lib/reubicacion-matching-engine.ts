@@ -3,17 +3,22 @@
  *
  * Determina, para un empleado que solicito reubicacion, cual es la mejor
  * oficina destino (excluyendo la actual) en base a:
- * - Skill match (70%): que porcentaje de las habilidades requeridas de la
+ * - Skill match (55%): que porcentaje de las habilidades requeridas de la
  *   oficina candidata posee el empleado.
- * - Deficit de personal (30%): que porcentaje de esas habilidades requeridas
- *   NO esta cubierto por la dotacion actual de esa oficina (prioriza mandar
- *   gente a donde falta cobertura).
+ * - Deficit de personal por skills (20%): que porcentaje de esas habilidades
+ *   requeridas NO esta cubierto por la dotacion actual de esa oficina
+ *   (prioriza mandar gente a donde falta cobertura).
+ * - Vacantes por capacidad (25%): que tan lejos esta la oficina de su
+ *   capacidad requerida (capacidadRequerida - asignados). Si la oficina no
+ *   tiene capacidad configurada (o es 0), este peso se redistribuye entre
+ *   los otros dos factores.
  */
 
 import type { OrgAnalysisEmployee, OrgAnalysisDepartment } from "@/app/Interfas/Interfaces";
 
-const SKILL_MATCH_WEIGHT = 0.7;
-const DEFICIT_WEIGHT = 0.3;
+const SKILL_MATCH_WEIGHT = 0.55;
+const DEFICIT_WEIGHT = 0.20;
+const CAPACITY_WEIGHT = 0.25;
 
 interface CandidateOffice {
   officeId: number;
@@ -21,6 +26,8 @@ interface CandidateOffice {
   departmentId: number;
   departmentNombre: string;
   habilidadesRequeridas: { nombre: string; level: number }[];
+  capacidadRequerida: number | null;
+  asignados: number;
 }
 
 export interface MatchResult {
@@ -32,6 +39,8 @@ export interface MatchResult {
   matchedSkills: string[];
   missingSkills: string[];
   deficitSkills: string[];
+  vacantes: number | null;
+  capacidad: number | null;
 }
 
 function employeeSkillNames(employee: OrgAnalysisEmployee): Set<string> {
@@ -55,6 +64,8 @@ function listCandidateOffices(
         departmentId: dept.id,
         departmentNombre: dept.nombre,
         habilidadesRequeridas: office.habilidades_requeridas,
+        capacidadRequerida: office.capacidadRequerida,
+        asignados: office.asignados,
       });
     }
   }
@@ -63,7 +74,7 @@ function listCandidateOffices(
 
 type ScoreDetails = Pick<
   MatchResult,
-  "scoreCompatibilidad" | "matchedSkills" | "missingSkills" | "deficitSkills"
+  "scoreCompatibilidad" | "matchedSkills" | "missingSkills" | "deficitSkills" | "vacantes" | "capacidad"
 >;
 
 function scoreCandidate(
@@ -72,11 +83,20 @@ function scoreCandidate(
   allEmployees: OrgAnalysisEmployee[]
 ): ScoreDetails {
   const required = candidate.habilidadesRequeridas;
+  const vacantes =
+    candidate.capacidadRequerida != null ? Math.max(candidate.capacidadRequerida - candidate.asignados, 0) : null;
 
   if (required.length === 0) {
     // Sin requisitos definidos para esta oficina: no se puede evaluar match
     // ni deficit, se usa un score neutral para no penalizar ni favorecer.
-    return { scoreCompatibilidad: 50, matchedSkills: [], missingSkills: [], deficitSkills: [] };
+    return {
+      scoreCompatibilidad: 50,
+      matchedSkills: [],
+      missingSkills: [],
+      deficitSkills: [],
+      vacantes,
+      capacidad: candidate.capacidadRequerida,
+    };
   }
 
   const matchedSkills = required.filter((r) => empSkillNames.has(r.nombre.toLowerCase())).map((r) => r.nombre);
@@ -92,11 +112,32 @@ function scoreCandidate(
   const deficitSkills = required.filter((r) => !staffSkillNames.has(r.nombre.toLowerCase())).map((r) => r.nombre);
   const deficitRatio = deficitSkills.length / required.length;
 
+  let skillWeight = SKILL_MATCH_WEIGHT;
+  let deficitWeight = DEFICIT_WEIGHT;
+  let capacityWeight = CAPACITY_WEIGHT;
+  let capacityRatio = 0;
+
+  const capacidadValida = candidate.capacidadRequerida != null && candidate.capacidadRequerida > 0;
+  if (capacidadValida) {
+    capacityRatio = Math.min(
+      Math.max((candidate.capacidadRequerida! - candidate.asignados) / candidate.capacidadRequerida!, 0),
+      1
+    );
+  } else {
+    // Sin capacidad configurada (o en 0): se redistribuye su peso
+    // proporcionalmente entre skill match y deficit, para no penalizar ni
+    // favorecer a esta oficina.
+    const remaining = SKILL_MATCH_WEIGHT + DEFICIT_WEIGHT;
+    skillWeight = SKILL_MATCH_WEIGHT + (SKILL_MATCH_WEIGHT / remaining) * CAPACITY_WEIGHT;
+    deficitWeight = DEFICIT_WEIGHT + (DEFICIT_WEIGHT / remaining) * CAPACITY_WEIGHT;
+    capacityWeight = 0;
+  }
+
   const scoreCompatibilidad = Math.round(
-    skillMatchRatio * SKILL_MATCH_WEIGHT * 100 + deficitRatio * DEFICIT_WEIGHT * 100
+    skillMatchRatio * skillWeight * 100 + deficitRatio * deficitWeight * 100 + capacityRatio * capacityWeight * 100
   );
 
-  return { scoreCompatibilidad, matchedSkills, missingSkills, deficitSkills };
+  return { scoreCompatibilidad, matchedSkills, missingSkills, deficitSkills, vacantes, capacidad: candidate.capacidadRequerida };
 }
 
 export function findBestRelocationMatch(
@@ -132,6 +173,8 @@ export function findBestRelocationMatch(
       matchedSkills: [],
       missingSkills: [],
       deficitSkills: [],
+      vacantes: null,
+      capacidad: null,
     }
   );
 }
