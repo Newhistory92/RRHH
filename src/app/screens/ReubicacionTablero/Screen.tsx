@@ -73,11 +73,13 @@ export default function ReubicacionTablero() {
 
   const [seleccionada, setSeleccionada] = useState<{ solicitud: SolicitudRRHH; accion: 'Aprobada' | 'Rechazada' } | null>(null);
   const [observacion, setObservacion] = useState('');
+  const [deptSeleccionado, setDeptSeleccionado] = useState<number | null>(null);
   const [destinoSeleccionado, setDestinoSeleccionado] = useState<number | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [analizando, setAnalizando] = useState(false);
   const [verRecomendacion, setVerRecomendacion] = useState<SolicitudRRHH | null>(null);
   const [paraEjecutar, setParaEjecutar] = useState<SolicitudRRHH | null>(null);
+  const [deptEjecucion, setDeptEjecucion] = useState<number | null>(null);
   const [officeEjecucion, setOfficeEjecucion] = useState<number | null>(null);
   const [ejecutando, setEjecutando] = useState(false);
   const toast = useRef<Toast>(null);
@@ -92,10 +94,10 @@ export default function ReubicacionTablero() {
   const officeOptions = departments.flatMap((d) => d.offices.map((o) => ({ label: o.nombre, value: o.id })));
   const departmentOptions = departments.map((d) => ({ label: d.nombre, value: d.id }));
 
-  const findDepartmentIdForOffice = (officeId: number | null): number | null => {
-    if (!officeId) return null;
-    const dept = departments.find((d) => d.offices.some((o) => o.id === officeId));
-    return dept ? dept.id : null;
+  const officesForDept = (deptId: number | null): { label: string; value: number }[] => {
+    if (!deptId) return [];
+    const dept = departments.find((d) => d.id === deptId);
+    return dept ? dept.offices.map((o) => ({ label: o.nombre, value: o.id })) : [];
   };
 
   const scoreBadgeClase = (score: number) =>
@@ -171,6 +173,7 @@ export default function ReubicacionTablero() {
   const abrirAccion = (solicitud: SolicitudRRHH, accion: 'Aprobada' | 'Rechazada') => {
     setSeleccionada({ solicitud, accion });
     setObservacion('');
+    setDeptSeleccionado(solicitud.departmentIdSugerido ?? null);
     setDestinoSeleccionado(solicitud.officeIdSugerido ?? null);
   };
 
@@ -183,7 +186,7 @@ export default function ReubicacionTablero() {
         estado: seleccionada.accion,
         observacion: observacion.trim() || null,
         officeIdDestino: esAprobacion ? destinoSeleccionado : null,
-        departmentIdDestino: esAprobacion ? findDepartmentIdForOffice(destinoSeleccionado) : null,
+        departmentIdDestino: esAprobacion ? deptSeleccionado : null,
       });
       toast.current?.show({ severity: 'success', summary: 'Actualizado', detail: `Solicitud ${seleccionada.accion.toLowerCase()}`, life: 3000 });
       setSeleccionada(null);
@@ -198,14 +201,16 @@ export default function ReubicacionTablero() {
 
   const abrirEjecucion = (solicitud: SolicitudRRHH) => {
     setParaEjecutar(solicitud);
+    setDeptEjecucion(solicitud.departmentIdDestino ?? null);
     setOfficeEjecucion(solicitud.officeIdDestino ?? null);
   };
 
   const confirmarEjecucion = async () => {
-    if (!paraEjecutar || !officeEjecucion) return;
+    if (!paraEjecutar || !deptEjecucion) return;
     setEjecutando(true);
     try {
       await apiClient.patch(`/reubicacion/${paraEjecutar.id}/ejecutar`, {
+        departmentId: deptEjecucion,
         officeId: officeEjecucion,
       });
       toast.current?.show({ severity: 'success', summary: 'Ejecutada', detail: 'Reubicación ejecutada correctamente', life: 3000 });
@@ -408,17 +413,32 @@ export default function ReubicacionTablero() {
       >
         <div className="space-y-3">
           {seleccionada?.accion === 'Aprobada' && (
-            <div>
-              <label className="block text-sm font-semibold text-foreground mb-1">Oficina destino (opcional)</label>
-              <Dropdown
-                value={destinoSeleccionado}
-                options={officeOptions}
-                onChange={(e) => setDestinoSeleccionado(e.value)}
-                showClear
-                placeholder="Sin destino"
-                className="w-full"
-              />
-            </div>
+            <>
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-1">Departamento destino (opcional)</label>
+                <Dropdown
+                  value={deptSeleccionado}
+                  options={departmentOptions}
+                  onChange={(e) => { setDeptSeleccionado(e.value); setDestinoSeleccionado(null); }}
+                  showClear
+                  placeholder="Sin destino"
+                  className="w-full"
+                />
+              </div>
+              {deptSeleccionado && officesForDept(deptSeleccionado).length > 0 && (
+                <div>
+                  <label className="block text-sm font-semibold text-foreground mb-1">Oficina destino (opcional)</label>
+                  <Dropdown
+                    value={destinoSeleccionado}
+                    options={officesForDept(deptSeleccionado)}
+                    onChange={(e) => setDestinoSeleccionado(e.value)}
+                    showClear
+                    placeholder="Todo el departamento"
+                    className="w-full"
+                  />
+                </div>
+              )}
+            </>
           )}
           <label className="block text-sm font-semibold text-foreground">Observación (opcional)</label>
           <InputTextarea value={observacion} onChange={(e) => setObservacion(e.target.value)} rows={4} className="w-full" />
@@ -483,16 +503,31 @@ export default function ReubicacionTablero() {
         modal
       >
         <div className="space-y-3">
-          <label className="block text-sm font-semibold text-foreground mb-1">Oficina destino</label>
-          <Dropdown
-            value={officeEjecucion}
-            options={officeOptions}
-            onChange={(e) => setOfficeEjecucion(e.value)}
-            placeholder="Seleccionar oficina"
-            className="w-full"
-          />
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-1">Departamento destino</label>
+            <Dropdown
+              value={deptEjecucion}
+              options={departmentOptions}
+              onChange={(e) => { setDeptEjecucion(e.value); setOfficeEjecucion(null); }}
+              placeholder="Seleccionar departamento"
+              className="w-full"
+            />
+          </div>
+          {deptEjecucion && officesForDept(deptEjecucion).length > 0 && (
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-1">Oficina destino (opcional)</label>
+              <Dropdown
+                value={officeEjecucion}
+                options={officesForDept(deptEjecucion)}
+                onChange={(e) => setOfficeEjecucion(e.value)}
+                showClear
+                placeholder="Todo el departamento"
+                className="w-full"
+              />
+            </div>
+          )}
           <p className="text-xs text-muted-foreground">
-            Se moverá al empleado a esta oficina/departamento y se actualizará el organigrama.
+            Se moverá al empleado a este destino y se actualizará el organigrama.
           </p>
           <div className="flex justify-end gap-2 pt-2">
             <Button label="Cancelar" className="p-button-text" onClick={() => setParaEjecutar(null)} />
@@ -500,7 +535,7 @@ export default function ReubicacionTablero() {
               label="Confirmar"
               severity="success"
               loading={ejecutando}
-              disabled={!officeEjecucion}
+              disabled={!deptEjecucion}
               onClick={confirmarEjecucion}
             />
           </div>
