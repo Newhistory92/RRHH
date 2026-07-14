@@ -399,6 +399,8 @@ export interface Department {
   nivel_jerarquico: number;
   jefeId?: number | null;
   parentId?: number | null;
+  capacidadRequerida?: number | null;
+  asignados?: number;
   habilidades_requeridas?: TechnicalSkill[];
   offices: Office[];
   employees?: Employee[];
@@ -455,6 +457,8 @@ export interface Office {
   empleadosIds?: number[];
   departmentId: number;
   parentDepartmentId?: number | null; // Nuevo campo para jerarquía
+  capacidadRequerida?: number | null;
+  asignados?: number;
   habilidades_requeridas?: TechnicalSkill[];
 }
 
@@ -532,6 +536,7 @@ export interface EntityFormData {
   nombre: string;
   descripcion: string;
   jefeId: number | null;
+  capacidadRequerida?: number | null;
   habilidades_requeridas: TechnicalSkill[];
   // Campos específicos de Department
   nivel_jerarquico?: number;
@@ -800,11 +805,15 @@ export interface OrgAnalysisDepartment {
   jefeId: number | null;
   nivelJerarquico: number | null;
   parentId: number | null;
+  capacidadRequerida: number | null;
+  asignados: number;
   habilidades_requeridas: { nombre: string; level: number }[];
   offices: {
     id: number;
     nombre: string;
     jefeId: number | null;
+    capacidadRequerida: number | null;
+    asignados: number;
     habilidades_requeridas: { nombre: string; level: number }[];
   }[];
 }

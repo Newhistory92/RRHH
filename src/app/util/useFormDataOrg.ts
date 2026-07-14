@@ -8,6 +8,7 @@ export const useFormData = (config: ModalConfig, employees: Employee[]) => {
     nombre: '',
     descripcion: '',
     jefeId: null,
+    capacidadRequerida: null,
     habilidades_requeridas: [],
     nivel_jerarquico: 1,
     parentId: null,
@@ -15,7 +16,7 @@ export const useFormData = (config: ModalConfig, employees: Employee[]) => {
   });
 
   useEffect(() => {
-    
+
     if (!data) {
       if (type === "department") {
         setFormData({
@@ -24,6 +25,7 @@ export const useFormData = (config: ModalConfig, employees: Employee[]) => {
           nivel_jerarquico: 2,
           parentId: null,
           jefeId: null,
+          capacidadRequerida: null,
           habilidades_requeridas: [],
           empleadosIds: []
         });
@@ -32,6 +34,7 @@ export const useFormData = (config: ModalConfig, employees: Employee[]) => {
           nombre: "",
           descripcion: "",
           jefeId: null,
+          capacidadRequerida: null,
           empleadosIds: [],
           habilidades_requeridas: [],
         });
@@ -42,6 +45,7 @@ export const useFormData = (config: ModalConfig, employees: Employee[]) => {
         nombre: data.nombre || '',
         descripcion: data.descripcion || '',
         jefeId: data.jefeId || null,
+        capacidadRequerida: (data as Department | Office).capacidadRequerida ?? null,
         habilidades_requeridas: data.habilidades_requeridas || [],
         nivel_jerarquico: (data as Department).nivel_jerarquico || (data as any).nivelJerarquico || 1,
         parentId: (data as Department).parentId || null,
