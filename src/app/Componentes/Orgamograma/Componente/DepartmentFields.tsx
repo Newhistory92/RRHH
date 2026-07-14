@@ -52,6 +52,24 @@ console.log(employees)
         />
       </div>
 
+      {/* Capacidad Requerida */}
+      <div>
+        <label className="block text-sm font-medium text-foreground mb-2">
+          Capacidad requerida (personas) *
+        </label>
+        <InputNumber
+          value={formData.capacidadRequerida ?? null}
+          onValueChange={(e: InputNumberValueChangeEvent) =>
+            setFormData(prev => ({ ...prev, capacidadRequerida: e.value ?? null }))
+          }
+          mode="decimal"
+          showButtons
+          min={0}
+          className="w-full"
+          placeholder="Ej: 20"
+        />
+      </div>
+
       {/* Departamento Padre */}
       <div>
         <label className="block text-sm font-medium text-foreground mb-2">

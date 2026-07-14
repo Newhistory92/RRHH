@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { MultiSelect, MultiSelectChangeEvent } from 'primereact/multiselect';
+import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber';
 import { Avatar } from 'primereact/avatar';
 import { AvatarGroup } from 'primereact/avatargroup';
 import { useEmployeeTemplates } from './EmployeeTemplates';
@@ -38,6 +39,24 @@ export const OfficeFields: React.FC<FormFieldProps> = ({
 
   return (
     <>
+      {/* Capacidad Requerida */}
+      <div>
+        <label className="block text-sm font-medium text-foreground mb-2">
+          Capacidad requerida (personas) *
+        </label>
+        <InputNumber
+          value={formData.capacidadRequerida ?? null}
+          onValueChange={(e: InputNumberValueChangeEvent) =>
+            setFormData(prev => ({ ...prev, capacidadRequerida: e.value ?? null }))
+          }
+          mode="decimal"
+          showButtons
+          min={0}
+          className="w-full"
+          placeholder="Ej: 4"
+        />
+      </div>
+
       {/* Departamento Padre (Jerarquía) */}
       <div>
         <label className="block text-sm font-medium text-foreground mb-2">

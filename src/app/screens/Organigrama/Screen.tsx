@@ -1,6 +1,7 @@
 "use client"
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {  Sparkles, LayoutGrid,  } from 'lucide-react';
+import { Toast } from 'primereact/toast';
 import { OrgChart } from '@/app/Componentes/OrganigramaGraf/OrgChart';
 import { DepartmentManagementView } from '@/app/Componentes/Orgamograma/Departamento';
 import { EntityFormModal } from '@/app/Componentes/Orgamograma/Componente/EntityFormModal';
@@ -26,7 +27,8 @@ export default function OrganigramaPage({ readOnly = false }: OrganigramaPagePro
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig>({type: "department", data: undefined, context: {},});
   const [activeTab, setActiveTab] = useState("gestion");
- 
+  const toast = useRef<Toast>(null);
+
 
   // Función centralizada para recargar departamentos (re-validación de estado)
   const refreshDepartments = useCallback(async () => {
@@ -125,6 +127,12 @@ const handleSave = async (formData: EntityFormData): Promise<void> => {
     handleCloseModal();
   } catch (err) {
     console.error('Error al guardar:', err);
+    toast.current?.show({
+      severity: 'error',
+      summary: 'Error',
+      detail: err instanceof Error ? err.message : 'No se pudo guardar',
+      life: 5000,
+    });
   }
 };
 
@@ -132,6 +140,7 @@ const handleSave = async (formData: EntityFormData): Promise<void> => {
 
   return (
     <div className="bg-background font-sans min-h-screen">
+      <Toast ref={toast} />
       <div className="container mx-auto p-4 md:p-8">
         <header className="mb-8">
           <h1 className="font-heading text-4xl font-bold text-foreground">

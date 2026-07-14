@@ -3,6 +3,7 @@ import React from 'react';
 import { Briefcase, Pencil } from 'lucide-react';
 import Image from 'next/image';
 import { EmployeeAvatar } from '../../util/UiRRHH';
+import { CapacityBadge } from './CapacityBadge';
 import type { Office, Employee } from '@/app/Interfas/Interfaces';
 
 interface OfficeCardProps {
@@ -22,9 +23,10 @@ export const OfficeCard: React.FC<OfficeCardProps> = ({ office, onEdit, employee
     <div className="bg-muted border border-border rounded-lg p-4 mb-4 transition-shadow hover:shadow-md">
       <div className="flex justify-between items-start">
         <div>
-          <h4 className="font-bold text-lg text-foreground flex items-center">
+          <h4 className="font-bold text-lg text-foreground flex items-center gap-2">
             <Briefcase className="w-5 h-5 mr-2 text-primary" />
             {office.nombre}
+            <CapacityBadge asignados={office.asignados} capacidadRequerida={office.capacidadRequerida} />
           </h4>
           <p className="text-sm text-muted-foreground mt-1">{office.descripcion}</p>
         </div>
