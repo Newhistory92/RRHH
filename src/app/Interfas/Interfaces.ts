@@ -685,7 +685,23 @@ export type Page =
   | "documentos"
   | "reubicacion"
   | "test"
-  | "admin";
+  | "admin"
+  | "inicio";
+
+export interface FeedPublication {
+  id: number;
+  titulo: string;
+  resumen: string | null;
+  contenido: string | null;
+  categoria: string;
+  prioridad: string;
+  estadoMantenimiento: string | null;
+  destacada: boolean;
+  fijada: boolean;
+  fechaPublicacion: string | null;
+  fechaExpiracion: string | null;
+  createdAt: string | null;
+}
 
 
 export type MotivoSalida =
