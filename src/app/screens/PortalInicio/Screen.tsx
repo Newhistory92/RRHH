@@ -13,10 +13,12 @@ interface PortalInicioProps {
 }
 
 const CATEGORIAS_SECCION = [
+  'Noticia Institucional',
   'Circular',
   'Resolución',
   'Mantenimiento y Reparaciones',
-  'Noticia Institucional',
+  'Aviso Importante',
+  'Evento Institucional',
   'Oportunidad Interna',
   'Beneficio para Empleados',
   'Comunicación de RRHH',
@@ -65,6 +67,14 @@ export default function PortalInicio({ employeeData }: PortalInicioProps) {
     )
     .sort((a, b) => new Date(a.fechaPublicacion!).getTime() - new Date(b.fechaPublicacion!).getTime())
     .slice(0, 5);
+
+  if (!employeeData) {
+    return (
+      <div className="bg-background font-sans min-h-screen flex items-center justify-center">
+        <p className="text-foreground">Cargando información del empleado...</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
