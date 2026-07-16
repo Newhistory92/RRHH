@@ -98,6 +98,7 @@ export default function GestionPublicaciones() {
       setModo('form');
     } catch (e) {
       console.error('Error al cargar publicación:', e);
+      setError('No se pudo cargar la publicación. Intentá de nuevo.');
     }
   };
 
