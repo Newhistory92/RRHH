@@ -686,7 +686,8 @@ export type Page =
   | "reubicacion"
   | "test"
   | "admin"
-  | "inicio";
+  | "inicio"
+  | "gestion-publicaciones";
 
 export interface FeedPublication {
   id: number;
@@ -701,6 +702,47 @@ export interface FeedPublication {
   fechaPublicacion: string | null;
   fechaExpiracion: string | null;
   createdAt: string | null;
+  adjuntos?: PublicationAttachment[];
+}
+
+export interface PublicationAttachment {
+  id: number;
+  url: string;
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+}
+
+export interface PublicationAdminRow {
+  id: number;
+  titulo: string;
+  categoria: string;
+  estado: string;
+  fechaPublicacion: string | null;
+  createdAt: string | null;
+}
+
+export interface PublicationTargetInput {
+  scope: 'institucion' | 'departamento' | 'oficina';
+  departmentId?: number | null;
+  officeId?: number | null;
+}
+
+export interface PublicationEditData {
+  id: number;
+  titulo: string;
+  resumen: string | null;
+  contenido: string | null;
+  categoria: string;
+  prioridad: string;
+  estadoMantenimiento: string | null;
+  esBorrador: boolean;
+  destacada: boolean;
+  fijada: boolean;
+  fechaPublicacion: string | null;
+  fechaExpiracion: string | null;
+  targets: PublicationTargetInput[];
+  adjuntos: PublicationAttachment[];
 }
 
 
