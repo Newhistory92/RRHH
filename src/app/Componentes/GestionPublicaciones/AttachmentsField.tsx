@@ -23,10 +23,12 @@ export function AttachmentsField({ attachments, onChange }: AttachmentsFieldProp
     input.multiple = true;
     input.onchange = async () => {
       const files = input.files ? Array.from(input.files) : [];
+      let actuales = attachments;
       for (const file of files) {
         try {
           const att = await uploadAttachment(file, 'adjunto');
-          onChange([...attachments, att]);
+          actuales = [...actuales, att];
+          onChange(actuales);
         } catch (e) {
           alert((e as Error).message);
         }
