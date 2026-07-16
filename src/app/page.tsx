@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { apiClient } from '@/app/util/apiClient';
 import { AppLayout } from '@/app/Componentes/Shell/AppLayout';
 import EstadisticasPage from '@/app/screens/Estadisticas/Screen';
+import PortalInicio from '@/app/screens/PortalInicio/Screen';
 import RecursosHumanosPage from '@/app/screens/RRHH/Screen';
 import IAPage from '@/app/screens/IA/Screen';
 import OrganigramaPage from '@/app/screens/Organigrama/Screen';
@@ -122,6 +123,8 @@ export default function App() {
     const readOnly = isReadOnlyForRole(roleId, page);
 
     switch (page) {
+      case 'inicio':
+        return <PortalInicio employeeData={employeeData} />;
       case 'estadisticas':
         return <EstadisticasPage />;
       case 'recursos-humanos':

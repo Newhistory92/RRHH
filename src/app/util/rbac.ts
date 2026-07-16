@@ -31,6 +31,17 @@ export interface PageConfig {
 
 export const PAGE_CONFIG: PageConfig[] = [
   {
+    id: "inicio",
+    label: "Inicio",
+    icon: "Home",
+    section: "General",
+    // USER llega aca porque es su pagina default (ver getDefaultPage), no via
+    // sidebar -- USER no tiene sidebar (getSidebarPages/getSidebarSections
+    // devuelven [] para ese rol).
+    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.ESTADISTA],
+    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.ESTADISTA, ROLE_ID.USER],
+  },
+  {
     id: "estadisticas",
     label: "Estadísticas",
     icon: "BarChart2",
@@ -162,7 +173,7 @@ export function getDefaultPage(roleId: number): Page {
     [ROLE_ID.ADMIN]: "admin",
     [ROLE_ID.RRHH]: "estadisticas",
     [ROLE_ID.ESTADISTA]: "estadisticas",
-    [ROLE_ID.USER]: "editar-perfil",
+    [ROLE_ID.USER]: "inicio",
   };
   return defaults[roleId] ?? "estadisticas";
 }
