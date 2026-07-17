@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { Calendar } from 'primereact/calendar';
 import { addLocale, type LocaleOptions } from 'primereact/api';
 import { CalendarDays } from 'lucide-react';
-import { apiClient } from '@/app/util/apiClient';
+import { Temporal } from '@js-temporal/polyfill';
+import { type HolidayApi, type PlainHoliday, processHolidays } from '@/app/lib/dates';
 
 addLocale('es', {
   firstDayOfWeek: 1,
@@ -17,12 +18,6 @@ addLocale('es', {
   clear: 'Limpiar',
 } as LocaleOptions);
 
-interface Feriado {
-  id: number;
-  fecha: string;
-  nombre: string;
-}
-
 interface CalendarDateTemplateArg {
   day: number;
   month: number;
@@ -30,22 +25,24 @@ interface CalendarDateTemplateArg {
 }
 
 export function CalendarWidget() {
-  const [feriados, setFeriados] = useState<Feriado[]>([]);
+  const [feriados, setFeriados] = useState<Map<string, PlainHoliday>>(new Map());
 
   useEffect(() => {
-    apiClient
-      .get<{ feriados: Feriado[] }>('/licenses/feriados')
-      .then((res) => setFeriados(res.feriados || []))
+    const year = Temporal.Now.plainDateISO().year;
+    fetch(`https://api.argentinadatos.com/v1/feriados/${year}`)
+      .then((r) => { if (!r.ok) throw new Error('Error al obtener feriados públicos'); return r.json(); })
+      .then((data: HolidayApi[]) => setFeriados(processHolidays(data)))
       .catch((err) => console.error('Error al cargar feriados:', err));
   }, []);
 
-  const feriadoFechas = new Set(feriados.map((f) => f.fecha.slice(0, 10)));
-
   const dateTemplate = (date: CalendarDateTemplateArg) => {
     const iso = `${date.year}-${String(date.month + 1).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
-    const esFeriado = feriadoFechas.has(iso);
+    const holiday = feriados.get(iso);
     return (
-      <span className={esFeriado ? 'flex items-center justify-center w-full h-full rounded-full bg-error/20 text-error font-semibold' : ''}>
+      <span
+        title={holiday?.name}
+        className={holiday ? 'flex items-center justify-center w-full h-full rounded-full bg-error/20 text-error font-semibold' : ''}
+      >
         {date.day}
       </span>
     );
