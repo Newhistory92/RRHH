@@ -16,6 +16,19 @@ export function resolveAttachmentUrl(url: string): string {
   return `${BACKEND_URL}${url.startsWith('/') ? url : `/${url}`}`;
 }
 
+/** Reescribe dentro de un string de HTML cualquier src/href relativo que
+ * apunte a /uploads/... para que resuelva contra el backend. Necesario
+ * para contenido guardado ANTES de que las inserciones nuevas empezaran
+ * a hornear la URL absoluta directamente (ver resolveAttachmentUrl) --
+ * asi el contenido viejo se autocorrige al mostrarse, sin re-subir nada. */
+export function resolveUploadsInHtml(html: string): string {
+  if (!html) return html;
+  return html.replace(
+    /(src|href)="(\/uploads\/[^"]*)"/g,
+    (_match, attr: string, path: string) => `${attr}="${BACKEND_URL}${path}"`
+  );
+}
+
 export async function uploadAttachment(
   file: File,
   rol: 'inline' | 'adjunto'

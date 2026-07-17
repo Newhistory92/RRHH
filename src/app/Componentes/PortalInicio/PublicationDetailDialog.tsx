@@ -5,7 +5,7 @@ import { Dialog } from 'primereact/dialog';
 import { FileText, Paperclip } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { CATEGORIA_ICONOS, PRIORIDAD_CLASES, formatFechaRelativa } from './publicationHelpers';
-import { resolveAttachmentUrl } from '@/app/util/uploadClient';
+import { resolveAttachmentUrl, resolveUploadsInHtml } from '@/app/util/uploadClient';
 import type { FeedPublication } from '@/app/Interfas/Interfaces';
 
 interface PublicationDetailDialogProps {
@@ -19,7 +19,7 @@ export function PublicationDetailDialog({ publication, onHide }: PublicationDeta
 
   useEffect(() => {
     if (publication?.contenido) {
-      setContenidoSeguro(DOMPurify.sanitize(publication.contenido));
+      setContenidoSeguro(DOMPurify.sanitize(resolveUploadsInHtml(publication.contenido)));
     } else {
       setContenidoSeguro(null);
     }

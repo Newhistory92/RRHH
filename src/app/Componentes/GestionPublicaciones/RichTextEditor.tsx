@@ -17,7 +17,7 @@ import {
 import { ButtonNode } from './tiptap/ButtonNode';
 import { GalleryNode } from './tiptap/GalleryNode';
 import { VideoNode } from './tiptap/VideoNode';
-import { uploadAttachment, resolveAttachmentUrl } from '@/app/util/uploadClient';
+import { uploadAttachment, resolveAttachmentUrl, resolveUploadsInHtml } from '@/app/util/uploadClient';
 import { validarArchivo } from './attachmentValidation';
 
 interface RichTextEditorProps {
@@ -51,7 +51,7 @@ export function RichTextEditor({ value, onChange, onInlineUploaded }: RichTextEd
       GalleryNode,
       VideoNode,
     ],
-    content: value || '',
+    content: resolveUploadsInHtml(value || ''),
     immediatelyRender: false,
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
   });
