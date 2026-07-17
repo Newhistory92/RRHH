@@ -57,7 +57,9 @@ export function CalendarWidget() {
         <CalendarDays size={16} className="text-primary" />
         Calendario
       </h3>
-      <Calendar inline locale="es" dateTemplate={dateTemplate} className="w-full" />
+      <div className="calendar-compact">
+        <Calendar inline locale="es" dateTemplate={dateTemplate} className="w-full" />
+      </div>
     </div>
   );
 }

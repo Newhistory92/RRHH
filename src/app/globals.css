@@ -156,3 +156,44 @@ body {
 .pub-content .pub-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem; margin: 0.75rem 0; }
 .pub-content .pub-gallery-img { width: 100%; height: 100px; object-fit: cover; border-radius: 0.5rem; }
 .pub-content a.pub-cta { display: inline-block; text-decoration: none; background: var(--color-primary); color: var(--color-primary-foreground); padding: 0.5rem 1rem; border-radius: 0.75rem; margin: 0.5rem 0; font-weight: 600; }
+
+/* Calendario compacto para el widget del sidebar (Home del empleado):
+   el tema PrimeReact activo dimensiona celdas a 2.5rem pensando en un
+   calendario a ancho completo; acá lo reducimos para que un mes entero
+   quepa en una columna angosta sin desbordar ni necesitar scroll. */
+.calendar-compact .p-datepicker {
+  padding: 0.25rem !important;
+  width: 100% !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.calendar-compact .p-datepicker-header {
+  padding: 0.25rem !important;
+}
+.calendar-compact .p-datepicker-header .p-datepicker-prev,
+.calendar-compact .p-datepicker-header .p-datepicker-next {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+}
+.calendar-compact .p-datepicker-title {
+  line-height: 1.5rem !important;
+  font-size: 0.8rem !important;
+}
+.calendar-compact .p-datepicker table {
+  font-size: 0.7rem !important;
+  margin: 0.25rem 0 !important;
+  table-layout: fixed !important;
+  width: 100% !important;
+}
+.calendar-compact .p-datepicker table th,
+.calendar-compact .p-datepicker table td {
+  padding: 0.1rem !important;
+  text-align: center !important;
+}
+.calendar-compact .p-datepicker table th > span,
+.calendar-compact .p-datepicker table td > span {
+  width: 1.6rem !important;
+  height: 1.6rem !important;
+  font-size: 0.7rem !important;
+  line-height: 1.6rem !important;
+}
