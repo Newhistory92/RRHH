@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { FileText, Paperclip } from 'lucide-react';
 import DOMPurify from 'dompurify';
@@ -15,6 +15,15 @@ interface PublicationDetailDialogProps {
 
 export function PublicationDetailDialog({ publication, onHide }: PublicationDetailDialogProps) {
   const Icono = publication ? (CATEGORIA_ICONOS[publication.categoria] ?? FileText) : FileText;
+  const [contenidoSeguro, setContenidoSeguro] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (publication?.contenido) {
+      setContenidoSeguro(DOMPurify.sanitize(publication.contenido));
+    } else {
+      setContenidoSeguro(null);
+    }
+  }, [publication?.contenido]);
 
   return (
     <Dialog
@@ -43,11 +52,13 @@ export function PublicationDetailDialog({ publication, onHide }: PublicationDeta
               Estado: <span className="font-normal">{publication.estadoMantenimiento}</span>
             </p>
           )}
-          {publication.contenido ? (
+          {contenidoSeguro ? (
             <div
               className="pub-content text-sm text-foreground space-y-2"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(publication.contenido) }}
+              dangerouslySetInnerHTML={{ __html: contenidoSeguro }}
             />
+          ) : publication.contenido ? (
+            <div className="text-sm text-muted-foreground animate-pulse">Cargando contenido…</div>
           ) : (
             <div className="text-sm text-foreground whitespace-pre-wrap">
               {publication.resumen || 'Sin contenido adicional.'}
