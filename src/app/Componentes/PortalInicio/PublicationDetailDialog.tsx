@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { Dialog } from 'primereact/dialog';
-import { FileText } from 'lucide-react';
+import { FileText, Paperclip } from 'lucide-react';
+import DOMPurify from 'dompurify';
 import { CATEGORIA_ICONOS, PRIORIDAD_CLASES, formatFechaRelativa } from './publicationHelpers';
 import type { FeedPublication } from '@/app/Interfas/Interfaces';
 
@@ -41,9 +42,37 @@ export function PublicationDetailDialog({ publication, onHide }: PublicationDeta
               Estado: <span className="font-normal">{publication.estadoMantenimiento}</span>
             </p>
           )}
-          <div className="text-sm text-foreground whitespace-pre-wrap">
-            {publication.contenido || publication.resumen || 'Sin contenido adicional.'}
-          </div>
+          {publication.contenido ? (
+            <div
+              className="pub-content text-sm text-foreground space-y-2"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(publication.contenido) }}
+            />
+          ) : (
+            <div className="text-sm text-foreground whitespace-pre-wrap">
+              {publication.resumen || 'Sin contenido adicional.'}
+            </div>
+          )}
+
+          {publication.adjuntos && publication.adjuntos.length > 0 && (
+            <div className="pt-2 border-t border-border">
+              <p className="text-sm font-semibold text-foreground mb-2">Archivos adjuntos</p>
+              <ul className="space-y-2">
+                {publication.adjuntos.map((a) => (
+                  <li key={a.id}>
+                    <a
+                      href={a.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                    >
+                      <Paperclip size={14} />
+                      {a.fileName}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </Dialog>

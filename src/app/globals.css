@@ -140,3 +140,19 @@ body {
   --primary-color: #E7717D;
   --primary-color-text: #FFFFFF;
 }
+
+/* Contenido rico de las publicaciones (editor + detalle) */
+.pub-content h1 { font-size: 1.5rem; font-weight: 700; margin: 0.5rem 0; }
+.pub-content h2 { font-size: 1.25rem; font-weight: 700; margin: 0.5rem 0; }
+.pub-content h3 { font-size: 1.1rem; font-weight: 600; margin: 0.5rem 0; }
+.pub-content p { margin: 0.5rem 0; }
+.pub-content ul { list-style: disc; padding-left: 1.5rem; margin: 0.5rem 0; }
+.pub-content ol { list-style: decimal; padding-left: 1.5rem; margin: 0.5rem 0; }
+.pub-content a { color: var(--color-primary); text-decoration: underline; }
+.pub-content img { max-width: 100%; border-radius: 0.5rem; margin: 0.5rem 0; }
+.pub-content table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; }
+.pub-content th, .pub-content td { border: 1px solid var(--color-border); padding: 0.5rem; text-align: left; }
+.pub-content video.pub-video { max-width: 100%; border-radius: 0.5rem; margin: 0.5rem 0; }
+.pub-content .pub-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem; margin: 0.75rem 0; }
+.pub-content .pub-gallery-img { width: 100%; height: 100px; object-fit: cover; border-radius: 0.5rem; }
+.pub-content a.pub-cta { display: inline-block; text-decoration: none; background: var(--color-primary); color: var(--color-primary-foreground); padding: 0.5rem 1rem; border-radius: 0.75rem; margin: 0.5rem 0; font-weight: 600; }
