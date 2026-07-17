@@ -7,6 +7,15 @@ import type { PublicationAttachment } from '@/app/Interfas/Interfaces';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://127.0.0.1:8000';
 
+/** Resuelve una URL de adjunto (relativa, ej. "/uploads/publications/x.jpg")
+ * contra el origen del backend, para que <img>/<video>/<a href> la carguen
+ * del servidor correcto en vez de resolverla contra el origen del frontend. */
+export function resolveAttachmentUrl(url: string): string {
+  if (!url) return url;
+  if (/^https?:\/\//i.test(url)) return url;
+  return `${BACKEND_URL}${url.startsWith('/') ? url : `/${url}`}`;
+}
+
 export async function uploadAttachment(
   file: File,
   rol: 'inline' | 'adjunto'

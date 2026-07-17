@@ -17,7 +17,7 @@ import {
 import { ButtonNode } from './tiptap/ButtonNode';
 import { GalleryNode } from './tiptap/GalleryNode';
 import { VideoNode } from './tiptap/VideoNode';
-import { uploadAttachment } from '@/app/util/uploadClient';
+import { uploadAttachment, resolveAttachmentUrl } from '@/app/util/uploadClient';
 import { validarArchivo } from './attachmentValidation';
 
 interface RichTextEditorProps {
@@ -67,7 +67,7 @@ export function RichTextEditor({ value, onChange, onInlineUploaded }: RichTextEd
     }
     try {
       const att = await uploadAttachment(file, 'inline');
-      editor.chain().focus().setImage({ src: att.url }).run();
+      editor.chain().focus().setImage({ src: resolveAttachmentUrl(att.url) }).run();
       onInlineUploaded(att.id);
     } catch (e) {
       alert((e as Error).message);
@@ -85,7 +85,7 @@ export function RichTextEditor({ value, onChange, onInlineUploaded }: RichTextEd
     }
     try {
       const att = await uploadAttachment(file, 'inline');
-      editor.chain().focus().setVideo({ src: att.url }).run();
+      editor.chain().focus().setVideo({ src: resolveAttachmentUrl(att.url) }).run();
       onInlineUploaded(att.id);
     } catch (e) {
       alert((e as Error).message);
@@ -108,7 +108,7 @@ export function RichTextEditor({ value, onChange, onInlineUploaded }: RichTextEd
     if (validos.length === 0) return;
     try {
       const subidas = await Promise.all(validos.map((f) => uploadAttachment(f, 'inline')));
-      editor.chain().focus().setGallery({ srcs: subidas.map((a) => a.url) }).run();
+      editor.chain().focus().setGallery({ srcs: subidas.map((a) => resolveAttachmentUrl(a.url)) }).run();
       subidas.forEach((a) => onInlineUploaded(a.id));
     } catch (e) {
       alert((e as Error).message);

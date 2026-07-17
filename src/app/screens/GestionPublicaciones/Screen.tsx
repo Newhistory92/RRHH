@@ -18,6 +18,23 @@ const PRIORIDADES = ['Baja', 'Normal', 'Alta', 'Urgente'];
 const ESTADOS_MANT = ['Programado', 'En curso', 'Completado', 'Suspendido', 'Reprogramado'];
 const CAT_MANTENIMIENTO = 'Mantenimiento y Reparaciones';
 
+/** Convierte el string UTC (sin 'Z', ej. "2026-07-17T10:56:00") que devuelve
+ * el backend a un valor local apto para <input type="datetime-local">. */
+function utcIsoToLocalInputValue(utcIso: string | null): string {
+  if (!utcIso) return '';
+  const conZ = utcIso.endsWith('Z') ? utcIso : `${utcIso}Z`;
+  const d = new Date(conZ);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/** Convierte el valor local de <input type="datetime-local"> (ej.
+ * "2026-07-17T07:56", sin timezone) a un ISO UTC real para mandar al backend. */
+function localInputValueToUtcIso(local: string): string | null {
+  if (!local) return null;
+  return new Date(local).toISOString();
+}
+
 interface DeptOption { id: number; nombre: string; offices: { id: number; nombre: string }[]; }
 
 const EMPTY_FORM = {
@@ -84,8 +101,8 @@ export default function GestionPublicaciones() {
         titulo: p.titulo, resumen: p.resumen || '', contenido: p.contenido || '',
         categoria: p.categoria, prioridad: p.prioridad, esBorrador: p.esBorrador,
         destacada: p.destacada, fijada: p.fijada,
-        fechaPublicacion: p.fechaPublicacion ? p.fechaPublicacion.slice(0, 16) : '',
-        fechaExpiracion: p.fechaExpiracion ? p.fechaExpiracion.slice(0, 16) : '',
+        fechaPublicacion: utcIsoToLocalInputValue(p.fechaPublicacion),
+        fechaExpiracion: utcIsoToLocalInputValue(p.fechaExpiracion),
       });
       setEstadoMant(p.estadoMantenimiento || '');
       setContenido(p.contenido || '');
@@ -121,8 +138,8 @@ export default function GestionPublicaciones() {
       ...form,
       contenido,
       estadoMantenimiento: form.categoria === CAT_MANTENIMIENTO ? (estadoMant || null) : null,
-      fechaPublicacion: form.fechaPublicacion || null,
-      fechaExpiracion: form.fechaExpiracion || null,
+      fechaPublicacion: localInputValueToUtcIso(form.fechaPublicacion),
+      fechaExpiracion: localInputValueToUtcIso(form.fechaExpiracion),
       targets,
       attachmentIds,
     };
@@ -291,7 +308,21 @@ export default function GestionPublicaciones() {
             </div>
             <div>
               <label className="text-sm font-semibold text-foreground">Fecha de expiración</label>
-              <input type="datetime-local" value={form.fechaExpiracion} onChange={(e) => setForm({ ...form, fechaExpiracion: e.target.value })} className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground" />
+              <label className="flex items-center gap-2 text-xs text-muted-foreground mt-1 mb-1">
+                <input
+                  type="checkbox"
+                  checked={form.fechaExpiracion === ''}
+                  onChange={(e) => setForm({ ...form, fechaExpiracion: e.target.checked ? '' : form.fechaExpiracion })}
+                />
+                Permanente (no expira nunca)
+              </label>
+              <input
+                type="datetime-local"
+                value={form.fechaExpiracion}
+                disabled={form.fechaExpiracion === ''}
+                onChange={(e) => setForm({ ...form, fechaExpiracion: e.target.value })}
+                className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground disabled:opacity-50"
+              />
             </div>
           </div>
 

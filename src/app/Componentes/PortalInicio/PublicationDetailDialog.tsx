@@ -5,6 +5,7 @@ import { Dialog } from 'primereact/dialog';
 import { FileText, Paperclip } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { CATEGORIA_ICONOS, PRIORIDAD_CLASES, formatFechaRelativa } from './publicationHelpers';
+import { resolveAttachmentUrl } from '@/app/util/uploadClient';
 import type { FeedPublication } from '@/app/Interfas/Interfaces';
 
 interface PublicationDetailDialogProps {
@@ -60,7 +61,7 @@ export function PublicationDetailDialog({ publication, onHide }: PublicationDeta
                 {publication.adjuntos.map((a) => (
                   <li key={a.id}>
                     <a
-                      href={a.url}
+                      href={resolveAttachmentUrl(a.url)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
