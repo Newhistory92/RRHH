@@ -58,6 +58,14 @@ export const PAGE_CONFIG: PageConfig[] = [
     accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
   },
   {
+    id: "gestion-publicaciones",
+    label: "Publicaciones",
+    icon: "Newspaper",
+    section: "Gente",
+    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
+    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
+  },
+  {
     id: "configuracion-licencias",
     label: "Configuración de Licencias",
     icon: "Settings",
