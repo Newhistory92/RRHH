@@ -18,15 +18,13 @@ import { ButtonNode } from './tiptap/ButtonNode';
 import { GalleryNode } from './tiptap/GalleryNode';
 import { VideoNode } from './tiptap/VideoNode';
 import { uploadAttachment } from '@/app/util/uploadClient';
+import { validarArchivo } from './attachmentValidation';
 
 interface RichTextEditorProps {
   value: string;
   onChange: (html: string) => void;
   onInlineUploaded: (id: number) => void;
 }
-
-const IMAGE_EXT = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-const VIDEO_EXT = ['mp4', 'webm'];
 
 function pickFile(accept: string, multiple: boolean): Promise<File[]> {
   return new Promise((resolve) => {
@@ -62,6 +60,11 @@ export function RichTextEditor({ value, onChange, onInlineUploaded }: RichTextEd
     if (!editor) return;
     const [file] = await pickFile('image/*', false);
     if (!file) return;
+    const error = validarArchivo(file);
+    if (error) {
+      alert(error);
+      return;
+    }
     try {
       const att = await uploadAttachment(file, 'inline');
       editor.chain().focus().setImage({ src: att.url }).run();
@@ -75,6 +78,11 @@ export function RichTextEditor({ value, onChange, onInlineUploaded }: RichTextEd
     if (!editor) return;
     const [file] = await pickFile('video/mp4,video/webm', false);
     if (!file) return;
+    const error = validarArchivo(file);
+    if (error) {
+      alert(error);
+      return;
+    }
     try {
       const att = await uploadAttachment(file, 'inline');
       editor.chain().focus().setVideo({ src: att.url }).run();
@@ -88,8 +96,18 @@ export function RichTextEditor({ value, onChange, onInlineUploaded }: RichTextEd
     if (!editor) return;
     const files = await pickFile('image/*', true);
     if (files.length === 0) return;
+    const validos: File[] = [];
+    for (const file of files) {
+      const error = validarArchivo(file);
+      if (error) {
+        alert(error);
+        continue;
+      }
+      validos.push(file);
+    }
+    if (validos.length === 0) return;
     try {
-      const subidas = await Promise.all(files.map((f) => uploadAttachment(f, 'inline')));
+      const subidas = await Promise.all(validos.map((f) => uploadAttachment(f, 'inline')));
       editor.chain().focus().setGallery({ srcs: subidas.map((a) => a.url) }).run();
       subidas.forEach((a) => onInlineUploaded(a.id));
     } catch (e) {

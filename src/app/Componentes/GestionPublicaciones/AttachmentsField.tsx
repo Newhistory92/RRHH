@@ -3,6 +3,7 @@
 import React, { useCallback } from 'react';
 import { Paperclip, X, FileText } from 'lucide-react';
 import { uploadAttachment } from '@/app/util/uploadClient';
+import { validarArchivo } from './attachmentValidation';
 import type { PublicationAttachment } from '@/app/Interfas/Interfaces';
 
 interface AttachmentsFieldProps {
@@ -25,6 +26,11 @@ export function AttachmentsField({ attachments, onChange }: AttachmentsFieldProp
       const files = input.files ? Array.from(input.files) : [];
       let actuales = attachments;
       for (const file of files) {
+        const error = validarArchivo(file);
+        if (error) {
+          alert(error);
+          continue;
+        }
         try {
           const att = await uploadAttachment(file, 'adjunto');
           actuales = [...actuales, att];
