@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { apiClient } from '@/app/util/apiClient';
 import { RichTextEditor } from '@/app/Componentes/GestionPublicaciones/RichTextEditor';
 import { AttachmentsField } from '@/app/Componentes/GestionPublicaciones/AttachmentsField';
+import { PublicationsFilterBar, type AdminFiltros } from '@/app/Componentes/GestionPublicaciones/PublicationsFilterBar';
 import type {
   PublicationAdminRow, PublicationEditData, PublicationAttachment, PublicationTargetInput,
 } from '@/app/Interfas/Interfaces';
@@ -43,6 +44,8 @@ const EMPTY_FORM = {
   fechaPublicacion: '', fechaExpiracion: '',
 };
 
+const FILTROS_VACIOS: AdminFiltros = { texto: '', categoria: '', prioridad: '', estado: '', fechaDesde: '', fechaHasta: '' };
+
 export default function GestionPublicaciones() {
   const [modo, setModo] = useState<'lista' | 'form'>('lista');
   const [rows, setRows] = useState<PublicationAdminRow[]>([]);
@@ -59,21 +62,40 @@ export default function GestionPublicaciones() {
   const [targetOfficeIds, setTargetOfficeIds] = useState<number[]>([]);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState('');
-
-  const cargarLista = useCallback(() => {
-    apiClient
-      .get<{ publications: PublicationAdminRow[] }>('/publications')
-      .then((res) => setRows(res.publications || []))
-      .catch((e) => console.error('Error al listar publicaciones:', e));
-  }, []);
+  const [filtros, setFiltros] = useState<AdminFiltros>(FILTROS_VACIOS);
+  const [textoDebounced, setTextoDebounced] = useState('');
+  const [refetchTick, setRefetchTick] = useState(0);
+  const reqId = useRef(0);
 
   useEffect(() => {
-    cargarLista();
     apiClient
       .get<{ departments: DeptOption[] }>('/departments/')
       .then((res) => setDepts(res.departments || []))
       .catch((e) => console.error('Error al cargar organigrama:', e));
-  }, [cargarLista]);
+  }, []);
+
+  // Debounce del texto
+  useEffect(() => {
+    const t = setTimeout(() => setTextoDebounced(filtros.texto), 300);
+    return () => clearTimeout(t);
+  }, [filtros.texto]);
+
+  // Carga de la lista segun filtros (y refetch tras guardar)
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (textoDebounced.trim()) params.set('texto', textoDebounced.trim());
+    if (filtros.categoria) params.set('categoria', filtros.categoria);
+    if (filtros.prioridad) params.set('prioridad', filtros.prioridad);
+    if (filtros.estado) params.set('estado', filtros.estado);
+    if (filtros.fechaDesde) params.set('fechaDesde', filtros.fechaDesde);
+    if (filtros.fechaHasta) params.set('fechaHasta', filtros.fechaHasta);
+    const qs = params.toString();
+    const myId = ++reqId.current;
+    apiClient
+      .get<{ publications: PublicationAdminRow[] }>(`/publications${qs ? `?${qs}` : ''}`)
+      .then((res) => { if (myId === reqId.current) setRows(res.publications || []); })
+      .catch((e) => { if (myId === reqId.current) console.error('Error al listar publicaciones:', e); });
+  }, [textoDebounced, filtros.categoria, filtros.prioridad, filtros.estado, filtros.fechaDesde, filtros.fechaHasta, refetchTick]);
 
   const resetForm = () => {
     setForm({ ...EMPTY_FORM });
@@ -151,7 +173,7 @@ export default function GestionPublicaciones() {
       } else {
         await apiClient.post('/publications', payload);
       }
-      cargarLista();
+      setRefetchTick((t) => t + 1);
       setModo('lista');
     } catch (e) {
       setError((e as Error).message);
@@ -178,9 +200,21 @@ export default function GestionPublicaciones() {
             </button>
           </header>
 
+          <PublicationsFilterBar
+            filtros={filtros}
+            onChange={(patch) => setFiltros((f) => ({ ...f, ...patch }))}
+            onLimpiar={() => { setFiltros(FILTROS_VACIOS); setTextoDebounced(''); }}
+          />
+
+          <p className="text-sm text-muted-foreground">
+            {rows.length} publicaci{rows.length === 1 ? 'ón' : 'ones'}
+          </p>
+
           <div className="bg-card border border-border rounded-xl shadow-soft overflow-hidden">
             {rows.length === 0 ? (
-              <p className="p-8 text-center text-muted-foreground">No hay publicaciones todavía.</p>
+              <p className="p-8 text-center text-muted-foreground">
+                No se encontraron publicaciones con esos filtros.
+              </p>
             ) : (
               <table className="w-full text-sm">
                 <thead className="bg-background text-muted-foreground">
