@@ -20,7 +20,7 @@ export interface PageConfig {
   id: Page;
   label: string;
   icon: string; // Nombre del ícono de lucide-react para el Sidebar
-  section: "General" | "Gente" | "Organización" | "Aprendizaje" | "IA" | "Sistema";
+  section: "General" | "Gente" | "Organización" | "Aprendizaje" | "IA" | "Sistema" | "Activos";
   /** roleIds que pueden VER esta página en el sidebar */
   visibleFor: RoleId[];
   /** roleIds que pueden NAVEGAR a esta página */
@@ -143,6 +143,14 @@ export const PAGE_CONFIG: PageConfig[] = [
     accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
   },
   {
+    id: "activos-config",
+    label: "Configuración de Activos",
+    icon: "Boxes",
+    section: "Activos",
+    visibleFor: [ROLE_ID.ADMIN],
+    accessibleFor: [ROLE_ID.ADMIN],
+  },
+  {
     id: "admin",
     label: "Administración",
     icon: "Shield",
@@ -208,6 +216,7 @@ const SECTION_ORDER: PageConfig["section"][] = [
   "Organización",
   "Aprendizaje",
   "IA",
+  "Activos",
   "Sistema",
 ];
 
