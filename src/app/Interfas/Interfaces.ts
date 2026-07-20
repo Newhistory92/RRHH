@@ -687,7 +687,36 @@ export type Page =
   | "test"
   | "admin"
   | "inicio"
-  | "gestion-publicaciones";
+  | "gestion-publicaciones"
+  | "activos-config";
+
+export interface ActivoCategoria {
+  id: number;
+  nombre: string;
+  grupo: string;
+  montableEnPC: boolean;
+  requiereSerie: boolean;
+  vidaUtilAnios: number | null;
+}
+
+export interface ActivoFabricante {
+  id: number;
+  nombre: string;
+}
+
+export interface ActivoProveedor {
+  id: number;
+  nombre: string;
+  contacto: string | null;
+}
+
+export interface ActivoEstado {
+  id: number;
+  nombre: string;
+  codigo: string;
+  orden: number;
+  esCore: boolean;
+}
 
 export interface FeedPublication {
   id: number;
