@@ -151,6 +151,14 @@ export const PAGE_CONFIG: PageConfig[] = [
     accessibleFor: [ROLE_ID.ADMIN],
   },
   {
+    id: "activos-inventario",
+    label: "Inventario",
+    icon: "Package",
+    section: "Activos",
+    visibleFor: [ROLE_ID.ADMIN],
+    accessibleFor: [ROLE_ID.ADMIN],
+  },
+  {
     id: "admin",
     label: "Administración",
     icon: "Shield",

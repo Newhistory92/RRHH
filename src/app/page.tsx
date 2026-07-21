@@ -23,6 +23,7 @@ import AdminPage from '@/app/screens/Admin/Screen';
 import ConfiguracionLicencias from '@/app/screens/ConfiguracionLicencias/Screen';
 import GestionPublicaciones from '@/app/screens/GestionPublicaciones/Screen';
 import ActivosConfig from '@/app/screens/ActivosConfig/Screen';
+import ActivosInventario from '@/app/screens/ActivosInventario/Screen';
 import { PrimeReactProvider } from 'primereact/api';
 import "primereact/resources/themes/lara-light-pink/theme.css";
 import 'primeicons/primeicons.css';
@@ -167,6 +168,8 @@ export default function App() {
         return <TestPage />;
       case 'activos-config':
         return <ActivosConfig />;
+      case 'activos-inventario':
+        return <ActivosInventario />;
       case 'admin':
         // Solo ADMIN (id 1) puede llegar aquí, protegido por canAccess()
         return roleId === ROLE_ID.ADMIN ? <AdminPage /> : null;

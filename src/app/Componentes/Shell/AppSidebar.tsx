@@ -16,6 +16,7 @@ import {
   Home,
   Newspaper,
   Boxes,
+  Package,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -41,6 +42,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Home,
   Newspaper,
   Boxes,
+  Package,
 };
 
 interface AppSidebarProps {
