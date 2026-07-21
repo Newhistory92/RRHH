@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { apiClient } from '@/app/util/apiClient';
-import type { ActivoDetalle, ActivoCategoria, ActivoFabricante, ActivoEstado } from '@/app/Interfas/Interfaces';
-import { Search } from 'lucide-react';
+import type { ActivoDetalle, ActivoCategoria, ActivoFabricante, ActivoEstado, PCPart } from '@/app/Interfas/Interfaces';
+import { Search, Package } from 'lucide-react';
 
 interface DeptOption { id: number; nombre: string; offices: { id: number; nombre: string }[]; }
 interface EmpOption { id: number; name: string; }
@@ -49,6 +49,8 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
   const [codigoBusqueda, setCodigoBusqueda] = useState('');
+  const [pcpartQuery, setPcpartQuery] = useState('');
+  const [pcpartResults, setPcpartResults] = useState<PCPart[]>([]);
 
   useEffect(() => {
     apiClient.get<{ categorias: ActivoCategoria[] }>('/activos/config/categorias').then((r) => setCategorias(r.categorias || [])).catch(() => {});
@@ -60,6 +62,30 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
 
   const categoriaSel = categorias.find((c) => String(c.id) === f.categoriaId);
   const serieObligatoria = categoriaSel?.requiereSerie ?? false;
+  const montablePC = categoriaSel?.montableEnPC ?? false;
+  const nombreCategoria = categoriaSel?.nombre ?? '';
+
+  useEffect(() => {
+    if (!montablePC) { setPcpartResults([]); return; }
+    const q = pcpartQuery.trim();
+    const t = setTimeout(() => {
+      apiClient.get<{ resultados: PCPart[] }>(`/activos/pcparts?categoria=${encodeURIComponent(nombreCategoria)}&texto=${encodeURIComponent(q)}`)
+        .then((r) => setPcpartResults(r.resultados || []))
+        .catch(() => setPcpartResults([]));
+    }, 300);
+    return () => clearTimeout(t);
+  }, [pcpartQuery, montablePC, nombreCategoria]);
+
+  const elegirPcpart = (p: PCPart) => {
+    setF((s) => ({
+      ...s,
+      nombre: p.name,
+      imagenReferencial: p.image || s.imagenReferencial,
+      observaciones: p.specs || s.observaciones,
+    }));
+    setPcpartResults([]);
+    setPcpartQuery('');
+  };
 
   const buscarCodigo = async () => {
     if (!codigoBusqueda.trim()) return;
@@ -164,6 +190,34 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
         <div className="sm:col-span-2"><label className="text-xs text-muted-foreground">Imagen referencial (URL)</label><input value={f.imagenReferencial} onChange={(e) => setF({ ...f, imagenReferencial: e.target.value })} className={inputCls} /></div>
         <div className="sm:col-span-2"><label className="text-xs text-muted-foreground">Observaciones</label><textarea value={f.observaciones} onChange={(e) => setF({ ...f, observaciones: e.target.value })} className={inputCls} rows={2} /></div>
       </div>
+
+      {montablePC && (
+        <div className="border-t border-border pt-4">
+          <label className="text-sm font-semibold text-foreground flex items-center gap-2"><Package size={16} /> Buscar en catálogo (opcional)</label>
+          <p className="text-xs text-muted-foreground mb-2">Elegí un modelo de referencia para precargar nombre, imagen y specs. Podés ignorarlo y cargar a mano.</p>
+          <input
+            value={pcpartQuery}
+            onChange={(e) => setPcpartQuery(e.target.value)}
+            className={inputCls}
+            placeholder={`Buscar en el catálogo de ${nombreCategoria}…`}
+          />
+          {pcpartResults.length > 0 && (
+            <div className="mt-2 max-h-60 overflow-y-auto border border-border rounded-lg divide-y divide-border">
+              {pcpartResults.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => elegirPcpart(p)}
+                  className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted flex items-center gap-3"
+                >
+                  {p.image && <img src={p.image} alt="" className="w-8 h-8 object-contain rounded bg-white shrink-0" />}
+                  <span className="flex-1">{p.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="border-t border-border pt-4">
         <label className="text-sm font-semibold text-foreground">Responsable</label>
