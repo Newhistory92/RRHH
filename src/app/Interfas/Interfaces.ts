@@ -748,11 +748,22 @@ export interface ActivoListItem {
   efectivoDepartamentoNombre: string | null;
   efectivoOficinaId: number | null;
   efectivoOficinaNombre: string | null;
+  pcPadreId: number | null;
+  pcPadreNombre: string | null;
+  puedeAlbergarComponentes: boolean;
   createdAt: string | null;
   updatedAt: string | null;
 }
 
 export type ActivoDetalle = ActivoListItem;
+
+export interface PCPart {
+  id: number;
+  category: string;
+  name: string;
+  image: string | null;
+  specs: string | null;
+}
 
 export interface FeedPublication {
   id: number;
