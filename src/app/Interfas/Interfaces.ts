@@ -744,6 +744,10 @@ export interface ActivoListItem {
   responsableEmpleadoId: number | null;
   responsableOficinaId: number | null;
   responsableDepartamentoId: number | null;
+  efectivoDepartamentoId: number | null;
+  efectivoDepartamentoNombre: string | null;
+  efectivoOficinaId: number | null;
+  efectivoOficinaNombre: string | null;
   createdAt: string | null;
   updatedAt: string | null;
 }

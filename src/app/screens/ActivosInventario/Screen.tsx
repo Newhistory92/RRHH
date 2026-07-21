@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { apiClient } from '@/app/util/apiClient';
 import { ActivoForm } from '@/app/Componentes/ActivosInventario/ActivoForm';
 import { CodigoLabels } from '@/app/Componentes/ActivosInventario/CodigoLabels';
 import type { ActivoListItem, ActivoDetalle, ActivoCategoria, ActivoEstado } from '@/app/Interfas/Interfaces';
 import { Plus, ArrowLeft, Pencil } from 'lucide-react';
+
+interface DeptOption { id: number; nombre: string; offices: { id: number; nombre: string }[]; }
 
 type Modo = 'lista' | 'ficha' | 'form';
 
@@ -16,7 +18,8 @@ export default function ActivosInventario() {
   const [editando, setEditando] = useState<ActivoDetalle | null>(null);
   const [categorias, setCategorias] = useState<ActivoCategoria[]>([]);
   const [estados, setEstados] = useState<ActivoEstado[]>([]);
-  const [filtros, setFiltros] = useState({ categoriaId: '', grupo: '', estadoId: '', texto: '' });
+  const [depts, setDepts] = useState<DeptOption[]>([]);
+  const [filtros, setFiltros] = useState({ categoriaId: '', grupo: '', estadoId: '', texto: '', departamentoId: '', oficinaId: '' });
   const [cambioEstado, setCambioEstado] = useState<{ estadoId: string; observacion: string } | null>(null);
 
   const cargar = useCallback(() => {
@@ -25,6 +28,8 @@ export default function ActivosInventario() {
     if (filtros.grupo) params.set('grupo', filtros.grupo);
     if (filtros.estadoId) params.set('estadoId', filtros.estadoId);
     if (filtros.texto.trim()) params.set('texto', filtros.texto.trim());
+    if (filtros.departamentoId) params.set('departamentoId', filtros.departamentoId);
+    if (filtros.oficinaId) params.set('oficinaId', filtros.oficinaId);
     const qs = params.toString();
     apiClient.get<{ activos: ActivoListItem[] }>(`/activos${qs ? `?${qs}` : ''}`)
       .then((r) => setRows(r.activos || []))
@@ -34,6 +39,7 @@ export default function ActivosInventario() {
   useEffect(() => {
     apiClient.get<{ categorias: ActivoCategoria[] }>('/activos/config/categorias').then((r) => setCategorias(r.categorias || [])).catch(() => {});
     apiClient.get<{ estados: ActivoEstado[] }>('/activos/config/estados').then((r) => setEstados(r.estados || [])).catch(() => {});
+    apiClient.get<{ departments: DeptOption[] }>('/departments/').then((r) => setDepts(r.departments || [])).catch(() => {});
   }, []);
 
   useEffect(() => { if (modo === 'lista') cargar(); }, [modo, cargar]);
@@ -60,6 +66,24 @@ export default function ActivosInventario() {
   };
 
   const inputCls = 'px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm';
+
+  const grupos = useMemo(() => {
+    const porDepto = new Map<string, Map<string, ActivoListItem[]>>();
+    for (const r of rows) {
+      const depto = r.efectivoDepartamentoNombre || 'Sin departamento';
+      const oficina = r.efectivoOficinaNombre || 'Sin oficina';
+      if (!porDepto.has(depto)) porDepto.set(depto, new Map());
+      const porOficina = porDepto.get(depto)!;
+      if (!porOficina.has(oficina)) porOficina.set(oficina, []);
+      porOficina.get(oficina)!.push(r);
+    }
+    return Array.from(porDepto.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([depto, porOficina]) => ({
+        depto,
+        oficinas: Array.from(porOficina.entries()).sort(([a], [b]) => a.localeCompare(b)),
+      }));
+  }, [rows]);
 
   if (modo === 'form') {
     return (
@@ -165,6 +189,25 @@ export default function ActivosInventario() {
             <option value="">Todos los estados</option>
             {estados.map((x) => <option key={x.id} value={x.id}>{x.nombre}</option>)}
           </select>
+          <select
+            value={filtros.departamentoId}
+            onChange={(e) => setFiltros({ ...filtros, departamentoId: e.target.value, oficinaId: '' })}
+            className={inputCls}
+          >
+            <option value="">Todos los departamentos</option>
+            {depts.map((d) => <option key={d.id} value={d.id}>{d.nombre}</option>)}
+          </select>
+          <select
+            value={filtros.oficinaId}
+            onChange={(e) => setFiltros({ ...filtros, oficinaId: e.target.value })}
+            className={inputCls}
+          >
+            <option value="">Todas las oficinas</option>
+            {(filtros.departamentoId
+              ? depts.find((d) => String(d.id) === filtros.departamentoId)?.offices || []
+              : depts.flatMap((d) => d.offices)
+            ).map((o) => <option key={o.id} value={o.id}>{o.nombre}</option>)}
+          </select>
         </div>
 
         <div className="bg-card border border-border rounded-xl shadow-soft overflow-x-auto">
@@ -183,15 +226,28 @@ export default function ActivosInventario() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r) => (
-                  <tr key={r.id} onClick={() => abrirFicha(r.id)} className="border-t border-border hover:bg-muted cursor-pointer">
-                    <td className="px-4 py-3 text-foreground">{r.numeroInventario}</td>
-                    <td className="px-4 py-3 text-foreground">{r.nombre}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{r.categoriaNombre}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{r.estadoNombre}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{r.responsableNombre ?? '—'}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{r.fechaAlta ? new Date(r.fechaAlta).toLocaleDateString('es-AR') : '—'}</td>
-                  </tr>
+                {grupos.map((g) => (
+                  <React.Fragment key={g.depto}>
+                    {g.oficinas.map(([oficina, items]) => (
+                      <React.Fragment key={`${g.depto}-${oficina}`}>
+                        <tr className="bg-muted/50 border-t border-border">
+                          <td colSpan={6} className="px-4 py-2 text-xs font-semibold text-foreground">
+                            {g.depto} · {oficina}
+                          </td>
+                        </tr>
+                        {items.map((r) => (
+                          <tr key={r.id} onClick={() => abrirFicha(r.id)} className="border-t border-border hover:bg-muted cursor-pointer">
+                            <td className="px-4 py-3 text-foreground">{r.numeroInventario}</td>
+                            <td className="px-4 py-3 text-foreground">{r.nombre}</td>
+                            <td className="px-4 py-3 text-muted-foreground">{r.categoriaNombre}</td>
+                            <td className="px-4 py-3 text-muted-foreground">{r.estadoNombre}</td>
+                            <td className="px-4 py-3 text-muted-foreground">{r.responsableNombre ?? '—'}</td>
+                            <td className="px-4 py-3 text-muted-foreground">{r.fechaAlta ? new Date(r.fechaAlta).toLocaleDateString('es-AR') : '—'}</td>
+                          </tr>
+                        ))}
+                      </React.Fragment>
+                    ))}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
