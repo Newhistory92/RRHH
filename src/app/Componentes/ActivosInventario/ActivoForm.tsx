@@ -51,6 +51,7 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
   const [codigoBusqueda, setCodigoBusqueda] = useState('');
   const [pcpartQuery, setPcpartQuery] = useState('');
   const [pcpartResults, setPcpartResults] = useState<PCPart[]>([]);
+  const [pcpartAbierto, setPcpartAbierto] = useState(false);
 
   useEffect(() => {
     apiClient.get<{ categorias: ActivoCategoria[] }>('/activos/config/categorias').then((r) => setCategorias(r.categorias || [])).catch(() => {});
@@ -85,6 +86,7 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
     }));
     setPcpartResults([]);
     setPcpartQuery('');
+    setPcpartAbierto(false);
   };
 
   const buscarCodigo = async () => {
@@ -159,15 +161,55 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div><label className="text-xs text-muted-foreground">N° de inventario *</label><input value={f.numeroInventario} onChange={(e) => setF({ ...f, numeroInventario: e.target.value })} className={inputCls} /></div>
-        <div><label className="text-xs text-muted-foreground">Nombre / especificación *</label><input value={f.nombre} onChange={(e) => setF({ ...f, nombre: e.target.value })} className={inputCls} /></div>
         <div>
           <label className="text-xs text-muted-foreground">Categoría *</label>
-          <select value={f.categoriaId} onChange={(e) => setF({ ...f, categoriaId: e.target.value })} className={inputCls}>
+          <select
+            value={f.categoriaId}
+            onChange={(e) => {
+              setF({ ...f, categoriaId: e.target.value });
+              setPcpartResults([]); setPcpartQuery(''); setPcpartAbierto(false);
+            }}
+            className={inputCls}
+          >
             <option value="">—</option>
             {categorias.map((c) => <option key={c.id} value={c.id}>{c.nombre} ({c.grupo})</option>)}
           </select>
         </div>
+        <div className="relative">
+          <label className="text-xs text-muted-foreground flex items-center gap-1">
+            Nombre / especificación *
+            {montablePC && <span className="inline-flex items-center gap-1 text-primary"><Package size={12} /> catálogo disponible</span>}
+          </label>
+          <input
+            value={f.nombre}
+            onChange={(e) => {
+              const val = e.target.value;
+              setF({ ...f, nombre: val });
+              if (montablePC) { setPcpartQuery(val); setPcpartAbierto(true); }
+            }}
+            onFocus={() => { if (montablePC && pcpartResults.length > 0) setPcpartAbierto(true); }}
+            onBlur={() => setTimeout(() => setPcpartAbierto(false), 150)}
+            className={inputCls}
+            placeholder={montablePC ? `Escribí para buscar en el catálogo de ${nombreCategoria}…` : undefined}
+            autoComplete="off"
+          />
+          {montablePC && pcpartAbierto && pcpartResults.length > 0 && (
+            <div className="absolute z-20 mt-1 w-full max-h-60 overflow-y-auto border border-border rounded-lg bg-card shadow-soft divide-y divide-border">
+              {pcpartResults.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onMouseDown={(e) => { e.preventDefault(); elegirPcpart(p); }}
+                  className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted flex items-center gap-3"
+                >
+                  {p.image && <img src={p.image} alt="" className="w-8 h-8 object-contain rounded bg-white shrink-0" />}
+                  <span className="flex-1">{p.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div><label className="text-xs text-muted-foreground">N° de inventario *</label><input value={f.numeroInventario} onChange={(e) => setF({ ...f, numeroInventario: e.target.value })} className={inputCls} /></div>
         <div>
           <label className="text-xs text-muted-foreground">Fabricante</label>
           <select value={f.fabricanteId} onChange={(e) => setF({ ...f, fabricanteId: e.target.value })} className={inputCls}>
@@ -190,34 +232,6 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
         <div className="sm:col-span-2"><label className="text-xs text-muted-foreground">Imagen referencial (URL)</label><input value={f.imagenReferencial} onChange={(e) => setF({ ...f, imagenReferencial: e.target.value })} className={inputCls} /></div>
         <div className="sm:col-span-2"><label className="text-xs text-muted-foreground">Observaciones</label><textarea value={f.observaciones} onChange={(e) => setF({ ...f, observaciones: e.target.value })} className={inputCls} rows={2} /></div>
       </div>
-
-      {montablePC && (
-        <div className="border-t border-border pt-4">
-          <label className="text-sm font-semibold text-foreground flex items-center gap-2"><Package size={16} /> Buscar en catálogo (opcional)</label>
-          <p className="text-xs text-muted-foreground mb-2">Elegí un modelo de referencia para precargar nombre, imagen y specs. Podés ignorarlo y cargar a mano.</p>
-          <input
-            value={pcpartQuery}
-            onChange={(e) => setPcpartQuery(e.target.value)}
-            className={inputCls}
-            placeholder={`Buscar en el catálogo de ${nombreCategoria}…`}
-          />
-          {pcpartResults.length > 0 && (
-            <div className="mt-2 max-h-60 overflow-y-auto border border-border rounded-lg divide-y divide-border">
-              {pcpartResults.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => elegirPcpart(p)}
-                  className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted flex items-center gap-3"
-                >
-                  {p.image && <img src={p.image} alt="" className="w-8 h-8 object-contain rounded bg-white shrink-0" />}
-                  <span className="flex-1">{p.name}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
 
       <div className="border-t border-border pt-4">
         <label className="text-sm font-semibold text-foreground">Responsable</label>
