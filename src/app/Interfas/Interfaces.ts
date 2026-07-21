@@ -688,7 +688,8 @@ export type Page =
   | "admin"
   | "inicio"
   | "gestion-publicaciones"
-  | "activos-config";
+  | "activos-config"
+  | "activos-inventario";
 
 export interface ActivoCategoria {
   id: number;
@@ -717,6 +718,37 @@ export interface ActivoEstado {
   orden: number;
   esCore: boolean;
 }
+
+export interface ActivoListItem {
+  id: number;
+  numeroInventario: string;
+  nombre: string;
+  categoriaId: number;
+  categoriaNombre: string;
+  grupo: string;
+  requiereSerie: boolean;
+  fabricanteId: number | null;
+  fabricanteNombre: string | null;
+  estadoId: number;
+  estadoNombre: string;
+  estadoCodigo: string;
+  fechaAlta: string | null;
+  anio: number | null;
+  observaciones: string | null;
+  imagenReferencial: string | null;
+  numeroSerie: string | null;
+  codigoBarras: string | null;
+  codigoQR: string | null;
+  responsableTipo: string | null;
+  responsableNombre: string | null;
+  responsableEmpleadoId: number | null;
+  responsableOficinaId: number | null;
+  responsableDepartamentoId: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export type ActivoDetalle = ActivoListItem;
 
 export interface FeedPublication {
   id: number;
