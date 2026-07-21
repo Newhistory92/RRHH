@@ -5,7 +5,7 @@ import { apiClient } from '@/app/util/apiClient';
 import { ActivoForm } from '@/app/Componentes/ActivosInventario/ActivoForm';
 import { CodigoLabels } from '@/app/Componentes/ActivosInventario/CodigoLabels';
 import type { ActivoListItem, ActivoDetalle, ActivoCategoria, ActivoEstado } from '@/app/Interfas/Interfaces';
-import { Plus, ArrowLeft, Pencil } from 'lucide-react';
+import { Plus, ArrowLeft, Pencil, Cpu, Trash2, Repeat } from 'lucide-react';
 
 interface DeptOption { id: number; nombre: string; offices: { id: number; nombre: string }[]; }
 
@@ -21,6 +21,14 @@ export default function ActivosInventario() {
   const [depts, setDepts] = useState<DeptOption[]>([]);
   const [filtros, setFiltros] = useState({ categoriaId: '', grupo: '', estadoId: '', texto: '', departamentoId: '', oficinaId: '' });
   const [cambioEstado, setCambioEstado] = useState<{ estadoId: string; observacion: string } | null>(null);
+  const [componentes, setComponentes] = useState<ActivoListItem[]>([]);
+  const [libres, setLibres] = useState<ActivoListItem[]>([]);
+  const [agregando, setAgregando] = useState(false);
+  const [libreSel, setLibreSel] = useState('');
+  const [reemplazando, setReemplazando] = useState(false);
+  const [saleSel, setSaleSel] = useState('');
+  const [entraSel, setEntraSel] = useState('');
+  const [obsReemplazo, setObsReemplazo] = useState('');
 
   const cargar = useCallback(() => {
     const params = new URLSearchParams();
@@ -44,11 +52,19 @@ export default function ActivosInventario() {
 
   useEffect(() => { if (modo === 'lista') cargar(); }, [modo, cargar]);
 
+  const cargarComponentes = (pcId: number) => {
+    apiClient.get<{ componentes: ActivoListItem[] }>(`/activos/${pcId}/componentes`)
+      .then((r) => setComponentes(r.componentes || []))
+      .catch(() => setComponentes([]));
+  };
+
   const abrirFicha = async (id: number) => {
     try {
       const det = await apiClient.get<ActivoDetalle>(`/activos/${id}`);
       setSeleccionado(det);
       setModo('ficha');
+      if (det.puedeAlbergarComponentes) cargarComponentes(id);
+      else setComponentes([]);
     } catch (e) { console.error(e); }
   };
 
@@ -62,6 +78,47 @@ export default function ActivosInventario() {
       setCambioEstado(null);
       const det = await apiClient.get<ActivoDetalle>(`/activos/${seleccionado.id}`);
       setSeleccionado(det);
+    } catch (e) { alert((e as Error).message); }
+  };
+
+  const abrirAgregar = async () => {
+    try {
+      const r = await apiClient.get<{ componentes: ActivoListItem[] }>('/activos/componentes-libres');
+      setLibres(r.componentes || []); setLibreSel(''); setAgregando(true);
+    } catch (e) { alert((e as Error).message); }
+  };
+
+  const confirmarAgregar = async () => {
+    if (!seleccionado || !libreSel) return;
+    try {
+      await apiClient.post(`/activos/${seleccionado.id}/componentes`, { componenteId: Number(libreSel) });
+      setAgregando(false); cargarComponentes(seleccionado.id);
+    } catch (e) { alert((e as Error).message); }
+  };
+
+  const quitarComponente = async (compId: number) => {
+    if (!seleccionado) return;
+    if (!confirm('¿Quitar este componente de la PC?')) return;
+    try {
+      await apiClient.delete(`/activos/${seleccionado.id}/componentes/${compId}`);
+      cargarComponentes(seleccionado.id);
+    } catch (e) { alert((e as Error).message); }
+  };
+
+  const abrirReemplazar = async () => {
+    try {
+      const r = await apiClient.get<{ componentes: ActivoListItem[] }>('/activos/componentes-libres');
+      setLibres(r.componentes || []); setSaleSel(''); setEntraSel(''); setObsReemplazo(''); setReemplazando(true);
+    } catch (e) { alert((e as Error).message); }
+  };
+
+  const confirmarReemplazar = async () => {
+    if (!seleccionado || !saleSel || !entraSel) return;
+    try {
+      await apiClient.post(`/activos/${seleccionado.id}/componentes/reemplazar`, {
+        saleComponenteId: Number(saleSel), entraComponenteId: Number(entraSel), observacion: obsReemplazo || null,
+      });
+      setReemplazando(false); cargarComponentes(seleccionado.id);
     } catch (e) { alert((e as Error).message); }
   };
 
@@ -137,6 +194,52 @@ export default function ActivosInventario() {
           )}
 
           <CodigoLabels valorQR={a.codigoQR || a.numeroInventario} valorBarras={a.codigoBarras || a.numeroInventario} />
+
+          {a.pcPadreId && (
+            <div className="bg-card border border-border rounded-xl shadow-soft p-4 flex items-center gap-2 text-sm">
+              <Cpu size={16} className="text-muted-foreground" />
+              <span className="text-muted-foreground">Instalado en:</span>
+              <button onClick={() => abrirFicha(a.pcPadreId!)} className="text-primary hover:underline">{a.pcPadreNombre ?? `#${a.pcPadreId}`}</button>
+            </div>
+          )}
+
+          {a.puedeAlbergarComponentes && (
+            <div className="bg-card border border-border rounded-xl shadow-soft p-4 sm:p-6 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="font-heading text-lg font-bold text-foreground flex items-center gap-2"><Cpu size={18} /> Componentes instalados</h2>
+                <div className="flex gap-2">
+                  <button onClick={abrirAgregar} className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90"><Plus size={16} /> Agregar</button>
+                  <button onClick={abrirReemplazar} disabled={componentes.length === 0} className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-border text-foreground text-sm hover:bg-muted disabled:opacity-50"><Repeat size={16} /> Reemplazar</button>
+                </div>
+              </div>
+              {componentes.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Esta PC no tiene componentes instalados.</p>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead className="text-muted-foreground">
+                    <tr>
+                      <th className="text-left font-medium py-2">Componente</th>
+                      <th className="text-left font-medium py-2">Categoría</th>
+                      <th className="text-left font-medium py-2">N° serie</th>
+                      <th className="text-left font-medium py-2">Estado</th>
+                      <th className="py-2"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {componentes.map((c) => (
+                      <tr key={c.id} className="border-t border-border">
+                        <td className="py-2"><button onClick={() => abrirFicha(c.id)} className="text-primary hover:underline">{c.nombre}</button></td>
+                        <td className="py-2 text-muted-foreground">{c.categoriaNombre}</td>
+                        <td className="py-2 text-muted-foreground">{c.numeroSerie ?? '—'}</td>
+                        <td className="py-2 text-muted-foreground">{c.estadoNombre}</td>
+                        <td className="py-2 text-right"><button onClick={() => quitarComponente(c.id)} className="inline-flex items-center gap-1 text-error hover:opacity-80 text-xs"><Trash2 size={14} /> Quitar</button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
         </div>
 
         {cambioEstado && (
@@ -156,6 +259,56 @@ export default function ActivosInventario() {
               <div className="flex justify-end gap-2">
                 <button onClick={() => setCambioEstado(null)} className="px-3 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted">Cancelar</button>
                 <button onClick={guardarEstado} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90">Guardar</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {agregando && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setAgregando(false)}>
+            <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md space-y-4" onClick={(e) => e.stopPropagation()}>
+              <h3 className="font-heading text-lg font-bold text-foreground">Agregar componente</h3>
+              <div>
+                <label className="text-xs text-muted-foreground">Componente libre</label>
+                <select value={libreSel} onChange={(e) => setLibreSel(e.target.value)} className={`w-full mt-1 ${inputCls}`}>
+                  <option value="">— Elegí un componente —</option>
+                  {libres.map((c) => <option key={c.id} value={c.id}>{c.nombre} ({c.categoriaNombre})</option>)}
+                </select>
+                {libres.length === 0 && <p className="text-xs text-muted-foreground mt-1">No hay componentes libres. Cargá uno desde &quot;Nuevo activo&quot;.</p>}
+              </div>
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setAgregando(false)} className="px-3 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted">Cancelar</button>
+                <button onClick={confirmarAgregar} disabled={!libreSel} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50">Instalar</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {reemplazando && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setReemplazando(false)}>
+            <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md space-y-4" onClick={(e) => e.stopPropagation()}>
+              <h3 className="font-heading text-lg font-bold text-foreground">Reemplazar componente</h3>
+              <div>
+                <label className="text-xs text-muted-foreground">Sale (instalado)</label>
+                <select value={saleSel} onChange={(e) => setSaleSel(e.target.value)} className={`w-full mt-1 ${inputCls}`}>
+                  <option value="">— Elegí el que sale —</option>
+                  {componentes.map((c) => <option key={c.id} value={c.id}>{c.nombre} ({c.categoriaNombre})</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Entra (libre)</label>
+                <select value={entraSel} onChange={(e) => setEntraSel(e.target.value)} className={`w-full mt-1 ${inputCls}`}>
+                  <option value="">— Elegí el que entra —</option>
+                  {libres.map((c) => <option key={c.id} value={c.id}>{c.nombre} ({c.categoriaNombre})</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Motivo / observación</label>
+                <textarea value={obsReemplazo} onChange={(e) => setObsReemplazo(e.target.value)} className={`w-full mt-1 ${inputCls}`} rows={2} />
+              </div>
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setReemplazando(false)} className="px-3 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted">Cancelar</button>
+                <button onClick={confirmarReemplazar} disabled={!saleSel || !entraSel} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50">Reemplazar</button>
               </div>
             </div>
           </div>
