@@ -7,9 +7,32 @@ import { CodigoLabels } from '@/app/Componentes/ActivosInventario/CodigoLabels';
 import { BuscadorCatalogoPCParts } from '@/app/Componentes/ActivosInventario/BuscadorCatalogoPCParts';
 import { formatearSpecs } from '@/app/util/pcparts';
 import type { ActivoListItem, ActivoDetalle, ActivoCategoria, ActivoEstado, PCPart } from '@/app/Interfas/Interfaces';
-import { Plus, ArrowLeft, Pencil, Cpu, Trash2, Repeat } from 'lucide-react';
+import { Plus, ArrowLeft, Pencil, Cpu, Trash2, Repeat, ChevronDown } from 'lucide-react';
 
 interface DeptOption { id: number; nombre: string; offices: { id: number; nombre: string }[]; }
+
+// Codigos estables (ActivoEstado.codigo) considerados "problematicos": estos activos
+// se muestran en una seccion colapsable aparte del listado principal, no mezclados
+// con los estados de uso normal (disponible/asignado/en_deposito/prestado/en_garantia).
+const ESTADOS_PROBLEMA = new Set(['en_reparacion', 'danado', 'extraviado', 'robado', 'dado_de_baja']);
+
+function agruparPorDeptoOficina(lista: ActivoListItem[]) {
+  const porDepto = new Map<string, Map<string, ActivoListItem[]>>();
+  for (const r of lista) {
+    const depto = r.efectivoDepartamentoNombre || 'Sin departamento';
+    const oficina = r.efectivoOficinaNombre || 'Sin oficina';
+    if (!porDepto.has(depto)) porDepto.set(depto, new Map());
+    const porOficina = porDepto.get(depto)!;
+    if (!porOficina.has(oficina)) porOficina.set(oficina, []);
+    porOficina.get(oficina)!.push(r);
+  }
+  return Array.from(porDepto.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([depto, porOficina]) => ({
+      depto,
+      oficinas: Array.from(porOficina.entries()).sort(([a], [b]) => a.localeCompare(b)),
+    }));
+}
 
 type Modo = 'lista' | 'ficha' | 'form';
 
@@ -41,6 +64,8 @@ export default function ActivosInventario() {
   const [creandoComponente, setCreandoComponente] = useState(false);
   const [errorNuevo, setErrorNuevo] = useState('');
   const [modoEntrada, setModoEntrada] = useState<'existente' | 'nuevo'>('existente');
+  const [estadoSalienteId, setEstadoSalienteId] = useState('');
+  const [mostrarProblema, setMostrarProblema] = useState(false);
 
   const categoriasMontables = categorias.filter((c) => c.montableEnPC);
   const categoriaNuevaSel = categoriasMontables.find((c) => String(c.id) === nuevoCategoriaId);
@@ -173,6 +198,7 @@ export default function ActivosInventario() {
     try {
       const r = await apiClient.get<{ componentes: ActivoListItem[] }>('/activos/componentes-libres');
       setLibres(r.componentes || []); setSaleSel(''); setEntraSel(''); setObsReemplazo(''); setReemplazando(true);
+      setEstadoSalienteId('');
       setModoEntrada('existente');
       setNuevoCategoriaId(''); setNuevoNombre(''); setNuevoNumeroInventario('');
       setNuevoNumeroSerie(''); setNuevoImagen(''); setNuevoObservaciones(''); setErrorNuevo('');
@@ -222,6 +248,7 @@ export default function ActivosInventario() {
     try {
       await apiClient.post(`/activos/${seleccionado.id}/componentes/reemplazar`, {
         saleComponenteId: Number(saleSel), entraComponenteId: entraId, observacion: obsReemplazo || null,
+        estadoSalienteId: estadoSalienteId ? Number(estadoSalienteId) : null,
       });
       setReemplazando(false); cargarComponentes(seleccionado.id);
     } catch (e) {
@@ -231,23 +258,34 @@ export default function ActivosInventario() {
 
   const inputCls = 'px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm';
 
-  const grupos = useMemo(() => {
-    const porDepto = new Map<string, Map<string, ActivoListItem[]>>();
-    for (const r of rows) {
-      const depto = r.efectivoDepartamentoNombre || 'Sin departamento';
-      const oficina = r.efectivoOficinaNombre || 'Sin oficina';
-      if (!porDepto.has(depto)) porDepto.set(depto, new Map());
-      const porOficina = porDepto.get(depto)!;
-      if (!porOficina.has(oficina)) porOficina.set(oficina, []);
-      porOficina.get(oficina)!.push(r);
-    }
-    return Array.from(porDepto.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([depto, porOficina]) => ({
-        depto,
-        oficinas: Array.from(porOficina.entries()).sort(([a], [b]) => a.localeCompare(b)),
-      }));
-  }, [rows]);
+  const rowsPrincipales = useMemo(() => rows.filter((r) => !ESTADOS_PROBLEMA.has(r.estadoCodigo)), [rows]);
+  const rowsProblema = useMemo(() => rows.filter((r) => ESTADOS_PROBLEMA.has(r.estadoCodigo)), [rows]);
+  const grupos = useMemo(() => agruparPorDeptoOficina(rowsPrincipales), [rowsPrincipales]);
+  const gruposProblema = useMemo(() => agruparPorDeptoOficina(rowsProblema), [rowsProblema]);
+
+  const renderFilasGrupos = (lista: typeof grupos) => lista.map((g) => (
+    <React.Fragment key={g.depto}>
+      {g.oficinas.map(([oficina, items]) => (
+        <React.Fragment key={`${g.depto}-${oficina}`}>
+          <tr className="bg-muted/50 border-t border-border">
+            <td colSpan={6} className="px-4 py-2 text-xs font-semibold text-foreground">
+              {g.depto} · {oficina}
+            </td>
+          </tr>
+          {items.map((r) => (
+            <tr key={r.id} onClick={() => abrirFicha(r.id)} className="border-t border-border hover:bg-muted cursor-pointer">
+              <td className="px-4 py-3 text-foreground">{r.numeroInventario}</td>
+              <td className="px-4 py-3 text-foreground">{r.nombre}</td>
+              <td className="px-4 py-3 text-muted-foreground">{r.categoriaNombre}</td>
+              <td className="px-4 py-3 text-muted-foreground">{r.estadoNombre}</td>
+              <td className="px-4 py-3 text-muted-foreground">{r.responsableNombre ?? '—'}</td>
+              <td className="px-4 py-3 text-muted-foreground">{r.fechaAlta ? new Date(r.fechaAlta).toLocaleDateString('es-AR') : '—'}</td>
+            </tr>
+          ))}
+        </React.Fragment>
+      ))}
+    </React.Fragment>
+  ));
 
   if (modo === 'form') {
     return (
@@ -462,10 +500,27 @@ export default function ActivosInventario() {
 
               <div>
                 <label className="text-xs text-muted-foreground">Sale (instalado)</label>
-                <select value={saleSel} onChange={(e) => setSaleSel(e.target.value)} className={`w-full mt-1 ${inputCls}`}>
+                <select
+                  value={saleSel}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSaleSel(val);
+                    const comp = componentes.find((c) => String(c.id) === val);
+                    setEstadoSalienteId(comp ? String(comp.estadoId) : '');
+                  }}
+                  className={`w-full mt-1 ${inputCls}`}
+                >
                   <option value="">— Elegí el que sale —</option>
                   {componentes.map((c) => <option key={c.id} value={c.id}>{c.nombre} ({c.categoriaNombre})</option>)}
                 </select>
+                {saleSel && (
+                  <div className="mt-2">
+                    <label className="text-xs text-muted-foreground">Estado al salir</label>
+                    <select value={estadoSalienteId} onChange={(e) => setEstadoSalienteId(e.target.value)} className={`w-full mt-1 ${inputCls}`}>
+                      {estados.map((x) => <option key={x.id} value={x.id}>{x.nombre}</option>)}
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -616,33 +671,41 @@ export default function ActivosInventario() {
                 </tr>
               </thead>
               <tbody>
-                {grupos.map((g) => (
-                  <React.Fragment key={g.depto}>
-                    {g.oficinas.map(([oficina, items]) => (
-                      <React.Fragment key={`${g.depto}-${oficina}`}>
-                        <tr className="bg-muted/50 border-t border-border">
-                          <td colSpan={6} className="px-4 py-2 text-xs font-semibold text-foreground">
-                            {g.depto} · {oficina}
-                          </td>
-                        </tr>
-                        {items.map((r) => (
-                          <tr key={r.id} onClick={() => abrirFicha(r.id)} className="border-t border-border hover:bg-muted cursor-pointer">
-                            <td className="px-4 py-3 text-foreground">{r.numeroInventario}</td>
-                            <td className="px-4 py-3 text-foreground">{r.nombre}</td>
-                            <td className="px-4 py-3 text-muted-foreground">{r.categoriaNombre}</td>
-                            <td className="px-4 py-3 text-muted-foreground">{r.estadoNombre}</td>
-                            <td className="px-4 py-3 text-muted-foreground">{r.responsableNombre ?? '—'}</td>
-                            <td className="px-4 py-3 text-muted-foreground">{r.fechaAlta ? new Date(r.fechaAlta).toLocaleDateString('es-AR') : '—'}</td>
-                          </tr>
-                        ))}
-                      </React.Fragment>
-                    ))}
-                  </React.Fragment>
-                ))}
+                {renderFilasGrupos(grupos)}
               </tbody>
             </table>
           )}
         </div>
+
+        {gruposProblema.length > 0 && (
+          <div className="bg-card border border-border rounded-xl shadow-soft">
+            <button
+              type="button"
+              onClick={() => setMostrarProblema((v) => !v)}
+              className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-foreground hover:bg-muted rounded-xl"
+            >
+              <span>Estados problemáticos ({rowsProblema.length})</span>
+              <ChevronDown size={16} className={`transition-transform ${mostrarProblema ? 'rotate-180' : ''}`} />
+            </button>
+            {mostrarProblema && (
+              <div className="overflow-x-auto border-t border-border">
+                <table className="w-full text-sm">
+                  <thead className="bg-background text-muted-foreground">
+                    <tr>
+                      <th className="text-left font-medium px-4 py-3">N° inventario</th>
+                      <th className="text-left font-medium px-4 py-3">Nombre</th>
+                      <th className="text-left font-medium px-4 py-3">Categoría</th>
+                      <th className="text-left font-medium px-4 py-3">Estado</th>
+                      <th className="text-left font-medium px-4 py-3">Responsable</th>
+                      <th className="text-left font-medium px-4 py-3">Fecha alta</th>
+                    </tr>
+                  </thead>
+                  <tbody>{renderFilasGrupos(gruposProblema)}</tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
