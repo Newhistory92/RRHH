@@ -4,13 +4,15 @@ import React, { useEffect, useState } from 'react';
 import { apiClient } from '@/app/util/apiClient';
 import type { ActivoDetalle, ActivoCategoria, ActivoFabricante, ActivoEstado, PCPart } from '@/app/Interfas/Interfaces';
 import { Search, Package } from 'lucide-react';
+import { formatearSpecs } from '@/app/util/pcparts';
+import { BuscadorCatalogoPCParts } from './BuscadorCatalogoPCParts';
 
 interface DeptOption { id: number; nombre: string; offices: { id: number; nombre: string }[]; }
 interface EmpOption { id: number; name: string; }
 
 interface ActivoFormProps {
   activo: ActivoDetalle | null;
-  onGuardado: () => void;
+  onGuardado: (id: number) => void;
   onCancelar: () => void;
 }
 
@@ -20,40 +22,6 @@ const RESP_TIPOS = [
   { value: 'oficina', label: 'Oficina' },
   { value: 'departamento', label: 'Departamento' },
 ];
-
-/** Convierte el JSON crudo de specs de PCParts en una descripcion legible
- * linea por linea (una entrada por clave), sin necesidad de conocer el
- * esquema especifico de cada una de las 25 categorias del dataset. */
-function formatearSpecs(specsJson: string | null): string {
-  if (!specsJson) return '';
-  let obj: Record<string, unknown>;
-  try {
-    obj = JSON.parse(specsJson);
-  } catch {
-    return specsJson;
-  }
-  const etiqueta = (clave: string) =>
-    clave
-      .replace(/_/g, ' ')
-      .replace(/([a-z])([A-Z])/g, '$1 $2')
-      .replace(/\b\w/g, (c) => c.toUpperCase());
-  const formatearValor = (v: unknown): string | null => {
-    if (v === null || v === undefined || v === '') return null;
-    if (Array.isArray(v)) {
-      if (v.length === 2 && typeof v[0] === 'number' && typeof v[1] === 'number') return `${v[0]} - ${v[1]}`;
-      return v.map((x) => String(x)).join(', ');
-    }
-    if (typeof v === 'boolean') return v ? 'Sí' : 'No';
-    return String(v);
-  };
-  return Object.entries(obj)
-    .map(([clave, v]) => {
-      const valor = formatearValor(v);
-      return valor !== null ? `${etiqueta(clave)}: ${valor}` : null;
-    })
-    .filter((linea): linea is string => linea !== null)
-    .join('\n');
-}
 
 export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) {
   const [categorias, setCategorias] = useState<ActivoCategoria[]>([]);
@@ -83,9 +51,6 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
   const [codigoBusqueda, setCodigoBusqueda] = useState('');
-  const [pcpartQuery, setPcpartQuery] = useState('');
-  const [pcpartResults, setPcpartResults] = useState<PCPart[]>([]);
-  const [pcpartAbierto, setPcpartAbierto] = useState(false);
 
   useEffect(() => {
     apiClient.get<{ categorias: ActivoCategoria[] }>('/activos/config/categorias').then((r) => setCategorias(r.categorias || [])).catch(() => {});
@@ -100,17 +65,6 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
   const montablePC = categoriaSel?.montableEnPC ?? false;
   const nombreCategoria = categoriaSel?.nombre ?? '';
 
-  useEffect(() => {
-    if (!montablePC) { setPcpartResults([]); return; }
-    const q = pcpartQuery.trim();
-    const t = setTimeout(() => {
-      apiClient.get<{ resultados: PCPart[] }>(`/activos/pcparts?categoria=${encodeURIComponent(nombreCategoria)}&texto=${encodeURIComponent(q)}`)
-        .then((r) => setPcpartResults(r.resultados || []))
-        .catch(() => setPcpartResults([]));
-    }, 300);
-    return () => clearTimeout(t);
-  }, [pcpartQuery, montablePC, nombreCategoria]);
-
   const elegirPcpart = (p: PCPart) => {
     setF((s) => ({
       ...s,
@@ -118,9 +72,6 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
       imagenReferencial: p.image || s.imagenReferencial,
       observaciones: formatearSpecs(p.specs) || s.observaciones,
     }));
-    setPcpartResults([]);
-    setPcpartQuery('');
-    setPcpartAbierto(false);
   };
 
   const buscarCodigo = async () => {
@@ -166,9 +117,15 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
     };
     setGuardando(true);
     try {
-      if (activo) await apiClient.put(`/activos/${activo.id}`, payload);
-      else await apiClient.post('/activos', payload);
-      onGuardado();
+      let id: number;
+      if (activo) {
+        await apiClient.put(`/activos/${activo.id}`, payload);
+        id = activo.id;
+      } else {
+        const res = await apiClient.post<{ id: number }>('/activos', payload);
+        id = res.id;
+      }
+      onGuardado(id);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -199,10 +156,7 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
           <label className="text-xs text-muted-foreground">Categoría *</label>
           <select
             value={f.categoriaId}
-            onChange={(e) => {
-              setF({ ...f, categoriaId: e.target.value });
-              setPcpartResults([]); setPcpartQuery(''); setPcpartAbierto(false);
-            }}
+            onChange={(e) => setF({ ...f, categoriaId: e.target.value })}
             className={inputCls}
           >
             <option value="">—</option>
@@ -214,34 +168,15 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
             Nombre / especificación *
             {montablePC && <span className="inline-flex items-center gap-1 text-primary"><Package size={12} /> catálogo disponible</span>}
           </label>
-          <input
-            value={f.nombre}
-            onChange={(e) => {
-              const val = e.target.value;
-              setF({ ...f, nombre: val });
-              if (montablePC) { setPcpartQuery(val); setPcpartAbierto(true); }
-            }}
-            onFocus={() => { if (montablePC && pcpartResults.length > 0) setPcpartAbierto(true); }}
-            onBlur={() => setTimeout(() => setPcpartAbierto(false), 150)}
-            className={inputCls}
+          <BuscadorCatalogoPCParts
+            categoriaNombre={nombreCategoria}
+            activo={montablePC}
+            valor={f.nombre}
+            onCambiarValor={(v) => setF({ ...f, nombre: v })}
+            onElegir={elegirPcpart}
             placeholder={montablePC ? `Escribí para buscar en el catálogo de ${nombreCategoria}…` : undefined}
-            autoComplete="off"
+            className={inputCls}
           />
-          {montablePC && pcpartAbierto && pcpartResults.length > 0 && (
-            <div className="absolute z-20 mt-1 w-full max-h-60 overflow-y-auto border border-border rounded-lg bg-card shadow-soft divide-y divide-border">
-              {pcpartResults.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onMouseDown={(e) => { e.preventDefault(); elegirPcpart(p); }}
-                  className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted flex items-center gap-3"
-                >
-                  {p.image && <img src={p.image} alt="" className="w-8 h-8 object-contain rounded bg-white shrink-0" />}
-                  <span className="flex-1">{p.name}</span>
-                </button>
-              ))}
-            </div>
-          )}
         </div>
         <div><label className="text-xs text-muted-foreground">N° de inventario *</label><input value={f.numeroInventario} onChange={(e) => setF({ ...f, numeroInventario: e.target.value })} className={inputCls} /></div>
         <div>
