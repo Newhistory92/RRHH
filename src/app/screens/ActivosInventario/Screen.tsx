@@ -426,6 +426,11 @@ export default function ActivosInventario() {
                   <option value="">— Elegí el que entra —</option>
                   {libres.map((c) => <option key={c.id} value={c.id}>{c.nombre} ({c.categoriaNombre})</option>)}
                 </select>
+                {libres.length === 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    No hay componentes libres para instalar. Creá uno nuevo sin instalarlo, o quitá uno de esta PC primero.
+                  </p>
+                )}
               </div>
               <div>
                 <label className="text-xs text-muted-foreground">Motivo / observación</label>
