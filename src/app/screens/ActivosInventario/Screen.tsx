@@ -40,6 +40,7 @@ export default function ActivosInventario() {
   const [nuevoObservaciones, setNuevoObservaciones] = useState('');
   const [creandoComponente, setCreandoComponente] = useState(false);
   const [errorNuevo, setErrorNuevo] = useState('');
+  const [modoEntrada, setModoEntrada] = useState<'existente' | 'nuevo'>('existente');
 
   const categoriasMontables = categorias.filter((c) => c.montableEnPC);
   const categoriaNuevaSel = categoriasMontables.find((c) => String(c.id) === nuevoCategoriaId);
@@ -172,17 +173,60 @@ export default function ActivosInventario() {
     try {
       const r = await apiClient.get<{ componentes: ActivoListItem[] }>('/activos/componentes-libres');
       setLibres(r.componentes || []); setSaleSel(''); setEntraSel(''); setObsReemplazo(''); setReemplazando(true);
+      setModoEntrada('existente');
+      setNuevoCategoriaId(''); setNuevoNombre(''); setNuevoNumeroInventario('');
+      setNuevoNumeroSerie(''); setNuevoImagen(''); setNuevoObservaciones(''); setErrorNuevo('');
     } catch (e) { alert((e as Error).message); }
   };
 
   const confirmarReemplazar = async () => {
-    if (!seleccionado || !saleSel || !entraSel) return;
+    if (!seleccionado || !saleSel) return;
+    setErrorNuevo('');
+    let entraId: number;
+    if (modoEntrada === 'existente') {
+      if (!entraSel) { setErrorNuevo('Elegí el componente que entra.'); return; }
+      entraId = Number(entraSel);
+    } else {
+      if (!nuevoCategoriaId) { setErrorNuevo('Elegí una categoría.'); return; }
+      if (!nuevoNombre.trim()) { setErrorNuevo('El nombre es obligatorio.'); return; }
+      if (!nuevoNumeroInventario.trim()) { setErrorNuevo('El número de inventario es obligatorio.'); return; }
+      if (serieObligatoriaNueva && !nuevoNumeroSerie.trim()) { setErrorNuevo('Esta categoría requiere número de serie.'); return; }
+      setCreandoComponente(true);
+      try {
+        const res = await apiClient.post<{ id: number }>('/activos', {
+          numeroInventario: nuevoNumeroInventario.trim(),
+          nombre: nuevoNombre.trim(),
+          categoriaId: Number(nuevoCategoriaId),
+          fabricanteId: null,
+          estadoId: null,
+          fechaAlta: new Date().toISOString().slice(0, 10),
+          anio: null,
+          observaciones: nuevoObservaciones || null,
+          imagenReferencial: nuevoImagen || null,
+          numeroSerie: nuevoNumeroSerie || null,
+          codigoBarras: null,
+          codigoQR: null,
+          responsableTipo: null,
+          responsableEmpleadoId: null,
+          responsableOficinaId: null,
+          responsableDepartamentoId: null,
+        });
+        entraId = res.id;
+      } catch (e) {
+        setErrorNuevo((e as Error).message);
+        setCreandoComponente(false);
+        return;
+      }
+      setCreandoComponente(false);
+    }
     try {
       await apiClient.post(`/activos/${seleccionado.id}/componentes/reemplazar`, {
-        saleComponenteId: Number(saleSel), entraComponenteId: Number(entraSel), observacion: obsReemplazo || null,
+        saleComponenteId: Number(saleSel), entraComponenteId: entraId, observacion: obsReemplazo || null,
       });
       setReemplazando(false); cargarComponentes(seleccionado.id);
-    } catch (e) { alert((e as Error).message); }
+    } catch (e) {
+      setErrorNuevo((e as Error).message);
+    }
   };
 
   const inputCls = 'px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm';
@@ -411,8 +455,11 @@ export default function ActivosInventario() {
 
         {reemplazando && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setReemplazando(false)}>
-            <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-card border border-border rounded-xl p-6 w-full max-w-lg space-y-4" onClick={(e) => e.stopPropagation()}>
               <h3 className="font-heading text-lg font-bold text-foreground">Reemplazar componente</h3>
+
+              {errorNuevo && <div className="bg-error-soft text-error-soft-foreground border border-error rounded-lg px-4 py-2 text-sm">{errorNuevo}</div>}
+
               <div>
                 <label className="text-xs text-muted-foreground">Sale (instalado)</label>
                 <select value={saleSel} onChange={(e) => setSaleSel(e.target.value)} className={`w-full mt-1 ${inputCls}`}>
@@ -420,25 +467,85 @@ export default function ActivosInventario() {
                   {componentes.map((c) => <option key={c.id} value={c.id}>{c.nombre} ({c.categoriaNombre})</option>)}
                 </select>
               </div>
+
               <div>
-                <label className="text-xs text-muted-foreground">Entra (libre)</label>
-                <select value={entraSel} onChange={(e) => setEntraSel(e.target.value)} className={`w-full mt-1 ${inputCls}`}>
-                  <option value="">— Elegí el que entra —</option>
-                  {libres.map((c) => <option key={c.id} value={c.id}>{c.nombre} ({c.categoriaNombre})</option>)}
-                </select>
-                {libres.length === 0 && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    No hay componentes libres para instalar. Creá uno nuevo sin instalarlo, o quitá uno de esta PC primero.
-                  </p>
+                <label className="text-xs text-muted-foreground mb-1 block">Entra</label>
+                <div className="flex gap-2 border-b border-border">
+                  <button
+                    type="button"
+                    onClick={() => setModoEntrada('existente')}
+                    className={`px-3 py-2 text-sm border-b-2 -mb-px ${modoEntrada === 'existente' ? 'border-primary text-primary font-semibold' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                  >
+                    Elegir existente
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setModoEntrada('nuevo')}
+                    className={`px-3 py-2 text-sm border-b-2 -mb-px ${modoEntrada === 'nuevo' ? 'border-primary text-primary font-semibold' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                  >
+                    Crear nuevo
+                  </button>
+                </div>
+
+                {modoEntrada === 'existente' ? (
+                  <div className="mt-2">
+                    <select value={entraSel} onChange={(e) => setEntraSel(e.target.value)} className={`w-full ${inputCls}`}>
+                      <option value="">— Elegí el que entra —</option>
+                      {libres.map((c) => <option key={c.id} value={c.id}>{c.nombre} ({c.categoriaNombre})</option>)}
+                    </select>
+                    {libres.length === 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        No hay componentes libres. Probá la pestaña &quot;Crear nuevo&quot;.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                    <div>
+                      <label className="text-xs text-muted-foreground">Categoría *</label>
+                      <select value={nuevoCategoriaId} onChange={(e) => { setNuevoCategoriaId(e.target.value); setNuevoNombre(''); }} className={`w-full mt-1 ${inputCls}`}>
+                        <option value="">—</option>
+                        {categoriasMontables.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                      </select>
+                    </div>
+                    <div className="relative">
+                      <label className="text-xs text-muted-foreground">Nombre / especificación *</label>
+                      <BuscadorCatalogoPCParts
+                        categoriaNombre={nombreCategoriaNueva}
+                        activo={!!nuevoCategoriaId}
+                        valor={nuevoNombre}
+                        onCambiarValor={setNuevoNombre}
+                        onElegir={elegirPcpartNuevo}
+                        placeholder={nuevoCategoriaId ? `Buscar en el catálogo de ${nombreCategoriaNueva}…` : 'Elegí una categoría primero'}
+                        className={`w-full mt-1 ${inputCls}`}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">N° de inventario *</label>
+                      <input value={nuevoNumeroInventario} onChange={(e) => setNuevoNumeroInventario(e.target.value)} className={`w-full mt-1 ${inputCls}`} />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">N° de serie {serieObligatoriaNueva && <span className="text-error">*</span>}</label>
+                      <input value={nuevoNumeroSerie} onChange={(e) => setNuevoNumeroSerie(e.target.value)} className={`w-full mt-1 ${inputCls}`} />
+                    </div>
+                  </div>
                 )}
               </div>
+
               <div>
                 <label className="text-xs text-muted-foreground">Motivo / observación</label>
                 <textarea value={obsReemplazo} onChange={(e) => setObsReemplazo(e.target.value)} className={`w-full mt-1 ${inputCls}`} rows={2} />
               </div>
+
               <div className="flex justify-end gap-2">
                 <button onClick={() => setReemplazando(false)} className="px-3 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted">Cancelar</button>
-                <button onClick={confirmarReemplazar} disabled={!saleSel || !entraSel} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50">Reemplazar</button>
+                <button
+                  onClick={confirmarReemplazar}
+                  disabled={!saleSel || (modoEntrada === 'existente' && !entraSel) || creandoComponente}
+                  className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50"
+                >
+                  {creandoComponente ? 'Creando…' : 'Reemplazar'}
+                </button>
               </div>
             </div>
           </div>
