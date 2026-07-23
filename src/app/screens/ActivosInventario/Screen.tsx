@@ -4,7 +4,9 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { apiClient } from '@/app/util/apiClient';
 import { ActivoForm } from '@/app/Componentes/ActivosInventario/ActivoForm';
 import { CodigoLabels } from '@/app/Componentes/ActivosInventario/CodigoLabels';
-import type { ActivoListItem, ActivoDetalle, ActivoCategoria, ActivoEstado } from '@/app/Interfas/Interfaces';
+import { BuscadorCatalogoPCParts } from '@/app/Componentes/ActivosInventario/BuscadorCatalogoPCParts';
+import { formatearSpecs } from '@/app/util/pcparts';
+import type { ActivoListItem, ActivoDetalle, ActivoCategoria, ActivoEstado, PCPart } from '@/app/Interfas/Interfaces';
 import { Plus, ArrowLeft, Pencil, Cpu, Trash2, Repeat } from 'lucide-react';
 
 interface DeptOption { id: number; nombre: string; offices: { id: number; nombre: string }[]; }
@@ -29,6 +31,20 @@ export default function ActivosInventario() {
   const [saleSel, setSaleSel] = useState('');
   const [entraSel, setEntraSel] = useState('');
   const [obsReemplazo, setObsReemplazo] = useState('');
+  const [modoAgregar, setModoAgregar] = useState<'existente' | 'nuevo'>('existente');
+  const [nuevoCategoriaId, setNuevoCategoriaId] = useState('');
+  const [nuevoNombre, setNuevoNombre] = useState('');
+  const [nuevoNumeroInventario, setNuevoNumeroInventario] = useState('');
+  const [nuevoNumeroSerie, setNuevoNumeroSerie] = useState('');
+  const [nuevoImagen, setNuevoImagen] = useState('');
+  const [nuevoObservaciones, setNuevoObservaciones] = useState('');
+  const [creandoComponente, setCreandoComponente] = useState(false);
+  const [errorNuevo, setErrorNuevo] = useState('');
+
+  const categoriasMontables = categorias.filter((c) => c.montableEnPC);
+  const categoriaNuevaSel = categoriasMontables.find((c) => String(c.id) === nuevoCategoriaId);
+  const serieObligatoriaNueva = categoriaNuevaSel?.requiereSerie ?? false;
+  const nombreCategoriaNueva = categoriaNuevaSel?.nombre ?? '';
 
   const cargar = useCallback(() => {
     const params = new URLSearchParams();
@@ -85,6 +101,9 @@ export default function ActivosInventario() {
     try {
       const r = await apiClient.get<{ componentes: ActivoListItem[] }>('/activos/componentes-libres');
       setLibres(r.componentes || []); setLibreSel(''); setAgregando(true);
+      setModoAgregar('existente');
+      setNuevoCategoriaId(''); setNuevoNombre(''); setNuevoNumeroInventario('');
+      setNuevoNumeroSerie(''); setNuevoImagen(''); setNuevoObservaciones(''); setErrorNuevo('');
     } catch (e) { alert((e as Error).message); }
   };
 
@@ -94,6 +113,50 @@ export default function ActivosInventario() {
       await apiClient.post(`/activos/${seleccionado.id}/componentes`, { componenteId: Number(libreSel) });
       setAgregando(false); cargarComponentes(seleccionado.id);
     } catch (e) { alert((e as Error).message); }
+  };
+
+  const elegirPcpartNuevo = (p: PCPart) => {
+    setNuevoNombre(p.name);
+    if (p.image) setNuevoImagen(p.image);
+    const specs = formatearSpecs(p.specs);
+    if (specs) setNuevoObservaciones(specs);
+  };
+
+  const confirmarCrearComponente = async () => {
+    if (!seleccionado) return;
+    setErrorNuevo('');
+    if (!nuevoCategoriaId) { setErrorNuevo('Elegí una categoría.'); return; }
+    if (!nuevoNombre.trim()) { setErrorNuevo('El nombre es obligatorio.'); return; }
+    if (!nuevoNumeroInventario.trim()) { setErrorNuevo('El número de inventario es obligatorio.'); return; }
+    if (serieObligatoriaNueva && !nuevoNumeroSerie.trim()) { setErrorNuevo('Esta categoría requiere número de serie.'); return; }
+    setCreandoComponente(true);
+    try {
+      const res = await apiClient.post<{ id: number }>('/activos', {
+        numeroInventario: nuevoNumeroInventario.trim(),
+        nombre: nuevoNombre.trim(),
+        categoriaId: Number(nuevoCategoriaId),
+        fabricanteId: null,
+        estadoId: null,
+        fechaAlta: new Date().toISOString().slice(0, 10),
+        anio: null,
+        observaciones: nuevoObservaciones || null,
+        imagenReferencial: nuevoImagen || null,
+        numeroSerie: nuevoNumeroSerie || null,
+        codigoBarras: null,
+        codigoQR: null,
+        responsableTipo: null,
+        responsableEmpleadoId: null,
+        responsableOficinaId: null,
+        responsableDepartamentoId: null,
+      });
+      await apiClient.post(`/activos/${seleccionado.id}/componentes`, { componenteId: res.id });
+      setAgregando(false);
+      cargarComponentes(seleccionado.id);
+    } catch (e) {
+      setErrorNuevo((e as Error).message);
+    } finally {
+      setCreandoComponente(false);
+    }
   };
 
   const quitarComponente = async (compId: number) => {
@@ -150,7 +213,10 @@ export default function ActivosInventario() {
           <ActivoForm
             activo={editando}
             onCancelar={() => setModo(editando ? 'ficha' : 'lista')}
-            onGuardado={() => { setModo('lista'); setEditando(null); }}
+            onGuardado={(id) => {
+              if (editando) { setModo('lista'); setEditando(null); }
+              else { setEditando(null); abrirFicha(id); }
+            }}
           />
         </div>
       </div>
@@ -266,20 +332,79 @@ export default function ActivosInventario() {
 
         {agregando && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setAgregando(false)}>
-            <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-card border border-border rounded-xl p-6 w-full max-w-lg space-y-4" onClick={(e) => e.stopPropagation()}>
               <h3 className="font-heading text-lg font-bold text-foreground">Agregar componente</h3>
-              <div>
-                <label className="text-xs text-muted-foreground">Componente libre</label>
-                <select value={libreSel} onChange={(e) => setLibreSel(e.target.value)} className={`w-full mt-1 ${inputCls}`}>
-                  <option value="">— Elegí un componente —</option>
-                  {libres.map((c) => <option key={c.id} value={c.id}>{c.nombre} ({c.categoriaNombre})</option>)}
-                </select>
-                {libres.length === 0 && <p className="text-xs text-muted-foreground mt-1">No hay componentes libres. Cargá uno desde &quot;Nuevo activo&quot;.</p>}
+
+              <div className="flex gap-2 border-b border-border">
+                <button
+                  type="button"
+                  onClick={() => setModoAgregar('existente')}
+                  className={`px-3 py-2 text-sm border-b-2 -mb-px ${modoAgregar === 'existente' ? 'border-primary text-primary font-semibold' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                >
+                  Elegir existente
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModoAgregar('nuevo')}
+                  className={`px-3 py-2 text-sm border-b-2 -mb-px ${modoAgregar === 'nuevo' ? 'border-primary text-primary font-semibold' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                >
+                  Crear nuevo
+                </button>
               </div>
-              <div className="flex justify-end gap-2">
-                <button onClick={() => setAgregando(false)} className="px-3 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted">Cancelar</button>
-                <button onClick={confirmarAgregar} disabled={!libreSel} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50">Instalar</button>
-              </div>
+
+              {modoAgregar === 'existente' ? (
+                <>
+                  <div>
+                    <label className="text-xs text-muted-foreground">Componente libre</label>
+                    <select value={libreSel} onChange={(e) => setLibreSel(e.target.value)} className={`w-full mt-1 ${inputCls}`}>
+                      <option value="">— Elegí un componente —</option>
+                      {libres.map((c) => <option key={c.id} value={c.id}>{c.nombre} ({c.categoriaNombre})</option>)}
+                    </select>
+                    {libres.length === 0 && <p className="text-xs text-muted-foreground mt-1">No hay componentes libres. Probá la pestaña &quot;Crear nuevo&quot;.</p>}
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <button onClick={() => setAgregando(false)} className="px-3 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted">Cancelar</button>
+                    <button onClick={confirmarAgregar} disabled={!libreSel} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50">Instalar</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {errorNuevo && <div className="bg-error-soft text-error-soft-foreground border border-error rounded-lg px-4 py-2 text-sm">{errorNuevo}</div>}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-muted-foreground">Categoría *</label>
+                      <select value={nuevoCategoriaId} onChange={(e) => { setNuevoCategoriaId(e.target.value); setNuevoNombre(''); }} className={`w-full mt-1 ${inputCls}`}>
+                        <option value="">—</option>
+                        {categoriasMontables.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                      </select>
+                    </div>
+                    <div className="relative">
+                      <label className="text-xs text-muted-foreground">Nombre / especificación *</label>
+                      <BuscadorCatalogoPCParts
+                        categoriaNombre={nombreCategoriaNueva}
+                        activo={!!nuevoCategoriaId}
+                        valor={nuevoNombre}
+                        onCambiarValor={setNuevoNombre}
+                        onElegir={elegirPcpartNuevo}
+                        placeholder={nuevoCategoriaId ? `Buscar en el catálogo de ${nombreCategoriaNueva}…` : 'Elegí una categoría primero'}
+                        className={`w-full mt-1 ${inputCls}`}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">N° de inventario *</label>
+                      <input value={nuevoNumeroInventario} onChange={(e) => setNuevoNumeroInventario(e.target.value)} className={`w-full mt-1 ${inputCls}`} />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">N° de serie {serieObligatoriaNueva && <span className="text-error">*</span>}</label>
+                      <input value={nuevoNumeroSerie} onChange={(e) => setNuevoNumeroSerie(e.target.value)} className={`w-full mt-1 ${inputCls}`} />
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <button onClick={() => setAgregando(false)} className="px-3 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted">Cancelar</button>
+                    <button onClick={confirmarCrearComponente} disabled={creandoComponente} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50">{creandoComponente ? 'Creando…' : 'Crear e instalar'}</button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
