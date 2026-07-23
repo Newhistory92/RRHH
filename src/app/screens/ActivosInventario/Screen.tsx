@@ -341,7 +341,15 @@ export default function ActivosInventario() {
             <img src={a.imagenReferencial} alt={a.nombre} className="max-w-xs rounded-xl border border-border" />
           )}
 
-          <CodigoLabels valorQR={a.codigoQR || a.numeroInventario} valorBarras={a.codigoBarras || a.numeroInventario} />
+          <CodigoLabels
+            valorQR={a.codigoQR || a.numeroInventario}
+            valorBarras={a.codigoBarras || a.numeroInventario}
+            nombre={a.nombre}
+            numeroInventario={a.numeroInventario}
+            numeroSerie={a.numeroSerie}
+            departamento={a.efectivoDepartamentoNombre}
+            oficina={a.efectivoOficinaNombre}
+          />
 
           {a.pcPadreId && (
             <div className="bg-card border border-border rounded-xl shadow-soft p-4 flex items-center gap-2 text-sm">

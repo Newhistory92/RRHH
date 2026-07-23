@@ -197,3 +197,19 @@ body {
   font-size: 0.7rem !important;
   line-height: 1.6rem !important;
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-etiqueta,
+  .print-etiqueta * {
+    visibility: visible;
+  }
+  .print-etiqueta {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
