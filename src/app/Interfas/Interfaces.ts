@@ -765,6 +765,19 @@ export interface PCPart {
   specs: string | null;
 }
 
+export interface HistorialItem {
+  id: number;
+  activoId: number;
+  accion: string;
+  campo: string | null;
+  valorAnterior: string | null;
+  valorNuevo: string | null;
+  usuarioEmpleadoId: number | null;
+  usuarioNombre: string | null;
+  observacion: string | null;
+  createdAt: string | null;
+}
+
 export interface FeedPublication {
   id: number;
   titulo: string;
