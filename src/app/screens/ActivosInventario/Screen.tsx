@@ -6,8 +6,9 @@ import { ActivoForm } from '@/app/Componentes/ActivosInventario/ActivoForm';
 import { CodigoLabels } from '@/app/Componentes/ActivosInventario/CodigoLabels';
 import { BuscadorCatalogoPCParts } from '@/app/Componentes/ActivosInventario/BuscadorCatalogoPCParts';
 import { formatearSpecs } from '@/app/util/pcparts';
-import type { ActivoListItem, ActivoDetalle, ActivoCategoria, ActivoEstado, PCPart } from '@/app/Interfas/Interfaces';
-import { Plus, ArrowLeft, Pencil, Cpu, Trash2, Repeat, ChevronDown, UserCog } from 'lucide-react';
+import { reportarDano, resolveAttachmentUrl } from '@/app/util/uploadClient';
+import type { ActivoListItem, ActivoDetalle, ActivoCategoria, ActivoEstado, PCPart, HistorialItem } from '@/app/Interfas/Interfaces';
+import { Plus, ArrowLeft, Pencil, Cpu, Trash2, Repeat, ChevronDown, UserCog, AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface DeptOption { id: number; nombre: string; offices: { id: number; nombre: string }[]; }
 interface EmpOption { id: number; name: string; }
@@ -40,6 +41,35 @@ function agruparPorDeptoOficina(lista: ActivoListItem[]) {
       depto,
       oficinas: Array.from(porOficina.entries()).sort(([a], [b]) => a.localeCompare(b)),
     }));
+}
+
+function etiquetaHistorial(h: HistorialItem): { icono: string; texto: string } {
+  switch (h.accion) {
+    case 'creacion':
+      return { icono: 'creacion', texto: 'Activo creado' };
+    case 'cambio_estado':
+      return { icono: 'estado', texto: `Cambio de estado: ${h.valorAnterior ?? '—'} → ${h.valorNuevo ?? '—'}` };
+    case 'cambio_responsable':
+      return { icono: 'responsable', texto: `Cambio de responsable: ${h.valorAnterior ?? 'Sin asignar'} → ${h.valorNuevo ?? 'Sin asignar'}` };
+    case 'modificacion':
+      return { icono: 'otro', texto: 'Datos modificados' };
+    case 'baja':
+      return { icono: 'baja', texto: 'Dado de baja' };
+    case 'instalacion':
+      return { icono: 'componente', texto: 'Instalado en una PC' };
+    case 'desinstalacion':
+      return { icono: 'componente', texto: 'Desinstalado de una PC' };
+    case 'componente_agregado':
+      return { icono: 'componente', texto: `Componente agregado: ${h.valorNuevo ?? '—'}` };
+    case 'componente_quitado':
+      return { icono: 'componente', texto: `Componente quitado: ${h.valorAnterior ?? '—'}` };
+    case 'reemplazo':
+      return { icono: 'componente', texto: 'Componente reemplazado' };
+    case 'dano_reportado':
+      return { icono: 'dano', texto: `Daño reportado${h.valorAnterior ? ` (estaba: ${h.valorAnterior})` : ''}` };
+    default:
+      return { icono: 'otro', texto: h.accion };
+  }
 }
 
 type Modo = 'lista' | 'ficha' | 'form';
@@ -83,6 +113,12 @@ export default function ActivosInventario() {
   const [transferObs, setTransferObs] = useState('');
   const [transferError, setTransferError] = useState('');
   const [transfiriendoGuardando, setTransfiriendoGuardando] = useState(false);
+  const [historial, setHistorial] = useState<HistorialItem[]>([]);
+  const [reportandoDano, setReportandoDano] = useState(false);
+  const [danoDescripcion, setDanoDescripcion] = useState('');
+  const [danoFoto, setDanoFoto] = useState<File | null>(null);
+  const [danoError, setDanoError] = useState('');
+  const [danoGuardando, setDanoGuardando] = useState(false);
 
   const categoriasMontables = categorias.filter((c) => c.montableEnPC);
   const categoriaNuevaSel = categoriasMontables.find((c) => String(c.id) === nuevoCategoriaId);
@@ -119,6 +155,12 @@ export default function ActivosInventario() {
       .catch(() => setComponentes([]));
   };
 
+  const cargarHistorial = (id: number) => {
+    apiClient.get<{ historial: HistorialItem[] }>(`/activos/${id}/historial`)
+      .then((r) => setHistorial(r.historial || []))
+      .catch(() => setHistorial([]));
+  };
+
   const abrirFicha = async (id: number) => {
     try {
       const det = await apiClient.get<ActivoDetalle>(`/activos/${id}`);
@@ -126,6 +168,7 @@ export default function ActivosInventario() {
       setModo('ficha');
       if (det.puedeAlbergarComponentes) cargarComponentes(id);
       else setComponentes([]);
+      cargarHistorial(id);
     } catch (e) { console.error(e); }
   };
 
@@ -175,6 +218,28 @@ export default function ActivosInventario() {
       setTransferError((e as Error).message);
     } finally {
       setTransfiriendoGuardando(false);
+    }
+  };
+
+  const abrirReportarDano = () => {
+    setDanoDescripcion(''); setDanoFoto(null); setDanoError(''); setReportandoDano(true);
+  };
+
+  const confirmarReportarDano = async () => {
+    if (!seleccionado) return;
+    setDanoError('');
+    if (!danoDescripcion.trim()) { setDanoError('La descripción es obligatoria.'); return; }
+    setDanoGuardando(true);
+    try {
+      await reportarDano(seleccionado.id, danoDescripcion.trim(), danoFoto);
+      setReportandoDano(false);
+      const det = await apiClient.get<ActivoDetalle>(`/activos/${seleccionado.id}`);
+      setSeleccionado(det);
+      cargarHistorial(seleccionado.id);
+    } catch (e) {
+      setDanoError((e as Error).message);
+    } finally {
+      setDanoGuardando(false);
     }
   };
 
@@ -378,6 +443,7 @@ export default function ActivosInventario() {
               <button onClick={() => { setEditando(a); setModo('form'); }} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border text-foreground hover:bg-muted"><Pencil size={16} /> Editar</button>
               <button onClick={() => setCambioEstado({ estadoId: String(a.estadoId), observacion: '' })} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:opacity-90">Cambiar estado</button>
               <button onClick={abrirTransferir} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border text-foreground hover:bg-muted"><UserCog size={16} /> Transferir</button>
+              <button onClick={abrirReportarDano} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-error text-error hover:bg-error-soft"><AlertTriangle size={16} /> Reportar daño</button>
             </div>
           </div>
 
@@ -452,6 +518,40 @@ export default function ActivosInventario() {
               )}
             </div>
           )}
+
+          <div className="bg-card border border-border rounded-xl shadow-soft p-4 sm:p-6 space-y-3">
+            <h2 className="font-heading text-lg font-bold text-foreground flex items-center gap-2"><RefreshCw size={18} /> Historial</h2>
+            {historial.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Sin movimientos registrados.</p>
+            ) : (
+              <ul className="space-y-3">
+                {historial.map((h) => {
+                  const { texto } = etiquetaHistorial(h);
+                  return (
+                    <li key={h.id} className="flex items-start gap-3 border-t border-border pt-3 first:border-t-0 first:pt-0">
+                      <RefreshCw size={16} className="text-muted-foreground mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-foreground">{texto}</p>
+                        {h.accion === 'dano_reportado' && h.observacion && (
+                          <p className="text-xs text-muted-foreground mt-0.5">{h.observacion}</p>
+                        )}
+                        {h.accion === 'dano_reportado' && h.valorNuevo && (
+                          <a href={resolveAttachmentUrl(h.valorNuevo)} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">Ver foto</a>
+                        )}
+                        {h.accion !== 'dano_reportado' && h.observacion && (
+                          <p className="text-xs text-muted-foreground mt-0.5">{h.observacion}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {h.createdAt ? new Date(h.createdAt).toLocaleString('es-AR') : ''}
+                          {h.usuarioNombre ? ` · ${h.usuarioNombre}` : ''}
+                        </p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
         </div>
 
         {cambioEstado && (
@@ -527,6 +627,27 @@ export default function ActivosInventario() {
               <div className="flex justify-end gap-2">
                 <button onClick={() => setTransfiriendo(false)} className="px-3 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted">Cancelar</button>
                 <button onClick={confirmarTransferir} disabled={transfiriendoGuardando} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50">{transfiriendoGuardando ? 'Guardando…' : 'Transferir'}</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {reportandoDano && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setReportandoDano(false)}>
+            <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md space-y-4" onClick={(e) => e.stopPropagation()}>
+              <h3 className="font-heading text-lg font-bold text-foreground">Reportar daño</h3>
+              {danoError && <div className="bg-error-soft text-error-soft-foreground border border-error rounded-lg px-4 py-2 text-sm">{danoError}</div>}
+              <div>
+                <label className="text-xs text-muted-foreground">Descripción *</label>
+                <textarea value={danoDescripcion} onChange={(e) => setDanoDescripcion(e.target.value)} className={`w-full mt-1 ${inputCls}`} rows={3} />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Foto (opcional)</label>
+                <input type="file" accept="image/*" onChange={(e) => setDanoFoto(e.target.files?.[0] ?? null)} className={`w-full mt-1 ${inputCls}`} />
+              </div>
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setReportandoDano(false)} className="px-3 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted">Cancelar</button>
+                <button onClick={confirmarReportarDano} disabled={danoGuardando} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50">{danoGuardando ? 'Guardando…' : 'Reportar'}</button>
               </div>
             </div>
           </div>
