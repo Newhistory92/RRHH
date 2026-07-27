@@ -50,3 +50,26 @@ export async function uploadAttachment(
   }
   return res.json();
 }
+
+export async function reportarDano(
+  activoId: number,
+  descripcion: string,
+  foto: File | null
+): Promise<{ message: string }> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const form = new FormData();
+  form.append('descripcion', descripcion);
+  if (foto) form.append('foto', foto);
+
+  const res = await fetch(`${BACKEND_URL}/activos/${activoId}/danos`, {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: form,
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || err.message || `Error al reportar el daño (${res.status})`);
+  }
+  return res.json();
+}
