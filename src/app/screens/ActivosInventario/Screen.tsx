@@ -7,14 +7,22 @@ import { CodigoLabels } from '@/app/Componentes/ActivosInventario/CodigoLabels';
 import { BuscadorCatalogoPCParts } from '@/app/Componentes/ActivosInventario/BuscadorCatalogoPCParts';
 import { formatearSpecs } from '@/app/util/pcparts';
 import type { ActivoListItem, ActivoDetalle, ActivoCategoria, ActivoEstado, PCPart } from '@/app/Interfas/Interfaces';
-import { Plus, ArrowLeft, Pencil, Cpu, Trash2, Repeat, ChevronDown } from 'lucide-react';
+import { Plus, ArrowLeft, Pencil, Cpu, Trash2, Repeat, ChevronDown, UserCog } from 'lucide-react';
 
 interface DeptOption { id: number; nombre: string; offices: { id: number; nombre: string }[]; }
+interface EmpOption { id: number; name: string; }
 
 // Codigos estables (ActivoEstado.codigo) considerados "problematicos": estos activos
 // se muestran en una seccion colapsable aparte del listado principal, no mezclados
 // con los estados de uso normal (disponible/asignado/en_deposito/prestado/en_garantia).
 const ESTADOS_PROBLEMA = new Set(['en_reparacion', 'danado', 'extraviado', 'robado', 'dado_de_baja']);
+
+const RESP_TIPOS = [
+  { value: '', label: 'Sin asignar' },
+  { value: 'empleado', label: 'Empleado' },
+  { value: 'oficina', label: 'Oficina' },
+  { value: 'departamento', label: 'Departamento' },
+];
 
 function agruparPorDeptoOficina(lista: ActivoListItem[]) {
   const porDepto = new Map<string, Map<string, ActivoListItem[]>>();
@@ -44,7 +52,7 @@ export default function ActivosInventario() {
   const [categorias, setCategorias] = useState<ActivoCategoria[]>([]);
   const [estados, setEstados] = useState<ActivoEstado[]>([]);
   const [depts, setDepts] = useState<DeptOption[]>([]);
-  const [filtros, setFiltros] = useState({ categoriaId: '', grupo: '', estadoId: '', texto: '', departamentoId: '', oficinaId: '' });
+  const [filtros, setFiltros] = useState({ categoriaId: '', grupo: '', estadoId: '', texto: '', departamentoId: '', oficinaId: '', empleadoId: '' });
   const [cambioEstado, setCambioEstado] = useState<{ estadoId: string; observacion: string } | null>(null);
   const [componentes, setComponentes] = useState<ActivoListItem[]>([]);
   const [libres, setLibres] = useState<ActivoListItem[]>([]);
@@ -66,6 +74,15 @@ export default function ActivosInventario() {
   const [modoEntrada, setModoEntrada] = useState<'existente' | 'nuevo'>('existente');
   const [estadoSalienteId, setEstadoSalienteId] = useState('');
   const [mostrarProblema, setMostrarProblema] = useState(false);
+  const [empleados, setEmpleados] = useState<EmpOption[]>([]);
+  const [transfiriendo, setTransfiriendo] = useState(false);
+  const [transferTipo, setTransferTipo] = useState('');
+  const [transferEmpleadoId, setTransferEmpleadoId] = useState('');
+  const [transferOficinaId, setTransferOficinaId] = useState('');
+  const [transferDepartamentoId, setTransferDepartamentoId] = useState('');
+  const [transferObs, setTransferObs] = useState('');
+  const [transferError, setTransferError] = useState('');
+  const [transfiriendoGuardando, setTransfiriendoGuardando] = useState(false);
 
   const categoriasMontables = categorias.filter((c) => c.montableEnPC);
   const categoriaNuevaSel = categoriasMontables.find((c) => String(c.id) === nuevoCategoriaId);
@@ -80,6 +97,7 @@ export default function ActivosInventario() {
     if (filtros.texto.trim()) params.set('texto', filtros.texto.trim());
     if (filtros.departamentoId) params.set('departamentoId', filtros.departamentoId);
     if (filtros.oficinaId) params.set('oficinaId', filtros.oficinaId);
+    if (filtros.empleadoId) params.set('empleadoId', filtros.empleadoId);
     const qs = params.toString();
     apiClient.get<{ activos: ActivoListItem[] }>(`/activos${qs ? `?${qs}` : ''}`)
       .then((r) => setRows(r.activos || []))
@@ -90,6 +108,7 @@ export default function ActivosInventario() {
     apiClient.get<{ categorias: ActivoCategoria[] }>('/activos/config/categorias').then((r) => setCategorias(r.categorias || [])).catch(() => {});
     apiClient.get<{ estados: ActivoEstado[] }>('/activos/config/estados').then((r) => setEstados(r.estados || [])).catch(() => {});
     apiClient.get<{ departments: DeptOption[] }>('/departments/').then((r) => setDepts(r.departments || [])).catch(() => {});
+    apiClient.get<{ employees: EmpOption[] }>('/rrhh/employees').then((r) => setEmpleados(r.employees || [])).catch(() => {});
   }, []);
 
   useEffect(() => { if (modo === 'lista') cargar(); }, [modo, cargar]);
@@ -121,6 +140,42 @@ export default function ActivosInventario() {
       const det = await apiClient.get<ActivoDetalle>(`/activos/${seleccionado.id}`);
       setSeleccionado(det);
     } catch (e) { alert((e as Error).message); }
+  };
+
+  const abrirTransferir = () => {
+    if (!seleccionado) return;
+    setTransferTipo(seleccionado.responsableTipo ?? '');
+    setTransferEmpleadoId(seleccionado.responsableEmpleadoId ? String(seleccionado.responsableEmpleadoId) : '');
+    setTransferOficinaId(seleccionado.responsableOficinaId ? String(seleccionado.responsableOficinaId) : '');
+    setTransferDepartamentoId(seleccionado.responsableDepartamentoId ? String(seleccionado.responsableDepartamentoId) : '');
+    setTransferObs('');
+    setTransferError('');
+    setTransfiriendo(true);
+  };
+
+  const confirmarTransferir = async () => {
+    if (!seleccionado) return;
+    setTransferError('');
+    if (transferTipo === 'empleado' && !transferEmpleadoId) { setTransferError('Elegí el empleado.'); return; }
+    if (transferTipo === 'oficina' && !transferOficinaId) { setTransferError('Elegí la oficina.'); return; }
+    if (transferTipo === 'departamento' && !transferDepartamentoId) { setTransferError('Elegí el departamento.'); return; }
+    setTransfiriendoGuardando(true);
+    try {
+      await apiClient.patch(`/activos/${seleccionado.id}/responsable`, {
+        responsableTipo: transferTipo || null,
+        responsableEmpleadoId: transferTipo === 'empleado' ? Number(transferEmpleadoId) : null,
+        responsableOficinaId: transferTipo === 'oficina' ? Number(transferOficinaId) : null,
+        responsableDepartamentoId: transferTipo === 'departamento' ? Number(transferDepartamentoId) : null,
+        observacion: transferObs || null,
+      });
+      setTransfiriendo(false);
+      const det = await apiClient.get<ActivoDetalle>(`/activos/${seleccionado.id}`);
+      setSeleccionado(det);
+    } catch (e) {
+      setTransferError((e as Error).message);
+    } finally {
+      setTransfiriendoGuardando(false);
+    }
   };
 
   const abrirAgregar = async () => {
@@ -319,9 +374,10 @@ export default function ActivosInventario() {
               <h1 className="font-heading text-2xl font-bold text-foreground">{a.nombre}</h1>
               <p className="text-muted-foreground">{a.numeroInventario} · {a.categoriaNombre} ({a.grupo})</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button onClick={() => { setEditando(a); setModo('form'); }} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border text-foreground hover:bg-muted"><Pencil size={16} /> Editar</button>
               <button onClick={() => setCambioEstado({ estadoId: String(a.estadoId), observacion: '' })} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:opacity-90">Cambiar estado</button>
+              <button onClick={abrirTransferir} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border text-foreground hover:bg-muted"><UserCog size={16} /> Transferir</button>
             </div>
           </div>
 
@@ -415,6 +471,62 @@ export default function ActivosInventario() {
               <div className="flex justify-end gap-2">
                 <button onClick={() => setCambioEstado(null)} className="px-3 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted">Cancelar</button>
                 <button onClick={guardarEstado} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90">Guardar</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {transfiriendo && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setTransfiriendo(false)}>
+            <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md space-y-4" onClick={(e) => e.stopPropagation()}>
+              <h3 className="font-heading text-lg font-bold text-foreground">Transferir responsable</h3>
+              {transferError && <div className="bg-error-soft text-error-soft-foreground border border-error rounded-lg px-4 py-2 text-sm">{transferError}</div>}
+              <div>
+                <label className="text-xs text-muted-foreground">Tipo</label>
+                <select
+                  value={transferTipo}
+                  onChange={(e) => { setTransferTipo(e.target.value); setTransferEmpleadoId(''); setTransferOficinaId(''); setTransferDepartamentoId(''); }}
+                  className={`w-full mt-1 ${inputCls}`}
+                >
+                  {RESP_TIPOS.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+              </div>
+              {transferTipo === 'empleado' && (
+                <div>
+                  <label className="text-xs text-muted-foreground">Empleado</label>
+                  <select value={transferEmpleadoId} onChange={(e) => setTransferEmpleadoId(e.target.value)} className={`w-full mt-1 ${inputCls}`}>
+                    <option value="">— Elegí empleado —</option>
+                    {empleados.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
+                  </select>
+                </div>
+              )}
+              {transferTipo === 'oficina' && (
+                <div>
+                  <label className="text-xs text-muted-foreground">Oficina</label>
+                  <select value={transferOficinaId} onChange={(e) => setTransferOficinaId(e.target.value)} className={`w-full mt-1 ${inputCls}`}>
+                    <option value="">— Elegí oficina —</option>
+                    {depts.flatMap((d) => d.offices.map((o) => ({ id: o.id, nombre: `${d.nombre} / ${o.nombre}` }))).map((o) => (
+                      <option key={o.id} value={o.id}>{o.nombre}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              {transferTipo === 'departamento' && (
+                <div>
+                  <label className="text-xs text-muted-foreground">Departamento</label>
+                  <select value={transferDepartamentoId} onChange={(e) => setTransferDepartamentoId(e.target.value)} className={`w-full mt-1 ${inputCls}`}>
+                    <option value="">— Elegí departamento —</option>
+                    {depts.map((d) => <option key={d.id} value={d.id}>{d.nombre}</option>)}
+                  </select>
+                </div>
+              )}
+              <div>
+                <label className="text-xs text-muted-foreground">Motivo / observación</label>
+                <textarea value={transferObs} onChange={(e) => setTransferObs(e.target.value)} className={`w-full mt-1 ${inputCls}`} rows={2} />
+              </div>
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setTransfiriendo(false)} className="px-3 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted">Cancelar</button>
+                <button onClick={confirmarTransferir} disabled={transfiriendoGuardando} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50">{transfiriendoGuardando ? 'Guardando…' : 'Transferir'}</button>
               </div>
             </div>
           </div>
@@ -660,6 +772,14 @@ export default function ActivosInventario() {
               ? depts.find((d) => String(d.id) === filtros.departamentoId)?.offices || []
               : depts.flatMap((d) => d.offices)
             ).map((o) => <option key={o.id} value={o.id}>{o.nombre}</option>)}
+          </select>
+          <select
+            value={filtros.empleadoId}
+            onChange={(e) => setFiltros({ ...filtros, empleadoId: e.target.value })}
+            className={inputCls}
+          >
+            <option value="">Todos los empleados</option>
+            {empleados.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
           </select>
         </div>
 
