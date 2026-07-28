@@ -689,7 +689,8 @@ export type Page =
   | "inicio"
   | "gestion-publicaciones"
   | "activos-config"
-  | "activos-inventario";
+  | "activos-inventario"
+  | "activos-modelos";
 
 export interface ActivoCategoria {
   id: number;
@@ -776,6 +777,49 @@ export interface HistorialItem {
   usuarioNombre: string | null;
   observacion: string | null;
   createdAt: string | null;
+}
+
+export interface ModeloPC {
+  id: number;
+  nombre: string;
+  descripcion: string | null;
+  cantidadRequisitos: number;
+}
+
+export interface ModeloRequisito {
+  id: number;
+  categoriaId: number;
+  categoriaNombre: string;
+  campoSpec: string;
+  etiqueta: string;
+  unidad: string;
+  valorMinimo: number;
+}
+
+export interface ModeloDetalle {
+  id: number;
+  nombre: string;
+  descripcion: string | null;
+  requisitos: ModeloRequisito[];
+}
+
+export interface CampoSpecCategoria {
+  categoriaId: number;
+  categoriaNombre: string;
+  campos: { campo: string; etiqueta: string; unidad: string }[];
+}
+
+export interface EvaluacionRequisito extends ModeloRequisito {
+  valorReal: number | null;
+  estado: 'cumple' | 'no_cumple' | 'sin_datos';
+}
+
+export interface EvaluacionResultado {
+  score: number | null;
+  total: number;
+  cumplidos: number;
+  sinDatos: number;
+  requisitos: EvaluacionRequisito[];
 }
 
 export interface FeedPublication {
