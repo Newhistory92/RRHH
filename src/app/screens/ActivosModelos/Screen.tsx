@@ -227,7 +227,7 @@ export default function ActivosModelos() {
       </div>
 
       {creando && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setCreando(false)}>
+        <div className="fixed inset-0 bg-muted/50 flex items-center justify-center p-4 z-50" onClick={() => setCreando(false)}>
           <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md space-y-4" onClick={(e) => e.stopPropagation()}>
             <h3 className="font-heading text-lg font-bold text-foreground">Nuevo modelo</h3>
             <div>
