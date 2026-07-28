@@ -7,7 +7,7 @@ import { CodigoLabels } from '@/app/Componentes/ActivosInventario/CodigoLabels';
 import { BuscadorCatalogoPCParts } from '@/app/Componentes/ActivosInventario/BuscadorCatalogoPCParts';
 import { formatearSpecs } from '@/app/util/pcparts';
 import { reportarDano, resolveAttachmentUrl } from '@/app/util/uploadClient';
-import type { ActivoListItem, ActivoDetalle, ActivoCategoria, ActivoEstado, PCPart, HistorialItem } from '@/app/Interfas/Interfaces';
+import type { ActivoListItem, ActivoDetalle, ActivoCategoria, ActivoEstado, PCPart, HistorialItem, ModeloPC, EvaluacionResultado } from '@/app/Interfas/Interfaces';
 import { Plus, ArrowLeft, Pencil, Cpu, Trash2, Repeat, ChevronDown, UserCog, AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface DeptOption { id: number; nombre: string; offices: { id: number; nombre: string }[]; }
@@ -100,6 +100,10 @@ export default function ActivosInventario() {
   const [nuevoImagen, setNuevoImagen] = useState('');
   const [nuevoObservaciones, setNuevoObservaciones] = useState('');
   const [nuevoSpecsJson, setNuevoSpecsJson] = useState('');
+  const [modelosPC, setModelosPC] = useState<ModeloPC[]>([]);
+  const [modeloEvalId, setModeloEvalId] = useState('');
+  const [evaluacion, setEvaluacion] = useState<EvaluacionResultado | null>(null);
+  const [errorEval, setErrorEval] = useState('');
   const [creandoComponente, setCreandoComponente] = useState(false);
   const [errorNuevo, setErrorNuevo] = useState('');
   const [modoEntrada, setModoEntrada] = useState<'existente' | 'nuevo'>('existente');
@@ -146,6 +150,7 @@ export default function ActivosInventario() {
     apiClient.get<{ estados: ActivoEstado[] }>('/activos/config/estados').then((r) => setEstados(r.estados || [])).catch(() => {});
     apiClient.get<{ departments: DeptOption[] }>('/departments/').then((r) => setDepts(r.departments || [])).catch(() => {});
     apiClient.get<{ employees: EmpOption[] }>('/rrhh/employees').then((r) => setEmpleados(r.employees || [])).catch(() => {});
+    apiClient.get<{ modelos: ModeloPC[] }>('/activos/modelos').then((r) => setModelosPC(r.modelos || [])).catch(() => {});
   }, []);
 
   useEffect(() => { if (modo === 'lista') cargar(); }, [modo, cargar]);
@@ -162,6 +167,19 @@ export default function ActivosInventario() {
       .catch(() => setHistorial([]));
   };
 
+  const evaluarContraModelo = async (pcId: number, modeloId: string) => {
+    setModeloEvalId(modeloId);
+    setErrorEval('');
+    if (!modeloId) { setEvaluacion(null); return; }
+    try {
+      const r = await apiClient.get<EvaluacionResultado>(`/activos/modelos/evaluar/${pcId}?modeloId=${modeloId}`);
+      setEvaluacion(r);
+    } catch (e) {
+      setEvaluacion(null);
+      setErrorEval((e as Error).message);
+    }
+  };
+
   const abrirFicha = async (id: number) => {
     try {
       const det = await apiClient.get<ActivoDetalle>(`/activos/${id}`);
@@ -170,6 +188,7 @@ export default function ActivosInventario() {
       if (det.puedeAlbergarComponentes) cargarComponentes(id);
       else setComponentes([]);
       cargarHistorial(id);
+      setModeloEvalId(''); setEvaluacion(null); setErrorEval('');
     } catch (e) { console.error(e); }
   };
 
@@ -520,6 +539,75 @@ export default function ActivosInventario() {
                   </tbody>
                 </table>
               )}
+
+              <div className="border-t border-border pt-4 space-y-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <label className="text-sm font-semibold text-foreground">Evaluar contra modelo</label>
+                  <select
+                    value={modeloEvalId}
+                    onChange={(e) => evaluarContraModelo(a.id, e.target.value)}
+                    className={inputCls}
+                  >
+                    <option value="">— Elegí un modelo —</option>
+                    {modelosPC.map((m) => <option key={m.id} value={m.id}>{m.nombre}</option>)}
+                  </select>
+                </div>
+
+                {errorEval && <div className="bg-error-soft text-error-soft-foreground border border-error rounded-lg px-4 py-2 text-sm">{errorEval}</div>}
+
+                {evaluacion && (
+                  <div className="space-y-3">
+                    {evaluacion.score === null ? (
+                      <p className="text-sm text-muted-foreground">Este modelo no tiene requisitos evaluables sobre esta PC.</p>
+                    ) : (
+                      <div>
+                        <div className="flex items-baseline gap-2">
+                          <span className={`text-3xl font-bold ${evaluacion.score >= 80 ? 'text-success' : evaluacion.score >= 50 ? 'text-warning' : 'text-error'}`}>
+                            {evaluacion.score}%
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {evaluacion.cumplidos} de {evaluacion.total - evaluacion.sinDatos} requisitos evaluables
+                            {evaluacion.sinDatos > 0 && ` · ${evaluacion.sinDatos} sin datos`}
+                          </span>
+                        </div>
+                        <div className="w-full h-2 bg-muted rounded-full mt-2 overflow-hidden">
+                          <div
+                            className={`h-full ${evaluacion.score >= 80 ? 'bg-success' : evaluacion.score >= 50 ? 'bg-warning' : 'bg-error'}`}
+                            style={{ width: `${evaluacion.score}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    <table className="w-full text-sm">
+                      <thead className="text-muted-foreground">
+                        <tr>
+                          <th className="text-left font-medium py-2">Categoría</th>
+                          <th className="text-left font-medium py-2">Requisito</th>
+                          <th className="text-left font-medium py-2">Mínimo</th>
+                          <th className="text-left font-medium py-2">Real</th>
+                          <th className="text-left font-medium py-2">Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {evaluacion.requisitos.map((r) => (
+                          <tr key={r.id} className="border-t border-border">
+                            <td className="py-2 text-foreground">{r.categoriaNombre}</td>
+                            <td className="py-2 text-muted-foreground">{r.etiqueta}</td>
+                            <td className="py-2 text-muted-foreground">{r.valorMinimo} {r.unidad}</td>
+                            <td className="py-2 text-muted-foreground">{r.valorReal !== null ? `${r.valorReal} ${r.unidad}` : '—'}</td>
+                            <td className="py-2">
+                              {r.estado === 'cumple' && <span className="text-success">✓ Cumple</span>}
+                              {r.estado === 'no_cumple' && <span className="text-error">✗ No cumple</span>}
+                              {r.estado === 'sin_datos' && <span className="text-muted-foreground">— Sin datos</span>}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
