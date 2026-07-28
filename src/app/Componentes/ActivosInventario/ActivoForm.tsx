@@ -47,6 +47,7 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
     responsableEmpleadoId: activo?.responsableEmpleadoId ? String(activo.responsableEmpleadoId) : '',
     responsableOficinaId: activo?.responsableOficinaId ? String(activo.responsableOficinaId) : '',
     responsableDepartamentoId: activo?.responsableDepartamentoId ? String(activo.responsableDepartamentoId) : '',
+    specsJson: '',
   });
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
@@ -71,6 +72,7 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
       nombre: p.name,
       imagenReferencial: p.image || s.imagenReferencial,
       observaciones: formatearSpecs(p.specs) || s.observaciones,
+      specsJson: p.specs || '',
     }));
   };
 
@@ -114,6 +116,7 @@ export function ActivoForm({ activo, onGuardado, onCancelar }: ActivoFormProps) 
       responsableEmpleadoId: f.responsableTipo === 'empleado' ? Number(f.responsableEmpleadoId) : null,
       responsableOficinaId: f.responsableTipo === 'oficina' ? Number(f.responsableOficinaId) : null,
       responsableDepartamentoId: f.responsableTipo === 'departamento' ? Number(f.responsableDepartamentoId) : null,
+      specsJson: f.specsJson || null,
     };
     setGuardando(true);
     try {

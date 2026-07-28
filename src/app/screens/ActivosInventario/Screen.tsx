@@ -99,6 +99,7 @@ export default function ActivosInventario() {
   const [nuevoNumeroSerie, setNuevoNumeroSerie] = useState('');
   const [nuevoImagen, setNuevoImagen] = useState('');
   const [nuevoObservaciones, setNuevoObservaciones] = useState('');
+  const [nuevoSpecsJson, setNuevoSpecsJson] = useState('');
   const [creandoComponente, setCreandoComponente] = useState(false);
   const [errorNuevo, setErrorNuevo] = useState('');
   const [modoEntrada, setModoEntrada] = useState<'existente' | 'nuevo'>('existente');
@@ -249,7 +250,7 @@ export default function ActivosInventario() {
       setLibres(r.componentes || []); setLibreSel(''); setAgregando(true);
       setModoAgregar('existente');
       setNuevoCategoriaId(''); setNuevoNombre(''); setNuevoNumeroInventario('');
-      setNuevoNumeroSerie(''); setNuevoImagen(''); setNuevoObservaciones(''); setErrorNuevo('');
+      setNuevoNumeroSerie(''); setNuevoImagen(''); setNuevoObservaciones(''); setNuevoSpecsJson(''); setErrorNuevo('');
     } catch (e) { alert((e as Error).message); }
   };
 
@@ -266,6 +267,7 @@ export default function ActivosInventario() {
     if (p.image) setNuevoImagen(p.image);
     const specs = formatearSpecs(p.specs);
     if (specs) setNuevoObservaciones(specs);
+    setNuevoSpecsJson(p.specs || '');
   };
 
   const confirmarCrearComponente = async () => {
@@ -294,6 +296,7 @@ export default function ActivosInventario() {
         responsableEmpleadoId: null,
         responsableOficinaId: null,
         responsableDepartamentoId: null,
+        specsJson: nuevoSpecsJson || null,
       });
       await apiClient.post(`/activos/${seleccionado.id}/componentes`, { componenteId: res.id });
       setAgregando(false);
@@ -321,7 +324,7 @@ export default function ActivosInventario() {
       setEstadoSalienteId('');
       setModoEntrada('existente');
       setNuevoCategoriaId(''); setNuevoNombre(''); setNuevoNumeroInventario('');
-      setNuevoNumeroSerie(''); setNuevoImagen(''); setNuevoObservaciones(''); setErrorNuevo('');
+      setNuevoNumeroSerie(''); setNuevoImagen(''); setNuevoObservaciones(''); setNuevoSpecsJson(''); setErrorNuevo('');
     } catch (e) { alert((e as Error).message); }
   };
 
@@ -356,6 +359,7 @@ export default function ActivosInventario() {
           responsableEmpleadoId: null,
           responsableOficinaId: null,
           responsableDepartamentoId: null,
+        specsJson: nuevoSpecsJson || null,
         });
         entraId = res.id;
       } catch (e) {
