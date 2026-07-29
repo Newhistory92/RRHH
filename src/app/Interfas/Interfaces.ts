@@ -752,6 +752,9 @@ export interface ActivoListItem {
   pcPadreId: number | null;
   pcPadreNombre: string | null;
   puedeAlbergarComponentes: boolean;
+  modeloId: number | null;
+  modeloNombre: string | null;
+  score: number | null;
   createdAt: string | null;
   updatedAt: string | null;
 }

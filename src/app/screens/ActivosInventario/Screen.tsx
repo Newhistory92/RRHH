@@ -67,6 +67,8 @@ function etiquetaHistorial(h: HistorialItem): { icono: string; texto: string } {
       return { icono: 'componente', texto: 'Componente reemplazado' };
     case 'dano_reportado':
       return { icono: 'dano', texto: `Daño reportado${h.valorAnterior ? ` (estaba: ${h.valorAnterior})` : ''}` };
+    case 'cambio_modelo':
+      return { icono: 'otro', texto: `Modelo: ${h.valorAnterior ?? 'ninguno'} → ${h.valorNuevo ?? 'ninguno'}` };
     default:
       return { icono: 'otro', texto: h.accion };
   }
@@ -170,10 +172,18 @@ export default function ActivosInventario() {
   const evaluarContraModelo = async (pcId: number, modeloId: string) => {
     setModeloEvalId(modeloId);
     setErrorEval('');
-    if (!modeloId) { setEvaluacion(null); return; }
+    setEvaluacion(null);
     try {
-      const r = await apiClient.get<EvaluacionResultado>(`/activos/modelos/evaluar/${pcId}?modeloId=${modeloId}`);
-      setEvaluacion(r);
+      const mid = modeloId ? Number(modeloId) : null;
+      const r = await apiClient.patch<{ message: string; evaluacion: EvaluacionResultado | null }>(
+        `/activos/${pcId}/modelo`,
+        { modeloId: mid }
+      );
+      setEvaluacion(r.evaluacion);
+      if (seleccionado) {
+        const modeloNombre = modelosPC.find(m => m.id === mid)?.nombre ?? null;
+        setSeleccionado({ ...seleccionado, modeloId: mid, modeloNombre });
+      }
     } catch (e) {
       setEvaluacion(null);
       setErrorEval((e as Error).message);
@@ -182,13 +192,21 @@ export default function ActivosInventario() {
 
   const abrirFicha = async (id: number) => {
     try {
-      const det = await apiClient.get<ActivoDetalle>(`/activos/${id}`);
+      const det = await apiClient.get<ActivoDetalle & { evaluacion?: EvaluacionResultado | null }>(`/activos/${id}`);
       setSeleccionado(det);
       setModo('ficha');
       if (det.puedeAlbergarComponentes) cargarComponentes(id);
       else setComponentes([]);
       cargarHistorial(id);
-      setModeloEvalId(''); setEvaluacion(null); setErrorEval('');
+      // Auto-load score if model is assigned
+      if (det.modeloId) {
+        setModeloEvalId(String(det.modeloId));
+        setEvaluacion(det.evaluacion ?? null);
+      } else {
+        setModeloEvalId('');
+        setEvaluacion(null);
+      }
+      setErrorEval('');
     } catch (e) { console.error(e); }
   };
 
@@ -411,7 +429,7 @@ export default function ActivosInventario() {
       {g.oficinas.map(([oficina, items]) => (
         <React.Fragment key={`${g.depto}-${oficina}`}>
           <tr className="bg-muted/50 border-t border-border">
-            <td colSpan={6} className="px-4 py-2 text-xs font-semibold text-foreground">
+            <td colSpan={7} className="px-4 py-2 text-xs font-semibold text-foreground">
               {g.depto} · {oficina}
             </td>
           </tr>
@@ -423,6 +441,17 @@ export default function ActivosInventario() {
               <td className="px-4 py-3 text-muted-foreground">{r.estadoNombre}</td>
               <td className="px-4 py-3 text-muted-foreground">{r.responsableNombre ?? '—'}</td>
               <td className="px-4 py-3 text-muted-foreground">{r.fechaAlta ? new Date(r.fechaAlta).toLocaleDateString('es-AR') : '—'}</td>
+              <td className="px-4 py-3">
+                {r.puedeAlbergarComponentes ? (
+                  r.score !== null && r.score !== undefined ? (
+                    <span className={`text-sm font-semibold ${r.score >= 80 ? 'text-success' : r.score >= 50 ? 'text-warning' : 'text-error'}`}>
+                      {r.score}%
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )
+                ) : null}
+              </td>
             </tr>
           ))}
         </React.Fragment>
@@ -542,13 +571,13 @@ export default function ActivosInventario() {
 
               <div className="border-t border-border pt-4 space-y-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <label className="text-sm font-semibold text-foreground">Evaluar contra modelo</label>
+                  <label className="text-sm font-semibold text-foreground">Modelo de referencia asignado</label>
                   <select
                     value={modeloEvalId}
                     onChange={(e) => evaluarContraModelo(a.id, e.target.value)}
                     className={inputCls}
                   >
-                    <option value="">— Elegí un modelo —</option>
+                    <option value="">— Sin modelo asignado —</option>
                     {modelosPC.map((m) => <option key={m.id} value={m.id}>{m.nombre}</option>)}
                   </select>
                 </div>
@@ -1009,6 +1038,7 @@ export default function ActivosInventario() {
                   <th className="text-left font-medium px-4 py-3">Estado</th>
                   <th className="text-left font-medium px-4 py-3">Responsable</th>
                   <th className="text-left font-medium px-4 py-3">Fecha alta</th>
+                  <th className="text-left font-medium px-4 py-3">Score</th>
                 </tr>
               </thead>
               <tbody>
@@ -1039,6 +1069,7 @@ export default function ActivosInventario() {
                       <th className="text-left font-medium px-4 py-3">Estado</th>
                       <th className="text-left font-medium px-4 py-3">Responsable</th>
                       <th className="text-left font-medium px-4 py-3">Fecha alta</th>
+                      <th className="text-left font-medium px-4 py-3">Score</th>
                     </tr>
                   </thead>
                   <tbody>{renderFilasGrupos(gruposProblema)}</tbody>
