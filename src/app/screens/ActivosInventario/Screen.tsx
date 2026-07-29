@@ -170,10 +170,18 @@ export default function ActivosInventario() {
   const evaluarContraModelo = async (pcId: number, modeloId: string) => {
     setModeloEvalId(modeloId);
     setErrorEval('');
-    if (!modeloId) { setEvaluacion(null); return; }
+    setEvaluacion(null);
     try {
-      const r = await apiClient.get<EvaluacionResultado>(`/activos/modelos/evaluar/${pcId}?modeloId=${modeloId}`);
-      setEvaluacion(r);
+      const mid = modeloId ? Number(modeloId) : null;
+      const r = await apiClient.patch<{ message: string; evaluacion: EvaluacionResultado | null }>(
+        `/activos/${pcId}/modelo`,
+        { modeloId: mid }
+      );
+      setEvaluacion(r.evaluacion);
+      if (seleccionado) {
+        const modeloNombre = modelosPC.find(m => m.id === mid)?.nombre ?? null;
+        setSeleccionado({ ...seleccionado, modeloId: mid, modeloNombre });
+      }
     } catch (e) {
       setEvaluacion(null);
       setErrorEval((e as Error).message);
@@ -182,13 +190,21 @@ export default function ActivosInventario() {
 
   const abrirFicha = async (id: number) => {
     try {
-      const det = await apiClient.get<ActivoDetalle>(`/activos/${id}`);
+      const det = await apiClient.get<ActivoDetalle & { evaluacion?: EvaluacionResultado | null }>(`/activos/${id}`);
       setSeleccionado(det);
       setModo('ficha');
       if (det.puedeAlbergarComponentes) cargarComponentes(id);
       else setComponentes([]);
       cargarHistorial(id);
-      setModeloEvalId(''); setEvaluacion(null); setErrorEval('');
+      // Auto-load score if model is assigned
+      if (det.modeloId) {
+        setModeloEvalId(String(det.modeloId));
+        setEvaluacion(det.evaluacion ?? null);
+      } else {
+        setModeloEvalId('');
+        setEvaluacion(null);
+      }
+      setErrorEval('');
     } catch (e) { console.error(e); }
   };
 
@@ -542,13 +558,13 @@ export default function ActivosInventario() {
 
               <div className="border-t border-border pt-4 space-y-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <label className="text-sm font-semibold text-foreground">Evaluar contra modelo</label>
+                  <label className="text-sm font-semibold text-foreground">Modelo de referencia asignado</label>
                   <select
                     value={modeloEvalId}
                     onChange={(e) => evaluarContraModelo(a.id, e.target.value)}
                     className={inputCls}
                   >
-                    <option value="">— Elegí un modelo —</option>
+                    <option value="">— Sin modelo asignado —</option>
                     {modelosPC.map((m) => <option key={m.id} value={m.id}>{m.nombre}</option>)}
                   </select>
                 </div>
