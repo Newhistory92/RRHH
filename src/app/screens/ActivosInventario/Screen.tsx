@@ -67,6 +67,8 @@ function etiquetaHistorial(h: HistorialItem): { icono: string; texto: string } {
       return { icono: 'componente', texto: 'Componente reemplazado' };
     case 'dano_reportado':
       return { icono: 'dano', texto: `Daño reportado${h.valorAnterior ? ` (estaba: ${h.valorAnterior})` : ''}` };
+    case 'cambio_modelo':
+      return { icono: 'otro', texto: `Modelo: ${h.valorAnterior ?? 'ninguno'} → ${h.valorNuevo ?? 'ninguno'}` };
     default:
       return { icono: 'otro', texto: h.accion };
   }
@@ -427,7 +429,7 @@ export default function ActivosInventario() {
       {g.oficinas.map(([oficina, items]) => (
         <React.Fragment key={`${g.depto}-${oficina}`}>
           <tr className="bg-muted/50 border-t border-border">
-            <td colSpan={6} className="px-4 py-2 text-xs font-semibold text-foreground">
+            <td colSpan={7} className="px-4 py-2 text-xs font-semibold text-foreground">
               {g.depto} · {oficina}
             </td>
           </tr>
@@ -439,6 +441,13 @@ export default function ActivosInventario() {
               <td className="px-4 py-3 text-muted-foreground">{r.estadoNombre}</td>
               <td className="px-4 py-3 text-muted-foreground">{r.responsableNombre ?? '—'}</td>
               <td className="px-4 py-3 text-muted-foreground">{r.fechaAlta ? new Date(r.fechaAlta).toLocaleDateString('es-AR') : '—'}</td>
+              <td className="px-4 py-3">
+                {r.puedeAlbergarComponentes && r.score !== null && r.score !== undefined ? (
+                  <span className={`text-sm font-semibold ${r.score >= 80 ? 'text-success' : r.score >= 50 ? 'text-warning' : 'text-error'}`}>
+                    {r.score}%
+                  </span>
+                ) : null}
+              </td>
             </tr>
           ))}
         </React.Fragment>
@@ -1025,6 +1034,7 @@ export default function ActivosInventario() {
                   <th className="text-left font-medium px-4 py-3">Estado</th>
                   <th className="text-left font-medium px-4 py-3">Responsable</th>
                   <th className="text-left font-medium px-4 py-3">Fecha alta</th>
+                  <th className="text-left font-medium px-4 py-3">Score</th>
                 </tr>
               </thead>
               <tbody>
@@ -1055,6 +1065,7 @@ export default function ActivosInventario() {
                       <th className="text-left font-medium px-4 py-3">Estado</th>
                       <th className="text-left font-medium px-4 py-3">Responsable</th>
                       <th className="text-left font-medium px-4 py-3">Fecha alta</th>
+                      <th className="text-left font-medium px-4 py-3">Score</th>
                     </tr>
                   </thead>
                   <tbody>{renderFilasGrupos(gruposProblema)}</tbody>
