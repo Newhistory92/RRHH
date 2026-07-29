@@ -442,10 +442,14 @@ export default function ActivosInventario() {
               <td className="px-4 py-3 text-muted-foreground">{r.responsableNombre ?? '—'}</td>
               <td className="px-4 py-3 text-muted-foreground">{r.fechaAlta ? new Date(r.fechaAlta).toLocaleDateString('es-AR') : '—'}</td>
               <td className="px-4 py-3">
-                {r.puedeAlbergarComponentes && r.score !== null && r.score !== undefined ? (
-                  <span className={`text-sm font-semibold ${r.score >= 80 ? 'text-success' : r.score >= 50 ? 'text-warning' : 'text-error'}`}>
-                    {r.score}%
-                  </span>
+                {r.puedeAlbergarComponentes ? (
+                  r.score !== null && r.score !== undefined ? (
+                    <span className={`text-sm font-semibold ${r.score >= 80 ? 'text-success' : r.score >= 50 ? 'text-warning' : 'text-error'}`}>
+                      {r.score}%
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )
                 ) : null}
               </td>
             </tr>
