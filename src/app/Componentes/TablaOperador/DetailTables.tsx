@@ -75,12 +75,16 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
   const [originalFormData, setOriginalFormData] = useState<typeof formData | null>(null);
   const [nombreEnReloj, setNombreEnReloj] = useState<string | null>(null);
   const [verificandoReloj, setVerificandoReloj] = useState(false);
+  const [relojSinConexion, setRelojSinConexion] = useState(false);
 
   // Al entrar en modo edicion de detallesAdicionales, pre-verificar el ID ya guardado
   // para evitar que aparezca "no existe" antes de que el usuario toque el campo.
   useEffect(() => {
     if (editingSection === 'detallesAdicionales' && formData.biometricoId.trim()) {
       verificarIdReloj(formData.biometricoId);
+    } else if (!editingSection) {
+      setNombreEnReloj(null);
+      setRelojSinConexion(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingSection]);
@@ -92,22 +96,31 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
     const limpio = valor.trim();
     if (!limpio) {
       setNombreEnReloj(null);
+      setRelojSinConexion(false);
       return;
     }
     setVerificandoReloj(true);
+    setRelojSinConexion(false);
     try {
-      const r = await apiClient.get<{ encontrado: boolean; nombre: string | null }>(
-        `/relojes/usuario/${encodeURIComponent(limpio)}`
-      );
-      setNombreEnReloj(r.encontrado ? r.nombre : null);
+      const r = await apiClient.get<{
+        encontrado: boolean;
+        nombre: string | null;
+        errores: Array<{ relojIp: string; error: string }>;
+      }>(`/relojes/usuario/${encodeURIComponent(limpio)}`);
+      if (!r.encontrado && r.errores?.length > 0) {
+        setRelojSinConexion(true);
+        setNombreEnReloj(null);
+      } else {
+        setNombreEnReloj(r.encontrado ? r.nombre : null);
+      }
     } catch {
       setNombreEnReloj(null);
+      setRelojSinConexion(true);
     } finally {
       setVerificandoReloj(false);
     }
   };
 
-  console.log(employee);
 
   const handleEdit = (section: ProfileSection) => {
     setOriginalFormData(formData);
@@ -138,12 +151,12 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
         horaInicio: timeStringToDecimal(formData.scheduleStart),
         horaFin: timeStringToDecimal(formData.scheduleEnd)
       };
-      console.log(horarioData)
-      // Ejecutar ambas actualizaciones en paralelo
+      // Guardar biometricoId primero: si hay conflicto (ID duplicado) se lanza
+      // 400 antes de tocar condicion laboral o horario, evitando un save parcial.
+      await apiClient.put(`/employee/${employee.id}`, { biometricoId: formData.biometricoId || null });
       await Promise.all([
         updateCondicionLaboral(employee.id, condicionLaboralData),
         updateHorario(employee.id, horarioData),
-        apiClient.put(`/employee/${employee.id}`, { biometricoId: formData.biometricoId || null })
       ]);
 
       toast.current?.show({
@@ -429,14 +442,17 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
                         En el reloj: <span className="font-medium text-foreground">{nombreEnReloj}</span>
                       </p>
                     )}
-                    {!verificandoReloj && nombreEnReloj === null && formData.biometricoId.trim() !== '' && (
+                    {!verificandoReloj && relojSinConexion && formData.biometricoId.trim() !== '' && (
+                      <p className="text-xs text-muted-foreground mt-1">No se pudo verificar en el reloj</p>
+                    )}
+                    {!verificandoReloj && !relojSinConexion && nombreEnReloj === null && formData.biometricoId.trim() !== '' && (
                       <p className="text-xs text-error mt-1">
                         Ese ID no existe en ningún reloj
                       </p>
                     )}
                   </>
                 ) : (
-                  <p className="text-foreground">{employee.biometricoId ?? '—'}</p>
+                  <p className="text-foreground">{formData.biometricoId || '—'}</p>
                 )}
               </div>
             </div>
