@@ -76,6 +76,15 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
   const [nombreEnReloj, setNombreEnReloj] = useState<string | null>(null);
   const [verificandoReloj, setVerificandoReloj] = useState(false);
 
+  // Al entrar en modo edicion de detallesAdicionales, pre-verificar el ID ya guardado
+  // para evitar que aparezca "no existe" antes de que el usuario toque el campo.
+  useEffect(() => {
+    if (editingSection === 'detallesAdicionales' && formData.biometricoId.trim()) {
+      verificarIdReloj(formData.biometricoId);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editingSection]);
+
   // Confirmacion por nombre: al escribir el ID, consulta que nombre tienen los
   // relojes cargado para ese numero, para que un typo (51 en vez de 50) quede a
   // la vista antes de guardar. Es una lectura, no modifica el equipo.
