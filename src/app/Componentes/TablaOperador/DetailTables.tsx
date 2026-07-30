@@ -63,7 +63,8 @@ const buildFormData = (employee: Employee) => ({
   category: employee.condicionLaboral.categoria,
   lastCategoryUpdate: employee.condicionLaboral.fechaCategoria
     ? new Date(employee.condicionLaboral.fechaCategoria)
-    : null
+    : null,
+  biometricoId: employee.biometricoId ?? ''
 });
 
 export const ProfileTab = ({ employee }: { employee: Employee }) => {
@@ -72,6 +73,30 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
   const toast = useRef<Toast>(null);
   const [formData, setFormData] = useState(buildFormData(employee));
   const [originalFormData, setOriginalFormData] = useState<typeof formData | null>(null);
+  const [nombreEnReloj, setNombreEnReloj] = useState<string | null>(null);
+  const [verificandoReloj, setVerificandoReloj] = useState(false);
+
+  // Confirmacion por nombre: al escribir el ID, consulta que nombre tienen los
+  // relojes cargado para ese numero, para que un typo (51 en vez de 50) quede a
+  // la vista antes de guardar. Es una lectura, no modifica el equipo.
+  const verificarIdReloj = async (valor: string) => {
+    const limpio = valor.trim();
+    if (!limpio) {
+      setNombreEnReloj(null);
+      return;
+    }
+    setVerificandoReloj(true);
+    try {
+      const r = await apiClient.get<{ encontrado: boolean; nombre: string | null }>(
+        `/relojes/usuario/${encodeURIComponent(limpio)}`
+      );
+      setNombreEnReloj(r.encontrado ? r.nombre : null);
+    } catch {
+      setNombreEnReloj(null);
+    } finally {
+      setVerificandoReloj(false);
+    }
+  };
 
   console.log(employee);
 
@@ -108,7 +133,8 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
       // Ejecutar ambas actualizaciones en paralelo
       await Promise.all([
         updateCondicionLaboral(employee.id, condicionLaboralData),
-        updateHorario(employee.id, horarioData)
+        updateHorario(employee.id, horarioData),
+        apiClient.put(`/employee/${employee.id}`, { biometricoId: formData.biometricoId || null })
       ]);
 
       toast.current?.show({
@@ -370,6 +396,40 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
               <InfoCard icon={ChartColumnStacked} title="Productividad">
                 {employee.productivityScore} Promedio
               </InfoCard>
+
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
+                  ID de reloj biométrico
+                </label>
+                {editingSection === 'detallesAdicionales' ? (
+                  <>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={formData.biometricoId}
+                      onChange={(e) => setFormData({ ...formData, biometricoId: e.target.value })}
+                      onBlur={(e) => verificarIdReloj(e.target.value)}
+                      placeholder="Ej: 50"
+                      className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm w-full"
+                    />
+                    {verificandoReloj && (
+                      <p className="text-xs text-muted-foreground mt-1">Verificando en el reloj…</p>
+                    )}
+                    {!verificandoReloj && nombreEnReloj && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        En el reloj: <span className="font-medium text-foreground">{nombreEnReloj}</span>
+                      </p>
+                    )}
+                    {!verificandoReloj && nombreEnReloj === null && formData.biometricoId.trim() !== '' && (
+                      <p className="text-xs text-error mt-1">
+                        Ese ID no existe en ningún reloj
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-foreground">{employee.biometricoId ?? '—'}</p>
+                )}
+              </div>
             </div>
 
             {editingSection === 'detallesAdicionales' && (

@@ -338,6 +338,7 @@ export interface Employee {
   id: number;
   name: string;
   dni: string;
+  biometricoId: string | null;
   email: string;
   phone: string;
   address: string;
