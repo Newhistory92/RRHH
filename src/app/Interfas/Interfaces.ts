@@ -676,6 +676,7 @@ export interface SkillTestDialogProps {
 
 export type Page =
   | "estadisticas"
+  | "asistencia"
   | "recursos-humanos"
   | "configuracion-licencias"
   | "ia"
@@ -946,6 +947,42 @@ export interface skillsGap {
   nombre: string
   nivel: string
 };
+
+export interface JornadaDiaria {
+  id: number;
+  fecha: string;
+  estado: 'ok' | 'incompleta' | 'ausente' | 'feriado' | 'licencia' | 'sin_horario';
+  horasRequeridas: number;
+  horasTrabajadas: number;
+  saldoDia: number;
+  entrada: string | null;
+  salida: string | null;
+  entradaManual: boolean;
+  salidaManual: boolean;
+  permisoBanco: number;
+  permisoDeuda: number;
+  permisoOficial: number;
+  observacion: string | null;
+}
+
+export interface TableroFila {
+  employeeId: number;
+  employeeName: string;
+  biometricoId: string;
+  saldoAcumulado: number;
+  ausencias: number;
+  incompletas: number;
+}
+
+export interface JornadaIncompleta {
+  id: number;
+  employeeId: number;
+  employeeName: string;
+  fecha: string;
+  estado: string;
+  entrada: string | null;
+  salida: string | null;
+}
 
 export interface BaseMetrics {
   avgProductivity: number;
