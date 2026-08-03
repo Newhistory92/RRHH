@@ -950,6 +950,7 @@ export interface skillsGap {
 
 export interface JornadaDiaria {
   id: number;
+  employeeId: number;
   fecha: string;
   estado: 'ok' | 'incompleta' | 'ausente' | 'feriado' | 'licencia' | 'sin_horario';
   horasRequeridas: number;

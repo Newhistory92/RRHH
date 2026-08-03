@@ -130,6 +130,7 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
             employee={selectedEmployee}
             onBack={() => setCurrentView({ name: "table" })}
             onLicenseClick={setSelectedLicense}
+            onSave={fetchEmployeeData}
           />
         );
       case "messages":

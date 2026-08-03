@@ -9,12 +9,14 @@ import { Avatar } from 'primereact/avatar';
 export interface EmployeeDetailViewProps {
   employee: Employee | null | undefined;
   onBack: () => void;
- onLicenseClick: (license: LicenseHistory | null) => void;
+  onLicenseClick: (license: LicenseHistory | null) => void;
+  onSave?: () => void | Promise<void>;
 }
 export const EmployeeDetailView = ({
   employee,
   onBack,
   onLicenseClick,
+  onSave,
 }: EmployeeDetailViewProps) => {
   const [activeTab, setActiveTab] = useState("perfil");
 
@@ -110,7 +112,7 @@ export const EmployeeDetailView = ({
         </nav>
       </div>
       <div className="no-print">
-        {activeTab === "perfil" && <ProfileTab employee={employee} />}
+        {activeTab === "perfil" && <ProfileTab employee={employee} onSave={onSave} />}
         {activeTab === "licencias" && (
           <LicenseHistoryTab
             licenses={employee.licenses}

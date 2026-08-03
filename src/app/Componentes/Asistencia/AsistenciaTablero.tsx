@@ -15,9 +15,9 @@ const fmtHoras = (h: number) => {
 
 const claseSaldo = (h: number) =>
   h < 0
-    ? "text-red-600 font-semibold"
+    ? "text-error font-semibold"
     : h > 0
-    ? "text-green-600 font-semibold"
+    ? "text-success font-semibold"
     : "text-muted-foreground";
 
 export default function AsistenciaTablero() {
@@ -31,11 +31,16 @@ export default function AsistenciaTablero() {
   const [guardando, setGuardando] = useState(false);
   const toast = useRef<Toast>(null);
 
+  const hoy = new Date().toISOString().split('T')[0];
+  const inicioAnio = new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0];
+  const [desdeTablero, setDesdeTablero] = useState(inicioAnio);
+  const [hastaTablero, setHastaTablero] = useState(hoy);
+
   const cargar = async () => {
     setCargando(true);
     try {
       const [t, i] = await Promise.all([
-        apiClient.get<{ empleados: TableroFila[] }>("/asistencia/tablero"),
+        apiClient.get<{ empleados: TableroFila[] }>(`/asistencia/tablero?desde=${desdeTablero}&hasta=${hastaTablero}`),
         apiClient.get<{ jornadas: JornadaIncompleta[] }>("/asistencia/incompletas"),
       ]);
       setFilas(t.empleados);
@@ -171,6 +176,32 @@ export default function AsistenciaTablero() {
         <h2 className="font-heading text-lg text-foreground mb-4">
           Saldo por empleado
         </h2>
+        <div className="flex gap-4 mb-4 items-end">
+          <div>
+            <label className="block text-sm font-medium mb-1">Desde</label>
+            <input
+              type="date"
+              value={desdeTablero}
+              onChange={e => setDesdeTablero(e.target.value)}
+              className="border rounded px-2 py-1"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Hasta</label>
+            <input
+              type="date"
+              value={hastaTablero}
+              onChange={e => setHastaTablero(e.target.value)}
+              className="border rounded px-2 py-1"
+            />
+          </div>
+          <button
+            onClick={cargar}
+            className="px-4 py-1 bg-primary text-white rounded"
+          >
+            Actualizar
+          </button>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

@@ -67,7 +67,7 @@ const buildFormData = (employee: Employee) => ({
   biometricoId: employee.biometricoId ?? ''
 });
 
-export const ProfileTab = ({ employee }: { employee: Employee }) => {
+export const ProfileTab = ({ employee, onSave }: { employee: Employee; onSave?: () => void | Promise<void> }) => {
   const [editingSection, setEditingSection] = useState<ProfileSection | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const toast = useRef<Toast>(null);
@@ -75,6 +75,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
   const [originalFormData, setOriginalFormData] = useState<typeof formData | null>(null);
   const [nombreEnReloj, setNombreEnReloj] = useState<string | null>(null);
   const [verificandoReloj, setVerificandoReloj] = useState(false);
+  const [hasCheckedReloj, setHasCheckedReloj] = useState(false);
   const [relojSinConexion, setRelojSinConexion] = useState(false);
 
   // Al entrar en modo edicion de detallesAdicionales, pre-verificar el ID ya guardado
@@ -85,6 +86,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
     } else if (!editingSection) {
       setNombreEnReloj(null);
       setRelojSinConexion(false);
+      setHasCheckedReloj(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingSection]);
@@ -118,6 +120,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
       setRelojSinConexion(true);
     } finally {
       setVerificandoReloj(false);
+      setHasCheckedReloj(true);
     }
   };
 
@@ -158,6 +161,8 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
         updateCondicionLaboral(employee.id, condicionLaboralData),
         updateHorario(employee.id, horarioData),
       ]);
+
+      void onSave?.();
 
       toast.current?.show({
         severity: 'success',
@@ -429,7 +434,12 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
                       type="text"
                       inputMode="numeric"
                       value={formData.biometricoId}
-                      onChange={(e) => setFormData({ ...formData, biometricoId: e.target.value })}
+                      onChange={(e) => {
+                        setFormData({ ...formData, biometricoId: e.target.value });
+                        setHasCheckedReloj(false);
+                        setNombreEnReloj(null);
+                        setRelojSinConexion(false);
+                      }}
                       onBlur={(e) => verificarIdReloj(e.target.value)}
                       placeholder="Ej: 50"
                       className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm w-full"
@@ -445,7 +455,7 @@ export const ProfileTab = ({ employee }: { employee: Employee }) => {
                     {!verificandoReloj && relojSinConexion && formData.biometricoId.trim() !== '' && (
                       <p className="text-xs text-muted-foreground mt-1">No se pudo verificar en el reloj</p>
                     )}
-                    {!verificandoReloj && !relojSinConexion && nombreEnReloj === null && formData.biometricoId.trim() !== '' && (
+                    {hasCheckedReloj && !verificandoReloj && !relojSinConexion && nombreEnReloj === null && formData.biometricoId.trim() !== '' && (
                       <p className="text-xs text-error mt-1">
                         Ese ID no existe en ningún reloj
                       </p>
