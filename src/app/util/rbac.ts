@@ -143,6 +143,14 @@ export const PAGE_CONFIG: PageConfig[] = [
     accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
   },
   {
+    id: "asistencia",
+    label: "Asistencia",
+    icon: "Clock",
+    section: "Gente",
+    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
+    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
+  },
+  {
     id: "activos-config",
     label: "Configuración de Activos",
     icon: "Boxes",

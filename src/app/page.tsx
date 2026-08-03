@@ -25,6 +25,7 @@ import GestionPublicaciones from '@/app/screens/GestionPublicaciones/Screen';
 import ActivosConfig from '@/app/screens/ActivosConfig/Screen';
 import ActivosInventario from '@/app/screens/ActivosInventario/Screen';
 import ActivosModelos from '@/app/screens/ActivosModelos/Screen';
+import AsistenciaPage from '@/app/screens/Asistencia/Screen';
 import { PrimeReactProvider } from 'primereact/api';
 import "primereact/resources/themes/lara-light-pink/theme.css";
 import 'primeicons/primeicons.css';
@@ -152,6 +153,8 @@ export default function App() {
         return roleId === ROLE_ID.ADMIN || roleId === ROLE_ID.RRHH
           ? <ReubicacionTablero />
           : <Reubicacion employeeData={employeeData} />;
+      case 'asistencia':
+        return <AsistenciaPage roleId={roleId} />;
       case 'feedback':
         if (globalSettings["Feedback"] === false) {
           return (
