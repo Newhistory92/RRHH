@@ -92,10 +92,18 @@ export const ApplyLicenseModal = ({
 export const PermissionModal = ({ employee, onClose, onSuccess }: PermissionModalProps) => {
   const [salida, setSalida] = useState<string>("");
   const [retorno, setRetorno] = useState<string>("");
+  const [oficial, setOficial] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useRef<Toast>(null);
 
   if (!employee) return null;
+
+  const handleClose = () => {
+    setSalida('');
+    setRetorno('');
+    setOficial(false);
+    onClose();
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -124,6 +132,7 @@ export const PermissionModal = ({ employee, onClose, onSuccess }: PermissionModa
     const data = {
       exitTime: timeStringToDecimal(salida),
       returnTime: timeStringToDecimal(retorno),
+      oficial: oficial,
     };
 
     setIsLoading(true);
@@ -141,7 +150,7 @@ export const PermissionModal = ({ employee, onClose, onSuccess }: PermissionModa
       // Esperar un momento para que se vea el toast antes de cerrar
       setTimeout(() => {
         onSuccess?.(); // Re-fetchea los datos del servidor para sincronizar la UI
-        onClose(); // Cierra el modal
+        handleClose(); // Cierra el modal
       }, 1000);
 
     } catch (error) {
@@ -173,7 +182,7 @@ export const PermissionModal = ({ employee, onClose, onSuccess }: PermissionModa
             </h3>
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="text-muted-foreground hover:text-foreground"
               disabled={isLoading}
             >
@@ -226,13 +235,26 @@ export const PermissionModal = ({ employee, onClose, onSuccess }: PermissionModa
                 disabled={isLoading}
               />
             </div>
+
+            <label className="flex items-center gap-2 mt-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={oficial}
+                onChange={(e) => setOficial(e.target.checked)}
+                className="w-4 h-4 accent-primary"
+              />
+              <span className="text-sm text-foreground">Permiso oficial</span>
+            </label>
+            <p className="text-xs text-muted-foreground mt-1">
+              Un permiso oficial no consume el cupo de 12 h anuales ni genera horas a recuperar.
+            </p>
           </div>
 
           <div className="mt-6 flex justify-end space-x-3">
             <Button
               type="button"
               label='Cancelar'
-              onClick={onClose}
+              onClick={handleClose}
               className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading}
               severity="secondary" text raised
