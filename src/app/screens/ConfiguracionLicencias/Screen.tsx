@@ -198,6 +198,23 @@ export default function ConfiguracionGeneral() {
         }
     };
 
+    const [importando, setImportando] = useState(false);
+    const handleImportarFeriados = async () => {
+        const anio = new Date().getFullYear();
+        setImportando(true);
+        try {
+            const res = await apiClient.post<{ importados: number; ya_existian: number }>(
+                `/licenses/feriados/importar/${anio}`, {}
+            );
+            showToast(`Importados ${res.importados} feriados nacionales ${anio} (${res.ya_existian} ya existían)`, "success");
+            loadAllData();
+        } catch (error: any) {
+            showToast(error.message || "Error al importar feriados", "error");
+        } finally {
+            setImportando(false);
+        }
+    };
+
     const handleVerificarFeedback = async () => {
         setVerificando(true);
         setReporteReglas(null);
@@ -639,9 +656,20 @@ export default function ConfiguracionGeneral() {
                         {/* ── TAB 6: FERIADOS ─────────────────────────────────────────── */}
                         {activeTab === 'feriados' && (
                             <div>
-                                <h2 className="font-heading text-lg font-bold text-foreground mb-2">Feriados de Empresa</h2>
+                                <div className="flex items-center justify-between mb-2">
+                                    <h2 className="font-heading text-lg font-bold text-foreground">Feriados</h2>
+                                    <button
+                                        onClick={handleImportarFeriados}
+                                        disabled={importando}
+                                        className="px-4 py-2 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
+                                    >
+                                        <i className={`pi ${importando ? 'pi-spin pi-spinner' : 'pi-download'} text-sm`} />
+                                        {importando ? 'Importando…' : `Importar feriados nacionales ${new Date().getFullYear()}`}
+                                    </button>
+                                </div>
                                 <p className="text-sm text-muted-foreground mb-4">
-                                    Fechas puntuales que se excluyen del conteo de días hábiles en el calendario de licencias, además de los feriados públicos.
+                                    Importá los feriados nacionales argentinos con el botón de arriba, o agregá fechas propias (cierres administrativos, etc.).
+                                    El módulo de asistencia los usa para no contar ausencias esos días.
                                 </p>
 
                                 <div className="flex flex-col sm:flex-row gap-3 mb-6">
