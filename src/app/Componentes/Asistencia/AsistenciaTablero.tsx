@@ -29,6 +29,7 @@ export default function AsistenciaTablero() {
   const [horaSalida, setHoraSalida] = useState("");
   const [observacion, setObservacion] = useState("");
   const [guardando, setGuardando] = useState(false);
+  const [recalculando, setRecalculando] = useState(false);
   const toast = useRef<Toast>(null);
 
   const hoy = new Date().toISOString().split('T')[0];
@@ -103,6 +104,28 @@ export default function AsistenciaTablero() {
     }
   };
 
+  const lanzarRecalculo = async () => {
+    setRecalculando(true);
+    try {
+      await apiClient.post("/asistencia/recalcular", {});
+      toast.current?.show({
+        severity: "info",
+        summary: "Recálculo iniciado",
+        detail: "El recálculo corre en segundo plano. Actualizá el tablero en unos segundos.",
+        life: 6000,
+      });
+    } catch (e) {
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: e instanceof Error ? e.message : "No se pudo iniciar el recálculo",
+        life: 5000,
+      });
+    } finally {
+      setRecalculando(false);
+    }
+  };
+
   if (cargando) {
     return (
       <div className="p-8 text-center text-muted-foreground">
@@ -115,7 +138,17 @@ export default function AsistenciaTablero() {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <Toast ref={toast} />
-      <h1 className="font-heading text-2xl text-foreground mb-6">Asistencia</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-heading text-2xl text-foreground">Asistencia</h1>
+        <button
+          onClick={lanzarRecalculo}
+          disabled={recalculando}
+          className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity flex items-center gap-2"
+        >
+          <i className={`pi ${recalculando ? "pi-spin pi-spinner" : "pi-refresh"} text-sm`} />
+          {recalculando ? "Iniciando…" : "Recalcular todo"}
+        </button>
+      </div>
 
       {/* ── Jornadas incompletas ─────────────────────────────────── */}
       {incompletas.length > 0 && (
