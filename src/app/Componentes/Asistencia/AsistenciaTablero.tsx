@@ -20,9 +20,16 @@ const claseSaldo = (h: number) =>
     ? "text-success font-semibold"
     : "text-muted-foreground";
 
+interface BiometricoHuerfano {
+  biometricoId: string;
+  cantidadMarcas: number;
+  ultimaMarcacion: string;
+}
+
 export default function AsistenciaTablero() {
   const [filas, setFilas] = useState<TableroFila[]>([]);
   const [incompletas, setIncompletas] = useState<JornadaIncompleta[]>([]);
+  const [huerfanos, setHuerfanos] = useState<BiometricoHuerfano[]>([]);
   const [cargando, setCargando] = useState(true);
   const [editando, setEditando] = useState<JornadaIncompleta | null>(null);
   const [horaEntrada, setHoraEntrada] = useState("");
@@ -40,12 +47,14 @@ export default function AsistenciaTablero() {
   const cargar = async () => {
     setCargando(true);
     try {
-      const [t, i] = await Promise.all([
+      const [t, i, h] = await Promise.all([
         apiClient.get<{ empleados: TableroFila[] }>(`/asistencia/tablero?desde=${desdeTablero}&hasta=${hastaTablero}`),
         apiClient.get<{ jornadas: JornadaIncompleta[] }>("/asistencia/incompletas"),
+        apiClient.get<{ huerfanos: BiometricoHuerfano[] }>("/asistencia/biometricos-huerfanos"),
       ]);
       setFilas(t.empleados);
       setIncompletas(i.jornadas);
+      setHuerfanos(h.huerfanos);
     } catch (e) {
       toast.current?.show({
         severity: "error",
@@ -168,6 +177,42 @@ export default function AsistenciaTablero() {
           {recalculando ? "Iniciando…" : "Recalcular todo"}
         </button>
       </div>
+
+      {/* ── IDs del reloj sin vincular ───────────────────────────── */}
+      {huerfanos.length > 0 && (
+        <div className="mb-8 bg-card rounded-lg shadow-sm p-4 border border-amber-400">
+          <h2 className="font-heading text-lg text-foreground mb-1 flex items-center gap-2">
+            <i className="pi pi-exclamation-triangle text-amber-500" />
+            IDs del reloj sin vincular ({huerfanos.length})
+          </h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Estas personas marcaron en el reloj pero su ID no está asignado a ningún empleado.
+            Ingresá al perfil del empleado y cargá el "ID del reloj" correspondiente, luego recalculá.
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-muted-foreground border-b border-border">
+                  <th className="py-2 pr-4">ID en el reloj</th>
+                  <th className="py-2 pr-4 text-right">Marcas (últimos 14 días)</th>
+                  <th className="py-2 text-right">Última marcación</th>
+                </tr>
+              </thead>
+              <tbody>
+                {huerfanos.map((h) => (
+                  <tr key={h.biometricoId} className="border-b border-border last:border-0">
+                    <td className="py-2 pr-4 font-mono font-semibold text-amber-600">{h.biometricoId}</td>
+                    <td className="py-2 pr-4 text-right">{h.cantidadMarcas}</td>
+                    <td className="py-2 text-right text-muted-foreground">
+                      {h.ultimaMarcacion.slice(0, 16).replace("T", " ")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* ── Jornadas incompletas ─────────────────────────────────── */}
       {incompletas.length > 0 && (
