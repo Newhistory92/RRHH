@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare, Folder } from "lucide-react";
+import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare, Folder, Clock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -103,6 +103,9 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => setPage("editar-perfil")}>
               <UserCircle size={16} className="mr-2" /> Editar Perfil
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setPage("asistencia")}>
+              <Clock size={16} className="mr-2" /> Mi Asistencia
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setPage("licencias")}>
               <FileText size={16} className="mr-2" /> Licencias
