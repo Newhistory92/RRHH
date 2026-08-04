@@ -53,7 +53,7 @@ const buildFormData = (employee: Employee) => ({
   scheduleEnd: typeof employee.horario.horaFin === 'number'
     ? decimalToTimeString(employee.horario.horaFin)
     : employee.horario.horaFin,
-  employmentStatus: employee.condicionLaboral.tipoContrato ?? 'permanente',
+  employmentStatus: employee.condicionLaboral.tipoContrato ?? null,
   startDate: employee.condicionLaboral?.fechaIngreso
     ? new Date(employee.condicionLaboral.fechaIngreso)
     : null,

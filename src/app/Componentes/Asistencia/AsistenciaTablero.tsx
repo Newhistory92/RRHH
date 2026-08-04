@@ -107,13 +107,32 @@ export default function AsistenciaTablero() {
   const lanzarRecalculo = async () => {
     setRecalculando(true);
     try {
+      // Snapshot del último recálculo antes de lanzar, para detectar el nuevo.
+      const antes = await apiClient.get<{ recalculos: { id: number; finalizadoAt: string | null }[] }>(
+        "/asistencia/recalculos?limite=1"
+      );
+      const idAntes = antes.recalculos[0]?.id ?? 0;
+
       await apiClient.post("/asistencia/recalcular", {});
+
+      // Polling: esperar hasta que aparezca un registro nuevo con finalizadoAt.
+      const esperar = (ms: number) => new Promise((r) => setTimeout(r, ms));
+      for (let i = 0; i < 60; i++) {
+        await esperar(3000);
+        const ahora = await apiClient.get<{ recalculos: { id: number; finalizadoAt: string | null }[] }>(
+          "/asistencia/recalculos?limite=1"
+        );
+        const top = ahora.recalculos[0];
+        if (top && top.id > idAntes && top.finalizadoAt) break;
+      }
+
       toast.current?.show({
-        severity: "info",
-        summary: "Recálculo iniciado",
-        detail: "El recálculo corre en segundo plano. Actualizá el tablero en unos segundos.",
-        life: 6000,
+        severity: "success",
+        summary: "Recálculo completado",
+        detail: "El tablero fue actualizado.",
+        life: 4000,
       });
+      await cargar();
     } catch (e) {
       toast.current?.show({
         severity: "error",
