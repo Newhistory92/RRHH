@@ -969,7 +969,7 @@ export interface JornadaDiaria {
 export interface TableroFila {
   employeeId: number;
   employeeName: string;
-  biometricoId: string;
+  biometricoId: string | null;
   saldoAcumulado: number;
   ausencias: number;
   incompletas: number;

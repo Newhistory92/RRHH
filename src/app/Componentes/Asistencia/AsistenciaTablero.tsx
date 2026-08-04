@@ -37,6 +37,7 @@ export default function AsistenciaTablero() {
   const [observacion, setObservacion] = useState("");
   const [guardando, setGuardando] = useState(false);
   const [recalculando, setRecalculando] = useState(false);
+  const [reseteando, setReseteando] = useState(false);
   const toast = useRef<Toast>(null);
 
   const hoy = new Date().toISOString().split('T')[0];
@@ -113,6 +114,30 @@ export default function AsistenciaTablero() {
     }
   };
 
+  const resetearDesdeHoy = async () => {
+    if (!confirm("¿Eliminar todas las jornadas anteriores a hoy y arrancar de cero desde hoy?")) return;
+    setReseteando(true);
+    try {
+      await apiClient.post("/asistencia/reset-inicio", {});
+      toast.current?.show({
+        severity: "info",
+        summary: "Módulo reseteado",
+        detail: "Datos anteriores a hoy eliminados. Recalculá para procesar el día de hoy.",
+        life: 5000,
+      });
+      await cargar();
+    } catch (e) {
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: e instanceof Error ? e.message : "No se pudo resetear",
+        life: 5000,
+      });
+    } finally {
+      setReseteando(false);
+    }
+  };
+
   const lanzarRecalculo = async () => {
     setRecalculando(true);
     try {
@@ -168,14 +193,24 @@ export default function AsistenciaTablero() {
       <Toast ref={toast} />
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-2xl text-foreground">Asistencia</h1>
-        <button
-          onClick={lanzarRecalculo}
-          disabled={recalculando}
-          className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity flex items-center gap-2"
-        >
-          <i className={`pi ${recalculando ? "pi-spin pi-spinner" : "pi-refresh"} text-sm`} />
-          {recalculando ? "Iniciando…" : "Recalcular todo"}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={resetearDesdeHoy}
+            disabled={reseteando || recalculando}
+            className="px-4 py-2 rounded-lg bg-muted text-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity flex items-center gap-2"
+          >
+            <i className={`pi ${reseteando ? "pi-spin pi-spinner" : "pi-calendar"} text-sm`} />
+            {reseteando ? "Reseteando…" : "Empezar desde hoy"}
+          </button>
+          <button
+            onClick={lanzarRecalculo}
+            disabled={recalculando || reseteando}
+            className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity flex items-center gap-2"
+          >
+            <i className={`pi ${recalculando ? "pi-spin pi-spinner" : "pi-refresh"} text-sm`} />
+            {recalculando ? "Iniciando…" : "Recalcular todo"}
+          </button>
+        </div>
       </div>
 
       {/* ── IDs del reloj sin vincular ───────────────────────────── */}
@@ -314,21 +349,22 @@ export default function AsistenciaTablero() {
               {filas.map((f) => (
                 <tr key={f.employeeId} className="border-b border-border last:border-0">
                   <td className="py-2 pr-4 text-foreground">{f.employeeName}</td>
-                  <td className="py-2 pr-4 text-muted-foreground">{f.biometricoId}</td>
-                  <td className={`py-2 pr-4 text-right ${claseSaldo(f.saldoAcumulado)}`}>
-                    {fmtHoras(f.saldoAcumulado)}
+                  <td className="py-2 pr-4">
+                    {f.biometricoId
+                      ? <span className="text-muted-foreground">{f.biometricoId}</span>
+                      : <span className="text-xs text-amber-600 font-medium">Sin vincular</span>}
                   </td>
-                  <td className="py-2 pr-4 text-right">{f.ausencias}</td>
-                  <td className="py-2 text-right">{f.incompletas}</td>
+                  <td className={`py-2 pr-4 text-right ${f.biometricoId ? claseSaldo(f.saldoAcumulado) : "text-muted-foreground"}`}>
+                    {f.biometricoId ? fmtHoras(f.saldoAcumulado) : "—"}
+                  </td>
+                  <td className="py-2 pr-4 text-right">{f.biometricoId ? f.ausencias : "—"}</td>
+                  <td className="py-2 text-right">{f.biometricoId ? f.incompletas : "—"}</td>
                 </tr>
               ))}
               {filas.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="py-6 text-center text-muted-foreground"
-                  >
-                    No hay empleados vinculados a un reloj todavía.
+                  <td colSpan={5} className="py-6 text-center text-muted-foreground">
+                    No hay empleados registrados.
                   </td>
                 </tr>
               )}
