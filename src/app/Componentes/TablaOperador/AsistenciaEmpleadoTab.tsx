@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiClient } from "@/app/util/apiClient";
-import { Employee, JornadaDiaria } from "@/app/Interfas/Interfaces";
+import { Employee, JornadaDiaria, ResumenAbuso } from "@/app/Interfas/Interfaces";
 
 const fmtHoras = (h: number) => {
   const signo = h < 0 ? "-" : h > 0 ? "+" : "";
@@ -37,6 +37,7 @@ interface Props {
 export function AsistenciaEmpleadoTab({ employee }: Props) {
   const [saldo, setSaldo] = useState<number>(0);
   const [jornadas, setJornadas] = useState<JornadaDiaria[]>([]);
+  const [abuso, setAbuso] = useState<ResumenAbuso | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,11 +45,14 @@ export function AsistenciaEmpleadoTab({ employee }: Props) {
     if (!employee.id) return;
     (async () => {
       try {
-        const r = await apiClient.get<{ saldoAcumulado: number; jornadas: JornadaDiaria[] }>(
-          `/asistencia/empleado/${employee.id}`,
-        );
+        const r = await apiClient.get<{
+          saldoAcumulado: number;
+          jornadas: JornadaDiaria[];
+          abuso: ResumenAbuso;
+        }>(`/asistencia/empleado/${employee.id}`);
         setSaldo(r.saldoAcumulado);
         setJornadas(r.jornadas);
+        setAbuso(r.abuso);
       } catch (e) {
         setError(e instanceof Error ? e.message : "No se pudo cargar la asistencia");
       } finally {
@@ -89,7 +93,7 @@ export function AsistenciaEmpleadoTab({ employee }: Props) {
   return (
     <div className="mt-6 space-y-6">
       {/* Resumen */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         <div className="bg-card rounded-lg border border-border p-5">
           <p className="text-xs text-muted-foreground mb-1">Saldo acumulado</p>
           <p className={`text-3xl font-heading ${debe ? "text-error" : "text-success"}`}>
@@ -112,6 +116,17 @@ export function AsistenciaEmpleadoTab({ employee }: Props) {
             {incompletas}
           </p>
           <p className="text-xs text-muted-foreground mt-1">jornadas parciales</p>
+        </div>
+        <div className="bg-card rounded-lg border border-border p-5">
+          <p className="text-xs text-muted-foreground mb-1">Días con tolerancia</p>
+          <p className={`text-3xl font-heading ${abuso?.alerta ? "text-amber-700 dark:text-amber-400" : "text-foreground"}`}>
+            {abuso?.diasAbuso ?? 0}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {abuso?.alerta
+              ? `${abuso.rachaMaxima} días seguidos`
+              : "fuera del margen estricto"}
+          </p>
         </div>
       </div>
 
@@ -149,6 +164,20 @@ export function AsistenciaEmpleadoTab({ employee }: Props) {
                   </td>
                   <td className={`py-2 pr-4 ${COLOR_ESTADO[j.estado] ?? ""}`}>
                     {ETIQUETA[j.estado] ?? j.estado}
+                    {(j.abusoEntrada || j.abusoSalida) && (
+                      <span
+                        className="ml-2 rounded px-1.5 py-0.5 text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300"
+                        title={
+                          j.abusoEntrada && j.abusoSalida
+                            ? "Fuera del margen en la entrada y en la salida"
+                            : j.abusoEntrada
+                              ? "Fuera del margen en la entrada"
+                              : "Fuera del margen en la salida"
+                        }
+                      >
+                        margen
+                      </span>
+                    )}
                   </td>
                   <td className="py-2 pr-4 text-right">{j.horasTrabajadas.toFixed(2)}</td>
                   <td className="py-2 pr-4 text-right">{j.horasRequeridas.toFixed(2)}</td>

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Toast } from "primereact/toast";
 import { apiClient } from "@/app/util/apiClient";
-import { JornadaIncompleta, TableroFila } from "@/app/Interfas/Interfaces";
+import { AlertaTolerancia, JornadaIncompleta, TableroFila } from "@/app/Interfas/Interfaces";
 
 const fmtHoras = (h: number) => {
   const signo = h < 0 ? "-" : h > 0 ? "+" : "";
@@ -20,6 +20,14 @@ const claseSaldo = (h: number) =>
     ? "text-success font-semibold"
     : "text-muted-foreground";
 
+const fmtFechas = (fechas: string[]) =>
+  fechas
+    .map((f) => {
+      const [, mes, dia] = f.split("-");
+      return `${Number(dia)}/${Number(mes)}`;
+    })
+    .join(", ");
+
 interface BiometricoHuerfano {
   biometricoId: string;
   cantidadMarcas: number;
@@ -30,6 +38,7 @@ export default function AsistenciaTablero() {
   const [filas, setFilas] = useState<TableroFila[]>([]);
   const [incompletas, setIncompletas] = useState<JornadaIncompleta[]>([]);
   const [huerfanos, setHuerfanos] = useState<BiometricoHuerfano[]>([]);
+  const [alertas, setAlertas] = useState<AlertaTolerancia[]>([]);
   const [cargando, setCargando] = useState(true);
   const [editando, setEditando] = useState<JornadaIncompleta | null>(null);
   const [horaEntrada, setHoraEntrada] = useState("");
@@ -48,14 +57,16 @@ export default function AsistenciaTablero() {
   const cargar = async () => {
     setCargando(true);
     try {
-      const [t, i, h] = await Promise.all([
+      const [t, i, h, a] = await Promise.all([
         apiClient.get<{ empleados: TableroFila[] }>(`/asistencia/tablero?desde=${desdeTablero}&hasta=${hastaTablero}`),
         apiClient.get<{ jornadas: JornadaIncompleta[] }>("/asistencia/incompletas"),
         apiClient.get<{ huerfanos: BiometricoHuerfano[] }>("/asistencia/biometricos-huerfanos"),
+        apiClient.get<{ empleados: AlertaTolerancia[] }>(`/asistencia/alertas-tolerancia?desde=${desdeTablero}&hasta=${hastaTablero}`),
       ]);
       setFilas(t.empleados);
       setIncompletas(i.jornadas);
       setHuerfanos(h.huerfanos);
+      setAlertas(a.empleados);
     } catch (e) {
       toast.current?.show({
         severity: "error",
@@ -303,6 +314,43 @@ export default function AsistenciaTablero() {
         </div>
       )}
 
+      {/* ── Uso reiterado de tolerancia ──────────────────────────── */}
+      {alertas.length > 0 && (
+        <div className="mb-8 bg-card rounded-lg shadow-sm p-6 border border-amber-300 dark:border-amber-700">
+          <h2 className="font-heading text-lg text-amber-800 dark:text-amber-300 mb-1">
+            Uso reiterado de tolerancia
+          </h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Marcaron fuera del margen estricto varios días trabajados seguidos.
+            No se les descontaron horas: siguen dentro de la tolerancia.
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-muted-foreground border-b border-border">
+                  <th className="py-2 pr-4">Empleado</th>
+                  <th className="py-2 pr-4 text-right">Días seguidos</th>
+                  <th className="py-2 pr-4 text-right">Días en el período</th>
+                  <th className="py-2">Fechas</th>
+                </tr>
+              </thead>
+              <tbody>
+                {alertas.map((a) => (
+                  <tr key={a.employeeId} className="border-b border-border last:border-0">
+                    <td className="py-2 pr-4 text-foreground">{a.employeeName}</td>
+                    <td className="py-2 pr-4 text-right font-semibold text-amber-700 dark:text-amber-400">
+                      {a.rachaMaxima}
+                    </td>
+                    <td className="py-2 pr-4 text-right">{a.diasAbuso}</td>
+                    <td className="py-2 text-muted-foreground">{fmtFechas(a.fechas)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* ── Tablero de saldo por empleado ────────────────────────── */}
       <div className="bg-card rounded-lg shadow-sm p-4 border border-border">
         <h2 className="font-heading text-lg text-foreground mb-4">
@@ -342,7 +390,8 @@ export default function AsistenciaTablero() {
                 <th className="py-2 pr-4">ID reloj</th>
                 <th className="py-2 pr-4 text-right">Saldo acumulado</th>
                 <th className="py-2 pr-4 text-right">Ausencias</th>
-                <th className="py-2 text-right">Incompletas</th>
+                <th className="py-2 pr-4 text-right">Incompletas</th>
+                <th className="py-2 text-right">Días con tolerancia</th>
               </tr>
             </thead>
             <tbody>
@@ -358,12 +407,20 @@ export default function AsistenciaTablero() {
                     {f.biometricoId ? fmtHoras(f.saldoAcumulado) : "—"}
                   </td>
                   <td className="py-2 pr-4 text-right">{f.biometricoId ? f.ausencias : "—"}</td>
-                  <td className="py-2 text-right">{f.biometricoId ? f.incompletas : "—"}</td>
+                  <td className="py-2 pr-4 text-right">{f.biometricoId ? f.incompletas : "—"}</td>
+                  <td className="py-2 text-right">
+                    {f.biometricoId ? (
+                      <span className={f.alerta ? "text-amber-700 dark:text-amber-400 font-semibold" : ""}>
+                        {f.diasAbuso}
+                        {f.alerta && <span className="ml-1" title={`${f.rachaMaxima} días seguidos`}>⚠</span>}
+                      </span>
+                    ) : "—"}
+                  </td>
                 </tr>
               ))}
               {filas.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="py-6 text-center text-muted-foreground">
+                  <td colSpan={6} className="py-6 text-center text-muted-foreground">
                     No hay empleados registrados.
                   </td>
                 </tr>
