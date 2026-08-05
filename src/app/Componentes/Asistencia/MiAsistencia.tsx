@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiClient } from "@/app/util/apiClient";
-import { JornadaDiaria } from "@/app/Interfas/Interfaces";
+import { JornadaDiaria, ResumenAbuso } from "@/app/Interfas/Interfaces";
 
 const fmtHoras = (h: number) => {
   const signo = h < 0 ? "-" : h > 0 ? "+" : "";
@@ -21,20 +21,32 @@ const ETIQUETA_ESTADO: Record<string, string> = {
   sin_horario: "Sin horario",
 };
 
+const fmtFechas = (fechas: string[]) =>
+  fechas
+    .map((f) => {
+      const [, mes, dia] = f.split("-");
+      return `${Number(dia)}/${Number(mes)}`;
+    })
+    .join(", ");
+
 export default function MiAsistencia() {
   const [saldo, setSaldo] = useState(0);
   const [jornadas, setJornadas] = useState<JornadaDiaria[]>([]);
+  const [abuso, setAbuso] = useState<ResumenAbuso | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
-        const r = await apiClient.get<{ saldoAcumulado: number; jornadas: JornadaDiaria[] }>(
-          "/asistencia/mi",
-        );
+        const r = await apiClient.get<{
+          saldoAcumulado: number;
+          jornadas: JornadaDiaria[];
+          abuso: ResumenAbuso;
+        }>("/asistencia/mi");
         setSaldo(r.saldoAcumulado);
         setJornadas(r.jornadas);
+        setAbuso(r.abuso);
       } catch (e) {
         setError(e instanceof Error ? e.message : "No se pudo cargar tu asistencia");
       } finally {
@@ -61,6 +73,20 @@ export default function MiAsistencia() {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <h1 className="font-heading text-2xl text-foreground mb-6">Mi asistencia</h1>
+
+      {abuso?.alerta && (
+        <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950/40">
+          <p className="font-semibold text-amber-800 dark:text-amber-300">
+            Uso reiterado del margen de tolerancia
+          </p>
+          <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">
+            Marcaste fuera del margen de {abuso.toleranciaEstrictaEntradaMin} minutos
+            a la entrada o {abuso.toleranciaEstrictaSalidaMin} a la salida{" "}
+            {abuso.rachaMaxima} días seguidos ({fmtFechas(abuso.fechasRachaMaxima)}).
+            No se te descontaron horas: sigue estando dentro de la tolerancia.
+          </p>
+        </div>
+      )}
 
       <div className="bg-card rounded-lg shadow-sm p-6 border border-border mb-8">
         <p className="text-sm text-muted-foreground mb-1">Saldo acumulado</p>
@@ -107,7 +133,23 @@ export default function MiAsistencia() {
                       <span className="ml-1 text-xs text-muted-foreground">(manual)</span>
                     )}
                   </td>
-                  <td className="py-2 pr-4">{ETIQUETA_ESTADO[j.estado] ?? j.estado}</td>
+                  <td className="py-2 pr-4">
+                    {ETIQUETA_ESTADO[j.estado] ?? j.estado}
+                    {(j.abusoEntrada || j.abusoSalida) && (
+                      <span
+                        className="ml-2 rounded px-1.5 py-0.5 text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300"
+                        title={
+                          j.abusoEntrada && j.abusoSalida
+                            ? "Fuera del margen en la entrada y en la salida"
+                            : j.abusoEntrada
+                              ? "Fuera del margen en la entrada"
+                              : "Fuera del margen en la salida"
+                        }
+                      >
+                        margen
+                      </span>
+                    )}
+                  </td>
                   <td className="py-2 pr-4 text-right">{j.horasTrabajadas.toFixed(2)}</td>
                   <td className="py-2 pr-4 text-right">{j.horasRequeridas.toFixed(2)}</td>
                   <td

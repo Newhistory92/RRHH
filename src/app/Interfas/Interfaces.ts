@@ -960,6 +960,8 @@ export interface JornadaDiaria {
   salida: string | null;
   entradaManual: boolean;
   salidaManual: boolean;
+  abusoEntrada: boolean;
+  abusoSalida: boolean;
   permisoBanco: number;
   permisoDeuda: number;
   permisoOficial: number;
@@ -973,6 +975,28 @@ export interface TableroFila {
   saldoAcumulado: number;
   ausencias: number;
   incompletas: number;
+  diasAbuso: number;
+  rachaMaxima: number;
+  alerta: boolean;
+}
+
+/** Resumen de uso reiterado de la tolerancia en un rango. */
+export interface ResumenAbuso {
+  diasAbuso: number;
+  rachaMaxima: number;
+  fechasRachaMaxima: string[];
+  alerta: boolean;
+  toleranciaEstrictaEntradaMin: number;
+  toleranciaEstrictaSalidaMin: number;
+}
+
+/** Fila del panel de alertas del tablero de RRHH. */
+export interface AlertaTolerancia {
+  employeeId: number;
+  employeeName: string;
+  diasAbuso: number;
+  rachaMaxima: number;
+  fechas: string[];
 }
 
 export interface JornadaIncompleta {
