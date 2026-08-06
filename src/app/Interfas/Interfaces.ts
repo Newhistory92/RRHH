@@ -990,6 +990,15 @@ export interface ResumenAbuso {
   toleranciaEstrictaSalidaMin: number;
 }
 
+/** Día fuera del margen estricto, con la hora marcada en cada extremo. */
+export interface JornadaAbuso {
+  fecha: string;
+  entrada: string | null;
+  salida: string | null;
+  abusoEntrada: boolean;
+  abusoSalida: boolean;
+}
+
 /** Fila del panel de alertas del tablero de RRHH. */
 export interface AlertaTolerancia {
   employeeId: number;
@@ -997,6 +1006,7 @@ export interface AlertaTolerancia {
   diasAbuso: number;
   rachaMaxima: number;
   fechas: string[];
+  jornadas: JornadaAbuso[];
 }
 
 export interface JornadaIncompleta {
