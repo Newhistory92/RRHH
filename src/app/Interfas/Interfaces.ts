@@ -1009,6 +1009,33 @@ export interface AlertaTolerancia {
   jornadas: JornadaAbuso[];
 }
 
+/** Parte médico que justifica una ausencia. */
+export interface JustificacionAusencia {
+  documentoId: number;
+  fileName: string;
+  mimeType: string;
+  observacion: string | null;
+  justificadoPor: string;
+  createdAt: string | null;
+}
+
+/** Licencia que cubriría la fecha pero todavía no está aprobada. */
+export interface LicenciaPendiente {
+  id: number;
+  type: string;
+  status: string;
+}
+
+/** Día ausente o justificado en la pestaña de Ausencias. */
+export interface AusenciaEmpleado {
+  fecha: string;
+  estado: "ausente" | "justificada";
+  horasPerdidas: number;
+  puedeJustificar: boolean;
+  justificacion: JustificacionAusencia | null;
+  licenciaPendiente: LicenciaPendiente | null;
+}
+
 export interface JornadaIncompleta {
   id: number;
   employeeId: number;

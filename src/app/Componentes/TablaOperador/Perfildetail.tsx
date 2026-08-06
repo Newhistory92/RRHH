@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import {ProfileTab,LicenseHistoryTab,PermissionHistoryTab,DocumentsTab,FeedbackIndicatorsTab} from "./DetailTables"
 import { AsistenciaEmpleadoTab } from "./AsistenciaEmpleadoTab"
 import { AlertasToleranciaTab } from "./AlertasToleranciaTab"
+import { AusenciasEmpleadoTab } from "./AusenciasEmpleadoTab"
 import {StatusBadge} from "@/app/util/UiRRHH"
 import { useState } from "react";
 import {  Employee, LicenseHistory} from '@/app/Interfas/Interfaces';
@@ -131,6 +132,16 @@ export const EmployeeDetailView = ({
           >
             Alertas de tolerancia
           </button>
+          <button
+            onClick={() => setActiveTab("ausencias")}
+            className={`${
+              activeTab === "ausencias"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+          >
+            Ausencias
+          </button>
         </nav>
       </div>
       <div className="no-print">
@@ -149,6 +160,7 @@ export const EmployeeDetailView = ({
         {activeTab === "feedback360" && <FeedbackIndicatorsTab employee={employee} />}
         {activeTab === "asistencia" && <AsistenciaEmpleadoTab employee={employee} />}
         {activeTab === "alertas" && <AlertasToleranciaTab employee={employee} />}
+        {activeTab === "ausencias" && <AusenciasEmpleadoTab employee={employee} />}
       </div>
     </div>
   );
