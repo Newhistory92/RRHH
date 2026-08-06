@@ -234,7 +234,7 @@ export function AusenciasEmpleadoTab({ employee }: Props) {
                         <span className="text-error">Sin justificar</span>
                         {a.licenciaPendiente && (
                           <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">
-                            Licencia de {a.licenciaPendiente.type} sin aprobar cubriría este día
+                            Licencia de {a.licenciaPendiente.type} ({a.licenciaPendiente.status.toLowerCase()}) cubriría este día
                           </p>
                         )}
                       </>
