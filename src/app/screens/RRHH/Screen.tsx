@@ -183,7 +183,7 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
         }
       `}</style>
       <Toast ref={toast} />
-      <div className="bg-background min-h-screen font-sans">
+      <div className="font-sans">
         <main>
           {renderContent()}
           <PermissionModal

@@ -12,8 +12,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Employee, Page } from "@/app/Interfas/Interfaces";
+import { Employee, Notification, Page } from "@/app/Interfas/Interfaces";
 import { logoutFromClient } from "@/app/util/authClient";
+import { apiClient } from "@/app/util/apiClient";
 
 const DEFAULT_AVATAR = "/Default-avatar.webp";
 
@@ -29,11 +30,20 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
   const [roleName, setRoleName] = useState("");
   const [userPhoto, setUserPhoto] = useState(DEFAULT_AVATAR);
   const [userName, setUserName] = useState("Usuario");
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
     setMounted(true);
     setUsuario(localStorage.getItem("usuario") ?? "");
     setRoleName(localStorage.getItem("roleName") ?? "");
+
+    const empId = Number(localStorage.getItem("employeeId"));
+    if (empId) {
+      apiClient
+        .get<{ notifications: Notification[] }>(`/licenses/notificaciones?employee_id=${empId}`)
+        .then(res => setNotifications(res.notifications || []))
+        .catch(err => console.error("Error al cargar notificaciones:", err));
+    }
   }, []);
 
   useEffect(() => {
@@ -52,24 +62,51 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
     }
   };
 
-  const unreadCount = 0; // Notificaciones reales: fuera de alcance de este plan.
+  const unreadCount = notifications.filter(n => n.status === "nueva").length;
 
   return (
     <header className="h-16 sticky top-0 z-20 bg-surface border-b border-border flex items-center justify-between px-6">
       <div className="flex items-center" />
 
       <div className="flex items-center gap-3">
-        <button
-          className="relative p-2 rounded-md hover:bg-surface-muted text-foreground transition-colors"
-          aria-label="Notificaciones"
-        >
-          <Bell size={18} />
-          {unreadCount > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px]">
-              {unreadCount}
-            </Badge>
-          )}
-        </button>
+        {/* Campanita con notificaciones reales */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="relative p-2 rounded-md hover:bg-surface-muted text-foreground transition-colors"
+              aria-label="Notificaciones"
+            >
+              <Bell size={18} />
+              {unreadCount > 0 && (
+                <Badge className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px]">
+                  {unreadCount}
+                </Badge>
+              )}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80">
+            <div className="px-3 py-2 border-b border-border">
+              <p className="font-semibold text-sm text-foreground">Notificaciones</p>
+              {unreadCount > 0 && (
+                <p className="text-xs text-muted-foreground">{unreadCount} sin leer</p>
+              )}
+            </div>
+            {notifications.length === 0 ? (
+              <div className="px-3 py-6 text-center text-sm text-muted-foreground">
+                No tenés notificaciones nuevas
+              </div>
+            ) : (
+              notifications.slice(0, 8).map(notif => (
+                <DropdownMenuItem key={notif.id} className="flex flex-col items-start gap-0.5 px-3 py-2.5 cursor-default">
+                  <span className={`text-sm leading-snug ${notif.status === "nueva" ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
+                    {notif.text.length > 90 ? notif.text.slice(0, 90) + "…" : notif.text}
+                  </span>
+                  <span className="text-xs text-muted-foreground">{notif.time}</span>
+                </DropdownMenuItem>
+              ))
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {mounted && (
           <button
