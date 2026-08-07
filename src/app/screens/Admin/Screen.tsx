@@ -4,6 +4,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { UserRoundSearch } from "lucide-react";
 import { InputText } from 'primereact/inputtext';
 import { Usuario, Role } from '@/app/Interfas/Interfaces';
+import { apiClient } from '@/app/util/apiClient';
+import { ObraSocialUsuariosTab } from '@/app/Componentes/Admin/ObraSocialUsuariosTab';
 
 
 
@@ -34,6 +36,7 @@ interface RolesApiResponse {
 
 export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<string>('active-users');
+    const [authProvider, setAuthProvider] = useState<string>('local');
     const [users, setUsers] = useState<Usuario[]>([]);
     const [roles, setRoles] = useState<Role[]>();
     const [searchTerm, setSearchTerm] = useState<string>('');
@@ -89,6 +92,12 @@ export default function AdminPage() {
     useEffect(() => {
         fetchUsers();
         fetchRoles();
+    }, []);
+
+    useEffect(() => {
+        apiClient.get<{ authProvider: string }>('/auth/config')
+            .then((r) => setAuthProvider(r.authProvider))
+            .catch(() => setAuthProvider('local'));
     }, []);
 
     const fetchRoles = async () => {
@@ -313,6 +322,9 @@ export default function AdminPage() {
                             <TabButton id="inactive-users" title="Usuarios Inactivos" />
                             <TabButton id="roles" title="Configuración de Roles" />
                             <TabButton id="profiles" title="Perfiles de Usuario" />
+                            {authProvider === 'obrasocial' && (
+                                <TabButton id="obrasocial" title="Usuarios ObraSocial" />
+                            )}
                         </nav>
                     </div>
 
@@ -354,6 +366,7 @@ export default function AdminPage() {
                             </div>
                         )}{activeTab === 'roles' && <RolesGrid roles={roles ?? []} onEdit={openRoleModal} />}
                         {activeTab === 'profiles' && <ProfileSettings />}
+                        {activeTab === 'obrasocial' && authProvider === 'obrasocial' && <ObraSocialUsuariosTab />}
                     </div>
                 </main>
             </div>

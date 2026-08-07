@@ -1263,3 +1263,17 @@ export interface EmpleadoJubilado {
   fechaJubilacion: string | null;
   saldoFinal: number;
 }
+
+/** Fila del tablero de importación de usuarios institucionales. */
+export interface UsuarioObraSocial {
+  idUsuario: string;
+  nombreUsuario: string;
+  anulado: boolean;
+  nombre: string | null;
+  apellido: string | null;
+  dni: string;
+  email: string | null;
+  telefono: string | null;
+  vinculado: boolean;
+  employeeId: number | null;
+}
