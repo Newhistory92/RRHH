@@ -5,6 +5,7 @@ import { Toast } from "primereact/toast";
 import { EmployeeDetailView } from "@/app/Componentes/TablaOperador/Perfildetail";
 import { MessagesView } from "@/app/Componentes/TablaOperador/MensajeDetail";
 import { EmployeeTableView } from "@/app/Componentes/TablaOperador/Table";
+import JubiladosTable from "@/app/Componentes/TablaOperador/JubiladosTable";
 import {LicenseDetailModal,PermissionModal} from "@/app/Componentes/ModalRRHH/LicenseModal";
 import {
   Employee,
@@ -19,7 +20,7 @@ export interface ArchivedMessage extends Message {
   employeeName: string;
 }
 export interface ViewState {
-  name: "table" | "detail" | "messages";
+  name: "table" | "detail" | "messages" | "jubilados";
   id?: number;
 }
 export default function RecursosHumanosPage() {
@@ -142,17 +143,31 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
             onApplyLicense={handleApplyLicense}
           />
         );
+      case "jubilados":
+        return (
+          <JubiladosTable onVolver={() => setCurrentView({ name: "table" })} />
+        );
       case "table":
       default:
         return (
-          <EmployeeTableView
-            employees={employees}
-            onSelectEmployee={(id: number) =>
-              setCurrentView({ name: "detail", id })
-            }
-            onShowMessages={() => setCurrentView({ name: "messages" })}
-            onOpenPermissionModal={setPermissionModalEmployeeId}
-          />
+          <>
+            <div className="flex justify-end mb-4 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8">
+              <button
+                onClick={() => setCurrentView({ name: "jubilados" })}
+                className="px-4 py-2 rounded-lg bg-muted text-foreground text-sm hover:opacity-90"
+              >
+                Ver jubilados
+              </button>
+            </div>
+            <EmployeeTableView
+              employees={employees}
+              onSelectEmployee={(id: number) =>
+                setCurrentView({ name: "detail", id })
+              }
+              onShowMessages={() => setCurrentView({ name: "messages" })}
+              onOpenPermissionModal={setPermissionModalEmployeeId}
+            />
+          </>
         );
     }
   };

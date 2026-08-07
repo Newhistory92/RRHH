@@ -13,7 +13,7 @@ export interface EmployeeTableViewProps {
 }
 
 export interface ViewState {
-  name: 'table' | 'detail' | 'messages';
+  name: 'table' | 'detail' | 'messages' | 'jubilados';
   id?: number;
 }
 type SortableKeys = keyof Employee | null;
