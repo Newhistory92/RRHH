@@ -832,6 +832,7 @@ export const StatusBadge = ({ status }: { status: string }) => {
     'Activo': 'bg-success-soft text-success-soft-foreground',
     'De licencia': 'bg-warning-soft text-warning-soft-foreground',
     'Parte médico': 'bg-error-soft text-error-soft-foreground',
+    'Jubilado': 'bg-muted text-muted-foreground',
   };
   return (
     <span className={`px-3 py-1 text-xs font-medium rounded-full inline-block ${map[status] ?? 'bg-muted text-muted-foreground'}`}>

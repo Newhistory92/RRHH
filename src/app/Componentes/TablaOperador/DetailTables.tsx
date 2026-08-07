@@ -64,6 +64,9 @@ const buildFormData = (employee: Employee) => ({
   lastCategoryUpdate: employee.condicionLaboral.fechaCategoria
     ? new Date(employee.condicionLaboral.fechaCategoria)
     : null,
+  retirementDate: employee.condicionLaboral.fechaJubilacion
+    ? new Date(employee.condicionLaboral.fechaJubilacion)
+    : null,
   biometricoId: employee.biometricoId ?? ''
 });
 
@@ -157,6 +160,11 @@ export const ProfileTab = ({ employee, onSave }: { employee: Employee; onSave?: 
       // Guardar biometricoId primero: si hay conflicto (ID duplicado) se lanza
       // 400 antes de tocar condicion laboral o horario, evitando un save parcial.
       await apiClient.put(`/employee/${employee.id}`, { biometricoId: formData.biometricoId || null });
+      await apiClient.put(`/rrhh/employee/${employee.id}/jubilacion`, {
+        fechaJubilacion: formData.retirementDate
+          ? formData.retirementDate.toISOString().split('T')[0]
+          : null,
+      });
       await Promise.all([
         updateCondicionLaboral(employee.id, condicionLaboralData),
         updateHorario(employee.id, horarioData),
@@ -335,6 +343,27 @@ export const ProfileTab = ({ employee, onSave }: { employee: Employee; onSave?: 
                   />
                 ) : (
                   formatDate(formData.lastCategoryUpdate)
+                )}
+              </InfoCard>
+
+              <InfoCard icon={CalendarIcon} title="Fecha de Jubilación">
+                {editingSection === 'condicionLaboral' ? (
+                  <>
+                    <Calendar
+                      value={formData.retirementDate}
+                      onChange={(e) => setFormData({ ...formData, retirementDate: e.value as Date })}
+                      dateFormat="yy-mm-dd"
+                      showButtonBar
+                      className="w-full"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Con la fecha cumplida el empleado queda desactivado: pierde el
+                      acceso al sistema y deja de sumar horas y vacaciones. Vaciar el
+                      campo lo reactiva.
+                    </p>
+                  </>
+                ) : (
+                  formData.retirementDate ? formatDate(formData.retirementDate) : '—'
                 )}
               </InfoCard>
             </div>

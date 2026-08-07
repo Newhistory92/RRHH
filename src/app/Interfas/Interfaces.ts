@@ -320,6 +320,8 @@ export interface CondicionLaboral {
   categoria: string;
   fechaCategoria: Date | null;
   position: string;
+  /** Fecha de jubilación. Con fecha cumplida el empleado queda desactivado. */
+  fechaJubilacion: Date | null;
 }
 // export interface SalaryHistory {
 //   currentSalary: number;
@@ -1244,4 +1246,20 @@ export interface GlobalStatsData {
   avgLateness: number;
   statusDistribution: { name: string; value: number }[];
   departmentProductivity: { name: string; productividad: number }[];
+}
+
+/** Fila del tablero de jubilados. */
+export interface EmpleadoJubilado {
+  id: number;
+  name: string;
+  dni: string | null;
+  email: string | null;
+  photo: string | null;
+  status: string;
+  departamento: string | null;
+  oficina: string | null;
+  tipoContrato: string | null;
+  fechaIngreso: string | null;
+  fechaJubilacion: string | null;
+  saldoFinal: number;
 }
