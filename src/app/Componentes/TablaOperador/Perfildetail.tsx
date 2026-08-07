@@ -60,8 +60,8 @@ export const EmployeeDetailView = ({
           </div>
         </div>
       </div>
-      <div className="border-b border-border no-print">
-        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+      <div className="border-b border-border no-print overflow-x-auto">
+        <nav className="-mb-px flex space-x-6 min-w-max" aria-label="Tabs">
           <button
             onClick={() => setActiveTab("perfil")}
             className={`${
