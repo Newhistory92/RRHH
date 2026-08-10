@@ -42,7 +42,7 @@ export function ObraSocialUsuariosTab() {
     const termino = busqueda.trim().toLowerCase();
     if (!termino) return usuarios;
     return usuarios.filter((u) =>
-      [u.nombreUsuario, u.nombre, u.apellido, u.dni]
+      [u.idUsuario, u.nombreUsuario, u.nombre, u.apellido, u.dni]
         .filter(Boolean)
         .some((campo) => String(campo).toLowerCase().includes(termino)),
     );
