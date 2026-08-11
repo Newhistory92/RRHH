@@ -15,6 +15,8 @@ import CertificacionesCursos from '@/app/Componentes/CvComponente/Certificacione
 import { Employee } from "@/app/Interfas/Interfaces"
 import { Button } from 'primereact/button';
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+
 interface EmployeeCVProps {
   employeeData: Employee | null;
   globalSettings?: Record<string, boolean>;
@@ -187,7 +189,7 @@ export default function EmployeeCV({ employeeData, globalSettings = {} }: Employ
     setIsSaving(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://127.0.0.1:8000/employee/${cvData.id}`, {
+      const response = await fetch(`${BACKEND_URL}/employee/${cvData.id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

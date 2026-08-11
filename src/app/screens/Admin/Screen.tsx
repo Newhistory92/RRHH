@@ -7,6 +7,8 @@ import { Usuario, Role } from '@/app/Interfas/Interfaces';
 import { apiClient } from '@/app/util/apiClient';
 import { ObraSocialUsuariosTab } from '@/app/Componentes/Admin/ObraSocialUsuariosTab';
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+
 
 
 
@@ -53,7 +55,7 @@ export default function AdminPage() {
         try {
             setLoading(true);
             const token = localStorage.getItem('token');
-            const response = await fetch('http://127.0.0.1:8000/users/', {
+            const response = await fetch(`${BACKEND_URL}/users/`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data: ApiResponse = await response.json();
@@ -104,7 +106,7 @@ export default function AdminPage() {
         try {
             setLoading(true);
             const token = localStorage.getItem('token');
-            const response = await fetch('http://127.0.0.1:8000/roles/', {
+            const response = await fetch(`${BACKEND_URL}/roles/`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data: RolesApiResponse = await response.json();
@@ -133,7 +135,7 @@ export default function AdminPage() {
 
             const token = localStorage.getItem('token');
             // Llamada al backend
-            const response = await fetch(`http://127.0.0.1:8000/users/${userId}/activo`, {
+            const response = await fetch(`${BACKEND_URL}/users/${userId}/activo`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ activo: newStatus })
@@ -179,7 +181,7 @@ export default function AdminPage() {
             const token = localStorage.getItem('token');
 
             // 1. Guardar Empleado
-            const employeeResponse = await fetch("http://127.0.0.1:8000/users/employee", {
+            const employeeResponse = await fetch(`${BACKEND_URL}/users/employee`, {
                 method: method,
                 headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
                 body: JSON.stringify({
@@ -199,7 +201,7 @@ export default function AdminPage() {
 
             // 2. Actualizar Rol
             if (formData.role) {
-                const roleResponse = await fetch(`http://127.0.0.1:8000/users/${editingUser.id}/role`, {
+                const roleResponse = await fetch(`${BACKEND_URL}/users/${editingUser.id}/role`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
                     body: JSON.stringify({ role: formData.role }),
@@ -221,7 +223,7 @@ export default function AdminPage() {
         console.log(role)
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://127.0.0.1:8000/users/${userId}/role`, {
+            const response = await fetch(`${BACKEND_URL}/users/${userId}/role`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
                 body: JSON.stringify({ role }),
@@ -263,7 +265,7 @@ export default function AdminPage() {
             const token = localStorage.getItem('token');
             if (roleId && parseInt(roleId)) {
                 // Actualizar rol existente
-                const response = await fetch(`http://127.0.0.1:8000/roles/${roleId}`, {
+                const response = await fetch(`${BACKEND_URL}/roles/${roleId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify(roleData)
@@ -274,7 +276,7 @@ export default function AdminPage() {
                 }
             } else {
                 // Crear nuevo rol
-                const response = await fetch('http://127.0.0.1:8000/roles/', {
+                const response = await fetch(`${BACKEND_URL}/roles/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify(roleData)

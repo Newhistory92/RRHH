@@ -4,6 +4,8 @@ import { DynamicSection } from '@/app/Componentes/Perfil/DynamicSectionCv';
 import { AcademicFormation } from "@/app/Interfas/Interfaces"
 import { argentinianDegrees } from "@/app/util/degrees";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+
 export interface CvFormacionProps {
   data: AcademicFormation[];
   updateData: (updates: AcademicFormation[]) => void;
@@ -38,7 +40,7 @@ export default function FormacionAcademica({ data, updateData, isEditing, employ
     if (!confirm("Seguro que deseas eliminar esta formacion academica?")) return;
 
     // Llamar al backend
-    const res = await fetch(`http://127.0.0.1:8000/employee/Academic/${id}`, {
+    const res = await fetch(`${BACKEND_URL}/employee/Academic/${id}`, {
       method: "DELETE",
     });
 

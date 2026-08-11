@@ -565,7 +565,7 @@
 //     const fetchStatus = async () => {
 //       try {
 //         const token = localStorage.getItem("token");
-//         const response = await fetch("http://127.0.0.1:8000/records/status", {
+//         const response = await fetch(`${BACKEND_URL}/records/status`, {
 //           headers: { "Authorization": `Bearer ${token}` }
 //         });
 //         if (response.ok) {
@@ -593,7 +593,7 @@
 //     setToggles((prev) => ({ ...prev, [setting]: newState }));
 
 //     const tabla = tableMap[setting];
-//     const url = `http://127.0.0.1:8000/records/${tabla}/toggle`;
+//     const url = `${BACKEND_URL}/records/${tabla}/toggle`;
 
 //     try {
 //       const token = localStorage.getItem("token");
@@ -801,6 +801,8 @@ import { Button } from 'primereact/button';
 import { Camera, CheckCircle, Activity, TrendingDown, AlertTriangle, Plus, SquarePen } from "lucide-react";
 import { Tag } from 'primereact/tag';
 import React from 'react';
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 
@@ -1123,7 +1125,7 @@ export const ProfileSettings: React.FC = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch("http://127.0.0.1:8000/records/status", {
+        const res = await fetch(`${BACKEND_URL}/records/status`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
         });
         if (!res.ok) return;
@@ -1138,7 +1140,7 @@ export const ProfileSettings: React.FC = () => {
     const next = !toggles[setting];
     setToggles(p => ({ ...p, [setting]: next }));
     try {
-      await fetch(`http://127.0.0.1:8000/records/${tableMap[setting]}/toggle`, {
+      await fetch(`${BACKEND_URL}/records/${tableMap[setting]}/toggle`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
         body: JSON.stringify({ activo: next }),

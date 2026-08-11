@@ -7,6 +7,8 @@ import { MessagesView } from "@/app/Componentes/TablaOperador/MensajeDetail";
 import { EmployeeTableView } from "@/app/Componentes/TablaOperador/Table";
 import JubiladosTable from "@/app/Componentes/TablaOperador/JubiladosTable";
 import {LicenseDetailModal,PermissionModal} from "@/app/Componentes/ModalRRHH/LicenseModal";
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
 import {
   Employee,
   EmployeeStatus,
@@ -41,7 +43,7 @@ useEffect(() => {
   const fetchEmployeeData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://127.0.0.1:8000/rrhh/employees`, {
+      const response = await fetch(`${BACKEND_URL}/rrhh/employees`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!response.ok) {
@@ -61,7 +63,7 @@ useEffect(() => {
     console.log("Payload enviado a /licenses/aplicar:", { employeeId, message });
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://127.0.0.1:8000/licenses/aplicar`, {
+      const response = await fetch(`${BACKEND_URL}/licenses/aplicar`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

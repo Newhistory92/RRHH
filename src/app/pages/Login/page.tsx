@@ -8,6 +8,8 @@ import { Toast } from 'primereact/toast';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { loginUser } from '@/app/util/auth';
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+
 export default function AuthPage() {
   const router = useRouter();
   const [isActive, setIsActive] = useState(false);
@@ -158,7 +160,7 @@ export default function AuthPage() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/users/register", {
+      const response = await fetch(`${BACKEND_URL}/users/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

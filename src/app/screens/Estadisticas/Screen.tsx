@@ -17,6 +17,8 @@ import { ProductivityRanking } from '@/app/Componentes/ComponEstadistica/Product
 import { GlobalStats }         from '@/app/Componentes/ComponEstadistica/Globalstat';
 import { EmployeeDetailModal } from '@/app/Componentes/ComponEstadistica/DetailModal';
 import { Feedback360Stats } from '@/app/Componentes/ComponEstadistica/Feedback360Stats';
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
 import type {
   StatsEmployee,
   EstadisticasMetadata,
@@ -54,9 +56,9 @@ export default function EstadisticasPage() {
       const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
 
       const [dashboardRes, metaRes, globalRes] = await Promise.all([
-        fetch('http://127.0.0.1:8000/stats/dashboard', { headers }),
-        fetch('http://127.0.0.1:8000/stats/metadata', { headers }),
-        fetch('http://127.0.0.1:8000/stats/global-stats', { headers }),
+        fetch(`${BACKEND_URL}/stats/dashboard`, { headers }),
+        fetch(`${BACKEND_URL}/stats/metadata`, { headers }),
+        fetch(`${BACKEND_URL}/stats/global-stats`, { headers }),
       ]);
 
       if (!dashboardRes.ok) throw new Error(`Dashboard API: ${dashboardRes.status}`);

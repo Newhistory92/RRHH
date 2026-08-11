@@ -7,8 +7,10 @@
 
 import { cookies } from "next/headers";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+
 export async function loginUser(username: string, password: string) {
-  const res = await fetch("http://127.0.0.1:8000/auth/login", {
+  const res = await fetch(`${BACKEND_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ username: username, password: password })
@@ -35,7 +37,7 @@ export async function logoutUser() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
   if (token) {
-    await fetch("http://127.0.0.1:8000/auth/logout", {
+    await fetch(`${BACKEND_URL}/auth/logout`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     });

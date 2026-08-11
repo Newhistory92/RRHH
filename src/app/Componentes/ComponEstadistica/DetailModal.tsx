@@ -5,6 +5,8 @@ import {  X,  BarChart2, Star,  Briefcase, Calendar, MessageSquareWarning, } fro
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Employee } from '@/app/Interfas/Interfaces';
 import { useEffect, useState } from 'react';
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
 export const EmployeeDetailModal: React.FC<{
   employee: Employee | null;
   onClose: () => void;
@@ -33,7 +35,7 @@ export const EmployeeDetailModal: React.FC<{
         setLoading(true);
         setError(null);
 
-        const url = `http://127.0.0.1:8000/employee/${employee.id}`;
+        const url = `${BACKEND_URL}/employee/${employee.id}`;
 
         const token = localStorage.getItem('token');
         const headers: HeadersInit = {};

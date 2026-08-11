@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -7,7 +9,7 @@ export async function GET(
   const { id } = await params;
  console.log(`Fetching details for employee ID: ${id}`); // Debugging log
   try {
-    const res = await fetch(`http://127.0.0.1:8000/employee/${encodeURIComponent(id)}`, {
+    const res = await fetch(`${BACKEND_URL}/employee/${encodeURIComponent(id)}`, {
       // No cache: siempre queremos el detalle actual
       cache: 'no-store',
     });

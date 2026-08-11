@@ -6,6 +6,8 @@ import { TechnicalSkill, SkillStatus, Skill, AcademicFormation, EmployeeTechnica
 import TestModal from '@/app/Componentes/Validaciones/TestModal';
 import { apiClient } from '@/app/util/apiClient';
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+
 // Props del componente HabilidadesTecnicas
 export type HabilidadesTecnicasProps = {
   data: EmployeeTechnicalSkill[];
@@ -45,7 +47,7 @@ export default function HabilidadesTecnicas({
         try {
             setLoading(true);
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://127.0.0.1:8000/tests/skills/${employeeId}`, {
+            const response = await fetch(`${BACKEND_URL}/tests/skills/${employeeId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
