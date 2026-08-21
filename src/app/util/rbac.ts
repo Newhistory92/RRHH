@@ -1,233 +1,95 @@
 // util/rbac.ts
-// Configuración centralizada de permisos por rol (Role-Based Access Control).
-// Los IDs corresponden a los registros en la tabla Role de la base de datos:
-//   1 → ADMIN, 2 → USER, 3 → RRHH, 4 → ESTADISTA
+// Metadata de cada página y el permiso que la habilita.
+// No hay IDs de rol acá: quién tiene cada permiso lo decide la tabla
+// RolePermission en la base, y el backend lo informa en GET /auth/permisos.
 
 import { Page } from "@/app/Interfas/Interfaces";
+import { tienePermiso } from "@/app/util/permisos";
 
-// ── IDs de roles ─────────────────────────────────────────────────────────────
-export const ROLE_ID = {
-  ADMIN: 1,
-  USER: 2,
-  RRHH: 3,
-  ESTADISTA: 4,
-} as const;
-
-export type RoleId = (typeof ROLE_ID)[keyof typeof ROLE_ID];
-
-// ── Configuración de cada página ─────────────────────────────────────────────
 export interface PageConfig {
   id: Page;
   label: string;
   icon: string; // Nombre del ícono de lucide-react para el Sidebar
   section: "General" | "Gente" | "Organización" | "Aprendizaje" | "IA" | "Sistema" | "Activos";
-  /** roleIds que pueden VER esta página en el sidebar */
-  visibleFor: RoleId[];
-  /** roleIds que pueden NAVEGAR a esta página */
-  accessibleFor: RoleId[];
-  /** Si true, el rol ESTADISTA solo puede leer (sin acciones de edición) */
-  readOnlyForEstadista?: boolean;
+  /** Código de permiso que habilita esta página */
+  permiso: string;
+  /** Si true, no aparece en el sidebar aunque el usuario tenga el permiso
+   *  (se llega por el menú de perfil del Header) */
+  ocultaEnSidebar?: boolean;
 }
 
 export const PAGE_CONFIG: PageConfig[] = [
-  {
-    id: "inicio",
-    label: "Inicio",
-    icon: "Home",
-    section: "General",
-    // USER llega aca porque es su pagina default (ver getDefaultPage), no via
-    // sidebar -- USER no tiene sidebar (getSidebarPages/getSidebarSections
-    // devuelven [] para ese rol).
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.ESTADISTA],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.ESTADISTA, ROLE_ID.USER],
-  },
-  {
-    id: "estadisticas",
-    label: "Estadísticas",
-    icon: "BarChart2",
-    section: "General",
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.ESTADISTA],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.ESTADISTA],
-  },
-  {
-    id: "recursos-humanos",
-    label: "Recursos Humanos",
-    icon: "Users",
-    section: "Gente",
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-  },
-  {
-    id: "gestion-publicaciones",
-    label: "Publicaciones",
-    icon: "Newspaper",
-    section: "Gente",
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-  },
-  {
-    id: "configuracion-licencias",
-    label: "Configuración de Licencias",
-    icon: "Settings",
-    section: "Organización",
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-  },
-  {
-    id: "ia",
-    label: "Inteligencia Artificial",
-    icon: "BrainCircuit",
-    section: "IA",
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-  },
-  {
-    id: "organigrama",
-    label: "Organigrama",
-    icon: "GitMerge",
-    section: "Organización",
-    // ESTADISTA puede VER el organigrama en el sidebar
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.ESTADISTA],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.ESTADISTA],
-    // ESTADISTA lo ve en modo solo lectura (sin botones de edición)
-    readOnlyForEstadista: true,
-  },
-  {
-    id: "test",
-    label: "Tests",
-    icon: "ClipboardList",
-    section: "Aprendizaje",
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-  },
-  {
-    id: "editar-perfil",
-    label: "Mi Perfil",
-    icon: "UserCircle",
-    section: "Gente",
-    // USER accede via Header (menú perfil), no sidebar
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
-  },
-  {
-    id: "licencias",
-    label: "Licencias",
-    icon: "FileText",
-    section: "Organización",
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
-  },
-  {
-    id: "documentos",
-    label: "Documentos",
-    icon: "Folder",
-    section: "Gente",
-    // USER accede via Header (menú perfil), no sidebar
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
-  },
-  {
-    id: "feedback",
-    label: "Feedback",
-    icon: "MessageSquare",
-    section: "Gente",
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
-  },
-  {
-    id: "reubicacion",
-    label: "Reubicación",
-    icon: "ArrowLeftRight",
-    section: "Gente",
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
-  },
-  {
-    id: "asistencia",
-    label: "Asistencia",
-    icon: "Clock",
-    section: "Gente",
-    visibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
-    accessibleFor: [ROLE_ID.ADMIN, ROLE_ID.RRHH, ROLE_ID.USER],
-  },
-  {
-    id: "activos-config",
-    label: "Configuración de Activos",
-    icon: "Boxes",
-    section: "Activos",
-    visibleFor: [ROLE_ID.ADMIN],
-    accessibleFor: [ROLE_ID.ADMIN],
-  },
-  {
-    id: "activos-inventario",
-    label: "Inventario",
-    icon: "Package",
-    section: "Activos",
-    visibleFor: [ROLE_ID.ADMIN],
-    accessibleFor: [ROLE_ID.ADMIN],
-  },
-  {
-    id: "activos-modelos",
-    label: "Modelos de PC",
-    icon: "Cpu",
-    section: "Activos",
-    visibleFor: [ROLE_ID.ADMIN],
-    accessibleFor: [ROLE_ID.ADMIN],
-  },
-  {
-    id: "admin",
-    label: "Administración",
-    icon: "Shield",
-    section: "Sistema",
-    // SOLO ADMIN puede acceder y ver en sidebar
-    visibleFor: [ROLE_ID.ADMIN],
-    accessibleFor: [ROLE_ID.ADMIN],
-  },
+  { id: "inicio", label: "Inicio", icon: "Home", section: "General", permiso: "inicio.ver" },
+  { id: "estadisticas", label: "Estadísticas", icon: "BarChart2", section: "General", permiso: "estadisticas.ver" },
+  { id: "recursos-humanos", label: "Recursos Humanos", icon: "Users", section: "Gente", permiso: "rrhh.gestionar" },
+  { id: "gestion-publicaciones", label: "Publicaciones", icon: "Newspaper", section: "Gente", permiso: "publicaciones.gestionar" },
+  { id: "configuracion-licencias", label: "Configuración de Licencias", icon: "Settings", section: "Organización", permiso: "licencias.configurar" },
+  { id: "ia", label: "Inteligencia Artificial", icon: "BrainCircuit", section: "IA", permiso: "ia.usar" },
+  { id: "organigrama", label: "Organigrama", icon: "GitMerge", section: "Organización", permiso: "organigrama.ver" },
+  { id: "test", label: "Tests", icon: "ClipboardList", section: "Aprendizaje", permiso: "test.gestionar" },
+  { id: "editar-perfil", label: "Mi Perfil", icon: "UserCircle", section: "Gente", permiso: "perfil.editar", ocultaEnSidebar: true },
+  { id: "licencias", label: "Licencias", icon: "FileText", section: "Organización", permiso: "licencias.propias" },
+  { id: "documentos", label: "Documentos", icon: "Folder", section: "Gente", permiso: "documentos.propios", ocultaEnSidebar: true },
+  { id: "feedback", label: "Feedback", icon: "MessageSquare", section: "Gente", permiso: "feedback.participar" },
+  { id: "asistencia", label: "Asistencia", icon: "Clock", section: "Gente", permiso: "asistencia.propia" },
+  { id: "activos-config", label: "Configuración de Activos", icon: "Boxes", section: "Activos", permiso: "activos.configurar" },
+  { id: "activos-inventario", label: "Inventario", icon: "Package", section: "Activos", permiso: "activos.inventario" },
+  { id: "activos-modelos", label: "Modelos de PC", icon: "Cpu", section: "Activos", permiso: "activos.modelos" },
+  { id: "admin", label: "Administración", icon: "Shield", section: "Sistema", permiso: "admin.gestionar" },
 ];
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
 /**
- * Retorna las páginas visibles en el Sidebar para un roleId dado.
- * USER (id 2) no tiene sidebar → retorna []
+ * Reubicación es la única página con dos variantes según permiso, así que
+ * no entra en PAGE_CONFIG con un permiso único: se resuelve en page.tsx.
+ * Se declara acá para que el sidebar la muestre a quien tenga cualquiera
+ * de las dos.
  */
-export function getSidebarPages(roleId: number): PageConfig[] {
-  if (roleId === ROLE_ID.USER) return []; // Sin sidebar
-  return PAGE_CONFIG.filter((p) => p.visibleFor.includes(roleId as RoleId));
-}
+export const REUBICACION_CONFIG: PageConfig & { permisoAlterno: string } = {
+  id: "reubicacion",
+  label: "Reubicación",
+  icon: "ArrowLeftRight",
+  section: "Gente",
+  permiso: "reubicacion.gestionar",
+  permisoAlterno: "reubicacion.solicitar",
+};
 
-/**
- * Verifica si un roleId puede acceder a una página específica.
- */
-export function canAccess(roleId: number, page: Page): boolean {
+function permisoDePagina(page: Page): string[] {
+  if (page === REUBICACION_CONFIG.id) {
+    return [REUBICACION_CONFIG.permiso, REUBICACION_CONFIG.permisoAlterno];
+  }
   const config = PAGE_CONFIG.find((p) => p.id === page);
-  if (!config) return false;
-  return config.accessibleFor.includes(roleId as RoleId);
+  return config ? [config.permiso] : [];
+}
+
+/** Verifica si el usuario puede navegar a una página. */
+export function canAccess(permisos: string[], page: Page): boolean {
+  const requeridos = permisoDePagina(page);
+  if (requeridos.length === 0) return false;
+  return requeridos.some((code) => tienePermiso(permisos, code));
+}
+
+/** Páginas visibles en el sidebar (excluye las marcadas ocultaEnSidebar). */
+export function getSidebarPages(permisos: string[]): PageConfig[] {
+  const pages = PAGE_CONFIG.filter(
+    (p) => !p.ocultaEnSidebar && tienePermiso(permisos, p.permiso)
+  );
+  if (canAccess(permisos, REUBICACION_CONFIG.id)) {
+    pages.push(REUBICACION_CONFIG);
+  }
+  return pages;
 }
 
 /**
- * Retorna la primera página accesible para un roleId (para redirect inicial).
+ * Primera página accesible, en el orden en que están declaradas.
+ * Inicio va primero en PAGE_CONFIG, así que todo rol con inicio.ver
+ * aterriza ahí; los que no, caen en la primera que tengan.
  */
-export function getDefaultPage(roleId: number): Page {
-  const defaults: Record<number, Page> = {
-    [ROLE_ID.ADMIN]: "admin",
-    [ROLE_ID.RRHH]: "estadisticas",
-    [ROLE_ID.ESTADISTA]: "estadisticas",
-    [ROLE_ID.USER]: "inicio",
-  };
-  return defaults[roleId] ?? "estadisticas";
+export function getDefaultPage(permisos: string[]): Page {
+  const primera = PAGE_CONFIG.find((p) => tienePermiso(permisos, p.permiso));
+  return primera?.id ?? "inicio";
 }
 
-/**
- * Retorna true si el rol ESTADISTA debe ver la página en modo solo lectura.
- */
-export function isReadOnlyForRole(roleId: number, page: Page): boolean {
-  if (roleId !== ROLE_ID.ESTADISTA) return false;
-  const config = PAGE_CONFIG.find((p) => p.id === page);
-  return config?.readOnlyForEstadista ?? false;
-}
-
-// ── Agrupación por sección ──────────────────────────────────────────────────────
+// ── Agrupación por sección ──────────────────────────────────────────────────
 
 export interface NavSection {
   label: PageConfig["section"];
@@ -245,18 +107,14 @@ const SECTION_ORDER: PageConfig["section"][] = [
 ];
 
 /**
- * Retorna las páginas visibles para un roleId, agrupadas por sección y en
- * el orden fijo de SECTION_ORDER. Secciones sin páginas visibles para el
- * rol no se incluyen. USER (id 2) retorna [] (sin sidebar, igual que
- * getSidebarPages).
+ * Páginas visibles agrupadas por sección, en el orden fijo de SECTION_ORDER.
+ * Secciones sin páginas visibles no se incluyen. Un usuario sin ninguna
+ * página de sidebar recibe [] y AppLayout no dibuja el sidebar.
  */
-export function getSidebarSections(roleId: number): NavSection[] {
-  if (roleId === ROLE_ID.USER) return [];
-
+export function getSidebarSections(permisos: string[]): NavSection[] {
+  const visibles = getSidebarPages(permisos);
   return SECTION_ORDER.map((section) => ({
     label: section,
-    pages: PAGE_CONFIG.filter(
-      (p) => p.section === section && p.visibleFor.includes(roleId as RoleId)
-    ),
+    pages: visibles.filter((p) => p.section === section),
   })).filter((group) => group.pages.length > 0);
 }
