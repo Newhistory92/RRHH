@@ -468,7 +468,7 @@
 //                   {onEdit && (
 //                     <Button
 //                       onClick={() => onEdit(user)}
-//                       className="text-[11px] py-0.5 px-2 rounded border border-[#2ecbe7] text-[#1ABCD7] hover:bg-cyan-500/10 transition leading-tight"
+//                       className="text-[11px] py-0.5 px-2 rounded border border-[var(--primary)] text-[var(--brand-sage)] hover:bg-cyan-500/10 transition leading-tight"
 //                       outlined
 //                       text
 //                       label="Editar"
