@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/app/providers/ThemeProvider";
+import "primereact/resources/themes/lara-light-teal/theme.css";
 import "./globals.css";
 
 const fraunces = Fraunces({

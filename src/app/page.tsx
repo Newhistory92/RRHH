@@ -27,7 +27,6 @@ import ActivosInventario from '@/app/screens/ActivosInventario/Screen';
 import ActivosModelos from '@/app/screens/ActivosModelos/Screen';
 import AsistenciaPage from '@/app/screens/Asistencia/Screen';
 import { PrimeReactProvider } from 'primereact/api';
-import "primereact/resources/themes/lara-light-pink/theme.css";
 import 'primeicons/primeicons.css';
 import TestPage from './screens/TestConfig/Screen';
 import FeedbackTab from './screens/Feedback/Screen';

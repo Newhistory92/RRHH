@@ -2,43 +2,74 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  /* ===== Paleta base ===== */
+  --brand-charcoal: #37363E;
+  --brand-teal:     #1E5561;
+  --brand-olive:    #C3D184;
+  --brand-red:      #EF4444;
+  --brand-sage:     #6AA69B;
+  --brand-amber:    #D97706;
+
+  /* ===== Variantes accesibles para TEXTO sobre fondo claro =====
+     Los colores base fallan AA como color de texto sobre blanco:
+     oliva 1.64:1 · sage 2.78:1 · rojo 3.76:1 · ámbar 2.96:1.
+     Estas variantes son las que se usan cuando el color es TEXTO. */
+  --brand-sage-text:  #3D7065; /* 5.67:1 */
+  --brand-olive-text: #616D33; /* 5.61:1 */
+  --brand-red-text:   #C42B2B; /* 5.63:1 */
+  --brand-amber-text: #A2570A; /* 5.38:1 */
+
   --radius: 1rem;
-  --background: #FAF8F6;
-  --foreground: #3A2F27;
+
+  --background: #F6F7F4;
+  --foreground: #37363E;              /* 11.10:1 */
   --card: #FFFFFF;
-  --card-foreground: #3A2F27;
+  --card-foreground: #37363E;         /* 11.93:1 */
   --popover: #FFFFFF;
-  --popover-foreground: #3A2F27;
-  --primary: #E7717D;
+  --popover-foreground: #37363E;
+
+  --primary: #1E5561;                 /* con blanco encima: 8.31:1 */
   --primary-foreground: #FFFFFF;
-  --secondary: #C2B9B0;
-  --secondary-foreground: #3A2F27;
-  --muted: #C2CAD0;
-  --muted-foreground: #5A6470;
-  --accent: #AFD275;
-  --accent-foreground: #2D3B1A;
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: color-mix(in srgb, #C2B9B0 35%, transparent);
-  --input: color-mix(in srgb, #C2B9B0 35%, transparent);
-  --ring: color-mix(in srgb, #E7717D 50%, transparent);
-  --warm-contrast: #7E685A;
+  --secondary: #C9DEDA;               /* tinte sage; con charcoal: 8.49:1 */
+  --secondary-foreground: #37363E;
+  --muted: #F3F3F4;
+  --muted-foreground: #6B6A73;        /* 4.81:1 sobre muted */
+  --accent: #C3D184;                  /* con charcoal encima: 7.26:1 */
+  --accent-foreground: #37363E;
+  --destructive: #C42B2B;             /* con blanco encima: 5.63:1 */
+  --destructive-foreground: #FFFFFF;
+
+  --border: color-mix(in srgb, #37363E 16%, transparent);
+  --input:  color-mix(in srgb, #37363E 16%, transparent);
+  --ring:   color-mix(in srgb, #1E5561 55%, transparent);
+
+  --warm-contrast: #37363E;           /* con blanco encima: 11.93:1 */
   --warm-contrast-foreground: #FFFFFF;
-  --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.06);
-  --color-success: #16a34a;
-  --color-success-foreground: #ffffff;
-  --color-warning: #d97706;
-  --color-warning-foreground: #ffffff;
-  --color-error: #dc2626;
-  --color-error-foreground: #ffffff;
-  --color-info: #2563eb;
-  --color-info-foreground: #ffffff;
+  --shadow-soft: 0 2px 10px rgba(55, 54, 62, 0.08);
+
+  --color-success: #3D7065;
+  --color-success-foreground: #FFFFFF;
+  --color-warning: #A2570A;
+  --color-warning-foreground: #FFFFFF;
+  --color-error: #C42B2B;
+  --color-error-foreground: #FFFFFF;
+  --color-info: #1E5561;
+  --color-info-foreground: #FFFFFF;
+
+  --color-success-soft: #E6F1EF;              /* + #3D7065 = 4.91:1 */
+  --color-success-soft-foreground: #3D7065;
+  --color-warning-soft: #FDF3E7;              /* + #A2570A = 4.91:1 */
+  --color-warning-soft-foreground: #A2570A;
+  --color-error-soft: #FDEAEA;                /* + #C42B2B = 4.86:1 */
+  --color-error-soft-foreground: #C42B2B;
+  --color-info-soft: #DCE7EA;                 /* + #1E5561 = 6.59:1 */
+  --color-info-soft-foreground: #1E5561;
 }
 
 .p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-link):not(.p-button-success):not(.p-button-danger):not(.p-button-warning):not(.p-button-info):not(.p-button-secondary):not(.p-button-help) {
-    background: var(--accent) !important;
-    border-color: var(--border) !important;
-    color: white !important;
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: var(--primary-foreground) !important;
 }
 .p-button:focus,
 .p-button:focus-visible {
@@ -50,36 +81,49 @@
     border-color: var(--border) !important;
 }
 .dark {
-  --background: #211B16;
-  --foreground: #F0EBE6;
-  --card: #2D2520;
-  --card-foreground: #F0EBE6;
-  --popover: #2D2520;
-  --popover-foreground: #F0EBE6;
-  --primary: #F08D98;
-  --primary-foreground: #2D1115;
-  --secondary: #3D352E;
-  --secondary-foreground: #F0EBE6;
-  --muted: #332C26;
-  --muted-foreground: #B5AAA0;
-  --accent: #C3E098;
-  --accent-foreground: #1A2410;
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: #4A3F36;
-  --input: #4A3F36;
-  --ring: color-mix(in srgb, #F08D98 50%, transparent);
-  --warm-contrast: #A68A78;
-  --warm-contrast-foreground: #211B16;
-  --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.06);
-  --color-success: #22c55e;
-  --color-success-foreground: #052e16;
-  --color-warning: #f59e0b;
-  --color-warning-foreground: #451a03;
-  --color-error: #ef4444;
-  --color-error-foreground: #450a0a;
-  --color-info: #3b82f6;
-  --color-info-foreground: #172554;
+  --background: #24232A;
+  --foreground: #EDECF0;              /* 13.24:1 */
+  --card: #2E2D36;
+  --card-foreground: #EDECF0;         /* 11.56:1 */
+  --popover: #2E2D36;
+  --popover-foreground: #EDECF0;
+
+  --primary: #5FA3B2;                 /* 5.46:1 — el teal base falla acá (1.87:1) */
+  --primary-foreground: #14262B;
+  --secondary: #3A4644;               /* con foreground encima: 8.35:1 */
+  --secondary-foreground: #EDECF0;
+  --muted: #33323B;
+  --muted-foreground: #A3A1AC;        /* 4.97:1 sobre muted */
+  --accent: #C3D184;                  /* 9.47:1 sobre el fondo */
+  --accent-foreground: #37363E;       /* 7.26:1 */
+  --destructive: #F87171;             /* 5.63:1 sobre el fondo */
+  --destructive-foreground: #24232A;
+
+  --border: #45444F;
+  --input:  #45444F;
+  --ring:   color-mix(in srgb, #5FA3B2 55%, transparent);
+
+  --warm-contrast: #C3D184;
+  --warm-contrast-foreground: #37363E;
+  --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.35);
+
+  --color-success: #8FC0B6;
+  --color-success-foreground: #24352F;
+  --color-warning: #FBBF24;
+  --color-warning-foreground: #3A2E1A;
+  --color-error: #F87171;
+  --color-error-foreground: #3A2323;
+  --color-info: #5FA3B2;
+  --color-info-foreground: #1B333A;
+
+  --color-success-soft: #24352F;
+  --color-success-soft-foreground: #8FC0B6;   /* 6.39:1 */
+  --color-warning-soft: #3A2E1A;
+  --color-warning-soft-foreground: #FBBF24;   /* 7.93:1 */
+  --color-error-soft: #3A2323;
+  --color-error-soft-foreground: #F87171;     /* 5.26:1 */
+  --color-info-soft: #1B333A;
+  --color-info-soft-foreground: #5FA3B2;      /* 4.66:1 */
 }
 
 @theme inline {
@@ -122,12 +166,14 @@
   --color-error-foreground: var(--color-error-foreground);
   --color-info: var(--color-info);
   --color-info-foreground: var(--color-info-foreground);
-  --color-success-soft: color-mix(in srgb, var(--color-success) 20%, var(--background));
-  --color-success-soft-foreground: var(--color-success);
-  --color-warning-soft: color-mix(in srgb, var(--color-warning) 20%, var(--background));
-  --color-warning-soft-foreground: var(--color-warning);
-  --color-error-soft: color-mix(in srgb, var(--color-error) 20%, var(--background));
-  --color-error-soft-foreground: var(--color-error);
+  --color-success-soft: var(--color-success-soft);
+  --color-success-soft-foreground: var(--color-success-soft-foreground);
+  --color-warning-soft: var(--color-warning-soft);
+  --color-warning-soft-foreground: var(--color-warning-soft-foreground);
+  --color-error-soft: var(--color-error-soft);
+  --color-error-soft-foreground: var(--color-error-soft-foreground);
+  --color-info-soft: var(--color-info-soft);
+  --color-info-soft-foreground: var(--color-info-soft-foreground);
 }
 
 body {
@@ -137,7 +183,7 @@ body {
 }
 
 :root {
-  --primary-color: #E7717D;
+  --primary-color: #1E5561;
   --primary-color-text: #FFFFFF;
 }
 
