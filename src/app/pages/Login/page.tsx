@@ -101,6 +101,7 @@ export default function AuthPage() {
       localStorage.setItem("roleName", data.roleName || "");
       localStorage.setItem("employeeId", data.employeeId || "");
       localStorage.setItem("usuario", data.usuario || "");
+      localStorage.setItem("permisos", JSON.stringify(data.permisos ?? []));
 
       // Mostrar toast de éxito
       toast.current?.show({

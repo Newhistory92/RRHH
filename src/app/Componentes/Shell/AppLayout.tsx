@@ -4,12 +4,12 @@ import { useState } from "react";
 import { AppSidebar } from "@/app/Componentes/Shell/AppSidebar";
 import { AppHeader } from "@/app/Componentes/Shell/AppHeader";
 import { Employee, Page } from "@/app/Interfas/Interfaces";
-import { ROLE_ID } from "@/app/util/rbac";
+import { getSidebarSections } from "@/app/util/rbac";
 
 interface AppLayoutProps {
   activePage: Page;
   setPage: (page: Page) => void;
-  roleId: number | null;
+  permisos: string[];
   employeeData?: Employee | null;
   children: React.ReactNode;
 }
@@ -17,20 +17,20 @@ interface AppLayoutProps {
 export function AppLayout({
   activePage,
   setPage,
-  roleId,
+  permisos,
   employeeData,
   children,
 }: AppLayoutProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const hasSidebar = !!roleId && roleId !== ROLE_ID.USER;
+  const hasSidebar = getSidebarSections(permisos).length > 0;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <AppSidebar
         activePage={activePage}
         setPage={setPage}
-        roleId={roleId}
+        permisos={permisos}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed((prev) => !prev)}
       />

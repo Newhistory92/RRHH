@@ -32,6 +32,7 @@ export async function logoutFromClient(): Promise<void> {
   localStorage.removeItem("token");
   localStorage.removeItem("roleName");
   localStorage.removeItem("roleId");
+  localStorage.removeItem("permisos");
   localStorage.removeItem("usuario");
   localStorage.removeItem("employeeId");
 

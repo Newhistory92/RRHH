@@ -18,6 +18,7 @@ import {
   Boxes,
   Package,
   Cpu,
+  ArrowLeftRight,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -27,7 +28,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Page } from "@/app/Interfas/Interfaces";
-import { getSidebarSections, ROLE_ID } from "@/app/util/rbac";
+import { getSidebarSections } from "@/app/util/rbac";
 
 const ICON_MAP: Record<string, React.ElementType> = {
   BarChart2,
@@ -45,12 +46,13 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Boxes,
   Package,
   Cpu,
+  ArrowLeftRight,
 };
 
 interface AppSidebarProps {
   activePage: Page;
   setPage: (page: Page) => void;
-  roleId: number | null;
+  permisos: string[];
   isCollapsed: boolean;
   onToggleCollapse: () => void;
 }
@@ -58,13 +60,14 @@ interface AppSidebarProps {
 export function AppSidebar({
   activePage,
   setPage,
-  roleId,
+  permisos,
   isCollapsed,
   onToggleCollapse,
 }: AppSidebarProps) {
-  if (!roleId || roleId === ROLE_ID.USER) return null;
+  const sections = getSidebarSections(permisos);
 
-  const sections = getSidebarSections(roleId);
+  // Sin páginas visibles no hay sidebar que dibujar (caso USER).
+  if (sections.length === 0) return null;
 
   return (
     <TooltipProvider delayDuration={200}>

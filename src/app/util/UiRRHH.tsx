@@ -964,8 +964,8 @@ export const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ 
   );
 };
 
-export const getScoreColor = (score?: number) => {
-  if (score === undefined) return 'bg-muted';
+export const getScoreColor = (score?: number | null) => {
+  if (score === undefined || score === null) return 'bg-muted';
   if (score >= 7) return 'bg-success';
   if (score >= 5) return 'bg-warning';
   return 'bg-error';

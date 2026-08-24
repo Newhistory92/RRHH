@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 // app/page.tsx — Shell principal de la aplicación.
-// RBAC: usa roleId numérico (1=ADMIN, 2=USER, 3=RRHH, 4=ESTADISTA)
-// proveniente de localStorage, y los helpers de util/rbac.ts
-// para determinar permisos de navegación y sidebar.
+// RBAC: usa los códigos de permiso que el backend devuelve al loguear
+// (GET /auth/permisos), y los helpers de util/rbac.ts para navegación
+// y sidebar. No hay IDs de rol en este archivo.
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -35,16 +35,15 @@ import { Employee, Page } from "@/app/Interfas/Interfaces";
 import {
   canAccess,
   getDefaultPage,
-  isReadOnlyForRole,
-  ROLE_ID,
 } from "@/app/util/rbac";
+import { leerPermisos, tienePermiso } from "@/app/util/permisos";
 
 export default function App() {
   const router = useRouter();
 
   // ── Estado de autenticación (se llena desde localStorage en useEffect) ──────
-  const [roleId, setRoleId] = useState<number | null>(null);
-  const [page, setPage] = useState<Page>('estadisticas');
+  const [permisos, setPermisos] = useState<string[]>([]);
+  const [page, setPage] = useState<Page>('inicio');
   const [isLoading, setIsLoading] = useState(true);
   const [employeeData, setEmployeeData] = useState<Employee | null>(null);
   const [globalSettings, setGlobalSettings] = useState<Record<string, boolean>>({});
@@ -52,20 +51,15 @@ export default function App() {
   useEffect(() => {
     const fetchEmployeeData = async () => {
       const token = localStorage.getItem('token');
-      const storedId = localStorage.getItem('roleId');   // Número guardado al login
       const employeeId = localStorage.getItem('employeeId');
       if (!token) {
         router.push('/');
         return;
       }
 
-      const parsedRoleId = storedId ? parseInt(storedId, 10) : null;
-      setRoleId(parsedRoleId);
-
-      // Establecer página inicial según el rol
-      if (parsedRoleId) {
-        setPage(getDefaultPage(parsedRoleId));
-      }
+      const permisosGuardados = leerPermisos();
+      setPermisos(permisosGuardados);
+      setPage(getDefaultPage(permisosGuardados));
 
       // Fetch de datos del empleado — usa apiClient para interceptar 401
       if (employeeId) {
@@ -100,17 +94,16 @@ export default function App() {
 
   // Verificar permiso antes de navegar
   const handlePageChange = (newPage: Page) => {
-    if (roleId && canAccess(roleId, newPage)) {
-
+    if (canAccess(permisos, newPage)) {
       setPage(newPage);
     } else {
-      console.warn(`Rol ${roleId} no tiene acceso a la página: ${newPage}`);
+      console.warn(`Sin permiso para la página: ${newPage}`);
     }
   };
 
   // ── Renderizado de página con control de acceso ───────────────────────────
   const renderPage = () => {
-    if (!roleId || !canAccess(roleId, page)) {
+    if (!canAccess(permisos, page)) {
       return (
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
@@ -123,9 +116,6 @@ export default function App() {
         </div>
       );
     }
-
-    // Prop readOnly para páginas que ESTADISTA debe ver sin edição
-    const readOnly = isReadOnlyForRole(roleId, page);
 
     switch (page) {
       case 'inicio':
@@ -141,8 +131,7 @@ export default function App() {
       case 'ia':
         return <IAPage />;
       case 'organigrama':
-        // Pasa readOnly al Organigrama para que muestre/oculte controles de edición
-        return <OrganigramaPage readOnly={readOnly} />;
+        return <OrganigramaPage readOnly={false} />;
       case 'editar-perfil':
         return <EmployeeCV employeeData={employeeData} globalSettings={globalSettings} />;
       case 'licencias':
@@ -150,11 +139,11 @@ export default function App() {
       case 'documentos':
         return <MisDocumentos employeeData={employeeData} />;
       case 'reubicacion':
-        return roleId === ROLE_ID.ADMIN || roleId === ROLE_ID.RRHH
+        return tienePermiso(permisos, 'reubicacion.gestionar')
           ? <ReubicacionTablero />
           : <Reubicacion employeeData={employeeData} />;
       case 'asistencia':
-        return <AsistenciaPage roleId={roleId} />;
+        return <AsistenciaPage puedeGestionar={tienePermiso(permisos, 'asistencia.gestionar')} />;
       case 'feedback':
         if (globalSettings["Feedback"] === false) {
           return (
@@ -177,8 +166,7 @@ export default function App() {
       case 'activos-modelos':
         return <ActivosModelos />;
       case 'admin':
-        // Solo ADMIN (id 1) puede llegar aquí, protegido por canAccess()
-        return roleId === ROLE_ID.ADMIN ? <AdminPage /> : null;
+        return <AdminPage />;
       default:
         return <EstadisticasPage />;
     }
@@ -201,7 +189,7 @@ export default function App() {
       <AppLayout
         activePage={page}
         setPage={handlePageChange}
-        roleId={roleId}
+        permisos={permisos}
         employeeData={employeeData}
       >
         {renderPage()}

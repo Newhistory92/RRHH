@@ -137,7 +137,7 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
       <div className="flex items-center">
         <div className={`w-3 h-3 rounded-full mr-3 ${getScoreColor(employee.productivityScore)}`}></div>
         <span className="font-bold text-lg text-foreground">
-          {employee.productivityScore.toFixed(1)}
+          {employee.productivityScore != null ? employee.productivityScore.toFixed(1) : 'N/A'}
         </span>
       </div>
     );
