@@ -64,6 +64,13 @@
   --color-error-soft-foreground: #C42B2B;
   --color-info-soft: #DCE7EA;                 /* + #1E5561 = 6.59:1 */
   --color-info-soft-foreground: #1E5561;
+
+  /* Rampa de 5 pasos para medidores de desempeño (fondo, siempre con texto #37363E) */
+  --scale-1: #3D7065;  /* mejor */
+  --scale-2: #6AA69B;
+  --scale-3: #C3D184;
+  --scale-4: #D97706;
+  --scale-5: #C42B2B;  /* peor */
 }
 
 .p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-link):not(.p-button-success):not(.p-button-danger):not(.p-button-warning):not(.p-button-info):not(.p-button-secondary):not(.p-button-help) {

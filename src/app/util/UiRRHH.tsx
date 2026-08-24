@@ -887,7 +887,7 @@ export const EmployeeAvatar = ({ employeeId, employees, showName = true, size = 
           className="w-full h-full object-cover object-center rounded-full"
         />
       </div>
-      {showName && <span className={`text-gray-700 ${textCls} font-medium`}>{employee.name}</span>}
+      {showName && <span className={`text-foreground ${textCls} font-medium`}>{employee.name}</span>}
     </div>
   );
 };
@@ -974,10 +974,10 @@ export const getScoreColor = (score?: number | null) => {
 export const SoftSkillBar = ({ skill, score }: { skill: string; score?: number }) => (
   <div className="mb-3">
     <div className="flex justify-between items-center mb-1">
-      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">{skill}</span>
-      <span className="text-sm font-bold text-gray-700 dark:text-gray-200">{score}/10</span>
+      <span className="text-sm font-medium text-muted-foreground">{skill}</span>
+      <span className="text-sm font-bold text-foreground">{score}/10</span>
     </div>
-    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+    <div className="w-full bg-muted rounded-full h-2">
       <div className={`${getScoreColor(score)} h-2 rounded-full transition-all`} style={{ width: `${(score ?? 0) * 10}%` }} />
     </div>
   </div>
