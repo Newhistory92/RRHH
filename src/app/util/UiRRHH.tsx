@@ -342,7 +342,7 @@
 
 
 // export const StatCard: React.FC<StatCardProps> = ({ icon, title, value, colorClass }) => (
-//   <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 transition-all hover:shadow-lg hover:border-cyan-400">
+//   <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 transition-all hover:shadow-lg hover:border-[var(--primary)]">
 //     <div className="flex items-center justify-between">
 //       <div>
 //         <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</p>
@@ -468,7 +468,7 @@
 //                   {onEdit && (
 //                     <Button
 //                       onClick={() => onEdit(user)}
-//                       className="text-[11px] py-0.5 px-2 rounded border border-[var(--primary)] text-[var(--brand-sage)] hover:bg-cyan-500/10 transition leading-tight"
+//                       className="text-[11px] py-0.5 px-2 rounded border border-[var(--primary)] text-[var(--brand-sage)] hover:bg-[var(--primary)]/10 transition leading-tight"
 //                       outlined
 //                       text
 //                       label="Editar"
@@ -527,7 +527,7 @@
 //     ))}
 //     <div
 //       onClick={() => onEdit(null)}
-//       className="border-2 border-dashed border-gray-600 rounded-xl flex items-center justify-center p-6 hover:border-cyan-500 hover:text-cyan-500 transition cursor-pointer"
+//       className="border-2 border-dashed border-gray-600 rounded-xl flex items-center justify-center p-6 hover:border-[var(--primary)] hover:text-[var(--primary)] transition cursor-pointer"
 //     >
 //       <div className="text-center">
 //         <Plus />
@@ -638,7 +638,7 @@
 //                 onChange={() => handleToggleChange(setting)}
 //                 className="sr-only peer"
 //               />
-//               <div className="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+//               <div className="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--primary)]"></div>
 //             </label>
 //           </div>
 //         ))}
@@ -753,7 +753,7 @@
 //             </Button>
 //             <Button
 //               type="submit"
-//               className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition"
+//               className="bg-[var(--primary)] hover:bg-[var(--brand-teal)] text-white font-bold py-2 px-4 rounded-lg transition"
 //             >
 //               {user.employee_id ? 'Actualizar Datos' : 'Guardar Datos'}
 //             </Button>
@@ -783,7 +783,7 @@
 //             </div>
 //             <div className="flex justify-end gap-3">
 //               <button type="button" onClick={onClose} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition">Cancelar</button>
-//               <button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition">Guardar</button>
+//               <button type="submit" className="bg-[var(--primary)] hover:bg-[var(--brand-teal)] text-white font-bold py-2 px-4 rounded-lg transition">Guardar</button>
 //             </div>
 //           </form>
 //         </div>
