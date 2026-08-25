@@ -162,15 +162,15 @@ export default function AuthPage() {
     }
 
     // El alta de usuarios se hace únicamente desde el panel de administración
-    // (POST /users/employee, protegido con el permiso admin.gestionar).
+    // (POST /users/employee, restringido a administradores en el backend).
     //
     // Esta llamada a POST /users/register queda deshabilitada SOLO acá, en el
     // frontend: es una mitigación parcial, no un cierre del hueco de seguridad.
     // El endpoint en el backend (Backend_RRHH/app/routes/user.py) sigue sin
     // ninguna autenticación y todavía puede invocarse directo (por ejemplo con
     // curl) para crear una cuenta. Falta una tarea de backend que proteja ese
-    // endpoint, idealmente restringiéndolo al permiso admin.gestionar, igual
-    // que ya se hace con POST /users/employee en el mismo archivo.
+    // endpoint con algún tipo de autorización solo-admin, siguiendo el mismo
+    // patrón que ya restringe POST /users/employee en el mismo archivo.
     //
     // try {
     //   const response = await fetch(`${BACKEND_URL}/users/register`, {

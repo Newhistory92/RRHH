@@ -112,19 +112,6 @@ cumplen AA, mínimo 4.5:1):
 | `--ring` | `color-mix(#1E5561 55%, transparent)` | `color-mix(#5FA3B2 55%, transparent)` |
 | `--warm-contrast` | `#37363E` | `#C3D184` |
 | `--warm-contrast-foreground` | `#FFFFFF` | `#37363E` |
-
-> **Nota — doble rol de `--warm-contrast`.** Este token es `#37363E`
-> (charcoal oscuro, igual que `--foreground`) en modo claro, y `#C3D184`
-> (oliva, un acento bien visible) en modo oscuro. Como superficie oscura es
-> consistente en ambos temas (18 usos existentes lo tratan así, y ahí
-> funciona bien). El problema aparece si se lo usa como color de acento
-> puramente decorativo (íconos, series de un gráfico): en modo claro se ve
-> como un acento apagado/casi invisible, y en modo oscuro como un acento
-> fuerte. Esto es una consecuencia aceptada y deliberada de la decisión de
-> la Tarea 1 de no renombrar este token — no es un bug. Si en algún momento
-> la consistencia visual entre temas para esos usos decorativos se vuelve
-> prioritaria, una tarea futura podría migrar esos usos puntuales a
-> `--accent` o `--primary` en su lugar.
 | `--color-success` | `#3D7065` | `#8FC0B6` |
 | `--color-success-foreground` | `#FFFFFF` | `#24352F` |
 | `--color-warning` | `#A2570A` | `#FBBF24` |
@@ -141,6 +128,19 @@ cumplen AA, mínimo 4.5:1):
 | `--color-error-soft-foreground` | `#C42B2B` | `#F87171` |
 | `--color-info-soft` | `#DCE7EA` | `#1B333A` |
 | `--color-info-soft-foreground` | `#1E5561` | `#5FA3B2` |
+
+> **Nota — doble rol de `--warm-contrast`.** Este token es `#37363E`
+> (charcoal oscuro, igual que `--foreground`) en modo claro, y `#C3D184`
+> (oliva, un acento bien visible) en modo oscuro. Como superficie oscura es
+> consistente en ambos temas (18 usos existentes lo tratan así, y ahí
+> funciona bien). El problema aparece si se lo usa como color de acento
+> puramente decorativo (íconos, series de un gráfico): en modo claro se ve
+> como un acento apagado/casi invisible, y en modo oscuro como un acento
+> fuerte. Esto es una consecuencia aceptada y deliberada de la decisión de
+> la Tarea 1 de no renombrar este token — no es un bug. Si en algún momento
+> la consistencia visual entre temas para esos usos decorativos se vuelve
+> prioritaria, una tarea futura podría migrar esos usos puntuales a
+> `--accent` o `--primary` en su lugar.
 
 ### Rampa de desempeño (5 pasos, reservada / sin uso actual)
 
