@@ -16,7 +16,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--login-bg);
   font-family: 'Poppins', sans-serif;
 }
@@ -192,6 +192,10 @@
 }
 
 .regiLink a {
+  display: inline-block;
+  padding: 10px 8px;
+  min-height: 44px;
+  line-height: 24px;
   text-decoration: none;
   color: var(--login-accent);
   font-weight: 600;
@@ -303,21 +307,62 @@
   transition-delay: 1.2s;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* ── Móvil: el diseño de dos paneles no sobrevive por debajo de ~700px.
+   Se sale de position:absolute, se apila en una columna y se muestra
+   un solo formulario por vez (el que corresponda a .active). ── */
+@media (max-width: 767px) {
+  .pageContainer {
+    align-items: flex-start;
+    padding: 24px 16px;
+  }
+
   .container {
-    width: 90%;
-    height: 500px;
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+    overflow: visible;
+    border-radius: 16px;
+    padding: 28px 22px 32px;
+    background: var(--login-panel);
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.45);
   }
 
-  .formBox.Login,
-  .formBox.Register {
-    padding: 0 20px;
+  /* Las formas curvas y los paneles informativos dependen del layout
+     absoluto de escritorio: en columna no tienen dónde ir. */
+  .curvedShape,
+  .curvedShape2,
+  .infoContent {
+    display: none;
   }
 
-  .infoContent.Login,
-  .infoContent.Register {
-    padding: 0 20px;
+  .formBox {
+    position: static;
+    width: 100%;
+    height: auto;
+    padding: 0;
+  }
+
+  .formBox.Register            { display: none; }
+  .container.active .formBox.Login    { display: none; }
+  .container.active .formBox.Register { display: block; }
+
+  /* En flujo normal las animaciones de slide no aplican: neutralizarlas
+     para que el formulario visible no quede transparente o desplazado. */
+  .formBox .animation,
+  .container.active .formBox .animation {
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transition-delay: 0s !important;
+  }
+
+  .formBox h2 {
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+
+  .inputBox {
+    margin-top: 22px;
   }
 }
 
@@ -339,6 +384,23 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .formBox .animation,
+  .infoContent .animation,
+  .curvedShape,
+  .curvedShape2,
+  .btn,
+  .btn::before,
+  .inputBox input,
+  .inputBox label,
+  .icon {
+    transition: none !important;
+    animation: none !important;
+    filter: none !important;
+    transition-delay: 0s !important;
   }
 }
 
