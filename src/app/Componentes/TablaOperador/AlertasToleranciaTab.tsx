@@ -41,7 +41,7 @@ export function AlertasToleranciaTab({ employee }: Props) {
 
   if (!employee.biometricoId) {
     return (
-      <div className="mt-6 p-6 bg-card rounded-lg border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400">
+      <div className="mt-6 p-6 bg-warning-soft rounded-lg border border-warning text-warning-soft-foreground">
         <p className="font-semibold mb-1">Sin ID de reloj asignado</p>
         <p className="text-sm">
           Este empleado no tiene un ID biométrico vinculado, así que no hay marcaciones que
@@ -72,7 +72,7 @@ export function AlertasToleranciaTab({ employee }: Props) {
         <p className="text-xs text-muted-foreground mb-1">{employee.name}</p>
         <p
           className={`text-3xl font-heading ${
-            abuso?.alerta ? "text-amber-700 dark:text-amber-400" : "text-foreground"
+            abuso?.alerta ? "text-warning" : "text-foreground"
           }`}
         >
           {dias.length}
@@ -104,14 +104,14 @@ export function AlertasToleranciaTab({ employee }: Props) {
                   <td className="py-2 pr-4 text-foreground">{j.fecha.slice(0, 10)}</td>
                   <td
                     className={`py-2 pr-4 ${
-                      j.abusoEntrada ? "text-amber-700 dark:text-amber-400 font-semibold" : ""
+                      j.abusoEntrada ? "text-warning font-semibold" : ""
                     }`}
                   >
                     {j.entrada ? j.entrada.slice(11, 16) : "—"}
                   </td>
                   <td
                     className={`py-2 pr-4 ${
-                      j.abusoSalida ? "text-amber-700 dark:text-amber-400 font-semibold" : ""
+                      j.abusoSalida ? "text-warning font-semibold" : ""
                     }`}
                   >
                     {j.salida ? j.salida.slice(11, 16) : "—"}

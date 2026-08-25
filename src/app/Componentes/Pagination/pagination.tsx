@@ -30,18 +30,18 @@ export const Pagination = ({
             <button
                 onClick={handlePrevious}
                 disabled={currentPage === 1}
-                className="px-4 py-2 text-sm font-medium text-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                className="min-h-11 px-4 py-2 text-sm font-medium text-muted-foreground bg-card border border-border rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
                 <ChevronLeft className="h-4 w-4 mr-2" />
                 Anterior
             </button>
-            <span className="text-sm text-gray-700 dark:text-gray-300">
+            <span className="text-sm text-foreground">
                 Página <span className="font-semibold">{currentPage}</span> de <span className="font-semibold">{totalPages}</span>
             </span>
             <button
                 onClick={handleNext}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 text-sm font-medium text-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                className="min-h-11 px-4 py-2 text-sm font-medium text-muted-foreground bg-card border border-border rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
                 Siguiente
                 <ChevronRight className="h-4 w-4 ml-2" />

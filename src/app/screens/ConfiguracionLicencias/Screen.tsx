@@ -785,7 +785,7 @@ export default function ConfiguracionGeneral() {
             {/* 1. Modal Licencia */}
             {showLicenciaModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowLicenciaModal(false)} />
+                    <div className="absolute inset-0 bg-warm-contrast/60 backdrop-blur-sm" onClick={() => setShowLicenciaModal(false)} />
                     <div className="relative bg-card w-full max-w-lg rounded-3xl border border-border shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center mb-6 pb-3 border-b border-border">
                             <h3 className="font-heading text-lg font-bold text-foreground">{isEditingLicencia ? 'Editar Regla de Licencia' : 'Nueva Regla Anual'}</h3>
@@ -828,7 +828,7 @@ export default function ConfiguracionGeneral() {
             {/* 2. Modal Contrato */}
             {showContractModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowContractModal(false)} />
+                    <div className="absolute inset-0 bg-warm-contrast/60 backdrop-blur-sm" onClick={() => setShowContractModal(false)} />
                     <div className="relative bg-card w-full max-w-lg rounded-3xl border border-border shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center mb-6 pb-3 border-b border-border">
                             <h3 className="font-heading text-lg font-bold text-foreground">{isEditingContract ? 'Editar Contrato' : 'Nuevo Tipo de Contrato'}</h3>
@@ -859,7 +859,7 @@ export default function ConfiguracionGeneral() {
             {/* 3. Modal Profesión */}
             {showProfessionModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowProfessionModal(false)} />
+                    <div className="absolute inset-0 bg-warm-contrast/60 backdrop-blur-sm" onClick={() => setShowProfessionModal(false)} />
                     <div className="relative bg-card w-full max-w-lg rounded-3xl border border-border shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center mb-6 pb-3 border-b border-border">
                             <h3 className="font-heading text-lg font-bold text-foreground">{isEditingProfession ? 'Editar Profesión' : 'Nueva Profesión / Cargo'}</h3>
@@ -886,7 +886,7 @@ export default function ConfiguracionGeneral() {
             {/* 4. Modal Jornada */}
             {showJornadaModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowJornadaModal(false)} />
+                    <div className="absolute inset-0 bg-warm-contrast/60 backdrop-blur-sm" onClick={() => setShowJornadaModal(false)} />
                     <div className="relative bg-card w-full max-w-lg rounded-3xl border border-border shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center mb-6 pb-3 border-b border-border">
                             <h3 className="font-heading text-lg font-bold text-foreground">{isEditingJornada ? 'Editar Jornada Laboral' : 'Nueva Jornada Laboral'}</h3>

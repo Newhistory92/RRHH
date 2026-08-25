@@ -63,7 +63,7 @@ export function AsistenciaEmpleadoTab({ employee }: Props) {
 
   if (!employee.biometricoId) {
     return (
-      <div className="mt-6 p-6 bg-card rounded-lg border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400">
+      <div className="mt-6 p-6 bg-warning-soft rounded-lg border border-warning text-warning-soft-foreground">
         <p className="font-semibold mb-1">Sin ID de reloj asignado</p>
         <p className="text-sm">
           Este empleado no tiene un ID biométrico vinculado. Asignalo en la pestaña Perfil para
@@ -119,7 +119,7 @@ export function AsistenciaEmpleadoTab({ employee }: Props) {
         </div>
         <div className="bg-card rounded-lg border border-border p-5">
           <p className="text-xs text-muted-foreground mb-1">Días con tolerancia</p>
-          <p className={`text-3xl font-heading ${abuso?.alerta ? "text-amber-700 dark:text-amber-400" : "text-foreground"}`}>
+          <p className={`text-3xl font-heading ${abuso?.alerta ? "text-warning" : "text-foreground"}`}>
             {abuso?.diasAbuso ?? 0}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
@@ -166,7 +166,7 @@ export function AsistenciaEmpleadoTab({ employee }: Props) {
                     {ETIQUETA[j.estado] ?? j.estado}
                     {(j.abusoEntrada || j.abusoSalida) && (
                       <span
-                        className="ml-2 rounded px-1.5 py-0.5 text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300"
+                        className="ml-2 rounded px-1.5 py-0.5 text-xs bg-warning-soft text-warning-soft-foreground"
                         title={
                           j.abusoEntrada && j.abusoSalida
                             ? "Fuera del margen en la entrada y en la salida"

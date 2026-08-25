@@ -37,11 +37,11 @@ export const NotificationDialog: React.FC<NotificationDialogProps> = ({
         icon={!userPhoto ? "pi pi-bell" : undefined}
         shape="circle"
         size="large"
-        className={!userPhoto ? "bg-blue-100 text-blue-600" : ""}
+        className={!userPhoto ? "bg-info-soft text-info-soft-foreground" : ""}
       />
       <div>
-        <h3 className="text-lg font-bold text-gray-800 m-0">Notificación</h3>
-        <p className="text-sm text-gray-500 m-0">{notification.time}</p>
+        <h3 className="text-lg font-bold text-foreground m-0">Notificación</h3>
+        <p className="text-sm text-muted-foreground m-0">{notification.time}</p>
       </div>
     </div>
   );
@@ -70,16 +70,16 @@ export const NotificationDialog: React.FC<NotificationDialogProps> = ({
       resizable={false}
     >
       <div className="py-4">
-        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4 rounded">
+        <div className="bg-info-soft border-l-4 border-info p-4 mb-4 rounded">
           <div className="flex items-start gap-3">
-            <i className="pi pi-info-circle text-blue-500 text-xl mt-1"></i>
-            <p className="text-gray-800 leading-relaxed m-0">
+            <i className="pi pi-info-circle text-info text-xl mt-1"></i>
+            <p className="text-info-soft-foreground leading-relaxed m-0">
               {notification.text}
             </p>
           </div>
         </div>
-        
-        <div className="text-sm text-gray-600 mt-4">
+
+        <div className="text-sm text-muted-foreground mt-4">
           <p className="mb-2">
             <i className="pi pi-clock mr-2"></i>
             <strong>Recibido:</strong> {notification.time}

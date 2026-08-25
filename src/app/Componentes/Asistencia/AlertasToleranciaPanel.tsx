@@ -33,16 +33,16 @@ export default function AlertasToleranciaPanel({ alertas, diasRachaAlerta }: Pro
       {alertas.map((a) => (
         <div
           key={a.employeeId}
-          className="bg-card rounded-lg shadow-sm p-5 border border-amber-300 dark:border-amber-700"
+          className="bg-card rounded-lg shadow-sm p-5 border border-warning"
         >
           <div className="flex items-baseline justify-between mb-4">
             <h3 className="font-heading text-lg text-foreground">{a.employeeName}</h3>
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-amber-700 dark:text-amber-400">
+              <span className="font-semibold text-warning">
                 {a.diasAbuso}
               </span>{" "}
               días en el período · racha de{" "}
-              <span className="font-semibold text-amber-700 dark:text-amber-400">
+              <span className="font-semibold text-warning">
                 {a.rachaMaxima}
               </span>{" "}
               seguidos
@@ -64,14 +64,14 @@ export default function AlertasToleranciaPanel({ alertas, diasRachaAlerta }: Pro
                     <td className="py-2 pr-4 text-foreground">{j.fecha}</td>
                     <td
                       className={`py-2 pr-4 ${
-                        j.abusoEntrada ? "text-amber-700 dark:text-amber-400 font-semibold" : ""
+                        j.abusoEntrada ? "text-warning font-semibold" : ""
                       }`}
                     >
                       {j.entrada ? j.entrada.slice(11, 16) : "—"}
                     </td>
                     <td
                       className={`py-2 pr-4 ${
-                        j.abusoSalida ? "text-amber-700 dark:text-amber-400 font-semibold" : ""
+                        j.abusoSalida ? "text-warning font-semibold" : ""
                       }`}
                     >
                       {j.salida ? j.salida.slice(11, 16) : "—"}

@@ -271,7 +271,7 @@ export default function AsistenciaTablero() {
           >
             Alertas de tolerancia
             {alertas.length > 0 && (
-              <span className="rounded-full px-2 py-0.5 text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300">
+              <span className="rounded-full px-2 py-0.5 text-xs bg-warning-soft text-warning-soft-foreground">
                 {alertas.length}
               </span>
             )}
@@ -287,9 +287,9 @@ export default function AsistenciaTablero() {
       <>
       {/* ── IDs del reloj sin vincular ───────────────────────────── */}
       {huerfanos.length > 0 && (
-        <div className="mb-8 bg-card rounded-lg shadow-sm p-4 border border-amber-400">
+        <div className="mb-8 bg-card rounded-lg shadow-sm p-4 border border-warning">
           <h2 className="font-heading text-lg text-foreground mb-1 flex items-center gap-2">
-            <i className="pi pi-exclamation-triangle text-amber-500" />
+            <i className="pi pi-exclamation-triangle text-warning" />
             IDs del reloj sin vincular ({huerfanos.length})
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
@@ -308,7 +308,7 @@ export default function AsistenciaTablero() {
               <tbody>
                 {huerfanos.map((h) => (
                   <tr key={h.biometricoId} className="border-b border-border last:border-0">
-                    <td className="py-2 pr-4 font-mono font-semibold text-amber-600">{h.biometricoId}</td>
+                    <td className="py-2 pr-4 font-mono font-semibold text-warning">{h.biometricoId}</td>
                     <td className="py-2 pr-4 text-right">{h.cantidadMarcas}</td>
                     <td className="py-2 text-right text-muted-foreground">
                       {h.ultimaMarcacion.slice(0, 16).replace("T", " ")}
@@ -399,7 +399,7 @@ export default function AsistenciaTablero() {
                   <td className="py-2 pr-4">
                     {f.biometricoId
                       ? <span className="text-muted-foreground">{f.biometricoId}</span>
-                      : <span className="text-xs text-amber-600 font-medium">Sin vincular</span>}
+                      : <span className="text-xs text-warning font-medium">Sin vincular</span>}
                   </td>
                   <td className={`py-2 pr-4 text-right ${f.biometricoId ? claseSaldo(f.saldoAcumulado) : "text-muted-foreground"}`}>
                     {f.biometricoId ? fmtHoras(f.saldoAcumulado) : "—"}
@@ -408,7 +408,7 @@ export default function AsistenciaTablero() {
                   <td className="py-2 pr-4 text-right">{f.biometricoId ? f.incompletas : "—"}</td>
                   <td className="py-2 text-right">
                     {f.biometricoId ? (
-                      <span className={f.alerta ? "text-amber-700 dark:text-amber-400 font-semibold" : ""}>
+                      <span className={f.alerta ? "text-warning font-semibold" : ""}>
                         {f.diasAbuso}
                         {f.alerta && <span className="ml-1" title={`${f.rachaMaxima} días seguidos`}>⚠</span>}
                       </span>

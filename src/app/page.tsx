@@ -106,9 +106,9 @@ export default function App() {
       return (
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
-            <i className="pi pi-lock text-6xl text-gray-400 mb-4" />
+            <i className="pi pi-lock text-6xl text-muted-foreground mb-4" />
             <h2 className="text-2xl font-bold mb-2">Acceso Denegado</h2>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-muted-foreground">
               No tenés permisos para acceder a esta página.
             </p>
           </div>
@@ -147,10 +147,10 @@ export default function App() {
         if (globalSettings["Feedback"] === false) {
           return (
             <div className="flex items-center justify-center min-h-[60vh]">
-              <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md text-center border dark:border-gray-700">
-                <i className="pi pi-ban text-6xl text-gray-300 dark:text-gray-600 mb-4" />
-                <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-2">Módulo Inactivo</h2>
-                <p className="text-gray-500 dark:text-gray-400">Este módulo ha sido deshabilitado por el administrador.</p>
+              <div className="bg-card p-8 rounded-xl shadow-md text-center border border-border">
+                <i className="pi pi-ban text-6xl text-muted-foreground mb-4" />
+                <h2 className="text-2xl font-bold text-foreground mb-2">Módulo Inactivo</h2>
+                <p className="text-muted-foreground">Este módulo ha sido deshabilitado por el administrador.</p>
               </div>
             </div>
           );
@@ -174,10 +174,10 @@ export default function App() {
   // ── Loading ───────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="flex items-center justify-center min-h-screen bg-muted">
         <div className="text-center">
-          <i className="pi pi-spin pi-spinner text-4xl text-blue-500 mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Cargando...</p>
+          <i className="pi pi-spin pi-spinner text-4xl text-info mb-4" />
+          <p className="text-muted-foreground">Cargando...</p>
         </div>
       </div>
     );

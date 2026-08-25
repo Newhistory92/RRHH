@@ -151,7 +151,7 @@ export function AusenciasEmpleadoTab({ employee }: Props) {
 
   if (!employee.biometricoId) {
     return (
-      <div className="mt-6 p-6 bg-card rounded-lg border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400">
+      <div className="mt-6 p-6 bg-warning-soft rounded-lg border border-warning text-warning-soft-foreground">
         <p className="font-semibold mb-1">Sin ID de reloj asignado</p>
         <p className="text-sm">
           Este empleado no tiene un ID biométrico vinculado, así que no hay ausencias
@@ -233,7 +233,7 @@ export function AusenciasEmpleadoTab({ employee }: Props) {
                       <>
                         <span className="text-error">Sin justificar</span>
                         {a.licenciaPendiente && (
-                          <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">
+                          <p className="text-xs text-warning mt-1">
                             Licencia de {a.licenciaPendiente.type} ({a.licenciaPendiente.status.toLowerCase()}) cubriría este día
                           </p>
                         )}

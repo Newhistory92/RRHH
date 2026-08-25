@@ -26,13 +26,13 @@ export const NodeConnections: React.FC<NodeConnectionsProps> = ({
     <div className="relative">
       {/* Línea vertical de conexión */}
       <div 
-        className="w-0.5 h-8 bg-gray-400 dark:bg-gray-500"
+        className="w-0.5 h-8 bg-muted-foreground/50"
         role="presentation"
         aria-hidden="true"
       />
       {/* Línea horizontal de distribución */}
       <div 
-        className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-0.5 bg-gray-400 dark:bg-gray-500"
+        className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-0.5 bg-muted-foreground/50"
         role="presentation"
         aria-hidden="true"
       />

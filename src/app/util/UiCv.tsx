@@ -7,8 +7,8 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 export const formatDate = (date: string | number | Date) =>
   new Date(date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 
-const baseCls = "mt-1 block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition";
-const disabledCls = "bg-gray-50 text-gray-400 cursor-not-allowed";
+const baseCls = "mt-1 block w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition";
+const disabledCls = "bg-muted text-muted-foreground cursor-not-allowed";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -22,7 +22,7 @@ type SelectProps = { label: string; value: string; onChange: React.ChangeEventHa
 // ─── Componentes ──────────────────────────────────────────────────────────────
 
 export const Card = ({ children, className = '' }: CardProps) => (
-  <div className={`bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 ${className}`}>
+  <div className={`bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 ${className}`}>
     {children}
   </div>
 );
@@ -37,22 +37,22 @@ export const SectionTitle = ({ icon: Icon, title }: SectionTitleProps) => (
 export const Accordion = ({ title, children, defaultOpen = false }: AccordionProps) => {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+    <div className="border border-border rounded-xl overflow-hidden shadow-sm">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex justify-between items-center px-4 py-3 bg-gray-50 hover:bg-gray-100 transition"
+        className="w-full flex justify-between items-center px-4 py-3 bg-muted hover:bg-muted/70 transition"
       >
-        <h3 className="text-sm font-semibold text-gray-700">{title}</h3>
-        {open ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
       </button>
-      {open && <div className="px-4 py-3 border-t border-gray-100">{children}</div>}
+      {open && <div className="px-4 py-3 border-t border-border">{children}</div>}
     </div>
   );
 };
 
 const FieldLabel = ({ label, required }: { label: string; required?: boolean }) => (
-  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-    {label}{required && <span className="text-red-400 ml-0.5">*</span>}
+  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+    {label}{required && <span className="text-error ml-0.5">*</span>}
   </label>
 );
 
@@ -65,7 +65,7 @@ export const Input = ({ label, type = 'text', value, onChange, disabled = false,
       onChange={onChange}
       disabled={disabled}
       required={required}
-      className={`${baseCls} ${disabled ? disabledCls : 'bg-white'}`}
+      className={`${baseCls} ${disabled ? disabledCls : 'bg-card'}`}
     />
   </div>
 );
@@ -78,7 +78,7 @@ export const Select = ({ label, value, onChange, options, disabled = false, requ
       onChange={onChange}
       disabled={disabled}
       required={required}
-      className={`${baseCls} ${disabled ? disabledCls : 'bg-white'}`}
+      className={`${baseCls} ${disabled ? disabledCls : 'bg-card'}`}
     >
       {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
     </select>

@@ -75,11 +75,11 @@ export default function MiAsistencia() {
       <h1 className="font-heading text-2xl text-foreground mb-6">Mi asistencia</h1>
 
       {abuso?.alerta && (
-        <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950/40">
-          <p className="font-semibold text-amber-800 dark:text-amber-300">
+        <div className="mb-6 rounded-lg border border-warning bg-warning-soft p-4">
+          <p className="font-semibold text-warning-soft-foreground">
             Uso reiterado del margen de tolerancia
           </p>
-          <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">
+          <p className="mt-1 text-sm text-warning-soft-foreground">
             Marcaste fuera del margen de {abuso.toleranciaEstrictaEntradaMin} minutos
             a la entrada o {abuso.toleranciaEstrictaSalidaMin} a la salida{" "}
             {abuso.rachaMaxima} días seguidos ({fmtFechas(abuso.fechasRachaMaxima)}).
@@ -137,7 +137,7 @@ export default function MiAsistencia() {
                     {ETIQUETA_ESTADO[j.estado] ?? j.estado}
                     {(j.abusoEntrada || j.abusoSalida) && (
                       <span
-                        className="ml-2 rounded px-1.5 py-0.5 text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300"
+                        className="ml-2 rounded px-1.5 py-0.5 text-xs bg-warning-soft text-warning-soft-foreground"
                         title={
                           j.abusoEntrada && j.abusoSalida
                             ? "Fuera del margen en la entrada y en la salida"
