@@ -208,6 +208,26 @@
   top: 0;
 }
 
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn:disabled:hover::before {
+  top: -100%;
+}
+
+.avisoRegistro {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--login-brand);
+  border: 1px solid var(--login-accent);
+  color: var(--login-text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .btn:focus-visible,
 .regiLink a:focus-visible {
   outline: 2px solid var(--login-accent);

@@ -161,44 +161,26 @@ export default function AuthPage() {
       return;
     }
 
-    try {
-      const response = await fetch(`${BACKEND_URL}/users/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+    // El alta de usuarios se hace únicamente desde el panel de administración
+    // (POST /users/employee, protegido con el permiso admin.gestionar).
+    // El registro público queda desactivado a propósito: este es un sistema
+    // interno y cualquiera con la URL podía crearse una cuenta con rol User.
+    //
+    // try {
+    //   const response = await fetch(`${BACKEND_URL}/users/register`, {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify(data),
+    //   });
+    //   ...
+    // } catch (error) { ... }
 
-      const resData = await response.json();
-      console.log("Respuesta del registro:", resData);
-      if (response.ok) {
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Registro exitoso',
-          detail: 'Tu cuenta ha sido creada correctamente',
-          life: 3000
-        });
-        setUsuario("");
-        setEmail("");
-        setPassword("");
-        setFieldErrors({});
-        setTouched({ usuario: false, email: false, password: false });
-      } else {
-        toast.current?.show({
-          severity: 'error',
-          summary: 'Error en el registro',
-          detail: resData.detail || "Error desconocido",
-          life: 4000
-        });
-      }
-    } catch (error) {
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error de conexión',
-        detail: 'No se pudo conectar con el servidor',
-        life: 4000
-      });
-      console.error(error);
-    }
+    toast.current?.show({
+      severity: 'info',
+      summary: 'El registro no está habilitado',
+      detail: 'Las cuentas las crea el área de Sistemas. Comunicate con Sistemas para que te den de alta.',
+      life: 6000,
+    });
   };
 
 
@@ -281,6 +263,10 @@ export default function AuthPage() {
           <h2 className={styles.animation} style={{ '--li': 17, '--S': 0 } as React.CSSProperties}>
             Regístrate
           </h2>
+          <p className={styles.avisoRegistro} role="status">
+            Las cuentas las crea el área de Sistemas. Si todavía no tenés acceso,
+            comunicate con Sistemas para que te den de alta.
+          </p>
           <form onSubmit={handleRegisterSubmit}>
             <div className={`${styles.inputBox} ${styles.animation}`} style={{ '--li': 18, '--S': 1 } as React.CSSProperties}>
               <input
@@ -352,7 +338,7 @@ export default function AuthPage() {
             </div>
 
             <div className={`${styles.inputBox} ${styles.animation}`} style={{ '--li': 21, '--S': 4 } as React.CSSProperties}>
-              <button className={styles.btn} type="submit">Regístrate</button>
+              <button className={styles.btn} type="submit" disabled>Regístrate</button>
             </div>
 
             <div className={`${styles.regiLink} ${styles.animation}`} style={{ '--li': 22, '--S': 5 } as React.CSSProperties}>
