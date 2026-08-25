@@ -135,11 +135,45 @@
   height: 24px;
   transform: translateY(-50%);
   transition: 0.5s;
+  color: var(--login-muted);
 }
 
 .inputBox input:focus ~ .icon,
 .InputBox input:valid ~ .icon {
   fill: var(--login-accent);
+}
+
+.toggleEye {
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--login-muted);
+  border-radius: 8px;
+  transition: color 0.2s ease;
+}
+
+.toggleEye:hover {
+  color: var(--login-accent);
+}
+
+.toggleEye:focus-visible {
+  outline: 2px solid var(--login-accent);
+  outline-offset: 2px;
+}
+
+/* El input necesita espacio para no quedar debajo del botón. */
+.inputBox.withToggle input {
+  padding-right: 48px;
 }
 
 .btn {

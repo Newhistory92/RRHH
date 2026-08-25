@@ -6,6 +6,7 @@ import { registerSchema } from "@/app/util/authValidation";
 import styles from './AuthPage.module.css';
 import { Toast } from 'primereact/toast';
 import { loginUser } from '@/app/util/auth';
+import { Eye, EyeOff } from 'lucide-react';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
 
@@ -15,6 +16,8 @@ export default function AuthPage() {
   const [usuario, setUsuario] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [verPassLogin, setVerPassLogin] = useState(false);
+  const [verPassRegistro, setVerPassRegistro] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{
     usuario?: string;
     email?: string;
@@ -96,7 +99,6 @@ export default function AuthPage() {
 
       // Guardar en localStorage los datos del usuario
       localStorage.setItem("token", data.access_token || "");
-      localStorage.setItem("roleId", data.roleId?.toString() || "");
       localStorage.setItem("roleName", data.roleName || "");
       localStorage.setItem("employeeId", data.employeeId || "");
       localStorage.setItem("usuario", data.usuario || "");
@@ -217,28 +219,38 @@ export default function AuthPage() {
           <form onSubmit={handleLoginSubmit}>
             <div className={`${styles.inputBox} ${styles.animation}`} style={{ '--D': 1, '--S': 22 } as React.CSSProperties}>
               <input
+                id="login-usuario"
                 type="text"
                 value={usuario}
                 onChange={(e) => setUsuario(e.target.value)}
+                autoComplete="username"
                 required
               />
-              <label>Usuario</label>
-              <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray">
+              <label htmlFor="login-usuario">Usuario</label>
+              <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
               </svg>
             </div>
 
-            <div className={`${styles.inputBox} ${styles.animation}`} style={{ '--D': 2, '--S': 23 } as React.CSSProperties}>
+            <div className={`${styles.inputBox} ${styles.withToggle} ${styles.animation}`} style={{ '--D': 2, '--S': 23 } as React.CSSProperties}>
               <input
-                type="password"
+                id="login-password"
+                type={verPassLogin ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
                 required
               />
-              <label>Contraseña</label>
-              <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray">
-                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
-              </svg>
+              <label htmlFor="login-password">Contraseña</label>
+              <button
+                type="button"
+                className={styles.toggleEye}
+                onClick={() => setVerPassLogin((v) => !v)}
+                aria-label={verPassLogin ? "Ocultar contraseña" : "Mostrar contraseña"}
+                aria-pressed={verPassLogin}
+              >
+                {verPassLogin ? <EyeOff size={20} aria-hidden="true" /> : <Eye size={20} aria-hidden="true" />}
+              </button>
             </div>
 
             <div className={`${styles.inputBox} ${styles.animation}`} style={{ '--D': 3, '--S': 24 } as React.CSSProperties}>
@@ -272,58 +284,70 @@ export default function AuthPage() {
           <form onSubmit={handleRegisterSubmit}>
             <div className={`${styles.inputBox} ${styles.animation}`} style={{ '--li': 18, '--S': 1 } as React.CSSProperties}>
               <input
+                id="registro-usuario"
                 type="text"
                 value={usuario}
                 onChange={(e) => {
                   setUsuario(e.target.value);
                   setTouched(prev => ({ ...prev, usuario: true }));
                 }}
+                autoComplete="username"
                 required
               />
-              <label>Usuario</label>
-              <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray">
+              <label htmlFor="registro-usuario">Usuario</label>
+              <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
               </svg>
               {fieldErrors.usuario && (
-                <span className={styles.errorText}>{fieldErrors.usuario}</span>
+                <span className={styles.errorText} role="alert">{fieldErrors.usuario}</span>
               )}
             </div>
 
             <div className={`${styles.inputBox} ${styles.animation}`} style={{ '--li': 19, '--S': 2 } as React.CSSProperties}>
               <input
+                id="registro-email"
                 type="email"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
                   setTouched(prev => ({ ...prev, email: true }));
                 }}
+                autoComplete="email"
                 required
               />
-              <label>Email</label>
-              <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray">
+              <label htmlFor="registro-email">Email</label>
+              <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
               </svg>
               {fieldErrors.email && (
-                <span className={styles.errorText}>{fieldErrors.email}</span>
+                <span className={styles.errorText} role="alert">{fieldErrors.email}</span>
               )}
             </div>
 
-            <div className={`${styles.inputBox} ${styles.animation}`} style={{ '--li': 20, '--S': 3 } as React.CSSProperties}>
+            <div className={`${styles.inputBox} ${styles.withToggle} ${styles.animation}`} style={{ '--li': 20, '--S': 3 } as React.CSSProperties}>
               <input
-                type="password"
+                id="registro-password"
+                type={verPassRegistro ? "text" : "password"}
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
                   setTouched(prev => ({ ...prev, password: true }));
                 }}
+                autoComplete="new-password"
                 required
               />
-              <label>Contraseña</label>
-              <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray">
-                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
-              </svg>
+              <label htmlFor="registro-password">Contraseña</label>
+              <button
+                type="button"
+                className={styles.toggleEye}
+                onClick={() => setVerPassRegistro((v) => !v)}
+                aria-label={verPassRegistro ? "Ocultar contraseña" : "Mostrar contraseña"}
+                aria-pressed={verPassRegistro}
+              >
+                {verPassRegistro ? <EyeOff size={20} aria-hidden="true" /> : <Eye size={20} aria-hidden="true" />}
+              </button>
               {fieldErrors.password && (
-                <span className={styles.errorText}>{fieldErrors.password}</span>
+                <span className={styles.errorText} role="alert">{fieldErrors.password}</span>
               )}
             </div>
 
