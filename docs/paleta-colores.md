@@ -112,6 +112,19 @@ cumplen AA, mínimo 4.5:1):
 | `--ring` | `color-mix(#1E5561 55%, transparent)` | `color-mix(#5FA3B2 55%, transparent)` |
 | `--warm-contrast` | `#37363E` | `#C3D184` |
 | `--warm-contrast-foreground` | `#FFFFFF` | `#37363E` |
+
+> **Nota — doble rol de `--warm-contrast`.** Este token es `#37363E`
+> (charcoal oscuro, igual que `--foreground`) en modo claro, y `#C3D184`
+> (oliva, un acento bien visible) en modo oscuro. Como superficie oscura es
+> consistente en ambos temas (18 usos existentes lo tratan así, y ahí
+> funciona bien). El problema aparece si se lo usa como color de acento
+> puramente decorativo (íconos, series de un gráfico): en modo claro se ve
+> como un acento apagado/casi invisible, y en modo oscuro como un acento
+> fuerte. Esto es una consecuencia aceptada y deliberada de la decisión de
+> la Tarea 1 de no renombrar este token — no es un bug. Si en algún momento
+> la consistencia visual entre temas para esos usos decorativos se vuelve
+> prioritaria, una tarea futura podría migrar esos usos puntuales a
+> `--accent` o `--primary` en su lugar.
 | `--color-success` | `#3D7065` | `#8FC0B6` |
 | `--color-success-foreground` | `#FFFFFF` | `#24352F` |
 | `--color-warning` | `#A2570A` | `#FBBF24` |
@@ -129,7 +142,7 @@ cumplen AA, mínimo 4.5:1):
 | `--color-info-soft` | `#DCE7EA` | `#1B333A` |
 | `--color-info-soft-foreground` | `#1E5561` | `#5FA3B2` |
 
-### Rampa de desempeño (5 pasos, siempre con texto `#37363E` encima)
+### Rampa de desempeño (5 pasos, reservada / sin uso actual)
 
 | Paso | Token | Hex | Significado |
 |---|---|---|---|
@@ -139,9 +152,19 @@ cumplen AA, mínimo 4.5:1):
 | 4 | `--scale-4` | `#D97706` | Ámbar |
 | 5 (peor) | `--scale-5` | `#C42B2B` | Rojo-text |
 
-El color de la rampa nunca es el único indicador de nivel: siempre va
-acompañado de una etiqueta numérica/textual adyacente (confirmado en la
-Tarea 3 del plan), para no depender solo del color (WCAG 1.4.1).
+Estos 5 tokens existen en `globals.css` (agregados intencionalmente en la
+Tarea 3 por si se necesitan a futuro), pero **actualmente no están cableados
+a ningún componente en vivo**. La única referencia a una rampa de 5 pasos en
+el código es la sección legacy, comentada y muerta, de
+`src/app/util/UiRRHH.tsx` (~líneas 1-793), que fue reemplazada por el código
+en vivo a partir de la línea ~795.
+
+El componente en vivo que muestra un medidor de desempeño es `SoftSkillBar`
+(en el mismo archivo `UiRRHH.tsx`), y usa una rampa de **3 pasos**
+(`bg-success` / `bg-warning` / `bg-error`, resueltos por el helper
+`getScoreColor`). Ese componente es el que efectivamente cumple WCAG 1.4.1:
+el color nunca es el único indicador de nivel, porque siempre va acompañado
+de una etiqueta numérica adyacente (`{score}/10`).
 
 ## 5. Antes de agregar un color nuevo
 

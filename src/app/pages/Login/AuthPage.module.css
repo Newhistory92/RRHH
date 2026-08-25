@@ -139,7 +139,7 @@
 }
 
 .inputBox input:focus ~ .icon,
-.InputBox input:valid ~ .icon {
+.inputBox input:valid ~ .icon {
   fill: var(--login-accent);
 }
 

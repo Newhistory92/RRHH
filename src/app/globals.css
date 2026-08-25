@@ -10,6 +10,10 @@
   --brand-sage:     #6AA69B;
   --brand-amber:    #D97706;
 
+  /* Scrim de overlays/modales: fijo en ambos temas a propósito, un scrim
+     siempre debe oscurecer el fondo, sin importar el tema activo. */
+  --overlay: rgba(36, 35, 42, 0.6);
+
   /* ===== Variantes accesibles para TEXTO sobre fondo claro =====
      Los colores base fallan AA como color de texto sobre blanco:
      oliva 1.64:1 · sage 2.78:1 · rojo 3.76:1 · ámbar 2.96:1.
@@ -164,6 +168,7 @@
   --color-ring: var(--ring);
   --color-warm-contrast: var(--warm-contrast);
   --color-warm-contrast-foreground: var(--warm-contrast-foreground);
+  --color-overlay: var(--overlay);
   --shadow-soft: var(--shadow-soft);
   --color-success: var(--color-success);
   --color-success-foreground: var(--color-success-foreground);

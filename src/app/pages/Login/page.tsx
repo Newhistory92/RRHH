@@ -163,8 +163,14 @@ export default function AuthPage() {
 
     // El alta de usuarios se hace únicamente desde el panel de administración
     // (POST /users/employee, protegido con el permiso admin.gestionar).
-    // El registro público queda desactivado a propósito: este es un sistema
-    // interno y cualquiera con la URL podía crearse una cuenta con rol User.
+    //
+    // Esta llamada a POST /users/register queda deshabilitada SOLO acá, en el
+    // frontend: es una mitigación parcial, no un cierre del hueco de seguridad.
+    // El endpoint en el backend (Backend_RRHH/app/routes/user.py) sigue sin
+    // ninguna autenticación y todavía puede invocarse directo (por ejemplo con
+    // curl) para crear una cuenta. Falta una tarea de backend que proteja ese
+    // endpoint, idealmente restringiéndolo al permiso admin.gestionar, igual
+    // que ya se hace con POST /users/employee en el mismo archivo.
     //
     // try {
     //   const response = await fetch(`${BACKEND_URL}/users/register`, {
@@ -228,7 +234,7 @@ export default function AuthPage() {
                 type="button"
                 className={styles.toggleEye}
                 onClick={() => setVerPassLogin((v) => !v)}
-                aria-label={verPassLogin ? "Ocultar contraseña" : "Mostrar contraseña"}
+                aria-label="Mostrar u ocultar contraseña"
                 aria-pressed={verPassLogin}
               >
                 {verPassLogin ? <EyeOff size={20} aria-hidden="true" /> : <Eye size={20} aria-hidden="true" />}
@@ -327,7 +333,7 @@ export default function AuthPage() {
                 type="button"
                 className={styles.toggleEye}
                 onClick={() => setVerPassRegistro((v) => !v)}
-                aria-label={verPassRegistro ? "Ocultar contraseña" : "Mostrar contraseña"}
+                aria-label="Mostrar u ocultar contraseña"
                 aria-pressed={verPassRegistro}
               >
                 {verPassRegistro ? <EyeOff size={20} aria-hidden="true" /> : <Eye size={20} aria-hidden="true" />}
