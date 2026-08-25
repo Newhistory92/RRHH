@@ -42,6 +42,13 @@ export default function AuthPage() {
     // Limpiar errores al cambiar de formulario
     setFieldErrors({});
     setTouched({ usuario: false, email: false, password: false });
+
+    toast.current?.show({
+      severity: 'info',
+      summary: 'El registro no está habilitado',
+      detail: 'Las cuentas las crea el área de Sistemas. Comunicate con Sistemas para que te den de alta.',
+      life: 6000,
+    });
   };
 
   const handleSignInClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -269,10 +276,6 @@ export default function AuthPage() {
           <h2 className={styles.animation} style={{ '--li': 17, '--S': 0 } as React.CSSProperties}>
             Regístrate
           </h2>
-          <p className={styles.avisoRegistro} role="status">
-            Las cuentas las crea el área de Sistemas. Si todavía no tenés acceso,
-            comunicate con Sistemas para que te den de alta.
-          </p>
           <form onSubmit={handleRegisterSubmit}>
             <div className={`${styles.inputBox} ${styles.animation}`} style={{ '--li': 18, '--S': 1 } as React.CSSProperties}>
               <input
