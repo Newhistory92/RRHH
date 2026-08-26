@@ -95,7 +95,11 @@ export default function LicenciasManage() {
       setView("contenedor");
     } catch (err) {
       console.error(err);
-      toast.current?.show({ severity: 'error', summary: 'Error', detail: 'No se pudo enviar la solicitud' });
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: err instanceof Error && err.message ? err.message : 'No se pudo enviar la solicitud',
+      });
     }
   };
 
