@@ -79,9 +79,13 @@ const Section = ({ title, icon, children }: { title: string; icon?: React.ReactN
 // ─── Componente ───────────────────────────────────────────────────────────────
 
 export default function ConteinerLicencia({ userData, saldos, misSolicitudes, solicitudesPendientes, onNewRequest, onManageRequest, supervisores }: Props) {
-  const tieneSolicitudPendiente = misSolicitudes.some(
-    s => s.status === 'Pendiente' || s.status === 'Pendiente Siguiente Aprobación'
-  );
+  // Nota: el bloqueo de "solicitud pendiente" ahora es por tipo de licencia
+  // (ver Backend_RRHH POST /licenses/request). Este componente todavía no
+  // sabe qué tipo va a elegir el usuario -- eso se define recién en el
+  // formulario que abre onNewRequest -- así que ya no puede deshabilitar
+  // preventivamente el botón "Solicitar" sin volver a bloquear tipos que
+  // no deberían bloquearse entre sí. El backend es la única fuente de
+  // verdad para este chequeo y devuelve el 400 con el tipo específico.
   const [selectedRequest, setSelectedRequest] = useState<LicenseHistory | null>(null);
   console.log("saldos", saldos);
   const pendientes = useMemo<SolicitudParsed[]>(() =>
@@ -171,14 +175,10 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
           </div>
           <h3 className="font-semibold text-sm mb-1">Nueva Solicitud</h3>
           <p className="text-xs text-primary-foreground/80 mb-4">
-            {tieneSolicitudPendiente
-              ? 'Ya tenés una solicitud pendiente de aprobación'
-              : 'Iniciá tu solicitud de licencia'}
+            Iniciá tu solicitud de licencia
           </p>
           <button
             onClick={onNewRequest}
-            disabled={tieneSolicitudPendiente}
-            title={tieneSolicitudPendiente ? 'Esperá la resolución de tu solicitud pendiente antes de crear otra.' : undefined}
             className="flex items-center gap-1.5 px-4 py-2 bg-card text-primary text-xs font-semibold rounded-full hover:bg-muted transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-card"
           >
             <Send size={13} />
