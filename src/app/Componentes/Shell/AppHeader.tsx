@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Employee, Notification, Page } from "@/app/Interfas/Interfaces";
 import { logoutFromClient } from "@/app/util/authClient";
 import { apiClient } from "@/app/util/apiClient";
+import { NotificationDialog } from "@/app/Componentes/Perfil/NotificationDialog";
 
 const DEFAULT_AVATAR = "/Default-avatar.webp";
 
@@ -43,6 +44,7 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
   const [userPhoto, setUserPhoto] = useState(DEFAULT_AVATAR);
   const [userName, setUserName] = useState("Usuario");
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifAbierta, setNotifAbierta] = useState<Notification | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -127,15 +129,15 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
             ) : (
               notifications.slice(0, 8).map(notif => (
                 // El DropdownMenuItem por defecto pinta el fondo de oliva
-                // (--accent) al pasar el mouse. Estos items son de solo
-                // lectura (cursor-default, sin onClick) y sus <span> de
-                // adentro fuerzan text-foreground/muted-foreground sin
-                // importar el estado del padre -- asi que el fondo cambiaba
-                // a oliva pero el texto se quedaba blanco, ilegible. Se
-                // apaga el hover coloreado y se deja uno neutro.
+                // (--accent) al pasar el mouse. Sus <span> de adentro
+                // fuerzan text-foreground/muted-foreground sin importar el
+                // estado del padre -- asi que el fondo cambiaba a oliva
+                // pero el texto se quedaba blanco, ilegible. Se apaga el
+                // hover coloreado y se deja uno neutro.
                 <DropdownMenuItem
                   key={notif.id}
-                  className="flex cursor-default flex-col items-start gap-0.5 px-3 py-2.5 focus:bg-muted focus:text-inherit"
+                  onClick={() => setNotifAbierta(notif)}
+                  className="flex flex-col items-start gap-0.5 px-3 py-2.5 focus:bg-muted focus:text-inherit"
                 >
                   <span className={`text-sm leading-snug ${notif.status === "nueva" ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
                     {notif.text.length > 90 ? notif.text.slice(0, 90) + "…" : notif.text}
@@ -200,6 +202,12 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
         </DropdownMenu>
       </div>
       </div>
+      <NotificationDialog
+        visible={notifAbierta !== null}
+        onHide={() => setNotifAbierta(null)}
+        notification={notifAbierta}
+        userPhoto={userPhoto}
+      />
     </header>
   );
 }
