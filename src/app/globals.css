@@ -47,11 +47,11 @@
   --input:  color-mix(in srgb, #37363E 16%, transparent);
   --ring:   color-mix(in srgb, #1E5561 55%, transparent);
 
-  /* Superficie glass del navbar. La opacidad es alta a proposito: con el
-     contenido pasando por debajo, bajar de ~0.85 hunde el contraste del texto
-     de la barra por debajo de AA. El blur aporta el efecto, no la
-     transparencia. */
-  --glass: rgba(255, 255, 255, 0.85);
+  /* Superficie glass del navbar, siempre con backdrop-blur-xl encima (ver
+     AppHeader). 0.70 es el piso: medido con el peor fondo posible pasando por
+     debajo (texto oscuro en claro), el texto de la barra da 6.78:1 -- bajar
+     mas de ahi rompe AA (0.65 ya cae a 4.18:1 en oscuro). */
+  --glass: rgba(255, 255, 255, 0.70);
   --glass-border: rgba(55, 54, 62, 0.12);
 
   --warm-contrast: #37363E;           /* con blanco encima: 11.93:1 */
@@ -141,7 +141,7 @@
   --input:  #45444F;
   --ring:   color-mix(in srgb, #5FA3B2 55%, transparent);
 
-  --glass: rgba(36, 35, 42, 0.85);
+  --glass: rgba(36, 35, 42, 0.70);
   --glass-border: rgba(255, 255, 255, 0.10);
 
   --warm-contrast: #C3D184;

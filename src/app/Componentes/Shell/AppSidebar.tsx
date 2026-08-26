@@ -6,6 +6,8 @@ import {
   BrainCircuit,
   GitMerge,
   ClipboardList,
+  ChevronLeft,
+  ChevronRight,
   Shield,
   UserCircle,
   FileText,
@@ -52,6 +54,7 @@ interface AppSidebarProps {
   setPage: (page: Page) => void;
   permisos: string[];
   isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
 export function AppSidebar({
@@ -59,6 +62,7 @@ export function AppSidebar({
   setPage,
   permisos,
   isCollapsed,
+  onToggleCollapse,
 }: AppSidebarProps) {
   const sections = getSidebarSections(permisos);
 
@@ -67,13 +71,20 @@ export function AppSidebar({
 
   return (
     <TooltipProvider delayDuration={200}>
-      {/* Arranca en top-16, debajo del navbar, que ahora cruza todo el ancho.
-          La marca y el control de colapso viven en el navbar. */}
+      {/* Arranca en top-16, debajo del navbar, que ahora cruza todo el ancho. */}
       <aside
         className={`bg-muted border-r border-border fixed top-16 left-0 h-[calc(100vh-4rem)] z-30 hidden md:flex flex-col transition-all duration-300 ease-in-out ${
           isCollapsed ? "w-16" : "w-64"
         }`}
       >
+        <button
+          onClick={onToggleCollapse}
+          className="absolute top-4 -right-3 bg-primary text-primary-foreground rounded-full p-1.5 shadow-md hover:opacity-90 transition-opacity z-50"
+          aria-label={isCollapsed ? "Expandir sidebar" : "Colapsar sidebar"}
+        >
+          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </button>
+
         <nav className="flex-1 px-2 py-4 overflow-y-auto overflow-x-hidden space-y-4">
           {sections.map((section, idx) => (
             <div key={section.label}>

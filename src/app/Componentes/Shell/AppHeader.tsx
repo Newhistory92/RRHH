@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare, Folder, Clock, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare, Folder, Clock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -21,19 +21,9 @@ const DEFAULT_AVATAR = "/Default-avatar.webp";
 interface AppHeaderProps {
   setPage: (page: Page) => void;
   employeeData?: Employee | null;
-  /** Solo se dibuja el control de colapso si hay sidebar que colapsar. */
-  hasSidebar?: boolean;
-  isCollapsed?: boolean;
-  onToggleSidebar?: () => void;
 }
 
-export function AppHeader({
-  setPage,
-  employeeData,
-  hasSidebar = false,
-  isCollapsed = false,
-  onToggleSidebar,
-}: AppHeaderProps) {
+export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [usuario, setUsuario] = useState("");
@@ -76,27 +66,16 @@ export function AppHeader({
 
   return (
     // Navbar de punta a punta: va fixed sobre TODO el ancho, con el sidebar
-    // arrancando por debajo. El fallback de background cubre a los navegadores
-    // sin backdrop-filter, donde si no quedaria semitransparente sin blur.
+    // arrancando por debajo. bg-glass es semitransparente; backdrop-blur-xl
+    // es lo que desenfoca lo que pasa por debajo -- sin las dos juntas no hay
+    // efecto glass, solo transparencia lisa.
     <header
-      className="fixed inset-x-0 top-0 z-40 h-16 border-b border-glass-border bg-background/95 supports-[backdrop-filter]:bg-glass supports-[backdrop-filter]:backdrop-blur-xl"
+      className="fixed inset-x-0 top-0 z-40 h-16 border-b border-glass-border bg-glass backdrop-blur-xl"
     >
       <div className="flex h-full items-center justify-between gap-3 px-4 sm:px-6">
-      <div className="flex items-center gap-2 min-w-0">
-        {hasSidebar && onToggleSidebar && (
-          <button
-            onClick={onToggleSidebar}
-            className="hidden md:inline-flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label={isCollapsed ? "Expandir menú lateral" : "Colapsar menú lateral"}
-            aria-expanded={!isCollapsed}
-          >
-            {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
-          </button>
-        )}
-        <span className="font-heading text-xl font-semibold text-foreground truncate">
-          Talexa
-        </span>
-      </div>
+      <span className="font-heading text-xl font-semibold text-foreground truncate">
+        Talexa
+      </span>
 
       <div className="flex items-center gap-3">
         {/* Campanita con notificaciones reales */}

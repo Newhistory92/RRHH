@@ -29,18 +29,13 @@ export function AppLayout({
     <div className="min-h-screen bg-background text-foreground">
       {/* El navbar es fixed y cruza todo el ancho, asi que va fuera del
           contenedor desplazado y el contenido compensa su alto con pt-16. */}
-      <AppHeader
-        setPage={setPage}
-        employeeData={employeeData}
-        hasSidebar={hasSidebar}
-        isCollapsed={isCollapsed}
-        onToggleSidebar={() => setIsCollapsed((prev) => !prev)}
-      />
+      <AppHeader setPage={setPage} employeeData={employeeData} />
       <AppSidebar
         activePage={activePage}
         setPage={setPage}
         permisos={permisos}
         isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed((prev) => !prev)}
       />
       <div
         className={`pt-16 transition-all duration-300 ${
