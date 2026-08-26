@@ -168,24 +168,24 @@ export default function PortalInicio({ employeeData }: PortalInicioProps) {
             {sidebar}
           </div>
         ) : (
-          <>
-            {urgentes.length > 0 && (
-              <div className="space-y-3">
-                {urgentes.map((p) => (
-                  <div key={p.id} className="border-l-4 border-error rounded-xl overflow-hidden">
-                    <PublicationCard publication={p} onClick={() => setSeleccionada(p)} />
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              {feedCompleto.length === 0 ? (
+                <div className="bg-card border border-border rounded-xl p-12 text-center">
+                  <p className="text-muted-foreground">No hay publicaciones por ahora.</p>
+                </div>
+              ) : (
+                <>
+                  {urgentes.length > 0 && (
+                    <div className="space-y-3">
+                      {urgentes.map((p) => (
+                        <div key={p.id} className="border-l-4 border-error rounded-xl overflow-hidden">
+                          <PublicationCard publication={p} onClick={() => setSeleccionada(p)} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-            {feedCompleto.length === 0 ? (
-              <div className="bg-card border border-border rounded-xl p-12 text-center">
-                <p className="text-muted-foreground">No hay publicaciones por ahora.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
                   {destacadas.length > 0 && (
                     <section>
                       <h2 className="font-heading text-xl font-bold text-foreground mb-3">Destacadas</h2>
@@ -207,11 +207,11 @@ export default function PortalInicio({ employeeData }: PortalInicioProps) {
                       </div>
                     </section>
                   ))}
-                </div>
-                {sidebar}
-              </div>
-            )}
-          </>
+                </>
+              )}
+            </div>
+            {sidebar}
+          </div>
         )}
       </div>
 
