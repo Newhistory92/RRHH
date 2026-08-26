@@ -44,18 +44,10 @@ export default function DateRangePicker({ onDateChange, maxDays, allowPastDates 
   const [loading, setLoading] = useState(true);
   // ── Fetch feriados (públicos + de empresa) ────────────────────────────────────
   useEffect(() => {
-    const year = Temporal.Now.plainDateISO().year;
-
-    Promise.all([
-      fetch(`https://api.argentinadatos.com/v1/feriados/${year}`)
-        .then(r => { if (!r.ok) throw new Error('Error al obtener feriados públicos'); return r.json(); })
-        .then((data: HolidayApi[]) => data)
-        .catch(err => { console.error(err); return [] as HolidayApi[]; }),
-      apiClient.get<{ feriados: { id: number; fecha: string; nombre: string }[] }>('/licenses/feriados')
-        .then(res => res.feriados.map(f => ({ fecha: f.fecha, tipo: 'Empresa', nombre: f.nombre } as HolidayApi)))
-        .catch(err => { console.error(err); return [] as HolidayApi[]; }),
-    ])
-      .then(([publicos, empresa]) => setHolidayMap(processHolidays([...publicos, ...empresa])))
+    apiClient.get<{ feriados: { id: number; fecha: string; nombre: string }[] }>('/licenses/feriados')
+      .then(res => res.feriados.map(f => ({ fecha: f.fecha, tipo: 'Empresa', nombre: f.nombre } as HolidayApi)))
+      .catch(err => { console.error(err); return [] as HolidayApi[]; })
+      .then(feriados => setHolidayMap(processHolidays(feriados)))
       .finally(() => setLoading(false));
   }, []);
 

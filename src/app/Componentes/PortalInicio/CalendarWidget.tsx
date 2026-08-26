@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { Calendar } from 'primereact/calendar';
 import { addLocale, type LocaleOptions } from 'primereact/api';
 import { CalendarDays } from 'lucide-react';
-import { Temporal } from '@js-temporal/polyfill';
 import { type HolidayApi, type PlainHoliday, processHolidays } from '@/app/lib/dates';
+import { apiClient } from '@/app/util/apiClient';
 
 addLocale('es', {
   firstDayOfWeek: 1,
@@ -28,10 +28,12 @@ export function CalendarWidget() {
   const [feriados, setFeriados] = useState<Map<string, PlainHoliday>>(new Map());
 
   useEffect(() => {
-    const year = Temporal.Now.plainDateISO().year;
-    fetch(`https://api.argentinadatos.com/v1/feriados/${year}`)
-      .then((r) => { if (!r.ok) throw new Error('Error al obtener feriados públicos'); return r.json(); })
-      .then((data: HolidayApi[]) => setFeriados(processHolidays(data)))
+    apiClient
+      .get<{ feriados: { id: number; fecha: string; nombre: string }[] }>('/licenses/feriados')
+      .then((res) => {
+        const data: HolidayApi[] = res.feriados.map((f) => ({ fecha: f.fecha, nombre: f.nombre, tipo: 'Empresa' }));
+        setFeriados(processHolidays(data));
+      })
       .catch((err) => console.error('Error al cargar feriados:', err));
   }, []);
 
