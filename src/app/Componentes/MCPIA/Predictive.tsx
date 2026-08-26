@@ -105,7 +105,7 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
             colorClass="bg-error-soft"
           />
           <StatCard
-            icon={<Target size={24} className="text-accent" />}
+            icon={<Target size={24} className="text-olive-strong" />}
             title="Productividad Promedio"
             value={`${(analysis.reduce((sum, d) => sum + d.avgProductivity, 0) / analysis.length).toFixed(1)}/10`}
             colorClass="bg-accent/15"

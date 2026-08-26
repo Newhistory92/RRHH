@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/app/providers/ThemeProvider";
-import "primereact/resources/themes/lara-light-teal/theme.css";
+import { PrimeReactTheme } from "@/app/Componentes/Shell/PrimeReactTheme";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -37,6 +37,7 @@ export default function RootLayout({
         className={`${fraunces.variable} ${inter.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <PrimeReactTheme />
           {children}
         </ThemeProvider>
       </body>

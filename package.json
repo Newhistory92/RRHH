@@ -12,7 +12,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test-db": "tsx test-db.ts"
+    "test-db": "tsx test-db.ts",
+    "postinstall": "node scripts/copy-primereact-themes.mjs",
+    "copy-themes": "node scripts/copy-primereact-themes.mjs"
   },
   "dependencies": {
     "@ai-sdk/google-vertex": "^3.0.10",

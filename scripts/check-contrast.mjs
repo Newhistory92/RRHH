@@ -25,6 +25,11 @@ const PARES = [
   ["claro/accent",            "#C3D184", "#37363E", 4.5],
   ["claro/destructive",       "#C42B2B", "#FFFFFF", 4.5],
   ["claro/warm-contrast",     "#37363E", "#FFFFFF", 4.5],
+  // Acentos decorativos usados como color de texto/icono sobre card.
+  // Los tonos base fallan aca (oliva 1.64:1), por eso existen las -strong.
+  ["claro/olive-strong",      "#FFFFFF", "#616D33", 4.5],
+  ["claro/sage-strong",       "#FFFFFF", "#3D7065", 4.5],
+  ["claro/amber-strong",      "#FFFFFF", "#A2570A", 4.5],
   ["claro/success-soft",      "#E6F1EF", "#3D7065", 4.5],
   ["claro/warning-soft",      "#FDF3E7", "#A2570A", 4.5],
   ["claro/error-soft",        "#FDEAEA", "#C42B2B", 4.5],
@@ -36,6 +41,9 @@ const PARES = [
   ["oscuro/secondary",        "#3A4644", "#EDECF0", 4.5],
   ["oscuro/accent",           "#C3D184", "#37363E", 4.5],
   ["oscuro/destructive",      "#F87171", "#24232A", 4.5],
+  ["oscuro/olive-strong",     "#2E2D36", "#C3D184", 4.5],
+  ["oscuro/sage-strong",      "#2E2D36", "#8FC0B6", 4.5],
+  ["oscuro/amber-strong",     "#2E2D36", "#FBBF24", 4.5],
   ["oscuro/success-soft",     "#24352F", "#8FC0B6", 4.5],
   ["oscuro/warning-soft",     "#3A2E1A", "#FBBF24", 4.5],
   ["oscuro/error-soft",       "#3A2323", "#F87171", 4.5],

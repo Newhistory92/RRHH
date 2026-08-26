@@ -42,3 +42,6 @@ next-env.d.ts
 
 # git worktrees
 .worktrees/
+
+# temas de PrimeReact copiados desde node_modules por postinstall
+/public/themes/

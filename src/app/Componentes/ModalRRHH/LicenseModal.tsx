@@ -339,7 +339,7 @@ export const LicenseDetailModal = ({ license, onClose }: LicenseDetailModalProps
 
               <div className="bg-muted p-4 rounded-lg border border-border">
                 <div className="flex items-center mb-2">
-                  <Calendar size={16} className="text-warm-contrast mr-2" />
+                  <Calendar size={16} className="text-sage-strong mr-2" />
                   <span className="text-sm font-medium text-muted-foreground">Período</span>
                 </div>
                 <p className="text-foreground font-semibold">{license.startDate} al {license.endDate}</p>
@@ -347,7 +347,7 @@ export const LicenseDetailModal = ({ license, onClose }: LicenseDetailModalProps
 
               <div className="bg-muted p-4 rounded-lg border border-border">
                 <div className="flex items-center mb-2">
-                  <Clock size={16} className="text-accent mr-2" />
+                  <Clock size={16} className="text-olive-strong mr-2" />
                   <span className="text-sm font-medium text-muted-foreground">Duración</span>
                 </div>
                 <p className="text-foreground font-semibold">{license.duration} días hábiles</p>

@@ -82,7 +82,7 @@ export const GlobalStats: React.FC<GlobalStatsProps> = ({ data, isLoading, error
       <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <AlertTriangle className="h-10 w-10 text-warm-contrast flex-shrink-0" />
+            <AlertTriangle className="h-10 w-10 text-warning flex-shrink-0" />
             <span className="truncate">Actividades de Baja Eficiencia</span>
           </CardTitle>
         </CardHeader>
@@ -124,7 +124,7 @@ export const GlobalStats: React.FC<GlobalStatsProps> = ({ data, isLoading, error
       <Card className="md:col-span-2 overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Users className="h-6 w-6 text-accent" />
+            <Users className="h-6 w-6 text-olive-strong" />
             <span>Distribución por Estado</span>
           </CardTitle>
         </CardHeader>

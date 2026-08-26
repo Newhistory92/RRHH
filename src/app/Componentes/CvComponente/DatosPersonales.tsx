@@ -116,7 +116,7 @@ export default function DatosPersonales({ data, updateData, isEditing, headerAct
                 onChange={handleDateChange}
                 dateFormat="dd/mm/yy"
                 showIcon
-                className="w-full --warm-contrast"
+                className="w-full"
                 placeholder="Seleccione fecha"
               />
             ) : (

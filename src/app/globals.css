@@ -92,6 +92,14 @@
     border-color: var(--border) !important;
 }
 .dark {
+  /* Las variantes -text de :root son tonos oscuros pensados para fondo claro:
+     sobre #24232A serian ilegibles. En oscuro el rol se invierte y los que
+     sirven como texto son los tonos claros. */
+  --brand-sage-text:  #8FC0B6;        /* 6.72:1 sobre --card */
+  --brand-olive-text: #C3D184;        /* 8.27:1 sobre --card */
+  --brand-red-text:   #F87171;        /* 4.91:1 sobre --card */
+  --brand-amber-text: #FBBF24;        /* 8.14:1 sobre --card */
+
   --background: #24232A;
   --foreground: #EDECF0;              /* 13.24:1 */
   --card: #2E2D36;
@@ -161,6 +169,13 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  /* Acentos usables como COLOR DE TEXTO/icono. Los tonos base (oliva, sage,
+     ambar) fallan AA como foreground sobre fondo claro -- el oliva da 1.64:1.
+     Estas variantes conmutan solas entre claro y oscuro.
+     Ver docs/paleta-colores.md. */
+  --color-olive-strong: var(--brand-olive-text);
+  --color-sage-strong: var(--brand-sage-text);
+  --color-amber-strong: var(--brand-amber-text);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);

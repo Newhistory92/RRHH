@@ -173,7 +173,7 @@ const currentYear = String(new Date().getFullYear());
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Star className="text-warm-contrast" />
+                  <Star className="text-sage-strong" />
                   Feedback del Equipo
                 </CardTitle>
               </CardHeader>
@@ -202,7 +202,7 @@ const currentYear = String(new Date().getFullYear());
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Briefcase className="text-accent" />
+                  <Briefcase className="text-olive-strong" />
                   Productividad por Tarea
                 </CardTitle>
               </CardHeader>

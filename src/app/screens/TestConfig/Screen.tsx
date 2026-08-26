@@ -290,7 +290,7 @@ export default function TestPage(){
                   {softSkills.length}
                 </p>
               </div>
-              <div className="bg-warm-contrast/15 p-3 rounded-full">
+              <div className="bg-sage-strong/15 p-3 rounded-full">
                 <span className="text-2xl">🎯</span>
               </div>
             </div>

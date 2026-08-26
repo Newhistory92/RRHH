@@ -307,7 +307,7 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
       {/* 4. Propuestas de Reubicación */}
       <Section
         title="Propuestas de Reubicación"
-        icon={<ArrowRightLeft size={20} className="text-warm-contrast" />}
+        icon={<ArrowRightLeft size={20} className="text-sage-strong" />}
         count={report.relocationProposals.length}
       >
         {report.relocationProposals.length === 0 ? (
@@ -331,7 +331,7 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
                     <td className="p-3 font-medium text-foreground">{p.employeeName}</td>
                     <td className="p-3 text-muted-foreground">{p.currentDept}</td>
                     <td className="p-3">
-                      <span className="bg-warm-contrast/15 text-warm-contrast text-xs font-bold px-2.5 py-1 rounded-full">
+                      <span className="bg-sage-strong/15 text-sage-strong text-xs font-bold px-2.5 py-1 rounded-full">
                         {p.suggestedDept}
                       </span>
                     </td>
@@ -405,9 +405,9 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
 function StatCard({ icon, color, label, value }: { icon: React.ReactNode; color: string; label: string; value: number | string }) {
   const colorMap: Record<string, string> = {
     cyan: "bg-primary/15 text-primary",
-    green: "bg-accent/15 text-accent",
+    green: "bg-accent/15 text-olive-strong",
     red: "bg-error-soft text-error",
-    purple: "bg-warm-contrast/15 text-warm-contrast",
+    purple: "bg-sage-strong/15 text-sage-strong",
   };
 
   return (

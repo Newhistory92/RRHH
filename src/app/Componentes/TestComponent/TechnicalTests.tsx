@@ -152,8 +152,8 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
                   <div className="flex items-center gap-2 ml-4">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${test.type === "multiple-choice"
-                        ? "bg-accent/15 text-accent"
-                        : "bg-warm-contrast/15 text-warm-contrast"
+                        ? "bg-accent/15 text-olive-strong"
+                        : "bg-sage-strong/15 text-sage-strong"
                         }`}
                     >
                       {test.type === "multiple-choice"
