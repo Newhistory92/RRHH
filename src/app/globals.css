@@ -91,6 +91,18 @@
     background: var(--secondary) !important;
     border-color: var(--border) !important;
 }
+/* PrimeReact deshabilita bajando la opacidad. Sobre el fondo oscuro eso hunde
+   el boton hasta que no se lee la etiqueta y no se entiende que esta apagado.
+   Se cambia por un par de tokens con contraste propio: muted-foreground sobre
+   muted da 4.81:1 en claro y 4.97:1 en oscuro. */
+.p-button:disabled,
+.p-button.p-disabled {
+    opacity: 1 !important;
+    background: var(--muted) !important;
+    border-color: var(--border) !important;
+    color: var(--muted-foreground) !important;
+    cursor: not-allowed !important;
+}
 .dark {
   /* Las variantes -text de :root son tonos oscuros pensados para fondo claro:
      sobre #24232A serian ilegibles. En oscuro el rol se invierte y los que

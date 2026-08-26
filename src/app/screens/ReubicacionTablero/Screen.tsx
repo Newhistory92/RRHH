@@ -272,12 +272,19 @@ export default function ReubicacionTablero() {
             <p className="text-muted-foreground">Tablero de RRHH para gestionar la movilidad interna.</p>
           </div>
           <div className="flex gap-2 items-center">
+            {/* Sin el title, un boton apagado no explica por que lo esta y
+                parece que la pantalla esta rota. */}
             <Button
               label="Analizar Solicitudes"
               icon="pi pi-sparkles"
               loading={analizando}
               disabled={!hayPendientes}
               onClick={analizarSolicitudes}
+              title={
+                hayPendientes
+                  ? 'Analizar las solicitudes pendientes con IA'
+                  : 'No hay solicitudes pendientes para analizar'
+              }
             />
             <button
               onClick={() => setVista('kanban')}

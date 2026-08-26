@@ -182,7 +182,7 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
           <p className="text-error mb-4">{error}</p>
           <button
             onClick={fetchAnalysis}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-error text-error-soft-foreground rounded-lg hover:opacity-90 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-error text-error-foreground rounded-lg hover:opacity-90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <RefreshCw size={16} /> Reintentar
           </button>

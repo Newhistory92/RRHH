@@ -1068,15 +1068,19 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onToggleS
                 </span>
               </td>
               <td className="px-3 py-2 text-center">
-                <div className="flex items-center justify-center gap-1.5">
+                <div className="flex items-center justify-center gap-2">
                   {user.activo && onEdit && (
                     <button onClick={() => onEdit(user)}
-                      className="text-[11px] px-2 py-0.5 rounded border border-primary/60 text-primary hover:bg-primary/10 transition leading-tight">
+                      className="rounded border border-primary/60 px-2.5 py-1 text-xs leading-tight text-primary transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                       Editar
                     </button>
                   )}
+                  {/* El par correcto del fondo solido es -foreground (blanco en
+                      claro). Con -soft-foreground el texto queda del mismo color
+                      que el fondo -- rojo sobre rojo, verde sobre verde -- y el
+                      boton se vuelve ilegible. */}
                   <button onClick={() => onToggleStatus(user.id)}
-                    className={`text-[11px] px-2 py-0.5 rounded transition leading-tight ${user.activo ? 'bg-error hover:opacity-90 text-error-soft-foreground' : 'bg-success hover:opacity-90 text-success-soft-foreground'}`}>
+                    className={`rounded px-2.5 py-1 text-xs leading-tight transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${user.activo ? 'bg-error text-error-foreground' : 'bg-success text-success-foreground'}`}>
                     {user.activo ? 'Desactivar' : 'Activar'}
                   </button>
                 </div>

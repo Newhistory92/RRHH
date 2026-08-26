@@ -25,6 +25,12 @@ const PARES = [
   ["claro/accent",            "#C3D184", "#37363E", 4.5],
   ["claro/destructive",       "#C42B2B", "#FFFFFF", 4.5],
   ["claro/warm-contrast",     "#37363E", "#FFFFFF", 4.5],
+  // Rellenos solidos de estado. El par correcto es -foreground, NO
+  // -soft-foreground: ese ultimo vale lo mismo que el fondo solido y deja el
+  // texto invisible (rojo sobre rojo).
+  ["claro/btn-error",         "#C42B2B", "#FFFFFF", 4.5],
+  ["claro/btn-success",       "#3D7065", "#FFFFFF", 4.5],
+  ["claro/btn-disabled",      "#F3F3F4", "#6B6A73", 4.5],
   // Acentos decorativos usados como color de texto/icono sobre card.
   // Los tonos base fallan aca (oliva 1.64:1), por eso existen las -strong.
   ["claro/olive-strong",      "#FFFFFF", "#616D33", 4.5],
@@ -41,6 +47,9 @@ const PARES = [
   ["oscuro/secondary",        "#3A4644", "#EDECF0", 4.5],
   ["oscuro/accent",           "#C3D184", "#37363E", 4.5],
   ["oscuro/destructive",      "#F87171", "#24232A", 4.5],
+  ["oscuro/btn-error",        "#F87171", "#3A2323", 4.5],
+  ["oscuro/btn-success",      "#8FC0B6", "#24352F", 4.5],
+  ["oscuro/btn-disabled",     "#33323B", "#A3A1AC", 4.5],
   ["oscuro/olive-strong",     "#2E2D36", "#C3D184", 4.5],
   ["oscuro/sage-strong",      "#2E2D36", "#8FC0B6", 4.5],
   ["oscuro/amber-strong",     "#2E2D36", "#FBBF24", 4.5],
