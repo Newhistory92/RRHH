@@ -10,6 +10,7 @@ export interface EmployeeTableViewProps {
   onSelectEmployee: (id: number) => void;
   onShowMessages: () => void;
   onOpenPermissionModal: (employeeId: number | null) => void;
+  onShowJubilados: () => void;
 }
 
 export interface ViewState {
@@ -32,6 +33,7 @@ export const EmployeeTableView = ({
   onSelectEmployee,
   onShowMessages,
   onOpenPermissionModal,
+  onShowJubilados,
 }: EmployeeTableViewProps) => {
   const [filters, setFilters] = useState({
     estado: "",
@@ -160,7 +162,18 @@ export const EmployeeTableView = ({
             Lista de Empleados
           </h1>
         </div>
-        <div className="mt-4 sm:mt-0">
+        <div className="mt-4 flex items-center gap-2 sm:mt-0">
+          {/* Antes vivia en un div aparte arriba de este bloque, con
+              bg-muted sobre un fondo casi identico -- por eso quedaba flotando
+              solo y sin contraste. Ahora comparte fila con el otro botón y
+              lleva borde + texto en --primary para que se note que es
+              accionable. */}
+          <button
+            onClick={onShowJubilados}
+            className="rounded-md border border-primary/50 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Ver jubilados
+          </button>
           <button
             onClick={onShowMessages}
             className="flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-primary"

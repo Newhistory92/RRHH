@@ -152,24 +152,15 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
       case "table":
       default:
         return (
-          <>
-            <div className="flex justify-end mb-4 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8">
-              <button
-                onClick={() => setCurrentView({ name: "jubilados" })}
-                className="px-4 py-2 rounded-lg bg-muted text-foreground text-sm hover:opacity-90"
-              >
-                Ver jubilados
-              </button>
-            </div>
-            <EmployeeTableView
-              employees={employees}
-              onSelectEmployee={(id: number) =>
-                setCurrentView({ name: "detail", id })
-              }
-              onShowMessages={() => setCurrentView({ name: "messages" })}
-              onOpenPermissionModal={setPermissionModalEmployeeId}
-            />
-          </>
+          <EmployeeTableView
+            employees={employees}
+            onSelectEmployee={(id: number) =>
+              setCurrentView({ name: "detail", id })
+            }
+            onShowMessages={() => setCurrentView({ name: "messages" })}
+            onOpenPermissionModal={setPermissionModalEmployeeId}
+            onShowJubilados={() => setCurrentView({ name: "jubilados" })}
+          />
         );
     }
   };

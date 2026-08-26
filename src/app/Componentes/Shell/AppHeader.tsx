@@ -18,6 +18,18 @@ import { apiClient } from "@/app/util/apiClient";
 
 const DEFAULT_AVATAR = "/Default-avatar.webp";
 
+/** "2026-08-12T13:36:50.840000" (tal cual la manda la base) -> "12/08/2026 - 13:36". */
+function formatearFechaHora(iso: string): string {
+  const fecha = new Date(iso);
+  if (Number.isNaN(fecha.getTime())) return iso;
+  const dd = String(fecha.getDate()).padStart(2, "0");
+  const mm = String(fecha.getMonth() + 1).padStart(2, "0");
+  const aaaa = fecha.getFullYear();
+  const hh = String(fecha.getHours()).padStart(2, "0");
+  const min = String(fecha.getMinutes()).padStart(2, "0");
+  return `${dd}/${mm}/${aaaa} - ${hh}:${min}`;
+}
+
 interface AppHeaderProps {
   setPage: (page: Page) => void;
   employeeData?: Employee | null;
@@ -114,11 +126,21 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
               </div>
             ) : (
               notifications.slice(0, 8).map(notif => (
-                <DropdownMenuItem key={notif.id} className="flex flex-col items-start gap-0.5 px-3 py-2.5 cursor-default">
+                // El DropdownMenuItem por defecto pinta el fondo de oliva
+                // (--accent) al pasar el mouse. Estos items son de solo
+                // lectura (cursor-default, sin onClick) y sus <span> de
+                // adentro fuerzan text-foreground/muted-foreground sin
+                // importar el estado del padre -- asi que el fondo cambiaba
+                // a oliva pero el texto se quedaba blanco, ilegible. Se
+                // apaga el hover coloreado y se deja uno neutro.
+                <DropdownMenuItem
+                  key={notif.id}
+                  className="flex cursor-default flex-col items-start gap-0.5 px-3 py-2.5 focus:bg-muted focus:text-inherit"
+                >
                   <span className={`text-sm leading-snug ${notif.status === "nueva" ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
                     {notif.text.length > 90 ? notif.text.slice(0, 90) + "…" : notif.text}
                   </span>
-                  <span className="text-xs text-muted-foreground">{notif.time}</span>
+                  <span className="text-xs text-muted-foreground">{formatearFechaHora(notif.time)}</span>
                 </DropdownMenuItem>
               ))
             )}
