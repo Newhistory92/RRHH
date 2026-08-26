@@ -16,20 +16,9 @@ import { Employee, Notification, Page } from "@/app/Interfas/Interfaces";
 import { logoutFromClient } from "@/app/util/authClient";
 import { apiClient } from "@/app/util/apiClient";
 import { NotificationDialog } from "@/app/Componentes/Perfil/NotificationDialog";
+import { formatearFechaHora } from "@/app/lib/dates";
 
 const DEFAULT_AVATAR = "/Default-avatar.webp";
-
-/** "2026-08-12T13:36:50.840000" (tal cual la manda la base) -> "12/08/2026 - 13:36". */
-function formatearFechaHora(iso: string): string {
-  const fecha = new Date(iso);
-  if (Number.isNaN(fecha.getTime())) return iso;
-  const dd = String(fecha.getDate()).padStart(2, "0");
-  const mm = String(fecha.getMonth() + 1).padStart(2, "0");
-  const aaaa = fecha.getFullYear();
-  const hh = String(fecha.getHours()).padStart(2, "0");
-  const min = String(fecha.getMinutes()).padStart(2, "0");
-  return `${dd}/${mm}/${aaaa} - ${hh}:${min}`;
-}
 
 interface AppHeaderProps {
   setPage: (page: Page) => void;

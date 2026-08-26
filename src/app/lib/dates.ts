@@ -46,6 +46,18 @@ export const fromNativeDate = (d: Date): Temporal.PlainDate =>
 export const isWeekend = (d: Temporal.PlainDate): boolean =>
     d.dayOfWeek >= 6;
 
+/** "2026-08-12T13:36:50.840000" (tal cual la manda la base) -> "12/08/2026 - 13:36". */
+export const formatearFechaHora = (iso: string): string => {
+    const fecha = new Date(iso);
+    if (Number.isNaN(fecha.getTime())) return iso;
+    const dd = String(fecha.getDate()).padStart(2, "0");
+    const mm = String(fecha.getMonth() + 1).padStart(2, "0");
+    const aaaa = fecha.getFullYear();
+    const hh = String(fecha.getHours()).padStart(2, "0");
+    const min = String(fecha.getMinutes()).padStart(2, "0");
+    return `${dd}/${mm}/${aaaa} - ${hh}:${min}`;
+};
+
 /**
  * Procesa la lista de feriados de la API:
  * - Parsea las fechas con Temporal (sin bug de mes)

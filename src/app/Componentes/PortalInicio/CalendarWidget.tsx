@@ -31,7 +31,7 @@ export function CalendarWidget() {
     apiClient
       .get<{ feriados: { id: number; fecha: string; nombre: string }[] }>('/licenses/feriados')
       .then((res) => {
-        const data: HolidayApi[] = res.feriados.map((f) => ({ fecha: f.fecha, nombre: f.nombre, tipo: 'Empresa' }));
+        const data: HolidayApi[] = res.feriados.map((f) => ({ fecha: f.fecha, nombre: f.nombre, tipo: 'Feriado' }));
         setFeriados(processHolidays(data));
       })
       .catch((err) => console.error('Error al cargar feriados:', err));

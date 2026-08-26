@@ -4,6 +4,7 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { Avatar } from 'primereact/avatar';
 import {  Notification } from "@/app/Interfas/Interfaces";
+import { formatearFechaHora } from "@/app/lib/dates";
 
 interface NotificationDialogProps {
   visible: boolean;
@@ -41,7 +42,7 @@ export const NotificationDialog: React.FC<NotificationDialogProps> = ({
       />
       <div>
         <h3 className="text-lg font-bold text-foreground m-0">Notificación</h3>
-        <p className="text-sm text-muted-foreground m-0">{notification.time}</p>
+        <p className="text-sm text-muted-foreground m-0">{formatearFechaHora(notification.time)}</p>
       </div>
     </div>
   );
@@ -82,7 +83,7 @@ export const NotificationDialog: React.FC<NotificationDialogProps> = ({
         <div className="text-sm text-muted-foreground mt-4">
           <p className="mb-2">
             <i className="pi pi-clock mr-2"></i>
-            <strong>Recibido:</strong> {notification.time}
+            <strong>Recibido:</strong> {formatearFechaHora(notification.time)}
           </p>
         </div>
       </div>

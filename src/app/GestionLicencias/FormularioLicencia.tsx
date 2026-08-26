@@ -76,6 +76,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
   const [tiposLicencia, setTiposLicencia] = useState<{ name: string }[]>([]);
   const [mensaje, setMensaje] = useState('');
   const [tiposData, setTiposData] = useState<Record<string, TipoDisponible>>({});
+  const [enviando, setEnviando] = useState(false);
   const toast = useRef<Toast>(null);
   // Obtener modo y días por defecto del tipo seleccionado (para licencias de duración fija)
   const licenseMeta = useMemo(() => {
@@ -297,7 +298,8 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
     tiposData,
     saldos
   ]);
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (enviando) return;
     if (!startDate || !endDate) return setError('Seleccioná las fechas.');
     if (!supervisorData) return setError('No tenés un supervisor válido asignado.');
     if (totalDiasSolicitados <= 0) return setError('Asigná al menos un día.');
@@ -312,19 +314,24 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
       }
     }
 
-    onSubmit({
-      name: userData.name,
-      type: selectedType?.name ?? '',
-      supervisorId: supervisorData.id,
-      solicitanteId: userData.id,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-      duration: diasCalculados,
-      tiposLicencia: {},
-      mensajeOriginal: mensaje,
-      status: 'Pendiente' as LicenseStatus,
-      createdAt: new Date().toISOString(),
-    });
+    setEnviando(true);
+    try {
+      await onSubmit({
+        name: userData.name,
+        type: selectedType?.name ?? '',
+        supervisorId: supervisorData.id,
+        solicitanteId: userData.id,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        duration: diasCalculados,
+        tiposLicencia: {},
+        mensajeOriginal: mensaje,
+        status: 'Pendiente' as LicenseStatus,
+        createdAt: new Date().toISOString(),
+      });
+    } finally {
+      setEnviando(false);
+    }
   };
 
   const typeKey = selectedType?.name;
@@ -489,9 +496,10 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
         </button>
         <button
           onClick={handleSubmit}
+          disabled={enviando}
           className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:opacity-90 disabled:bg-muted disabled:text-muted-foreground text-primary-foreground text-sm font-semibold rounded-xl transition shadow-sm disabled:cursor-not-allowed"
         >
-          Enviar Solicitud
+          {enviando ? 'Enviando…' : 'Enviar Solicitud'}
           <Send size={15} />
         </button>
       </div>

@@ -42,10 +42,10 @@ export default function DateRangePicker({ onDateChange, maxDays, allowPastDates 
   const [dates, setDates] = useState<[Date | null, Date | null] | null>(null);
   const [holidayMap, setHolidayMap] = useState<Map<string, PlainHoliday>>(new Map());
   const [loading, setLoading] = useState(true);
-  // ── Fetch feriados (públicos + de empresa) ────────────────────────────────────
+  // ── Fetch feriados (nacionales importados + de empresa, vía /licenses/feriados) ──
   useEffect(() => {
     apiClient.get<{ feriados: { id: number; fecha: string; nombre: string }[] }>('/licenses/feriados')
-      .then(res => res.feriados.map(f => ({ fecha: f.fecha, tipo: 'Empresa', nombre: f.nombre } as HolidayApi)))
+      .then(res => res.feriados.map(f => ({ fecha: f.fecha, tipo: 'Feriado', nombre: f.nombre } as HolidayApi)))
       .catch(err => { console.error(err); return [] as HolidayApi[]; })
       .then(feriados => setHolidayMap(processHolidays(feriados)))
       .finally(() => setLoading(false));
