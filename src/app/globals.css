@@ -47,6 +47,13 @@
   --input:  color-mix(in srgb, #37363E 16%, transparent);
   --ring:   color-mix(in srgb, #1E5561 55%, transparent);
 
+  /* Superficie glass del navbar. La opacidad es alta a proposito: con el
+     contenido pasando por debajo, bajar de ~0.85 hunde el contraste del texto
+     de la barra por debajo de AA. El blur aporta el efecto, no la
+     transparencia. */
+  --glass: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(55, 54, 62, 0.12);
+
   --warm-contrast: #37363E;           /* con blanco encima: 11.93:1 */
   --warm-contrast-foreground: #FFFFFF;
   --shadow-soft: 0 2px 10px rgba(55, 54, 62, 0.08);
@@ -134,6 +141,9 @@
   --input:  #45444F;
   --ring:   color-mix(in srgb, #5FA3B2 55%, transparent);
 
+  --glass: rgba(36, 35, 42, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.10);
+
   --warm-contrast: #C3D184;
   --warm-contrast-foreground: #37363E;
   --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.35);
@@ -185,6 +195,8 @@
      ambar) fallan AA como foreground sobre fondo claro -- el oliva da 1.64:1.
      Estas variantes conmutan solas entre claro y oscuro.
      Ver docs/paleta-colores.md. */
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
   --color-olive-strong: var(--brand-olive-text);
   --color-sage-strong: var(--brand-sage-text);
   --color-amber-strong: var(--brand-amber-text);

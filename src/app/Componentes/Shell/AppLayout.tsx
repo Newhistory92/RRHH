@@ -27,19 +27,26 @@ export function AppLayout({
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* El navbar es fixed y cruza todo el ancho, asi que va fuera del
+          contenedor desplazado y el contenido compensa su alto con pt-16. */}
+      <AppHeader
+        setPage={setPage}
+        employeeData={employeeData}
+        hasSidebar={hasSidebar}
+        isCollapsed={isCollapsed}
+        onToggleSidebar={() => setIsCollapsed((prev) => !prev)}
+      />
       <AppSidebar
         activePage={activePage}
         setPage={setPage}
         permisos={permisos}
         isCollapsed={isCollapsed}
-        onToggleCollapse={() => setIsCollapsed((prev) => !prev)}
       />
       <div
-        className={`transition-all duration-300 ${
+        className={`pt-16 transition-all duration-300 ${
           hasSidebar ? (isCollapsed ? "md:pl-16" : "md:pl-64") : ""
         }`}
       >
-        <AppHeader setPage={setPage} employeeData={employeeData} />
         <main className="p-6 max-w-7xl mx-auto">{children}</main>
       </div>
     </div>

@@ -269,36 +269,27 @@ export const EmployeeTableView = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border bg-card">
+                  {/* El hover y el click van en el <tr>, no en cada <td>: si
+                      van por celda se pinta solo la columna bajo el cursor. */}
                   {paginatedEmployees.map((employee) => (
-                    <tr key={employee.id}>
-                      <td
-                        className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-foreground sm:pl-6 hover:bg-muted cursor-pointer"
-                        onClick={() => onSelectEmployee(employee.id)}
-                      >
+                    <tr
+                      key={employee.id}
+                      onClick={() => onSelectEmployee(employee.id)}
+                      className="cursor-pointer transition-colors hover:bg-muted"
+                    >
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-foreground sm:pl-6">
                         {employee.name}
                       </td>
-                      <td
-                        className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground hover:bg-muted cursor-pointer"
-                        onClick={() => onSelectEmployee(employee.id)}
-                      >
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                         {employee.dni}
                       </td>
-                      <td
-                        className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground hover:bg-muted cursor-pointer"
-                        onClick={() => onSelectEmployee(employee.id)}
-                      >
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                         <StatusBadge status={employee.status} />
                       </td>
-                      <td
-                        className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground hover:bg-muted cursor-pointer"
-                        onClick={() => onSelectEmployee(employee.id)}
-                      >
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                         {getDepartmentName(employee.department)}
                       </td>
-                      <td
-                        className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground hover:bg-muted cursor-pointer"
-                        onClick={() => onSelectEmployee(employee.id)}
-                      >
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                         <HoursDisplay hours={employee.hours} />
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
@@ -307,7 +298,7 @@ export const EmployeeTableView = ({
                             e.stopPropagation();
                             onOpenPermissionModal(employee.id);
                           }}
-                          className="text-primary hover:opacity-80 font-medium flex items-center gap-1"
+                          className="flex items-center gap-1 font-medium text-primary hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
                         >
                           <LogOut size={14} /> Permiso Salida
                         </button>
