@@ -348,7 +348,7 @@ export interface Employee {
   gender?: string;
   photo: string;
   status: EmployeeStatus;
-  hours: number; // Total available hours for permissions
+  horas: number; // Total available hours for permissions
   // Employment Details
   position: string;
   department: Department;

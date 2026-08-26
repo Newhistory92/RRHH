@@ -272,7 +272,7 @@ export const EmployeeTableView = ({
                     <SortableHeader columnKey="department">
                       Departamento
                     </SortableHeader>
-                    <SortableHeader columnKey="hours">Horas</SortableHeader>
+                    <SortableHeader columnKey="horas">Horas</SortableHeader>
                     <th
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-foreground"
@@ -303,7 +303,7 @@ export const EmployeeTableView = ({
                         {getDepartmentName(employee.department)}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
-                        <HoursDisplay hours={employee.hours} />
+                        <HoursDisplay hours={employee.horas} />
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                         <button
