@@ -47,12 +47,18 @@
   --input:  color-mix(in srgb, #37363E 16%, transparent);
   --ring:   color-mix(in srgb, #1E5561 55%, transparent);
 
-  /* Superficie glass del navbar, siempre con backdrop-blur-xl encima (ver
-     AppHeader). 0.70 es el piso: medido con el peor fondo posible pasando por
-     debajo (texto oscuro en claro), el texto de la barra da 6.78:1 -- bajar
-     mas de ahi rompe AA (0.65 ya cae a 4.18:1 en oscuro). */
-  --glass: rgba(255, 255, 255, 0.70);
-  --glass-border: rgba(55, 54, 62, 0.12);
+  /* Superficie glass del navbar. Blanco puro + blur no lee como vidrio sobre
+     un fondo de pagina liso (#F6F7F4): no hay color detras para desenfocar.
+     Se tine la base con un 10% de --primary antes de bajarla a alpha, y el
+     backdrop-filter suma saturate() para que lo que sí pasa por abajo (tarjetas,
+     badges) salga mas vivo. rgb(233,238,239) = 10% de #1E5561 sobre blanco.
+     alpha 0.72 es el piso medido: con el peor fondo posible pasando por abajo
+     (texto oscuro en claro) da 6.12:1 -- ver la variante .dark para el piso
+     ahi, que es mas alto (0.76) porque el tinte se compone distinto. */
+  --glass: rgba(233, 238, 239, 0.72);
+  --glass-border: rgba(30, 85, 97, 0.18);
+  --glass-highlight: rgba(255, 255, 255, 0.55);
+  --glass-shadow: 0 8px 32px rgba(30, 85, 97, 0.10), 0 1px 2px rgba(55, 54, 62, 0.06);
 
   --warm-contrast: #37363E;           /* con blanco encima: 11.93:1 */
   --warm-contrast-foreground: #FFFFFF;
@@ -141,8 +147,12 @@
   --input:  #45444F;
   --ring:   color-mix(in srgb, #5FA3B2 55%, transparent);
 
-  --glass: rgba(36, 35, 42, 0.70);
-  --glass-border: rgba(255, 255, 255, 0.10);
+  /* rgb(44,53,61) = 14% de --primary (#5FA3B2) sobre el fondo oscuro.
+     alpha 0.76: en el peor caso (texto claro pasando por abajo) da 5.01:1. */
+  --glass: rgba(44, 53, 61, 0.76);
+  --glass-border: rgba(95, 163, 178, 0.16);
+  --glass-highlight: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
 
   --warm-contrast: #C3D184;
   --warm-contrast-foreground: #37363E;

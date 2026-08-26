@@ -65,12 +65,20 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
   const unreadCount = notifications.filter(n => n.status === "nueva").length;
 
   return (
-    // Navbar de punta a punta: va fixed sobre TODO el ancho, con el sidebar
-    // arrancando por debajo. bg-glass es semitransparente; backdrop-blur-xl
-    // es lo que desenfoca lo que pasa por debajo -- sin las dos juntas no hay
-    // efecto glass, solo transparencia lisa.
+    // Navbar de punta a punta, fixed sobre todo el ancho. El material glass
+    // tiene 4 capas, no solo blur+transparencia (eso sobre un fondo de pagina
+    // liso lee como un blanco sucio, no como vidrio):
+    //   1. bg-glass: base tenida con --primary, no blanco/negro puro.
+    //   2. backdrop-blur-xl + saturate(180%): satura lo que SI pasa por abajo
+    //      (tarjetas, badges) antes de desenfocarlo, para que se note.
+    //   3. glass-highlight: filo de luz interior arriba, el borde que
+    //      "atrapa" la luz en un vidrio real.
+    //   4. glass-shadow: sombra de elevacion, separa la barra del contenido.
     <header
-      className="fixed inset-x-0 top-0 z-40 h-16 border-b border-glass-border bg-glass backdrop-blur-xl"
+      className="fixed inset-x-0 top-0 z-40 h-16 border-b border-glass-border bg-glass backdrop-blur-xl backdrop-saturate-[180%]"
+      style={{
+        boxShadow: `inset 0 1px 0 var(--glass-highlight), var(--glass-shadow)`,
+      }}
     >
       <div className="flex h-full items-center justify-between gap-3 px-4 sm:px-6">
       <span className="font-heading text-xl font-semibold text-foreground truncate">
