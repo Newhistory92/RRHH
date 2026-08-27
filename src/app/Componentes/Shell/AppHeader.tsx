@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare, Folder, Clock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -55,6 +55,20 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
       setUserPhoto(employeeData.photo || DEFAULT_AVATAR);
     }
   }, [employeeData]);
+
+  const handleMarkAsRead = useCallback((notificationId: number) => {
+    setNotifications(prev =>
+      prev.map(n => (n.id === notificationId ? { ...n, status: "leida" } : n))
+    );
+    apiClient
+      .patch(`/licenses/notificaciones/${notificationId}/leer`)
+      .catch(err => {
+        console.error("Error al marcar notificación como leída:", err);
+        setNotifications(prev =>
+          prev.map(n => (n.id === notificationId ? { ...n, status: "nueva" } : n))
+        );
+      });
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -196,6 +210,7 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
         onHide={() => setNotifAbierta(null)}
         notification={notifAbierta}
         userPhoto={userPhoto}
+        onMarkAsRead={handleMarkAsRead}
       />
     </header>
   );
