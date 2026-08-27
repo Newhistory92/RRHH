@@ -6,6 +6,7 @@ import { Avatar } from 'primereact/avatar';
 import { AvatarGroup } from 'primereact/avatargroup';
 import { useEmployeeTemplates } from './EmployeeTemplates';
 import { FormFieldProps } from '@/app/Interfas/Interfaces';
+import { departmentApi } from '@/app/Componentes/Orgamograma/departmentApi';
 
 export const DepartmentFields: React.FC<FormFieldProps> = ({
   formData,
@@ -160,6 +161,31 @@ console.log(employees)
           </div>
         )}
       </div>
+
+      {formData.id != null && (
+        <div>
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.scoreExento ?? false}
+              onChange={async (e) => {
+                const val = e.target.checked;
+                setFormData(prev => ({ ...prev, scoreExento: val }));
+                await departmentApi.setDeptScoreExento(formData.id!, val);
+              }}
+              className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+            />
+            <span className="text-sm font-medium text-foreground">
+              Exento del score de productividad
+            </span>
+          </label>
+          <p className="mt-1 text-xs text-muted-foreground ml-7">
+            El trabajo de esta área no queda registrado en los accesos al sistema.
+            Sus empleados reciben el promedio general en lugar de un score medido,
+            ordenados entre sí por asistencia.
+          </p>
+        </div>
+      )}
     </>
   );
 };

@@ -403,6 +403,7 @@ export interface Department {
   jefeId?: number | null;
   parentId?: number | null;
   capacidadRequerida?: number | null;
+  scoreExento?: boolean;
   asignados?: number;
   habilidades_requeridas?: TechnicalSkill[];
   offices: Office[];
@@ -461,6 +462,7 @@ export interface Office {
   departmentId: number;
   parentDepartmentId?: number | null; // Nuevo campo para jerarquía
   capacidadRequerida?: number | null;
+  scoreExento?: boolean;
   asignados?: number;
   habilidades_requeridas?: TechnicalSkill[];
 }
@@ -540,6 +542,7 @@ export interface EntityFormData {
   descripcion: string;
   jefeId: number | null;
   capacidadRequerida?: number | null;
+  scoreExento?: boolean;
   habilidades_requeridas: TechnicalSkill[];
   // Campos específicos de Department
   nivel_jerarquico?: number;

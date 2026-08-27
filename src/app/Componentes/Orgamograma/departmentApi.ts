@@ -95,6 +95,14 @@ export const departmentApi = {
     apiClient.put<{ message: string }>(
       `/departments/office/${officeId}/assign-employee/${empId}`
     ),
+
+  // PUT — Exención del score de productividad para departamento
+  setDeptScoreExento: (depId: number, exento: boolean): Promise<{ success: boolean; exento: boolean }> =>
+    apiClient.put<{ success: boolean; exento: boolean }>(`/departments/${depId}/score-exento`, { exento }),
+
+  // PUT — Exención del score de productividad para oficina
+  setOfficeScoreExento: (officeId: number, exento: boolean): Promise<{ success: boolean; exento: boolean }> =>
+    apiClient.put<{ success: boolean; exento: boolean }>(`/departments/office/${officeId}/score-exento`, { exento }),
 };
 
 // Función para transformar datos de la API al formato de la app.
