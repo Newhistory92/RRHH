@@ -371,6 +371,7 @@ export interface Employee {
 
   // Performance Metrics
   productivityScore: number;
+  isExento?: boolean;
   overallProductivity: number;
   monthlyHours: MonthlyHours[];
   tasks: Task[];

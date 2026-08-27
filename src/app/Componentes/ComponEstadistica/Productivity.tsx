@@ -134,11 +134,22 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
   // Template para la columna de productividad
   const productivityBodyTemplate = (employee: Employee) => {
     return (
-      <div className="flex items-center">
-        <div className={`w-3 h-3 rounded-full mr-3 ${getScoreColor(employee.productivityScore)}`}></div>
+      <div className="flex items-center gap-2">
+        <div className={`w-3 h-3 rounded-full ${getScoreColor(employee.productivityScore)}`}></div>
         <span className="font-bold text-lg text-foreground">
           {employee.productivityScore != null ? employee.productivityScore.toFixed(1) : 'N/A'}
         </span>
+        {employee.isExento && (
+          <span
+            className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium bg-info-soft text-info-soft-foreground"
+            title="Promedio del área — el trabajo de esta área no se mide por accesos al sistema"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-3 w-3" aria-hidden="true">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
+            </svg>
+            Promedio
+          </span>
+        )}
       </div>
     );
   };
