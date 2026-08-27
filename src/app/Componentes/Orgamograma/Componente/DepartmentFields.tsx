@@ -171,7 +171,11 @@ console.log(employees)
               onChange={async (e) => {
                 const val = e.target.checked;
                 setFormData(prev => ({ ...prev, scoreExento: val }));
-                await departmentApi.setDeptScoreExento(formData.id!, val);
+                try {
+                  await departmentApi.setDeptScoreExento(formData.id!, val);
+                } catch {
+                  setFormData(prev => ({ ...prev, scoreExento: !val }));
+                }
               }}
               className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
             />
