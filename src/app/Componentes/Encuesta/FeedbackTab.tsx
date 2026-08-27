@@ -109,6 +109,7 @@ export const FeedbackTab: React.FC<FeedbackTabProps> = ({ siguiente, status, loa
                 value={valorEscala}
                 onChange={(e) => setValorEscala(e.value)}
                 options={escalaOptions}
+                className="flex flex-wrap justify-center gap-2 [&_.p-button]:!m-0 [&_.p-button]:!rounded-lg [&_.p-button]:!border"
               />
             </div>
           ) : (

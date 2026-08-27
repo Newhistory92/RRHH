@@ -26,6 +26,7 @@ import ActivosConfig from '@/app/screens/ActivosConfig/Screen';
 import ActivosInventario from '@/app/screens/ActivosInventario/Screen';
 import ActivosModelos from '@/app/screens/ActivosModelos/Screen';
 import AsistenciaPage from '@/app/screens/Asistencia/Screen';
+import MiAsistencia from '@/app/Componentes/Asistencia/MiAsistencia';
 import { PrimeReactProvider } from 'primereact/api';
 import 'primeicons/primeicons.css';
 import TestPage from './screens/TestConfig/Screen';
@@ -143,6 +144,8 @@ export default function App() {
           : <Reubicacion employeeData={employeeData} />;
       case 'asistencia':
         return <AsistenciaPage puedeGestionar={tienePermiso(permisos, 'asistencia.gestionar')} />;
+      case 'mi-asistencia':
+        return <MiAsistencia />;
       case 'feedback':
         if (globalSettings["Feedback"] === false) {
           return (

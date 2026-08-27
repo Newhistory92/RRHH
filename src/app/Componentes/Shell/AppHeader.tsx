@@ -184,7 +184,7 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
             <DropdownMenuItem onClick={() => setPage("editar-perfil")}>
               <UserCircle size={16} className="mr-2" /> Editar Perfil
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setPage("asistencia")}>
+            <DropdownMenuItem onClick={() => setPage("mi-asistencia")}>
               <Clock size={16} className="mr-2" /> Mi Asistencia
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setPage("licencias")}>

@@ -10,7 +10,7 @@ export interface PageConfig {
   id: Page;
   label: string;
   icon: string; // Nombre del ícono de lucide-react para el Sidebar
-  section: "General" | "Gente" | "Organización" | "Aprendizaje" | "IA" | "Sistema" | "Activos";
+  section: "General" | "Agente" | "Organización" | "Aprendizaje" | "IA" | "Sistema" | "Activos";
   /** Código de permiso que habilita esta página */
   permiso: string;
   /** Si true, no aparece en el sidebar aunque el usuario tenga el permiso
@@ -21,17 +21,18 @@ export interface PageConfig {
 export const PAGE_CONFIG: PageConfig[] = [
   { id: "inicio", label: "Inicio", icon: "Home", section: "General", permiso: "inicio.ver" },
   { id: "estadisticas", label: "Estadísticas", icon: "BarChart2", section: "General", permiso: "estadisticas.ver" },
-  { id: "recursos-humanos", label: "Recursos Humanos", icon: "Users", section: "Gente", permiso: "rrhh.gestionar" },
-  { id: "gestion-publicaciones", label: "Publicaciones", icon: "Newspaper", section: "Gente", permiso: "publicaciones.gestionar" },
+  { id: "recursos-humanos", label: "Recursos Humanos", icon: "Users", section: "Agente", permiso: "rrhh.gestionar" },
+  { id: "gestion-publicaciones", label: "Publicaciones", icon: "Newspaper", section: "Agente", permiso: "publicaciones.gestionar" },
   { id: "configuracion-licencias", label: "Configuración", icon: "Settings", section: "Organización", permiso: "licencias.configurar" },
   { id: "ia", label: "Inteligencia Artificial", icon: "BrainCircuit", section: "IA", permiso: "ia.usar" },
   { id: "organigrama", label: "Organigrama", icon: "GitMerge", section: "Organización", permiso: "organigrama.ver" },
   { id: "test", label: "Tests", icon: "ClipboardList", section: "Aprendizaje", permiso: "test.gestionar" },
-  { id: "editar-perfil", label: "Mi Perfil", icon: "UserCircle", section: "Gente", permiso: "perfil.editar", ocultaEnSidebar: true },
-  { id: "licencias", label: "Licencias", icon: "FileText", section: "Organización", permiso: "licencias.propias", ocultaEnSidebar: true },
-  { id: "documentos", label: "Documentos", icon: "Folder", section: "Gente", permiso: "documentos.propios", ocultaEnSidebar: true },
-  { id: "feedback", label: "Feedback", icon: "MessageSquare", section: "Gente", permiso: "feedback.participar" },
-  { id: "asistencia", label: "Asistencia", icon: "Clock", section: "Gente", permiso: "asistencia.propia" },
+  { id: "editar-perfil", label: "Mi Perfil", icon: "UserCircle", section: "Agente", permiso: "perfil.editar", ocultaEnSidebar: true },
+  { id: "licencias", label: "Licencias", icon: "FileText", section: "Organización", permiso: "licencias.propias" },
+  { id: "documentos", label: "Documentos", icon: "Folder", section: "Agente", permiso: "documentos.propios" },
+  { id: "feedback", label: "Feedback", icon: "MessageSquare", section: "Agente", permiso: "feedback.participar", ocultaEnSidebar: true },
+  { id: "asistencia", label: "Asistencia", icon: "Clock", section: "Agente", permiso: "asistencia.propia" },
+  { id: "mi-asistencia", label: "Mi Asistencia", icon: "Clock", section: "Agente", permiso: "asistencia.propia", ocultaEnSidebar: true },
   { id: "activos-config", label: "Configuración de Activos", icon: "Boxes", section: "Activos", permiso: "activos.configurar" },
   { id: "activos-inventario", label: "Inventario", icon: "Package", section: "Activos", permiso: "activos.inventario" },
   { id: "activos-modelos", label: "Modelos de PC", icon: "Cpu", section: "Activos", permiso: "activos.modelos" },
@@ -48,7 +49,7 @@ export const REUBICACION_CONFIG: PageConfig & { permisoAlterno: string } = {
   id: "reubicacion",
   label: "Reubicación",
   icon: "ArrowLeftRight",
-  section: "Gente",
+  section: "Agente",
   permiso: "reubicacion.gestionar",
   permisoAlterno: "reubicacion.solicitar",
 };
@@ -98,7 +99,7 @@ export interface NavSection {
 
 const SECTION_ORDER: PageConfig["section"][] = [
   "General",
-  "Gente",
+  "Agente",
   "Organización",
   "Aprendizaje",
   "IA",

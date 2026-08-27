@@ -683,6 +683,7 @@ export interface SkillTestDialogProps {
 export type Page =
   | "estadisticas"
   | "asistencia"
+  | "mi-asistencia"
   | "recursos-humanos"
   | "configuracion-licencias"
   | "ia"
