@@ -16,6 +16,11 @@ export interface PageConfig {
   /** Si true, no aparece en el sidebar aunque el usuario tenga el permiso
    *  (se llega por el menú de perfil del Header) */
   ocultaEnSidebar?: boolean;
+  /** Si el usuario tiene alguno de estos permisos, la página no aparece en
+   *  el sidebar (sigue accesible por el menú de perfil). Para páginas
+   *  personales que a un rol de gestión ya con mucho menú le sobran ahí,
+   *  pero que a un usuario base sin otras secciones le sirve tener a mano. */
+  ocultaSiTienePermiso?: string[];
 }
 
 export const PAGE_CONFIG: PageConfig[] = [
@@ -29,7 +34,7 @@ export const PAGE_CONFIG: PageConfig[] = [
   { id: "test", label: "Tests", icon: "ClipboardList", section: "Aprendizaje", permiso: "test.gestionar" },
   { id: "editar-perfil", label: "Mi Perfil", icon: "UserCircle", section: "Agente", permiso: "perfil.editar", ocultaEnSidebar: true },
   { id: "licencias", label: "Licencias", icon: "FileText", section: "Organización", permiso: "licencias.propias" },
-  { id: "documentos", label: "Documentos", icon: "Folder", section: "Agente", permiso: "documentos.propios" },
+  { id: "documentos", label: "Documentos", icon: "Folder", section: "Agente", permiso: "documentos.propios", ocultaSiTienePermiso: ["rrhh.gestionar", "admin.gestionar"] },
   { id: "feedback", label: "Feedback", icon: "MessageSquare", section: "Agente", permiso: "feedback.participar", ocultaEnSidebar: true },
   { id: "asistencia", label: "Asistencia", icon: "Clock", section: "Agente", permiso: "asistencia.propia" },
   { id: "mi-asistencia", label: "Mi Asistencia", icon: "Clock", section: "Agente", permiso: "asistencia.propia", ocultaEnSidebar: true },
@@ -72,7 +77,10 @@ export function canAccess(permisos: string[], page: Page): boolean {
 /** Páginas visibles en el sidebar (excluye las marcadas ocultaEnSidebar). */
 export function getSidebarPages(permisos: string[]): PageConfig[] {
   const pages = PAGE_CONFIG.filter(
-    (p) => !p.ocultaEnSidebar && tienePermiso(permisos, p.permiso)
+    (p) =>
+      !p.ocultaEnSidebar &&
+      tienePermiso(permisos, p.permiso) &&
+      !p.ocultaSiTienePermiso?.some((permiso) => tienePermiso(permisos, permiso))
   );
   if (canAccess(permisos, REUBICACION_CONFIG.id)) {
     pages.push(REUBICACION_CONFIG);
