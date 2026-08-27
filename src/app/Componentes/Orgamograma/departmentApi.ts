@@ -17,6 +17,7 @@ export interface ApiOffice {
   nombre: string;
   employees: ApiEmployee[];
   parentDepartmentId?: number | null;
+  scoreExento?: boolean;
 }
 
 export interface ApiDepartment {
@@ -28,6 +29,7 @@ export interface ApiDepartment {
   parentId?: number | null;
   offices: ApiOffice[];
   employees: ApiEmployee[];
+  scoreExento?: boolean;
 }
 
 export interface ApiResponse {
@@ -115,6 +117,7 @@ export const transformApiDataToApp = (apiDepts: ApiDepartment[]): any[] => {
     nivel_jerarquico: dept.nivelJerarquico ?? 1,
     jefeId: dept.jefeId ?? null,
     parentId: dept.parentId ?? null,
+    scoreExento: dept.scoreExento ?? false,
     habilidades_requeridas: [],
     oficinas: dept.offices.map((office) => ({
       id: office.id,
@@ -124,6 +127,7 @@ export const transformApiDataToApp = (apiDepts: ApiDepartment[]): any[] => {
       empleadosIds: office.employees.map((emp) => emp.id),
       departmentId: dept.id,
       parentDepartmentId: office.parentDepartmentId ?? null,
+      scoreExento: office.scoreExento ?? false,
       habilidades_requeridas: [],
     })),
   }));
