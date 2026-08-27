@@ -98,9 +98,8 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
       }}
     >
       <div className="flex h-full items-center justify-between gap-3 px-4 sm:px-6">
-      <span className="font-heading text-xl font-semibold text-foreground truncate">
-        Talexa
-      </span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/meridia.png" alt="Meridia" className="h-8 w-auto shrink-0" />
 
       <div className="flex items-center gap-3">
         {/* Campanita con notificaciones reales */}

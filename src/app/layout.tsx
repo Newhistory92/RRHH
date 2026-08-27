@@ -22,7 +22,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Talexa",
+  title: "Meridia",
   description: "Gestion de Personal",
 };
 
