@@ -3,8 +3,9 @@ import { Accordion, AccordionTab } from 'primereact/accordion';
 import { DynamicSection } from '@/app/Componentes/Perfil/DynamicSectionCv';
 import { AcademicFormation } from "@/app/Interfas/Interfaces"
 import { argentinianDegrees } from "@/app/util/degrees";
+import { getBackendUrl } from "@/app/util/backendUrl";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+const BACKEND_URL = getBackendUrl();
 
 export interface CvFormacionProps {
   data: AcademicFormation[];

@@ -14,8 +14,9 @@ import HabilidadesBlandas from '@/app/Componentes/CvComponente/HabilidadesBlanda
 import CertificacionesCursos from '@/app/Componentes/CvComponente/CertificacionesCursos';
 import { Employee } from "@/app/Interfas/Interfaces"
 import { Button } from 'primereact/button';
+import { getBackendUrl } from '@/app/util/backendUrl';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+const BACKEND_URL = getBackendUrl();
 
 interface EmployeeCVProps {
   employeeData: Employee | null;

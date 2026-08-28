@@ -17,8 +17,9 @@ import { ProductivityRanking } from '@/app/Componentes/ComponEstadistica/Product
 import { GlobalStats }         from '@/app/Componentes/ComponEstadistica/Globalstat';
 import { EmployeeDetailModal } from '@/app/Componentes/ComponEstadistica/DetailModal';
 import { Feedback360Stats } from '@/app/Componentes/ComponEstadistica/Feedback360Stats';
+import { getBackendUrl } from '@/app/util/backendUrl';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+const BACKEND_URL = getBackendUrl();
 import type {
   StatsEmployee,
   EstadisticasMetadata,

@@ -4,8 +4,9 @@
 // setear el boundary. Inyecta el mismo Bearer token de localStorage.
 
 import type { PublicationAttachment } from '@/app/Interfas/Interfaces';
+import { getBackendUrl } from '@/app/util/backendUrl';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://127.0.0.1:8000';
+const BACKEND_URL = getBackendUrl();
 
 /** Resuelve una URL de adjunto (relativa, ej. "/uploads/publications/x.jpg")
  * contra el origen del backend, para que <img>/<video>/<a href> la carguen

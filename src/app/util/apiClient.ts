@@ -4,7 +4,9 @@
 // - Intercepta respuestas 401 (token expirado/inválido) y fuerza logout + redirección.
 // - Uso EXCLUSIVO en Client Components (usa localStorage y window).
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+import { getBackendUrl } from "@/app/util/backendUrl";
+
+const BACKEND_URL = getBackendUrl();
 
 /**
  * Limpia todo el estado de autenticación y redirige al login.

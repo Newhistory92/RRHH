@@ -7,8 +7,9 @@ import { MessagesView } from "@/app/Componentes/TablaOperador/MensajeDetail";
 import { EmployeeTableView } from "@/app/Componentes/TablaOperador/Table";
 import JubiladosTable from "@/app/Componentes/TablaOperador/JubiladosTable";
 import {LicenseDetailModal,PermissionModal} from "@/app/Componentes/ModalRRHH/LicenseModal";
+import { getBackendUrl } from "@/app/util/backendUrl";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+const BACKEND_URL = getBackendUrl();
 import {
   Employee,
   EmployeeStatus,

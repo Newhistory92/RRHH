@@ -7,8 +7,9 @@ import styles from './AuthPage.module.css';
 import { Toast } from 'primereact/toast';
 import { loginUser } from '@/app/util/auth';
 import { Eye, EyeOff } from 'lucide-react';
+import { getBackendUrl } from '@/app/util/backendUrl';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+const BACKEND_URL = getBackendUrl();
 
 export default function AuthPage() {
   const router = useRouter();

@@ -6,8 +6,9 @@ import { InputText } from 'primereact/inputtext';
 import { Usuario, Role } from '@/app/Interfas/Interfaces';
 import { apiClient } from '@/app/util/apiClient';
 import { ObraSocialUsuariosTab } from '@/app/Componentes/Admin/ObraSocialUsuariosTab';
+import { getBackendUrl } from '@/app/util/backendUrl';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+const BACKEND_URL = getBackendUrl();
 
 
 

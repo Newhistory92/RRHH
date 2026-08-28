@@ -2,7 +2,9 @@
 // Funciones de autenticación para usar EXCLUSIVAMENTE en Client Components.
 // No importar este archivo en Server Components ni en layout.tsx del servidor.
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+import { getBackendUrl } from "@/app/util/backendUrl";
+
+const BACKEND_URL = getBackendUrl();
 
 /**
  * Cierra la sesión del usuario desde el client-side:

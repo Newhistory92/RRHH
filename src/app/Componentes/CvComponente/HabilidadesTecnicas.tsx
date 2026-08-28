@@ -5,8 +5,9 @@ import { SkillCard } from '@/app/util/UiRRHH';
 import { TechnicalSkill, SkillStatus, Skill, AcademicFormation, EmployeeTechnicalSkill, AcademicTitleMapping } from "@/app/Interfas/Interfaces"
 import TestModal from '@/app/Componentes/Validaciones/TestModal';
 import { apiClient } from '@/app/util/apiClient';
+import { getBackendUrl } from '@/app/util/backendUrl';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+const BACKEND_URL = getBackendUrl();
 
 // Props del componente HabilidadesTecnicas
 export type HabilidadesTecnicasProps = {

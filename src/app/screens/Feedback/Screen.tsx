@@ -5,8 +5,9 @@ import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
 import { apiClient } from '@/app/util/apiClient';
 import { FeedbackTab, SiguienteFeedback, FeedbackStatus } from '@/app/Componentes/Encuesta/FeedbackTab';
+import { getBackendUrl } from '@/app/util/backendUrl';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
+const BACKEND_URL = getBackendUrl();
 
 function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null;

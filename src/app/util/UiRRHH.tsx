@@ -801,8 +801,9 @@ import { Button } from 'primereact/button';
 import { Camera, CheckCircle, Activity, TrendingDown, AlertTriangle, Plus, SquarePen } from "lucide-react";
 import { Tag } from 'primereact/tag';
 import React from 'react';
+import { getBackendUrl } from '@/app/util/backendUrl';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
+const BACKEND_URL = getBackendUrl();
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 
