@@ -26,8 +26,8 @@ export const metadata: Metadata = {
   description: "Gestion de Personal",
   // Genera <meta name="apple-mobile-web-app-title" content="Meridia" />:
   // el nombre que iOS usa al agregar la app a la pantalla de inicio.
-  // Los iconos (favicon.ico, icon0.svg, icon1.png, apple-icon.png) y el
-  // manifest.json se detectan solos por convencion de archivos en src/app.
+  // Los iconos (favicon.ico, icon1.png, apple-icon.png) y el manifest.json
+  // se detectan solos por convencion de archivos en src/app.
   appleWebApp: {
     title: "Meridia",
   },
