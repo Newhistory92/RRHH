@@ -99,7 +99,9 @@ const currentYear = String(new Date().getFullYear());
 
             <div className={`p-2 rounded-full ${getScoreColor(remoteEmployee?.productivityScore)} mr-6`}>
               <div className="bg-card rounded-full w-24 h-24 flex items-center justify-center text-3xl font-bold text-foreground">
-                {remoteEmployee?.productivityScore.toFixed(1)}
+                {remoteEmployee?.productivityScore != null
+                  ? remoteEmployee.productivityScore.toFixed(1)
+                  : "N/A"}
               </div>
             </div>
 
@@ -213,7 +215,7 @@ const currentYear = String(new Date().getFullYear());
                 <ul>
 
                   {(remoteEmployee?.tasks || []).map(
-                    (task: { name: string; productivity: number }) => (
+                    (task: { name: string; productivity: number | null }) => (
 
                       <li
                         key={task.name}
@@ -224,7 +226,7 @@ const currentYear = String(new Date().getFullYear());
                         </span>
 
                         <span className={`font-bold px-2 py-1 rounded-md text-white text-sm ${getScoreColor(task.productivity)}`}>
-                          {task.productivity.toFixed(1)}
+                          {task.productivity != null ? task.productivity.toFixed(1) : "N/A"}
                         </span>
                       </li>
 
