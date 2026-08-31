@@ -146,7 +146,7 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
       <div className="flex items-center justify-center min-h-[60vh] p-4">
         <div className="text-center">
           <div className="relative">
-            <Brain className="w-20 h-20 text-primary mx-auto mb-6 animate-pulse" />
+            <Brain className="w-20 h-20 text-primary mx-auto mb-6 animate-heartbeat" />
             <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full animate-ping" />
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-2">

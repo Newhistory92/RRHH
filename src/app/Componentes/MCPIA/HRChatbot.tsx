@@ -1,7 +1,8 @@
 "use client";
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, Send, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { apiClient } from "@/app/util/apiClient";
+import { MarkdownLite } from "@/app/util/markdownLite";
 
 interface HRChatbotProps {
   onBack: () => void;
@@ -107,23 +108,35 @@ export const HRChatbot = ({ onBack }: HRChatbotProps) => {
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              className={`flex items-start gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
+              {msg.role === "assistant" && (
+                <div className="mt-1 shrink-0 h-7 w-7 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-sm">
+                  <Sparkles size={14} className="text-primary-foreground" />
+                </div>
+              )}
               <div
-                className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl whitespace-pre-wrap ${
+                className={`max-w-xs md:max-w-md lg:max-w-xl px-4 py-3 text-sm ${
                   msg.role === "user"
-                    ? "bg-primary text-primary-foreground rounded-br-none"
-                    : "bg-muted text-foreground rounded-bl-none"
+                    ? "rounded-2xl rounded-br-md bg-primary text-primary-foreground whitespace-pre-wrap"
+                    : "rounded-2xl rounded-bl-md bg-gradient-to-b from-muted to-muted/70 text-foreground border border-border/60 shadow-sm"
                 }`}
               >
-                {msg.content}
+                {msg.role === "assistant" ? (
+                  <MarkdownLite texto={msg.content} />
+                ) : (
+                  msg.content
+                )}
               </div>
             </div>
           ))}
 
           {isLoading && (
-            <div className="flex justify-start">
-              <div className="max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl bg-muted text-foreground rounded-bl-none">
+            <div className="flex items-start gap-2 justify-start">
+              <div className="mt-1 shrink-0 h-7 w-7 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-sm">
+                <Sparkles size={14} className="text-primary-foreground" />
+              </div>
+              <div className="max-w-xs md:max-w-md lg:max-w-xl px-4 py-3 rounded-2xl rounded-bl-md bg-gradient-to-b from-muted to-muted/70 text-foreground border border-border/60 shadow-sm">
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-muted-foreground">
                     Consultando base de datos

@@ -42,6 +42,7 @@ export default function AsistenciaTablero() {
   const [guardando, setGuardando] = useState(false);
   const [recalculando, setRecalculando] = useState(false);
   const [reseteando, setReseteando] = useState(false);
+  const [huerfanosAbierto, setHuerfanosAbierto] = useState(false);
   const toast = useRef<Toast>(null);
 
   const hoy = new Date().toISOString().split('T')[0];
@@ -287,37 +288,50 @@ export default function AsistenciaTablero() {
       <>
       {/* ── IDs del reloj sin vincular ───────────────────────────── */}
       {huerfanos.length > 0 && (
-        <div className="mb-8 bg-card rounded-lg shadow-sm p-4 border border-warning">
-          <h2 className="font-heading text-lg text-foreground mb-1 flex items-center gap-2">
-            <i className="pi pi-exclamation-triangle text-warning" />
-            IDs del reloj sin vincular ({huerfanos.length})
-          </h2>
-          <p className="text-sm text-muted-foreground mb-4">
-            Estas personas marcaron en el reloj pero su ID no está asignado a ningún empleado.
-            Ingresá al perfil del empleado y cargá el "ID del reloj" correspondiente, luego recalculá.
-          </p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-muted-foreground border-b border-border">
-                  <th className="py-2 pr-4">ID en el reloj</th>
-                  <th className="py-2 pr-4 text-right">Marcas (últimos 14 días)</th>
-                  <th className="py-2 text-right">Última marcación</th>
-                </tr>
-              </thead>
-              <tbody>
-                {huerfanos.map((h) => (
-                  <tr key={h.biometricoId} className="border-b border-border last:border-0">
-                    <td className="py-2 pr-4 font-mono font-semibold text-warning">{h.biometricoId}</td>
-                    <td className="py-2 pr-4 text-right">{h.cantidadMarcas}</td>
-                    <td className="py-2 text-right text-muted-foreground">
-                      {h.ultimaMarcacion.slice(0, 16).replace("T", " ")}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div className="mb-8 bg-card rounded-lg shadow-sm border border-warning overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setHuerfanosAbierto((a) => !a)}
+            className="w-full flex items-center justify-between gap-2 p-4 text-left hover:bg-surface-muted transition-colors"
+            aria-expanded={huerfanosAbierto}
+          >
+            <h2 className="font-heading text-lg text-foreground flex items-center gap-2">
+              <i className="pi pi-exclamation-triangle text-warning" />
+              IDs del reloj sin vincular ({huerfanos.length})
+            </h2>
+            <i className={`pi ${huerfanosAbierto ? "pi-chevron-up" : "pi-chevron-down"} text-muted-foreground`} />
+          </button>
+
+          {huerfanosAbierto && (
+            <div className="px-4 pb-4">
+              <p className="text-sm text-muted-foreground mb-4">
+                Estas personas marcaron en el reloj pero su ID no está asignado a ningún empleado.
+                Ingresá al perfil del empleado y cargá el "ID del reloj" correspondiente, luego recalculá.
+              </p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-muted-foreground border-b border-border">
+                      <th className="py-2 pr-4">ID en el reloj</th>
+                      <th className="py-2 pr-4 text-right">Marcas (últimos 14 días)</th>
+                      <th className="py-2 text-right">Última marcación</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {huerfanos.map((h) => (
+                      <tr key={h.biometricoId} className="border-b border-border last:border-0">
+                        <td className="py-2 pr-4 font-mono font-semibold text-warning">{h.biometricoId}</td>
+                        <td className="py-2 pr-4 text-right">{h.cantidadMarcas}</td>
+                        <td className="py-2 text-right text-muted-foreground">
+                          {h.ultimaMarcacion.slice(0, 16).replace("T", " ")}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
