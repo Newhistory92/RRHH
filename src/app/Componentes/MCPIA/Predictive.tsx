@@ -55,7 +55,7 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
     return (
       <div className="bg-background flex items-center justify-center min-h-screen p-4">
         <div className="text-center">
-          <Brain className="w-20 h-20 text-primary animate-pulse mx-auto mb-6" />
+          <Brain className="w-20 h-20 text-primary animate-heartbeat mx-auto mb-6" />
           <h2 className="text-2xl font-bold text-foreground mb-2">Analizando Datos con IA</h2>
           <p className="text-muted-foreground">Procesando patrones y generando predicciones...</p>
         </div>

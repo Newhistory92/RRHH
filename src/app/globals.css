@@ -320,3 +320,24 @@ body {
     width: 100%;
   }
 }
+
+/* Icono de carga con pulso de latido -dos golpes cortos y una pausa larga,
+   como un corazon real, no un fundido de opacidad parejo (animate-pulse). */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%      { transform: scale(1.18); }
+  28%      { transform: scale(1); }
+  42%      { transform: scale(1.12); }
+  70%      { transform: scale(1); }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-heartbeat {
+    animation: none;
+  }
+}
