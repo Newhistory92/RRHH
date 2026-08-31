@@ -17,6 +17,7 @@ import { ProductivityRanking } from '@/app/Componentes/ComponEstadistica/Product
 import { GlobalStats }         from '@/app/Componentes/ComponEstadistica/Globalstat';
 import { EmployeeDetailModal } from '@/app/Componentes/ComponEstadistica/DetailModal';
 import { Feedback360Stats } from '@/app/Componentes/ComponEstadistica/Feedback360Stats';
+import { ComoSeCalculaModal } from '@/app/Componentes/ComponEstadistica/ComoSeCalculaModal';
 import { getBackendUrl } from '@/app/util/backendUrl';
 
 const BACKEND_URL = getBackendUrl();
@@ -42,6 +43,7 @@ export default function EstadisticasPage() {
   const [globalStats, setGlobalStats]     = React.useState<GlobalStatsData | null>(null);
   const [isLoading, setIsLoading]         = React.useState(true);
   const [error, setError]                 = React.useState<string | null>(null);
+  const [comoSeCalcula, setComoSeCalcula] = React.useState(false);
 
   // Anti-spam ref — guarda el timestamp del último fetch exitoso
   const lastFetchTs = React.useRef<number>(0);
@@ -124,20 +126,35 @@ export default function EstadisticasPage() {
   return (
     <div className="bg-background min-h-screen font-sans text-foreground">
       <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-        <header className="mb-8 flex justify-between items-center">
+        <header className="mb-8 flex justify-between items-center gap-3">
           <div>
-            <h1 className="font-heading text-3xl font-bold text-foreground">Panel Estadístico de Personal</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="font-heading text-3xl font-bold text-foreground">Panel Estadístico de Personal</h1>
+              {/* El puntaje no resume lo que la tabla muestra al lado. Sin este
+                  acceso, una autoridad puede decidir sobre una persona creyendo
+                  que el numero dice mas de lo que dice. */}
+              <button
+                onClick={() => setComoSeCalcula(true)}
+                title="Cómo se forma el puntaje"
+                aria-label="Cómo se forma el puntaje"
+                className="shrink-0 h-7 w-7 rounded-full bg-warning-soft text-warning border border-warning/40 flex items-center justify-center font-bold text-base hover:bg-warning hover:text-white transition-colors"
+              >
+                !
+              </button>
+            </div>
             <p className="text-muted-foreground">Visualización y análisis de datos de empleados.</p>
           </div>
           <button
             onClick={() => fetchData(true)}
             title="Actualizar datos"
-            className="flex items-center gap-2 px-3 py-2 text-sm bg-card border border-border rounded-lg hover:bg-muted transition-colors"
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-card border border-border rounded-lg hover:bg-muted transition-colors shrink-0"
           >
             <RefreshCw className="w-4 h-4 text-muted-foreground" />
             <span className="hidden sm:inline text-muted-foreground">Actualizar</span>
           </button>
         </header>
+
+        {comoSeCalcula && <ComoSeCalculaModal onClose={() => setComoSeCalcula(false)} />}
 
         {/* Tabs */}
         <div className="mb-6 border-b border-border">
