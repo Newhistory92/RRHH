@@ -29,12 +29,15 @@ const fmtFechas = (fechas: string[]) =>
     })
     .join(", ");
 
+const JORNADAS_POR_PAGINA = 10;
+
 export default function MiAsistencia() {
   const [saldo, setSaldo] = useState(0);
   const [jornadas, setJornadas] = useState<JornadaDiaria[]>([]);
   const [abuso, setAbuso] = useState<ResumenAbuso | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pagina, setPagina] = useState(1);
 
   useEffect(() => {
     (async () => {
@@ -54,6 +57,11 @@ export default function MiAsistencia() {
       }
     })();
   }, []);
+
+  const totalPaginas = Math.max(1, Math.ceil(jornadas.length / JORNADAS_POR_PAGINA));
+  const paginaSegura = Math.min(pagina, totalPaginas);
+  const inicio = (paginaSegura - 1) * JORNADAS_POR_PAGINA;
+  const jornadasPagina = jornadas.slice(inicio, inicio + JORNADAS_POR_PAGINA);
 
   if (cargando) {
     return (
@@ -118,7 +126,7 @@ export default function MiAsistencia() {
               </tr>
             </thead>
             <tbody>
-              {jornadas.map((j) => (
+              {jornadasPagina.map((j) => (
                 <tr key={j.id} className="border-b border-border last:border-0">
                   <td className="py-2 pr-4 text-foreground">{j.fecha.slice(0, 10)}</td>
                   <td className="py-2 pr-4">
@@ -175,6 +183,35 @@ export default function MiAsistencia() {
             </tbody>
           </table>
         </div>
+
+        {jornadas.length > 0 && (
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+            <p className="text-sm text-muted-foreground">
+              Mostrando {inicio + 1}–{Math.min(inicio + JORNADAS_POR_PAGINA, jornadas.length)} de {jornadas.length}
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                disabled={paginaSegura === 1}
+                className="px-3 py-1.5 text-sm rounded-md border border-border text-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-muted transition-colors"
+              >
+                Anterior
+              </button>
+              <span className="text-sm text-muted-foreground px-2">
+                Página {paginaSegura} de {totalPaginas}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                disabled={paginaSegura === totalPaginas}
+                className="px-3 py-1.5 text-sm rounded-md border border-border text-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-muted transition-colors"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
