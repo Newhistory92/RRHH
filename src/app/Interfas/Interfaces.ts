@@ -372,6 +372,10 @@ export interface Employee {
   // Performance Metrics
   productivityScore: number;
   isExento?: boolean;
+  /** Puntaje de Feedback 360 (1-5). null si no llega al minimo de 3 evaluadores. */
+  feedbackPromedio?: number | null;
+  feedbackEvaluadores?: number;
+  feedbackAlertas?: number;
   overallProductivity: number;
   monthlyHours: MonthlyHours[];
   tasks: Task[];
@@ -1199,6 +1203,10 @@ export interface StatsEmployee {
   productivityScore: number;
   productivityAvg: number;
   overallProductivity: number;
+  /** Puntaje de Feedback 360 (1-5). null si no llega al minimo de 3 evaluadores. */
+  feedbackPromedio?: number | null;
+  feedbackEvaluadores?: number;
+  feedbackAlertas?: number;
   monthlyHours: MonthlyHours[];
   timeBalance: number;
   tasks: Task[];

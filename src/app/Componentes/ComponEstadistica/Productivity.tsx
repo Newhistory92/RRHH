@@ -1,6 +1,6 @@
 
 import { getScoreColor } from '@/app/util/UiRRHH';
-import { ChevronDown, ChevronUp,  Filter,  } from 'lucide-react';
+import { ChevronDown, ChevronUp, Filter, AlertTriangle } from 'lucide-react';
 import React from 'react';
 import {  Employee, StatsProductivityRankingProps, SortableKey, SortDirection  } from '@/app/Interfas/Interfaces';
 import { Pagination} from '@/app/Componentes/Pagination/pagination';
@@ -154,6 +154,45 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
     );
   };
 
+  // Columna de Feedback 360. Dos estados posibles y solo dos: el puntaje y
+  // las alertas comparten el piso de 3 evaluadores, asi que o se muestran
+  // ambos o ninguno. No existe "Datos insuficientes" con icono de alerta.
+  const feedbackBodyTemplate = (employee: Employee) => {
+    const promedio = employee.feedbackPromedio;
+    const alertas = employee.feedbackAlertas ?? 0;
+
+    if (promedio == null) {
+      return (
+        <span
+          className="text-sm text-muted-foreground"
+          title="Hacen falta al menos 3 evaluadores para mostrar un puntaje. Con menos, el numero seria la opinion de una o dos personas y haria deducible quien evaluo."
+        >
+          Datos insuficientes
+        </span>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-2">
+        <div>
+          <span className="font-bold text-lg text-foreground">{promedio.toFixed(1)}</span>
+          <p className="text-xs text-muted-foreground">
+            {employee.feedbackEvaluadores} evaluadores
+          </p>
+        </div>
+        {alertas > 0 && (
+          <span
+            className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium bg-warning-soft text-warning-soft-foreground"
+            title={`${alertas} alerta(s) de conducta para revisar por RRHH`}
+          >
+            <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+            {alertas}
+          </span>
+        )}
+      </div>
+    );
+  };
+
   // Template para header con sort
   const productivityHeaderTemplate = () => {
     return (
@@ -254,11 +293,19 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
           className="hidden lg:table-cell"
           headerClassName="hidden lg:table-cell"
         />
-        <Column 
-          field="productivityScore" 
+        <Column
+          field="productivityScore"
           header={productivityHeaderTemplate()}
           body={productivityBodyTemplate}
           style={{ minWidth: '150px' }}
+        />
+        <Column
+          field="feedbackPromedio"
+          header="Feedback"
+          body={feedbackBodyTemplate}
+          style={{ minWidth: '160px' }}
+          className="hidden lg:table-cell"
+          headerClassName="hidden lg:table-cell"
         />
       </DataTable>
             <Pagination

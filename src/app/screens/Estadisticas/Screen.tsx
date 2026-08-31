@@ -58,10 +58,11 @@ export default function EstadisticasPage() {
       const token = localStorage.getItem('token');
       const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
 
-      const [dashboardRes, metaRes, globalRes] = await Promise.all([
+      const [dashboardRes, metaRes, globalRes, feedbackRes] = await Promise.all([
         fetch(`${BACKEND_URL}/stats/dashboard`, { headers }),
         fetch(`${BACKEND_URL}/stats/metadata`, { headers }),
         fetch(`${BACKEND_URL}/stats/global-stats`, { headers }),
+        fetch(`${BACKEND_URL}/feedback/puntajes`, token ? { headers: { 'Authorization': `Bearer ${token}` } } : undefined),
       ]);
 
       if (!dashboardRes.ok) throw new Error(`Dashboard API: ${dashboardRes.status}`);
@@ -76,7 +77,31 @@ export default function EstadisticasPage() {
       if (!metaJson.success)      throw new Error(metaJson.error ?? 'Error al cargar metadata');
       if (!globalJson.success)    throw new Error(globalJson.error ?? 'Error al cargar global stats');
 
-      setEmployees(dashboardJson.data);
+      const employees = dashboardJson.data;
+
+      // El puntaje de feedback vive en su propio endpoint: se mezcla por id.
+      // Un 403 no rompe la pantalla -- el ranking sigue sirviendo sin la
+      // columna para quien no tiene rrhh.gestionar.
+      let porEmpleado = new Map<number, { promedio: number | null; evaluadores: number; alertas: number }>();
+      if (feedbackRes.ok) {
+        const fb = await feedbackRes.json() as { puntajes?: { employeeId: number; promedio: number | null; evaluadores: number; alertas: number }[] };
+        porEmpleado = new Map(
+          (fb.puntajes ?? []).map((p) =>
+            [p.employeeId, { promedio: p.promedio, evaluadores: p.evaluadores, alertas: p.alertas }]
+          )
+        );
+      }
+      const conFeedback = employees.map((e: StatsEmployee) => {
+        const f = porEmpleado.get(e.id);
+        return {
+          ...e,
+          feedbackPromedio: f ? f.promedio : null,
+          feedbackEvaluadores: f ? f.evaluadores : 0,
+          feedbackAlertas: f ? f.alertas : 0,
+        };
+      });
+
+      setEmployees(conFeedback);
       setMetadata(metaJson.data);
       setGlobalStats(globalJson.data);
 

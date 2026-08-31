@@ -91,6 +91,11 @@ export function ComoSeCalculaModal({ onClose }: Props) {
               titulo="Asistencia — solo como desempate"
               detalle="Únicamente en áreas marcadas como exentas, para ordenar entre compañeros. No suma ni resta puntos al resto del personal."
             />
+            <Fila
+              icon={<MinusCircle size={18} className="text-muted-foreground" />}
+              titulo="Feedback 360 — columna aparte, no suma al puntaje"
+              detalle="La opinión de los compañeros se muestra en su propia columna. Aparece solo con 3 evaluadores o más: con menos, el número sería la opinión de una o dos personas y permitiría deducir quién evaluó."
+            />
           </div>
 
           <h3 className="font-heading text-lg font-semibold text-foreground mb-3">
