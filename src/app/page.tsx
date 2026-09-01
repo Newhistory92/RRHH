@@ -31,6 +31,7 @@ import { PrimeReactProvider } from 'primereact/api';
 import 'primeicons/primeicons.css';
 import TestPage from './screens/TestConfig/Screen';
 import FeedbackTab from './screens/Feedback/Screen';
+import MeritoPage from '@/app/screens/Merito/Screen';
 import { Employee, Page } from "@/app/Interfas/Interfaces";
 import {
   canAccess,
@@ -167,6 +168,8 @@ export default function App() {
         return <ActivosInventario />;
       case 'activos-modelos':
         return <ActivosModelos />;
+      case 'merito':
+        return <MeritoPage />;
       case 'admin':
         return <AdminPage />;
       default:
