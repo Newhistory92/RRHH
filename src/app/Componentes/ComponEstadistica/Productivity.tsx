@@ -33,6 +33,18 @@ export const ProductivityRanking = ({
 }: StatsProductivityRankingProps) => {
   const itemsPerPage = 10;
 console.log('Metadata recibida en ProductivityRanking:',  employees);
+  // Cobertura de la medicion, sobre el total sin filtrar.
+  //
+  // Fila por fila el panel ya dice "N/A", pero nadie ve el agregado: se puede
+  // recorrer la tabla sin notar que la mayoria no esta medida. Mostrarlo al
+  // lado del titulo pone el limite donde esta el numero, y no detras del boton
+  // de ayuda que hay que decidir abrir.
+  const cobertura = React.useMemo(() => {
+    const total = employees.length;
+    const medidos = employees.filter(e => e.productivityScore != null).length;
+    return { total, medidos };
+  }, [employees]);
+
   // Preparar opciones de departamentos desde metadata
   const departmentOptions = React.useMemo(() => {
     const options = [{ label: 'Todos los Departamentos', value: 'all' }];
@@ -238,9 +250,28 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
       <CardContent>
       <div className="mb-6">
         <div className="flex flex-wrap items-center gap-4">
-          <h2 className="text-xl font-bold text-foreground flex-shrink-0 mr-4">
-            Ranking de Productividad
-          </h2>
+          {/* No se llama "Ranking": el nombre prometia un orden de merito
+              sobre un numero que mide actividad en un solo sistema y que no
+              cubre a todo el personal. Un titulo honesto previene el mal uso
+              antes de que alguien interprete, que es mas efectivo que una
+              advertencia detras de un boton. */}
+          <div className="flex-shrink-0 mr-4">
+            <h2 className="text-xl font-bold text-foreground">
+              Indicadores por persona
+            </h2>
+            {cobertura.total > 0 && (
+              <p
+                className={`text-xs mt-0.5 ${
+                  cobertura.medidos < cobertura.total
+                    ? 'text-warning'
+                    : 'text-muted-foreground'
+                }`}
+                title="El puntaje de actividad solo se calcula para quienes registran uso del sistema de gestión. El resto figura como N/A: no fueron medidos, que no es lo mismo que haber rendido poco."
+              >
+                {cobertura.medidos} de {cobertura.total} con puntaje de actividad
+              </p>
+            )}
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full md:w-auto flex-grow">
             <Dropdown
               value={filters.department}

@@ -164,8 +164,8 @@ export function ComoSeCalculaModal({ onClose }: Props) {
           </div>
 
           <p className="text-xs text-muted-foreground mt-6">
-            Para ver la evidencia detallada de una persona, abra su ficha desde el
-            ranking.
+            Para ver la evidencia detallada de una persona, abra su ficha desde la
+            lista de indicadores.
           </p>
         </div>
       </div>

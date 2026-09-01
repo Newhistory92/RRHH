@@ -36,7 +36,13 @@ export default function EstadisticasPage() {
   const [selectedEmployee, setSelectedEmployee] = React.useState<StatsEmployee | null>(null);
   const [currentPage, setCurrentPage]     = React.useState(1);
   const [filters, setFilters]             = React.useState<Filters>({ department: 'all', activityType: 'all', employmentStatus: 'all' });
-  const [sortConfig, setSortConfig]       = React.useState<SortConfig>({ key: 'productivityAvg', direction: 'descending' });
+  // Ordena por nombre, no por score. El default anterior era 'productivityAvg',
+  // un campo que el backend nunca envia: quedaba undefined en todas las filas y
+  // no ordenaba nada. Apuntarlo al score "arreglaria" el bug convirtiendo la
+  // pantalla en un ranking de personas sobre una metrica que premia la sesion
+  // larga y no el trabajo hecho. Ordenar por score queda como accion explicita
+  // del usuario, no como estado inicial.
+  const [sortConfig, setSortConfig]       = React.useState<SortConfig>({ key: 'name', direction: 'ascending' });
 
   const [employees, setEmployees]         = React.useState<StatsEmployee[]>([]);
   const [metadata, setMetadata]           = React.useState<EstadisticasMetadata>({ departments: [], employmentStatuses: [], activityTypes: [] });
@@ -185,7 +191,7 @@ export default function EstadisticasPage() {
         <div className="mb-6 border-b border-border">
           <nav className="-mb-px flex space-x-6" aria-label="Tabs">
             {([
-              { id: 'ranking',     label: 'Ranking de Productividad', Icon: User },
+              { id: 'ranking',     label: 'Indicadores por persona',  Icon: User },
               { id: 'globales',    label: 'Estadísticas Globales',    Icon: BarChart2 },
               { id: 'feedback360', label: 'Feedback 360°',            Icon: Award },
             ] as const).map(({ id, label, Icon }) => (
