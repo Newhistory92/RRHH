@@ -80,6 +80,17 @@ export const ProfileTab = ({ employee, onSave }: { employee: Employee; onSave?: 
   const [verificandoReloj, setVerificandoReloj] = useState(false);
   const [hasCheckedReloj, setHasCheckedReloj] = useState(false);
   const [relojSinConexion, setRelojSinConexion] = useState(false);
+  const [profesiones, setProfesiones] = useState<string[]>([]);
+
+  // Las posiciones salen del catalogo de Configuracion > Profesiones y cargos,
+  // el mismo endpoint que administra esa pantalla. Antes estaban hardcodeadas
+  // aca, asi que lo que se cargaba en configuracion no llegaba al perfil.
+  useEffect(() => {
+    apiClient
+      .get<{ professions: Array<{ nombre: string }> }>('/professions')
+      .then((r) => setProfesiones((r.professions ?? []).map((p) => p.nombre)))
+      .catch(() => setProfesiones([]));
+  }, []);
 
   // Al entrar en modo edicion de detallesAdicionales, pre-verificar el ID ya guardado
   // para evitar que aparezca "no existe" antes de que el usuario toque el campo.
@@ -228,15 +239,16 @@ export const ProfileTab = ({ employee, onSave }: { employee: Employee; onSave?: 
   ];
 
 
-  const positionOptions = [
-    { label: 'Desarrollador Senior', value: 'Desarrollador Senior' },
-    { label: 'Desarrollador Junior', value: 'Desarrollador Junior' },
-    { label: 'Analista', value: 'Analista' },
-    { label: 'Gerente', value: 'Gerente' },
-    { label: 'Coordinador', value: 'Coordinador' },
-    { label: 'Director', value: 'Director' },
-    { label: 'Especialista', value: 'Especialista' }
-  ];
+  // Si el empleado tiene una posicion que ya no esta en el catalogo (se
+  // desactivo, o es anterior a la carga), se incluye igual para no perderla
+  // en silencio al entrar en modo edicion.
+  const positionOptions = useMemo(() => {
+    const actual = formData.position;
+    const nombres = actual && !profesiones.includes(actual)
+      ? [actual, ...profesiones]
+      : profesiones;
+    return nombres.map((n) => ({ label: n, value: n }));
+  }, [profesiones, formData.position]);
 
 
   return (
