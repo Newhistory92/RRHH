@@ -102,31 +102,44 @@ export default function MeritoPage() {
             onChange={handleSeleccion}
           >
             <option value="" disabled>
-              Seleccionar departamento…
+              Seleccionar…
             </option>
-            {/* Nivel 1 como grupos; dentro van sus hijos de nivel 2.
-                Si un nivel 1 no tiene hijos se muestra solo como opcion. */}
+            {/* Lista plana: nivel 1 sin sangria, nivel 2 con prefijo.
+                Ambos son seleccionables. Al elegir nivel 1 el backend
+                trae empleados de ese departamento y todos sus hijos. */}
             {departamentos
               .filter((d) => d.nivelJerarquico === 1)
-              .map((padre) => {
+              .flatMap((padre) => {
                 const hijos = departamentos.filter(
                   (d) => d.nivelJerarquico === 2 && d.parentId === padre.id
                 );
-                return hijos.length > 0 ? (
-                  <optgroup key={padre.id} label={padre.nombre}>
-                    <option value={padre.id}>{padre.nombre} (todos)</option>
-                    {hijos.map((h) => (
-                      <option key={h.id} value={h.id}>
-                        {h.nombre}
-                      </option>
-                    ))}
-                  </optgroup>
-                ) : (
+                return [
                   <option key={padre.id} value={padre.id}>
                     {padre.nombre}
-                  </option>
-                );
+                  </option>,
+                  ...hijos.map((h) => (
+                    <option key={h.id} value={h.id}>
+                      {"  └ "}
+                      {h.nombre}
+                    </option>
+                  )),
+                ];
               })}
+            {/* Nivel 2 sin padre de nivel 1 en la lista: se muestran igual
+                para que ningun departamento quede fuera del selector. */}
+            {departamentos
+              .filter(
+                (d) =>
+                  d.nivelJerarquico === 2 &&
+                  !departamentos.some(
+                    (p) => p.nivelJerarquico === 1 && p.id === d.parentId
+                  )
+              )
+              .map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.nombre}
+                </option>
+              ))}
           </select>
         )}
       </div>
