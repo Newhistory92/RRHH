@@ -86,8 +86,18 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
     
     if (sortConfig.key) {
       sortableEmployees.sort((a, b) => {
-        const valueA = a[sortConfig.key as keyof Employee] ?? 0;
-        const valueB = b[sortConfig.key as keyof Employee] ?? 0;
+        const valueA = a[sortConfig.key as keyof Employee];
+        const valueB = b[sortConfig.key as keyof Employee];
+
+        // "Sin dato" no es un cero: si se ordenara como 0 la persona caeria al
+        // fondo del ranking y se leeria como la peor, que es justo lo que la
+        // columna evita al mostrar "N/A" en vez de un numero. Van siempre al
+        // final, en las dos direcciones, para que no se mezclen con los medidos.
+        const faltaA = valueA === null || valueA === undefined;
+        const faltaB = valueB === null || valueB === undefined;
+        if (faltaA && faltaB) return 0;
+        if (faltaA) return 1;
+        if (faltaB) return -1;
 
         if (valueA < valueB) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
