@@ -7,7 +7,7 @@
 // ranking global.
 
 import React from "react";
-import { AlertCircle, RefreshCw, Award } from "lucide-react";
+import { AlertCircle, RefreshCw, TrendingUp } from "lucide-react";
 import { TablaMerito } from "@/app/Componentes/Merito/TablaMerito";
 import { getBackendUrl } from "@/app/util/backendUrl";
 import type { FichaMerito } from "@/app/Interfas/Interfaces";
@@ -75,16 +75,15 @@ export default function MeritoPage() {
     <div className="container mx-auto p-4 sm:p-6 lg:p-8">
       <header className="mb-6">
         <div className="flex items-center gap-3 mb-1">
-          <Award className="text-primary w-6 h-6" aria-hidden="true" />
+          <TrendingUp className="text-primary w-6 h-6" aria-hidden="true" />
           <h1 className="font-heading text-2xl font-bold text-foreground">
-            Evidencia para decidir un ascenso
+            Perfil de la gerencia
           </h1>
         </div>
         <p className="text-muted-foreground mt-1 max-w-3xl">
-          Cada dimension se muestra por separado, con la cantidad de evidencia que
-          la respalda. El sistema no ordena a las personas ni recomienda a nadie:
-          reune lo que sabe para que la decision la tome quien puede ponderar lo
-          que ningun registro captura.
+          Cada dimension se muestra por separado con la cantidad de registros que la respalda.
+          El sistema no ordena ni recomienda: reune la informacion disponible para quien
+          necesite conocer en profundidad a su equipo.
         </p>
       </header>
 

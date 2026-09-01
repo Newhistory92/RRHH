@@ -195,9 +195,9 @@ export default function EstadisticasPage() {
           <nav className="-mb-px flex space-x-6" aria-label="Tabs">
             {([
               { id: 'ranking',     label: 'Indicadores por persona',  Icon: User },
+              ...(puedeVerMerito ? [{ id: 'merito' as const, label: 'Mérito', Icon: TrendingUp }] : []),
               { id: 'globales',    label: 'Estadísticas Globales',    Icon: BarChart2 },
               { id: 'feedback360', label: 'Feedback 360°',            Icon: Award },
-              ...(puedeVerMerito ? [{ id: 'merito' as const, label: 'Mérito', Icon: TrendingUp }] : []),
             ] as const).map(({ id, label, Icon }) => (
               <button key={id} onClick={() => setActiveTab(id)}
                 className={`flex items-center px-4 py-2 font-semibold transition-colors duration-200 ${
