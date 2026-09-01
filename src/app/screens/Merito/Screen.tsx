@@ -17,6 +17,8 @@ const BACKEND_URL = getBackendUrl();
 interface Departamento {
   id: number;
   nombre: string;
+  nivelJerarquico: number;
+  parentId: number | null;
 }
 
 export default function MeritoPage() {
@@ -27,19 +29,14 @@ export default function MeritoPage() {
   const [cargandoDeps, setCargandoDeps] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Carga la lista de gerencias al montar
+  // Carga la lista de departamentos con jerarquia al montar
   React.useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch(`${BACKEND_URL}/departments`, {
+    fetch(`${BACKEND_URL}/stats/departamentos`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
       .then((r) => r.json())
-      .then((json) => {
-        const lista: Departamento[] = (json.departments ?? []).map(
-          (d: { id: number; nombre: string }) => ({ id: d.id, nombre: d.nombre })
-        );
-        setDepartamentos(lista);
-      })
+      .then((json) => setDepartamentos(json.departamentos ?? []))
       .catch(() => setDepartamentos([]))
       .finally(() => setCargandoDeps(false));
   }, []);
@@ -96,7 +93,7 @@ export default function MeritoPage() {
           Gerencia
         </label>
         {cargandoDeps ? (
-          <p className="text-sm text-muted-foreground">Cargando gerencias…</p>
+          <p className="text-sm text-muted-foreground">Cargando departamentos…</p>
         ) : (
           <select
             id="selector-gerencia"
@@ -105,13 +102,31 @@ export default function MeritoPage() {
             onChange={handleSeleccion}
           >
             <option value="" disabled>
-              Seleccionar gerencia…
+              Seleccionar departamento…
             </option>
-            {departamentos.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.nombre}
-              </option>
-            ))}
+            {/* Nivel 1 como grupos; dentro van sus hijos de nivel 2.
+                Si un nivel 1 no tiene hijos se muestra solo como opcion. */}
+            {departamentos
+              .filter((d) => d.nivelJerarquico === 1)
+              .map((padre) => {
+                const hijos = departamentos.filter(
+                  (d) => d.nivelJerarquico === 2 && d.parentId === padre.id
+                );
+                return hijos.length > 0 ? (
+                  <optgroup key={padre.id} label={padre.nombre}>
+                    <option value={padre.id}>{padre.nombre} (todos)</option>
+                    {hijos.map((h) => (
+                      <option key={h.id} value={h.id}>
+                        {h.nombre}
+                      </option>
+                    ))}
+                  </optgroup>
+                ) : (
+                  <option key={padre.id} value={padre.id}>
+                    {padre.nombre}
+                  </option>
+                );
+              })}
           </select>
         )}
       </div>

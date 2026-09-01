@@ -1302,6 +1302,7 @@ export interface FichaMerito {
   employeeId: number;
   nombre: string;
   position: string | null;
+  dependencia: string;
   cumplimiento: DimensionMerito;
   actividad: DimensionMerito;
   operativo: DimensionMerito;

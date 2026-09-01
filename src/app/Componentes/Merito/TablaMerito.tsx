@@ -55,6 +55,7 @@ export function TablaMerito({ fichas }: { fichas: FichaMerito[] }) {
         <thead>
           <tr className="bg-muted border-b border-border text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
             <th className="px-4 py-3">Persona</th>
+            <th className="px-4 py-3">Dependencia</th>
             <th className="px-4 py-3">Cumplimiento</th>
             <th className="px-4 py-3">Actividad</th>
             <th className="px-4 py-3">Volumen operativo</th>
@@ -69,6 +70,9 @@ export function TablaMerito({ fichas }: { fichas: FichaMerito[] }) {
               <td className="px-4 py-3">
                 <p className="font-semibold text-foreground">{f.nombre}</p>
                 <p className="text-xs text-muted-foreground">{f.position ?? "Sin cargo"}</p>
+              </td>
+              <td className="px-4 py-3">
+                <p className="text-sm text-foreground">{f.dependencia || "—"}</p>
               </td>
               <td className="px-4 py-3"><Celda dim={f.cumplimiento} /></td>
               <td className="px-4 py-3"><Celda dim={f.actividad} /></td>
