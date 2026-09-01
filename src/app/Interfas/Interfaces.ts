@@ -1290,3 +1290,23 @@ export interface UsuarioObraSocial {
   vinculado: boolean;
   employeeId: number | null;
 }
+
+/** Una dimension de la ficha de merito. `medida` distingue el cero del sin dato. */
+export interface DimensionMerito {
+  valor: number | null;
+  detalle: string;
+  medida: boolean;
+}
+
+export interface FichaMerito {
+  employeeId: number;
+  nombre: string;
+  position: string | null;
+  cumplimiento: DimensionMerito;
+  actividad: DimensionMerito;
+  operativo: DimensionMerito;
+  feedback: DimensionMerito;
+  trayectoria: string;
+  cobertura: number;
+  dimensionesTotales: number;
+}
