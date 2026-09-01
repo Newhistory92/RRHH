@@ -116,6 +116,41 @@
     color: var(--muted-foreground) !important;
     cursor: not-allowed !important;
 }
+
+/* Listas desplegables de PrimeReact. El tema pinta el item seleccionado con el
+   color primario pero deja el texto en el color por defecto, asi que sobre el
+   verde la etiqueta queda invisible. Se fija el par fondo/texto en los tres
+   estados (seleccionado, foco de teclado y hover) usando tokens, para que
+   funcione igual en claro y en oscuro. */
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight,
+.p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight,
+.p-autocomplete-panel .p-autocomplete-items .p-autocomplete-item.p-highlight,
+.p-listbox .p-listbox-list .p-listbox-item.p-highlight {
+    background: var(--primary) !important;
+    color: var(--primary-foreground) !important;
+}
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-focus,
+.p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-focus,
+.p-autocomplete-panel .p-autocomplete-items .p-autocomplete-item.p-focus,
+.p-listbox .p-listbox-list .p-listbox-item.p-focus {
+    background: var(--muted) !important;
+    color: var(--foreground) !important;
+}
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight.p-focus,
+.p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight.p-focus,
+.p-autocomplete-panel .p-autocomplete-items .p-autocomplete-item.p-highlight.p-focus,
+.p-listbox .p-listbox-list .p-listbox-item.p-highlight.p-focus {
+    background: var(--primary) !important;
+    color: var(--primary-foreground) !important;
+}
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover,
+.p-multiselect-panel .p-multiselect-items .p-multiselect-item:not(.p-highlight):not(.p-disabled):hover,
+.p-autocomplete-panel .p-autocomplete-items .p-autocomplete-item:not(.p-highlight):not(.p-disabled):hover,
+.p-listbox .p-listbox-list .p-listbox-item:not(.p-highlight):not(.p-disabled):hover {
+    background: var(--muted) !important;
+    color: var(--foreground) !important;
+}
+
 .dark {
   /* Las variantes -text de :root son tonos oscuros pensados para fondo claro:
      sobre #24232A serian ilegibles. En oscuro el rol se invierte y los que
