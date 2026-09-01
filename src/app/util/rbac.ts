@@ -47,7 +47,6 @@ export const PAGE_CONFIG: PageConfig[] = [
   { id: "activos-inventario", label: "Inventario", icon: "Package", section: "Activos", permiso: "activos.inventario" },
   { id: "activos-modelos", label: "Modelos de PC", icon: "Cpu", section: "Activos", permiso: "activos.modelos" },
   { id: "admin", label: "Administración", icon: "Shield", section: "Sistema", permiso: "admin.gestionar" },
-  { id: "merito", label: "Mérito", icon: "Award", section: "General", permiso: "rrhh.gestionar" },
 ];
 
 /**

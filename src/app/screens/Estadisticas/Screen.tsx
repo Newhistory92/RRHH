@@ -12,12 +12,14 @@
  */
 
 import React from 'react';
-import { BarChart2, User, RefreshCw, AlertCircle, Award } from 'lucide-react';
+import { BarChart2, User, RefreshCw, AlertCircle, Award, TrendingUp } from 'lucide-react';
 import { ProductivityRanking } from '@/app/Componentes/ComponEstadistica/Productivity';
 import { GlobalStats }         from '@/app/Componentes/ComponEstadistica/Globalstat';
 import { EmployeeDetailModal } from '@/app/Componentes/ComponEstadistica/DetailModal';
 import { Feedback360Stats } from '@/app/Componentes/ComponEstadistica/Feedback360Stats';
 import { ComoSeCalculaModal } from '@/app/Componentes/ComponEstadistica/ComoSeCalculaModal';
+import MeritoPage from '@/app/screens/Merito/Screen';
+import { leerPermisos, tienePermiso } from '@/app/util/permisos';
 import { getBackendUrl } from '@/app/util/backendUrl';
 
 const BACKEND_URL = getBackendUrl();
@@ -32,7 +34,8 @@ import type {
 const ANTI_SPAM_MS = 3_000;
 
 export default function EstadisticasPage() {
-  const [activeTab, setActiveTab]         = React.useState<'ranking' | 'globales' | 'feedback360'>('ranking');
+  const puedeVerMerito = tienePermiso(leerPermisos(), 'rrhh.gestionar');
+  const [activeTab, setActiveTab]         = React.useState<'ranking' | 'globales' | 'feedback360' | 'merito'>('ranking');
   const [selectedEmployee, setSelectedEmployee] = React.useState<StatsEmployee | null>(null);
   const [currentPage, setCurrentPage]     = React.useState(1);
   const [filters, setFilters]             = React.useState<Filters>({ department: 'all', activityType: 'all', employmentStatus: 'all' });
@@ -194,6 +197,7 @@ export default function EstadisticasPage() {
               { id: 'ranking',     label: 'Indicadores por persona',  Icon: User },
               { id: 'globales',    label: 'Estadísticas Globales',    Icon: BarChart2 },
               { id: 'feedback360', label: 'Feedback 360°',            Icon: Award },
+              ...(puedeVerMerito ? [{ id: 'merito' as const, label: 'Mérito', Icon: TrendingUp }] : []),
             ] as const).map(({ id, label, Icon }) => (
               <button key={id} onClick={() => setActiveTab(id)}
                 className={`flex items-center px-4 py-2 font-semibold transition-colors duration-200 ${
@@ -226,6 +230,9 @@ export default function EstadisticasPage() {
           )}
           {activeTab === 'feedback360' && (
             <Feedback360Stats />
+          )}
+          {activeTab === 'merito' && puedeVerMerito && (
+            <MeritoPage />
           )}
         </main>
 

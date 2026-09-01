@@ -703,8 +703,7 @@ export type Page =
   | "gestion-publicaciones"
   | "activos-config"
   | "activos-inventario"
-  | "activos-modelos"
-  | "merito";
+  | "activos-modelos";
 
 export interface ActivoCategoria {
   id: number;
