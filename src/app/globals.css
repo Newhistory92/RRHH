@@ -151,6 +151,27 @@
     color: var(--foreground) !important;
 }
 
+/* Mismo problema del bloque anterior, en el arbol del organigrama y el
+   selector de fecha: el nodo/dia seleccionado hereda el color de texto por
+   defecto en vez del que corresponde al fondo primario que le puso el tema,
+   asi que el nombre del departamento o el numero del dia quedan invisibles. */
+.p-tree .p-treenode-content.p-highlight {
+    background: var(--primary) !important;
+    color: var(--primary-foreground) !important;
+}
+.p-tree .p-treenode-content.p-highlight * {
+    color: var(--primary-foreground) !important;
+}
+.p-tree .p-treenode-content:not(.p-highlight):hover {
+    background: var(--muted) !important;
+    color: var(--foreground) !important;
+}
+.p-datepicker table td > span.p-highlight,
+.p-datepicker table td.p-datepicker-today > span.p-highlight {
+    background: var(--primary) !important;
+    color: var(--primary-foreground) !important;
+}
+
 .dark {
   /* Las variantes -text de :root son tonos oscuros pensados para fondo claro:
      sobre #24232A serian ilegibles. En oscuro el rol se invierte y los que
