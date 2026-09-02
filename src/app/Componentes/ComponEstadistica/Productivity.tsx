@@ -1,6 +1,6 @@
 
 import { getScoreColor } from '@/app/util/UiRRHH';
-import { ChevronDown, ChevronUp,  Filter,  } from 'lucide-react';
+import { ChevronDown, ChevronUp, Filter, AlertTriangle } from 'lucide-react';
 import React from 'react';
 import {  Employee, StatsProductivityRankingProps, SortableKey, SortDirection  } from '@/app/Interfas/Interfaces';
 import { Pagination} from '@/app/Componentes/Pagination/pagination';
@@ -33,6 +33,18 @@ export const ProductivityRanking = ({
 }: StatsProductivityRankingProps) => {
   const itemsPerPage = 10;
 console.log('Metadata recibida en ProductivityRanking:',  employees);
+  // Cobertura de la medicion, sobre el total sin filtrar.
+  //
+  // Fila por fila el panel ya dice "N/A", pero nadie ve el agregado: se puede
+  // recorrer la tabla sin notar que la mayoria no esta medida. Mostrarlo al
+  // lado del titulo pone el limite donde esta el numero, y no detras del boton
+  // de ayuda que hay que decidir abrir.
+  const cobertura = React.useMemo(() => {
+    const total = employees.length;
+    const medidos = employees.filter(e => e.productivityScore != null).length;
+    return { total, medidos };
+  }, [employees]);
+
   // Preparar opciones de departamentos desde metadata
   const departmentOptions = React.useMemo(() => {
     const options = [{ label: 'Todos los Departamentos', value: 'all' }];
@@ -86,8 +98,18 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
     
     if (sortConfig.key) {
       sortableEmployees.sort((a, b) => {
-        const valueA = a[sortConfig.key as keyof Employee] ?? 0;
-        const valueB = b[sortConfig.key as keyof Employee] ?? 0;
+        const valueA = a[sortConfig.key as keyof Employee];
+        const valueB = b[sortConfig.key as keyof Employee];
+
+        // "Sin dato" no es un cero: si se ordenara como 0 la persona caeria al
+        // fondo del ranking y se leeria como la peor, que es justo lo que la
+        // columna evita al mostrar "N/A" en vez de un numero. Van siempre al
+        // final, en las dos direcciones, para que no se mezclen con los medidos.
+        const faltaA = valueA === null || valueA === undefined;
+        const faltaB = valueB === null || valueB === undefined;
+        if (faltaA && faltaB) return 0;
+        if (faltaA) return 1;
+        if (faltaB) return -1;
 
         if (valueA < valueB) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
@@ -154,6 +176,45 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
     );
   };
 
+  // Columna de Feedback 360. Dos estados posibles y solo dos: el puntaje y
+  // las alertas comparten el piso de 3 evaluadores, asi que o se muestran
+  // ambos o ninguno. No existe "Datos insuficientes" con icono de alerta.
+  const feedbackBodyTemplate = (employee: Employee) => {
+    const promedio = employee.feedbackPromedio;
+    const alertas = employee.feedbackAlertas ?? 0;
+
+    if (promedio == null) {
+      return (
+        <span
+          className="text-sm text-muted-foreground"
+          title="Hacen falta al menos 3 evaluadores para mostrar un puntaje. Con menos, el numero seria la opinion de una o dos personas y haria deducible quien evaluo."
+        >
+          Datos insuficientes
+        </span>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-2">
+        <div>
+          <span className="font-bold text-lg text-foreground">{promedio.toFixed(1)}</span>
+          <p className="text-xs text-muted-foreground">
+            {employee.feedbackEvaluadores} evaluadores
+          </p>
+        </div>
+        {alertas > 0 && (
+          <span
+            className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium bg-warning-soft text-warning-soft-foreground"
+            title={`${alertas} alerta(s) de conducta para revisar por RRHH`}
+          >
+            <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+            {alertas}
+          </span>
+        )}
+      </div>
+    );
+  };
+
   // Template para header con sort
   const productivityHeaderTemplate = () => {
     return (
@@ -189,9 +250,28 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
       <CardContent>
       <div className="mb-6">
         <div className="flex flex-wrap items-center gap-4">
-          <h2 className="text-xl font-bold text-foreground flex-shrink-0 mr-4">
-            Ranking de Productividad
-          </h2>
+          {/* No se llama "Ranking": el nombre prometia un orden de merito
+              sobre un numero que mide actividad en un solo sistema y que no
+              cubre a todo el personal. Un titulo honesto previene el mal uso
+              antes de que alguien interprete, que es mas efectivo que una
+              advertencia detras de un boton. */}
+          <div className="flex-shrink-0 mr-4">
+            <h2 className="text-xl font-bold text-foreground">
+              Indicadores por persona
+            </h2>
+            {cobertura.total > 0 && (
+              <p
+                className={`text-xs mt-0.5 ${
+                  cobertura.medidos < cobertura.total
+                    ? 'text-warning'
+                    : 'text-muted-foreground'
+                }`}
+                title="El puntaje de actividad solo se calcula para quienes registran uso del sistema de gestión. El resto figura como N/A: no fueron medidos, que no es lo mismo que haber rendido poco."
+              >
+                {cobertura.medidos} de {cobertura.total} con puntaje de actividad
+              </p>
+            )}
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full md:w-auto flex-grow">
             <Dropdown
               value={filters.department}
@@ -254,11 +334,19 @@ console.log('Metadata recibida en ProductivityRanking:',  employees);
           className="hidden lg:table-cell"
           headerClassName="hidden lg:table-cell"
         />
-        <Column 
-          field="productivityScore" 
+        <Column
+          field="productivityScore"
           header={productivityHeaderTemplate()}
           body={productivityBodyTemplate}
           style={{ minWidth: '150px' }}
+        />
+        <Column
+          field="feedbackPromedio"
+          header="Feedback"
+          body={feedbackBodyTemplate}
+          style={{ minWidth: '160px' }}
+          className="hidden lg:table-cell"
+          headerClassName="hidden lg:table-cell"
         />
       </DataTable>
             <Pagination

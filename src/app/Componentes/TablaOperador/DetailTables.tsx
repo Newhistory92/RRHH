@@ -1,5 +1,5 @@
 import { InfoCard, HoursDisplay } from "@/app/util/UiRRHH"
-import { User, Briefcase, Clock, Building, Calendar as CalendarIcon, CheckCircle, Phone, Home, Cake, AtSign, Handshake, CopyCheck, ChartColumnStacked, AlertCircle } from 'lucide-react';
+import { User, Briefcase, Clock, Building, Calendar as CalendarIcon, CheckCircle, Phone, Home, Cake, AtSign, Handshake, CopyCheck, ChartColumnStacked, AlertCircle, AlertTriangle } from 'lucide-react';
 import { Employee, Licenses, LicenseHistory, Permit, EmploymentStatus } from '@/app/Interfas/Interfaces';
 import { Pagination } from '@/app/Componentes/Pagination/pagination';
 import { useMemo, useState, useEffect } from "react";
@@ -80,6 +80,17 @@ export const ProfileTab = ({ employee, onSave }: { employee: Employee; onSave?: 
   const [verificandoReloj, setVerificandoReloj] = useState(false);
   const [hasCheckedReloj, setHasCheckedReloj] = useState(false);
   const [relojSinConexion, setRelojSinConexion] = useState(false);
+  const [profesiones, setProfesiones] = useState<string[]>([]);
+
+  // Las posiciones salen del catalogo de Configuracion > Profesiones y cargos,
+  // el mismo endpoint que administra esa pantalla. Antes estaban hardcodeadas
+  // aca, asi que lo que se cargaba en configuracion no llegaba al perfil.
+  useEffect(() => {
+    apiClient
+      .get<{ professions: Array<{ nombre: string }> }>('/professions')
+      .then((r) => setProfesiones((r.professions ?? []).map((p) => p.nombre)))
+      .catch(() => setProfesiones([]));
+  }, []);
 
   // Al entrar en modo edicion de detallesAdicionales, pre-verificar el ID ya guardado
   // para evitar que aparezca "no existe" antes de que el usuario toque el campo.
@@ -228,15 +239,16 @@ export const ProfileTab = ({ employee, onSave }: { employee: Employee; onSave?: 
   ];
 
 
-  const positionOptions = [
-    { label: 'Desarrollador Senior', value: 'Desarrollador Senior' },
-    { label: 'Desarrollador Junior', value: 'Desarrollador Junior' },
-    { label: 'Analista', value: 'Analista' },
-    { label: 'Gerente', value: 'Gerente' },
-    { label: 'Coordinador', value: 'Coordinador' },
-    { label: 'Director', value: 'Director' },
-    { label: 'Especialista', value: 'Especialista' }
-  ];
+  // Si el empleado tiene una posicion que ya no esta en el catalogo (se
+  // desactivo, o es anterior a la carga), se incluye igual para no perderla
+  // en silencio al entrar en modo edicion.
+  const positionOptions = useMemo(() => {
+    const actual = formData.position;
+    const nombres = actual && !profesiones.includes(actual)
+      ? [actual, ...profesiones]
+      : profesiones;
+    return nombres.map((n) => ({ label: n, value: n }));
+  }, [profesiones, formData.position]);
 
 
   return (
@@ -1277,6 +1289,13 @@ interface CategoriaPromedio {
   promedio: number;
 }
 
+interface AlertaConducta {
+  pregunta: string;
+  categoria: string;
+  reportan: number;
+  evaluadores: number;
+}
+
 interface FeedbackIndicadores {
   employeeId: number;
   fortalezas: CategoriaPromedio[];
@@ -1288,6 +1307,7 @@ interface FeedbackIndicadores {
     promedioAnterior: number | null;
     diferencia: number | null;
   };
+  alertas: AlertaConducta[];
 }
 
 export const FeedbackIndicatorsTab = ({ employee }: { employee: Employee }) => {
@@ -1368,6 +1388,25 @@ export const FeedbackIndicatorsTab = ({ employee }: { employee: Employee }) => {
           <p className="text-sm text-muted-foreground italic">Sin datos suficientes para comparar.</p>
         )}
       </div>
+
+      {indicadores.alertas.length > 0 && (
+        <div className="bg-warning-soft border border-warning rounded-lg p-4">
+          <h3 className="font-heading font-semibold text-warning-soft-foreground mb-3 flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+            Alertas de conducta ({indicadores.alertas.length})
+          </h3>
+          <ul className="space-y-2">
+            {indicadores.alertas.map((a, i) => (
+              <li key={i} className="text-sm bg-card border border-border rounded-lg p-3">
+                <p className="text-foreground">{a.pregunta}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {a.categoria} · reportado por {a.reportan} de {a.evaluadores} evaluadores
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

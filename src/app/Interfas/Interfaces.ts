@@ -372,6 +372,10 @@ export interface Employee {
   // Performance Metrics
   productivityScore: number;
   isExento?: boolean;
+  /** Puntaje de Feedback 360 (1-5). null si no llega al minimo de 3 evaluadores. */
+  feedbackPromedio?: number | null;
+  feedbackEvaluadores?: number;
+  feedbackAlertas?: number;
   overallProductivity: number;
   monthlyHours: MonthlyHours[];
   tasks: Task[];
@@ -1199,6 +1203,10 @@ export interface StatsEmployee {
   productivityScore: number;
   productivityAvg: number;
   overallProductivity: number;
+  /** Puntaje de Feedback 360 (1-5). null si no llega al minimo de 3 evaluadores. */
+  feedbackPromedio?: number | null;
+  feedbackEvaluadores?: number;
+  feedbackAlertas?: number;
   monthlyHours: MonthlyHours[];
   timeBalance: number;
   tasks: Task[];
@@ -1281,4 +1289,47 @@ export interface UsuarioObraSocial {
   telefono: string | null;
   vinculado: boolean;
   employeeId: number | null;
+}
+
+/** Una dimension de la ficha de merito. `medida` distingue el cero del sin dato. */
+export interface DimensionMerito {
+  valor: number | null;
+  detalle: string;
+  medida: boolean;
+}
+
+export interface FichaMerito {
+  employeeId: number;
+  nombre: string;
+  position: string | null;
+  dependencia: string;
+  cumplimiento: DimensionMerito;
+  actividad: DimensionMerito;
+  operativo: DimensionMerito;
+  feedback: DimensionMerito;
+  trayectoria: string;
+  cobertura: number;
+  dimensionesTotales: number;
+}
+
+export type EstadoRuta = "cuenta" | "no_cuenta" | "pendiente";
+
+export interface RutaProductividad {
+  metodo: string;
+  ruta: string;
+  eventos: number;
+  usuarios: number;
+  ultimaVez: string | null;
+  estado: EstadoRuta;
+}
+
+export interface LogSistemaFila {
+  fechaHoraLog: string;
+  nombreUsuario: string | null;
+  metodo: string;
+  url: string;
+  rutaNormalizada: string;
+  statusCode: number;
+  tiempoRespuestaMs: number | null;
+  requestId: string | null;
 }
