@@ -70,7 +70,7 @@ export function ComoSeCalculaModal({ onClose }: Props) {
             </div>
 
             <div className="space-y-2">
-              <Fila icon={<CheckCircle2 size={16} className="text-success" />} titulo="Qué entra en el puntaje" detalle="Cantidad de registros generados en el sistema de gestión dividida por las horas efectivas trabajadas (según planilla de jornada)." />
+              <Fila icon={<CheckCircle2 size={16} className="text-success" />} titulo="Qué entra en el puntaje" detalle="Acciones completadas con éxito en el sistema de gestión, divididas por las horas efectivas trabajadas (según planilla de jornada). Qué acciones cuentan como trabajo lo define el administrador del sistema." />
               <Fila icon={<MinusCircle size={16} className="text-muted-foreground" />} titulo="Qué NO entra" detalle="Tardanzas, licencias, ausencias, quejas, feedback de compañeros, habilidades. Aparecen en otras columnas como contexto, pero no modifican el número." />
             </div>
 
