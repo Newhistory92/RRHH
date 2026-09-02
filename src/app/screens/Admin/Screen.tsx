@@ -6,6 +6,7 @@ import { InputText } from 'primereact/inputtext';
 import { Usuario, Role } from '@/app/Interfas/Interfaces';
 import { apiClient } from '@/app/util/apiClient';
 import { ObraSocialUsuariosTab } from '@/app/Componentes/Admin/ObraSocialUsuariosTab';
+import { ProductividadTab } from '@/app/Componentes/Admin/ProductividadTab';
 import { getBackendUrl } from '@/app/util/backendUrl';
 
 const BACKEND_URL = getBackendUrl();
@@ -325,6 +326,7 @@ export default function AdminPage() {
                             <TabButton id="inactive-users" title="Usuarios Inactivos" />
                             <TabButton id="roles" title="Configuración de Roles" />
                             <TabButton id="profiles" title="Perfiles de Usuario" />
+                            <TabButton id="productividad" title="Productividad" />
                             {authProvider === 'obrasocial' && (
                                 <TabButton id="obrasocial" title="Usuarios ObraSocial" />
                             )}
@@ -370,6 +372,7 @@ export default function AdminPage() {
                         )}{activeTab === 'roles' && <RolesGrid roles={roles ?? []} onEdit={openRoleModal} />}
                         {activeTab === 'profiles' && <ProfileSettings />}
                         {activeTab === 'obrasocial' && authProvider === 'obrasocial' && <ObraSocialUsuariosTab />}
+                        {activeTab === 'productividad' && <ProductividadTab />}
                     </div>
                 </main>
             </div>

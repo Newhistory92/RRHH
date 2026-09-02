@@ -1311,3 +1311,25 @@ export interface FichaMerito {
   cobertura: number;
   dimensionesTotales: number;
 }
+
+export type EstadoRuta = "cuenta" | "no_cuenta" | "pendiente";
+
+export interface RutaProductividad {
+  metodo: string;
+  ruta: string;
+  eventos: number;
+  usuarios: number;
+  ultimaVez: string | null;
+  estado: EstadoRuta;
+}
+
+export interface LogSistemaFila {
+  fechaHoraLog: string;
+  nombreUsuario: string | null;
+  metodo: string;
+  url: string;
+  rutaNormalizada: string;
+  statusCode: number;
+  tiempoRespuestaMs: number | null;
+  requestId: string | null;
+}
