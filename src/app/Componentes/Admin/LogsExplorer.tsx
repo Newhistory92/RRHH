@@ -33,6 +33,7 @@ export function LogsExplorer({
   const [total, setTotal] = React.useState(0);
   const [pagina, setPagina] = React.useState(1);
   const [texto, setTexto] = React.useState("");
+  const [textoBusqueda, setTextoBusqueda] = React.useState("");
   const [metodo, setMetodo] = React.useState("");
   const [clase, setClase] = React.useState("");
   const [cargando, setCargando] = React.useState(true);
@@ -63,6 +64,11 @@ export function LogsExplorer({
   }, [pagina, texto, metodo, clase]);
 
   React.useEffect(() => {
+    const t = setTimeout(() => setTexto(textoBusqueda), 300);
+    return () => clearTimeout(t);
+  }, [textoBusqueda]);
+
+  React.useEffect(() => {
     void traer();
   }, [traer]);
 
@@ -88,8 +94,8 @@ export function LogsExplorer({
           />
           <input
             type="text"
-            value={texto}
-            onChange={(e) => cambiarFiltro(() => setTexto(e.target.value))}
+            value={textoBusqueda}
+            onChange={(e) => cambiarFiltro(() => setTextoBusqueda(e.target.value))}
             placeholder="Buscar en la URL…"
             className="w-full rounded-lg border border-border bg-card py-2 pl-9 pr-3 text-foreground"
           />
