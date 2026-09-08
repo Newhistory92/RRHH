@@ -4,10 +4,12 @@ import {ProfileTab,LicenseHistoryTab,PermissionHistoryTab,DocumentsTab,FeedbackI
 import { AsistenciaEmpleadoTab } from "./AsistenciaEmpleadoTab"
 import { AlertasToleranciaTab } from "./AlertasToleranciaTab"
 import { AusenciasEmpleadoTab } from "./AusenciasEmpleadoTab"
+import { CargaInicialLicenciasTab } from "./CargaInicialLicenciasTab";
 import {StatusBadge} from "@/app/util/UiRRHH"
 import { useState } from "react";
 import {  Employee, LicenseHistory} from '@/app/Interfas/Interfaces';
 import { Avatar } from 'primereact/avatar';
+import { leerPermisos, tienePermiso } from "@/app/util/permisos";
 
 export interface EmployeeDetailViewProps {
   employee: Employee | null | undefined;
@@ -22,6 +24,8 @@ export const EmployeeDetailView = ({
   onSave,
 }: EmployeeDetailViewProps) => {
   const [activeTab, setActiveTab] = useState("perfil");
+  // Pestaña transitoria: se apaga quitandole el permiso al rol, sin redeploy.
+  const puedeCargarSaldos = tienePermiso(leerPermisos(), "licencias.cargaInicial");
 
 
   if (!employee) {
@@ -132,6 +136,18 @@ export const EmployeeDetailView = ({
           >
             Alertas de tolerancia
           </button>
+          {puedeCargarSaldos && (
+            <button
+              onClick={() => setActiveTab("cargaInicial")}
+              className={`${
+                activeTab === "cargaInicial"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Carga inicial de saldos
+            </button>
+          )}
           <button
             onClick={() => setActiveTab("ausencias")}
             className={`${
@@ -161,6 +177,9 @@ export const EmployeeDetailView = ({
         {activeTab === "asistencia" && <AsistenciaEmpleadoTab employee={employee} />}
         {activeTab === "alertas" && <AlertasToleranciaTab employee={employee} />}
         {activeTab === "ausencias" && <AusenciasEmpleadoTab employee={employee} />}
+        {activeTab === "cargaInicial" && puedeCargarSaldos && (
+          <CargaInicialLicenciasTab employee={employee} />
+        )}
       </div>
     </div>
   );
