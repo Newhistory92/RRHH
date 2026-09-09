@@ -107,7 +107,7 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
       <img
         src={mounted && resolvedTheme === "dark" ? "/logo-osp-blanco.webp" : "/logo-osp-rojo.webp"}
         alt="OSP"
-        className="h-10 w-auto shrink-0"
+        className="h-[3.125rem] w-auto shrink-0"
       />
 
       <div className="flex items-center gap-3">
