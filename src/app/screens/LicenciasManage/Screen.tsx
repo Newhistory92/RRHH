@@ -157,11 +157,11 @@ export default function LicenciasManage() {
         <button
           type="button"
           onClick={() => setMostrarGuia(true)}
-          className="text-muted-foreground hover:text-primary transition-colors"
+          className="text-warning hover:text-warning/80 transition-colors"
           aria-label="Cómo funcionan las licencias"
           title="Cómo funcionan las licencias"
         >
-          <CircleAlert size={22} />
+          <CircleAlert size={26} />
         </button>
       </div>
       {mostrarGuia && <ComoFuncionanLicenciasModal onClose={() => setMostrarGuia(false)} />}

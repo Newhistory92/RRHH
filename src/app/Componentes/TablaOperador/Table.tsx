@@ -166,11 +166,11 @@ export const EmployeeTableView = ({
           <button
             type="button"
             onClick={() => setMostrarGuiaLicencias(true)}
-            className="text-muted-foreground hover:text-primary transition-colors"
+            className="text-warning hover:text-warning/80 transition-colors"
             aria-label="Cómo funcionan las licencias"
             title="Cómo funcionan las licencias"
           >
-            <CircleAlert size={20} />
+            <CircleAlert size={26} />
           </button>
         </div>
         <div className="mt-4 flex items-center gap-2 sm:mt-0">

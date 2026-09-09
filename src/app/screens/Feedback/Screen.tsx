@@ -128,11 +128,11 @@ export default function FeedbackPage() {
             <button
               type="button"
               onClick={() => setMostrarGuia(true)}
-              className="text-muted-foreground hover:text-primary transition-colors mb-2"
+              className="text-warning hover:text-warning/80 transition-colors mb-2"
               aria-label="En qué consiste esta encuesta"
               title="En qué consiste esta encuesta"
             >
-              <CircleAlert size={22} />
+              <CircleAlert size={26} />
             </button>
           </div>
           <p className="text-lg text-muted-foreground">

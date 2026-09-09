@@ -156,11 +156,11 @@ export default function TestPage(){
             <button
               type="button"
               onClick={() => setMostrarGuia(true)}
-              className="text-muted-foreground hover:text-primary transition-colors mb-2"
+              className="text-warning hover:text-warning/80 transition-colors mb-2"
               aria-label="Cómo funciona Gestión de Tests"
               title="Cómo funciona Gestión de Tests"
             >
-              <CircleAlert size={22} />
+              <CircleAlert size={26} />
             </button>
           </div>
           <p className="text-muted-foreground">
