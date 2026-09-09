@@ -20,6 +20,47 @@ import type {
 
 const clave = (f: { anio: number; categoria: string }) => `${f.anio}|${f.categoria}`;
 
+// Fuera del componente a proposito: definido adentro, React lo trataba como
+// un tipo de componente nuevo en cada render (una identidad distinta por
+// letra tipeada), asi que cada input perdia el foco despues de cada
+// caracter -- la carga se volvia intipeable.
+const Bloque = ({ titulo, ayuda, filas, valorDe, onEditar }: {
+  titulo: string;
+  ayuda: string;
+  filas: SaldoCargaInicial[];
+  valorDe: (fila: SaldoCargaInicial) => string;
+  onEditar: (fila: SaldoCargaInicial, crudo: string) => void;
+}) => (
+  <div className="bg-card border border-border rounded-lg p-4">
+    <h3 className="font-heading font-semibold text-foreground">{titulo}</h3>
+    <p className="text-xs text-muted-foreground mb-3">{ayuda}</p>
+    {filas.length === 0 ? (
+      <p className="text-sm text-muted-foreground italic">
+        No hay licencias de este tipo para este empleado.
+      </p>
+    ) : (
+      <div className="space-y-2">
+        {filas.map((f) => (
+          <div key={clave(f)} className="grid grid-cols-[1fr_5rem_6rem] gap-3 items-center">
+            <span className="text-sm text-foreground">{f.categoria}</span>
+            <span className="text-sm text-muted-foreground tabular-nums">{f.anio}</span>
+            <input
+              type="number"
+              min={0}
+              inputMode="numeric"
+              placeholder="—"
+              value={valorDe(f)}
+              onChange={(e) => onEditar(f, e.target.value)}
+              className="w-full rounded border border-border bg-background px-2 py-1 text-sm text-foreground text-right tabular-nums"
+              aria-label={`Dias pendientes de ${f.categoria} ${f.anio}`}
+            />
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
 export const CargaInicialLicenciasTab = ({ employee }: { employee: Employee }) => {
   const [catalogo, setCatalogo] = useState<CatalogoCargaInicial | null>(null);
   const [cambios, setCambios] = useState<Map<string, number | null>>(new Map());
@@ -91,39 +132,6 @@ export const CargaInicialLicenciasTab = ({ employee }: { employee: Employee }) =
 
   if (!catalogo) return null;
 
-  const Bloque = ({ titulo, ayuda, filas }: {
-    titulo: string; ayuda: string; filas: SaldoCargaInicial[];
-  }) => (
-    <div className="bg-card border border-border rounded-lg p-4">
-      <h3 className="font-heading font-semibold text-foreground">{titulo}</h3>
-      <p className="text-xs text-muted-foreground mb-3">{ayuda}</p>
-      {filas.length === 0 ? (
-        <p className="text-sm text-muted-foreground italic">
-          No hay licencias de este tipo para este empleado.
-        </p>
-      ) : (
-        <div className="space-y-2">
-          {filas.map((f) => (
-            <div key={clave(f)} className="grid grid-cols-[1fr_5rem_6rem] gap-3 items-center">
-              <span className="text-sm text-foreground">{f.categoria}</span>
-              <span className="text-sm text-muted-foreground tabular-nums">{f.anio}</span>
-              <input
-                type="number"
-                min={0}
-                inputMode="numeric"
-                placeholder="—"
-                value={valorDe(f)}
-                onChange={(e) => editar(f, e.target.value)}
-                className="w-full rounded border border-border bg-background px-2 py-1 text-sm text-foreground text-right tabular-nums"
-                aria-label={`Dias pendientes de ${f.categoria} ${f.anio}`}
-              />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-
   return (
     <div className="p-4 sm:p-6 space-y-6">
       <div className="rounded-xl border-l-4 border-warning bg-warning-soft p-4">
@@ -144,11 +152,15 @@ export const CargaInicialLicenciasTab = ({ employee }: { employee: Employee }) =
           titulo="Se arrastran de años anteriores"
           ayuda="Las vacaciones se acumulan y vencen a los 3 años. Cargar el saldo de cada año por separado."
           filas={catalogo.acumulables}
+          valorDe={valorDe}
+          onEditar={editar}
         />
         <Bloque
           titulo="Solo del año en curso"
           ayuda="Estas licencias no se arrastran: lo que no se usa en el año no pasa al siguiente."
           filas={catalogo.anuales}
+          valorDe={valorDe}
+          onEditar={editar}
         />
       </div>
 
