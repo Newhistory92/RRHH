@@ -1,62 +1,20 @@
 "use client";
 
-// Guia de licencias para empleados y autoridades.
+// Guia de licencias para quien las solicita.
 // Explica el mecanismo -- lo verificable contra el codigo -- y no el encuadre
-// normativo, que no vive en este sistema. Los dias de cada tipo se leen de la
-// configuracion en vivo para que el documento no quede desactualizado cuando
-// RRHH cambia un tope.
+// normativo, que no vive en este sistema.
+//
+// La tabla de dias por categoria vive en GuiaLicenciasRRHHModal (pantalla
+// Lista de Empleados), no aca: ese dato es de gestion, no algo que quien pide
+// una licencia necesite para entender como funciona el circuito.
 
-import { useEffect, useState } from "react";
 import { X, CalendarDays, Clock, ShieldCheck, Info, AlertTriangle } from "lucide-react";
-import { apiClient } from "@/app/util/apiClient";
-
-interface ConfigLicencia {
-  categoria: string;
-  diasTotales: number;
-}
-
-interface DiasPorCategoria {
-  categoria: string;
-  // Un string ("N días") cuando todos los contratos coinciden en el año
-  // actual; un rango ("N–M días según contrato") cuando no.
-  texto: string;
-}
 
 interface Props {
   onClose: () => void;
 }
 
 export function ComoFuncionanLicenciasModal({ onClose }: Props) {
-  const [tipos, setTipos] = useState<DiasPorCategoria[]>([]);
-
-  useEffect(() => {
-    const anioActual = new Date().getFullYear();
-    apiClient
-      .get<{ configuraciones: ConfigLicencia[] }>(`/licenses/configuracion?anio=${anioActual}`)
-      .then((r) => {
-        // Una categoria puede tener distintos diasTotales segun el tipo de
-        // contrato dentro del mismo año (por ejemplo "contratado" vs.
-        // "permanente"), asi que se juntan todos los valores vistos en vez
-        // de quedarse con el primero que aparezca.
-        const valoresPorCategoria = new Map<string, Set<number>>();
-        for (const c of r.configuraciones ?? []) {
-          if (!valoresPorCategoria.has(c.categoria)) valoresPorCategoria.set(c.categoria, new Set());
-          valoresPorCategoria.get(c.categoria)!.add(c.diasTotales);
-        }
-        setTipos(
-          [...valoresPorCategoria].map(([categoria, valores]) => {
-            const ordenados = [...valores].sort((a, b) => a - b);
-            const texto =
-              ordenados.length === 1
-                ? `${ordenados[0]} días`
-                : `${ordenados[0]}–${ordenados[ordenados.length - 1]} días según contrato`;
-            return { categoria, texto };
-          })
-        );
-      })
-      .catch(() => setTipos([]));
-  }, []);
-
   return (
     <div
       className="fixed inset-0 bg-overlay flex justify-center items-start z-50 p-4 overflow-y-auto"
@@ -144,7 +102,7 @@ export function ComoFuncionanLicenciasModal({ onClose }: Props) {
             </p>
           </section>
 
-          <section className="mb-8">
+          <section>
             <div className="flex items-center gap-2 mb-3">
               <Info size={20} className="text-primary shrink-0" aria-hidden="true" />
               <h3 className="font-heading text-lg font-semibold text-foreground">
@@ -157,33 +115,6 @@ export function ComoFuncionanLicenciasModal({ onClose }: Props) {
               <Paso n="3" texto="Aprobada, RRHH la aplica y recién ahí se descuentan los días de tu saldo." ultimo />
             </div>
           </section>
-
-          {tipos.length > 0 && (
-            <section>
-              <h3 className="font-heading text-lg font-semibold text-foreground mb-3">
-                Días por tipo de licencia
-              </h3>
-              <p className="text-sm text-muted-foreground mb-3">
-                Los valores vigentes según la configuración actual. Si RRHH los
-                cambia, este listado lo refleja solo.
-              </p>
-              <div className="rounded-xl border border-border overflow-hidden">
-                {tipos.map((t, i) => (
-                  <div
-                    key={t.categoria}
-                    className={`grid grid-cols-[1fr_10rem] gap-3 p-3 bg-card ${
-                      i === tipos.length - 1 ? "" : "border-b border-border"
-                    }`}
-                  >
-                    <span className="text-sm text-foreground">{t.categoria}</span>
-                    <span className="text-sm text-muted-foreground text-right tabular-nums">
-                      {t.texto}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
         </div>
       </div>
     </div>

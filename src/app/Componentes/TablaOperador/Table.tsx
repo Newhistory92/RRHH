@@ -1,9 +1,10 @@
 "use client"
 import { useState, useMemo } from 'react';
-import { Search, AlertTriangle, Bell, LogOut, ChevronUpIcon, ChevronDownIcon } from 'lucide-react';
+import { Search, AlertTriangle, Bell, LogOut, ChevronUpIcon, ChevronDownIcon, CircleAlert } from 'lucide-react';
 import { StatusBadge, HoursDisplay } from "@/app/util/UiRRHH"
 import { Pagination } from '@/app/Componentes/Pagination/pagination';
 import { Employee, SortDirection, } from '@/app/Interfas/Interfaces';
+import { GuiaLicenciasRRHHModal } from "@/app/Componentes/ModalRRHH/GuiaLicenciasRRHHModal";
 
 export interface EmployeeTableViewProps {
   employees: Employee[];
@@ -35,6 +36,7 @@ export const EmployeeTableView = ({
   onOpenPermissionModal,
   onShowJubilados,
 }: EmployeeTableViewProps) => {
+  const [mostrarGuiaLicencias, setMostrarGuiaLicencias] = useState(false);
   const [filters, setFilters] = useState({
     estado: "",
     departamento: "",
@@ -157,10 +159,19 @@ export const EmployeeTableView = ({
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="sm:flex sm:items-center sm:justify-between">
-        <div className="sm:flex-auto">
+        <div className="sm:flex-auto flex items-center gap-3">
           <h1 className="font-heading text-2xl font-bold leading-6 text-foreground">
             Lista de Empleados
           </h1>
+          <button
+            type="button"
+            onClick={() => setMostrarGuiaLicencias(true)}
+            className="text-muted-foreground hover:text-primary transition-colors"
+            aria-label="Cómo funcionan las licencias"
+            title="Cómo funcionan las licencias"
+          >
+            <CircleAlert size={20} />
+          </button>
         </div>
         <div className="mt-4 flex items-center gap-2 sm:mt-0">
           {/* Antes vivia en un div aparte arriba de este bloque, con
@@ -347,6 +358,10 @@ export const EmployeeTableView = ({
           </div>
         </div>
       </div>
+
+      {mostrarGuiaLicencias && (
+        <GuiaLicenciasRRHHModal onClose={() => setMostrarGuiaLicencias(false)} />
+      )}
     </div>
   );
 };
