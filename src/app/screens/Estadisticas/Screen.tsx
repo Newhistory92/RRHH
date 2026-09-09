@@ -171,7 +171,7 @@ export default function EstadisticasPage() {
                 onClick={() => setComoSeCalcula(true)}
                 title="Cómo se forma el puntaje"
                 aria-label="Cómo se forma el puntaje"
-                className="shrink-0 h-7 w-7 rounded-full bg-warning-soft text-warning border border-warning/40 flex items-center justify-center font-bold text-base hover:bg-warning hover:text-white transition-colors"
+                className="shrink-0 h-7 w-7 rounded-full bg-warning-soft text-warning border border-warning/40 flex items-center justify-center font-bold text-base hover:bg-warning hover:text-white transition-colors animate-heartbeat"
               >
                 !
               </button>

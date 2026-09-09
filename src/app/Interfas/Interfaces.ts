@@ -1333,3 +1333,22 @@ export interface LogSistemaFila {
   tiempoRespuestaMs: number | null;
   requestId: string | null;
 }
+
+/** Una celda de la carga inicial de saldos de licencias. TRANSITORIO:
+ *  se borra junto con la pestaña al terminar la migracion. */
+export interface SaldoCargaInicial {
+  anio: number;
+  categoria: string;
+  /** null = no se cargo nada (rige el calculo del sistema).
+   *  0 = se cargo un cero (no le queda ningun dia). Son distintos. */
+  diasPendientes: number | null;
+  /** Tope de ConfiguracionLicencias para el contrato del empleado, que la
+   *  pantalla usa como valor por defecto del casillero. Viene en null en las
+   *  acumulables: ahi el tope sale de la antiguedad, no de la configuracion. */
+  diasConfigurados: number | null;
+}
+
+export interface CatalogoCargaInicial {
+  acumulables: SaldoCargaInicial[];
+  anuales: SaldoCargaInicial[];
+}

@@ -5,6 +5,7 @@ import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
 import { apiClient } from '@/app/util/apiClient';
 import { FeedbackTab, SiguienteFeedback, FeedbackStatus } from '@/app/Componentes/Encuesta/FeedbackTab';
+import { ComoFuncionaFeedbackModal } from '@/app/Componentes/Encuesta/ComoFuncionaFeedbackModal';
 import { getBackendUrl } from '@/app/util/backendUrl';
 
 const BACKEND_URL = getBackendUrl();
@@ -22,6 +23,7 @@ export default function FeedbackPage() {
   const [status, setStatus] = useState<FeedbackStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mostrarGuia, setMostrarGuia] = useState(false);
   const toast = useRef<Toast>(null);
 
   useEffect(() => {
@@ -121,11 +123,24 @@ export default function FeedbackPage() {
       <Toast ref={toast} />
       <div className="max-w-7xl mx-auto">
         <header className="mb-8 text-center">
-          <h1 className="font-heading text-4xl font-bold text-foreground mb-2">Sistema de Feedback 360°</h1>
+          <div className="flex items-center justify-center gap-3">
+            <h1 className="font-heading text-4xl font-bold text-foreground mb-2">Sistema de Feedback 360°</h1>
+            <button
+              type="button"
+              onClick={() => setMostrarGuia(true)}
+              className="shrink-0 h-7 w-7 rounded-full bg-warning-soft text-warning border border-warning/40 flex items-center justify-center font-bold text-base hover:bg-warning hover:text-white transition-colors animate-heartbeat mb-2"
+              aria-label="En qué consiste esta encuesta"
+              title="En qué consiste esta encuesta"
+            >
+              !
+            </button>
+          </div>
           <p className="text-lg text-muted-foreground">
             Evaluá a tus compañeros y a tu superior directo de forma anónima.
           </p>
         </header>
+
+        {mostrarGuia && <ComoFuncionaFeedbackModal onClose={() => setMostrarGuia(false)} />}
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           <div className="xl:col-span-2">

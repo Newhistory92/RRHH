@@ -6,11 +6,12 @@
 // - Los saldos incluyen diasTotales, consumidos y disponibles por tipo.
 
 import { useRef, useState, useEffect } from "react";
-import { FileText, } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import dynamic from "next/dynamic";
 import { Toast } from 'primereact/toast';
 import { apiClient } from "@/app/util/apiClient";
 import { LicenseHistory, Usuario } from "@/app/Interfas/Interfaces";
+import { ComoFuncionanLicenciasModal } from "@/app/Componentes/ModalRRHH/ComoFuncionanLicenciasModal";
 
 const RequestForm = dynamic(() => import("@/app/GestionLicencias/FormularioLicencia"), { ssr: false });
 const ConteinerLicencia = dynamic(() => import("@/app/GestionLicencias/Licencias"), { ssr: false });
@@ -26,6 +27,7 @@ export default function LicenciasManage() {
   const [misSaldos, setMisSaldos] = useState<any>({});
   // Lista dinámica de supervisores para derivación de aprobaciones (tabla LicenseSupervisor)
   const [supervisores, setSupervisores] = useState<Usuario[]>([]);
+  const [mostrarGuia, setMostrarGuia] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -152,7 +154,17 @@ export default function LicenciasManage() {
         <h1 className="font-heading text-2xl font-bold text-foreground">
           Gestión de Licencias
         </h1>
+        <button
+          type="button"
+          onClick={() => setMostrarGuia(true)}
+          className="shrink-0 h-7 w-7 rounded-full bg-warning-soft text-warning border border-warning/40 flex items-center justify-center font-bold text-base hover:bg-warning hover:text-white transition-colors animate-heartbeat"
+          aria-label="Cómo funcionan las licencias"
+          title="Cómo funcionan las licencias"
+        >
+          !
+        </button>
       </div>
+      {mostrarGuia && <ComoFuncionanLicenciasModal onClose={() => setMostrarGuia(false)} />}
       <main>
         {view === "contenedor" && currentUser && (
           <ConteinerLicencia

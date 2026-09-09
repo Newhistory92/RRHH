@@ -1,0 +1,131 @@
+"use client";
+
+// Guia de licencias para quien las solicita.
+// Explica el mecanismo -- lo verificable contra el codigo -- y no el encuadre
+// normativo, que no vive en este sistema.
+//
+// La tabla de dias por categoria vive en GuiaLicenciasRRHHModal (pantalla
+// Lista de Empleados), no aca: ese dato es de gestion, no algo que quien pide
+// una licencia necesite para entender como funciona el circuito.
+
+import { X, CalendarDays, Clock, ShieldCheck, Info, AlertTriangle } from "lucide-react";
+
+interface Props {
+  onClose: () => void;
+}
+
+export function ComoFuncionanLicenciasModal({ onClose }: Props) {
+  return (
+    <div
+      className="fixed inset-0 bg-overlay flex justify-center items-start z-50 p-4 overflow-y-auto"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="licencias-guia-titulo"
+    >
+      <div
+        className="bg-card rounded-2xl shadow-2xl w-full max-w-3xl my-8 relative border border-border"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Cerrar"
+        >
+          <X size={22} />
+        </button>
+
+        <div className="p-6 sm:p-8">
+          <p className="font-mono text-xs tracking-widest uppercase text-muted-foreground mb-2">
+            Guía de uso
+          </p>
+          <h2
+            id="licencias-guia-titulo"
+            className="font-heading text-2xl sm:text-3xl font-bold text-foreground mb-6"
+          >
+            Cómo funcionan las licencias
+          </h2>
+
+          <section className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <CalendarDays size={20} className="text-primary shrink-0" aria-hidden="true" />
+              <h3 className="font-heading text-lg font-semibold text-foreground">
+                Cómo se forma tu saldo
+              </h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3">
+              Cada tipo de licencia tiene una cantidad de días que te corresponden
+              por año. Tu saldo disponible es esa cantidad menos los días que ya
+              te tomaste y fueron aprobados. Una solicitud pendiente todavía no
+              descuenta: recién lo hace cuando la aprueban.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <Clock size={20} className="text-primary shrink-0" aria-hidden="true" />
+              <h3 className="font-heading text-lg font-semibold text-foreground">
+                Qué se acumula y qué no
+              </h3>
+            </div>
+            <div className="rounded-xl border-l-4 border-warning bg-warning-soft p-4 mb-3">
+              <div className="flex gap-3">
+                <AlertTriangle className="text-warning shrink-0 mt-0.5" size={18} aria-hidden="true" />
+                <p className="text-sm text-warning-soft-foreground">
+                  <strong>Solo las vacaciones se acumulan, y vencen a los 3 años.</strong>{" "}
+                  Lo que no uses de un año pasa al siguiente, pero el sistema da de
+                  baja automáticamente el saldo que cumple tres años sin usarse.
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              El resto de las licencias es anual: lo que no se usa dentro del año
+              no pasa al siguiente. No hace falta pedirlas para "no perderlas" —
+              se otorgan cuando ocurre el hecho que las justifica.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <ShieldCheck size={20} className="text-primary shrink-0" aria-hidden="true" />
+              <h3 className="font-heading text-lg font-semibold text-foreground">
+                Por qué no ves todas las licencias
+              </h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              La lista se adapta a cada persona. Las licencias por nacimiento y por
+              embarazo se muestran según corresponda, y las de encuadre médico o
+              excepcional — accidente de trabajo, enfermedad profesional, licencia
+              sin goce de haberes — las gestiona RRHH directamente y no aparecen
+              para solicitarlas por el circuito común.
+            </p>
+          </section>
+
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <Info size={20} className="text-primary shrink-0" aria-hidden="true" />
+              <h3 className="font-heading text-lg font-semibold text-foreground">
+                El recorrido de una solicitud
+              </h3>
+            </div>
+            <div className="rounded-xl border border-border overflow-hidden">
+              <Paso n="1" texto="Elegís el tipo de licencia y las fechas. El sistema cuenta los días hábiles y verifica que no superes tu saldo." />
+              <Paso n="2" texto="La solicitud le llega a tu superior, que la aprueba o la rechaza." />
+              <Paso n="3" texto="Aprobada, RRHH la aplica y recién ahí se descuentan los días de tu saldo." ultimo />
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Paso({ n, texto, ultimo }: { n: string; texto: string; ultimo?: boolean }) {
+  return (
+    <div className={`grid grid-cols-[2rem_1fr] gap-3 p-3 bg-card ${ultimo ? "" : "border-b border-border"}`}>
+      <span className="font-mono text-sm font-semibold text-primary">{n}</span>
+      <span className="text-sm text-muted-foreground">{texto}</span>
+    </div>
+  );
+}
