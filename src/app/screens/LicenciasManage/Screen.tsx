@@ -6,7 +6,7 @@
 // - Los saldos incluyen diasTotales, consumidos y disponibles por tipo.
 
 import { useRef, useState, useEffect } from "react";
-import { FileText, CircleAlert } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import dynamic from "next/dynamic";
 import { Toast } from 'primereact/toast';
 import { apiClient } from "@/app/util/apiClient";
@@ -157,11 +157,11 @@ export default function LicenciasManage() {
         <button
           type="button"
           onClick={() => setMostrarGuia(true)}
-          className="text-warning hover:text-warning/80 transition-colors"
+          className="shrink-0 h-7 w-7 rounded-full bg-warning-soft text-warning border border-warning/40 flex items-center justify-center font-bold text-base hover:bg-warning hover:text-white transition-colors animate-heartbeat"
           aria-label="Cómo funcionan las licencias"
           title="Cómo funcionan las licencias"
         >
-          <CircleAlert size={26} />
+          !
         </button>
       </div>
       {mostrarGuia && <ComoFuncionanLicenciasModal onClose={() => setMostrarGuia(false)} />}

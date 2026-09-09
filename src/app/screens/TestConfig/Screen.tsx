@@ -1,6 +1,5 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { CircleAlert } from 'lucide-react';
 import { TechnicalTests } from '@/app/Componentes/TestComponent/TechnicalTests';
 import { Test, TestsByProfession, SoftSkill, AcademicTitleMapping } from "@/app/Interfas/Interfaces";
 import { apiClient } from '@/app/util/apiClient';
@@ -156,11 +155,11 @@ export default function TestPage(){
             <button
               type="button"
               onClick={() => setMostrarGuia(true)}
-              className="text-warning hover:text-warning/80 transition-colors mb-2"
+              className="shrink-0 h-7 w-7 rounded-full bg-warning-soft text-warning border border-warning/40 flex items-center justify-center font-bold text-base hover:bg-warning hover:text-white transition-colors animate-heartbeat mb-2"
               aria-label="Cómo funciona Gestión de Tests"
               title="Cómo funciona Gestión de Tests"
             >
-              <CircleAlert size={26} />
+              !
             </button>
           </div>
           <p className="text-muted-foreground">

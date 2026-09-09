@@ -1,6 +1,6 @@
 "use client"
 import { useState, useMemo } from 'react';
-import { Search, AlertTriangle, Bell, LogOut, ChevronUpIcon, ChevronDownIcon, CircleAlert } from 'lucide-react';
+import { Search, AlertTriangle, Bell, LogOut, ChevronUpIcon, ChevronDownIcon } from 'lucide-react';
 import { StatusBadge, HoursDisplay } from "@/app/util/UiRRHH"
 import { Pagination } from '@/app/Componentes/Pagination/pagination';
 import { Employee, SortDirection, } from '@/app/Interfas/Interfaces';
@@ -166,11 +166,11 @@ export const EmployeeTableView = ({
           <button
             type="button"
             onClick={() => setMostrarGuiaLicencias(true)}
-            className="text-warning hover:text-warning/80 transition-colors"
+            className="shrink-0 h-7 w-7 rounded-full bg-warning-soft text-warning border border-warning/40 flex items-center justify-center font-bold text-base hover:bg-warning hover:text-white transition-colors animate-heartbeat"
             aria-label="Cómo funcionan las licencias"
             title="Cómo funcionan las licencias"
           >
-            <CircleAlert size={26} />
+            !
           </button>
         </div>
         <div className="mt-4 flex items-center gap-2 sm:mt-0">

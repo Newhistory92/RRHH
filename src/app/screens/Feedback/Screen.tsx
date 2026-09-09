@@ -1,5 +1,5 @@
 "use client"
-import { BarChart, User, RefreshCw, CircleAlert } from 'lucide-react';
+import { BarChart, User, RefreshCw } from 'lucide-react';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
@@ -128,11 +128,11 @@ export default function FeedbackPage() {
             <button
               type="button"
               onClick={() => setMostrarGuia(true)}
-              className="text-warning hover:text-warning/80 transition-colors mb-2"
+              className="shrink-0 h-7 w-7 rounded-full bg-warning-soft text-warning border border-warning/40 flex items-center justify-center font-bold text-base hover:bg-warning hover:text-white transition-colors animate-heartbeat mb-2"
               aria-label="En qué consiste esta encuesta"
               title="En qué consiste esta encuesta"
             >
-              <CircleAlert size={26} />
+              !
             </button>
           </div>
           <p className="text-lg text-muted-foreground">
