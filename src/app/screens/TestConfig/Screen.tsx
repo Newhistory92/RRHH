@@ -1,8 +1,10 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import { CircleAlert } from 'lucide-react';
 import { TechnicalTests } from '@/app/Componentes/TestComponent/TechnicalTests';
 import { Test, TestsByProfession, SoftSkill, AcademicTitleMapping } from "@/app/Interfas/Interfaces";
 import { apiClient } from '@/app/util/apiClient';
+import { ComoFuncionanTestsModal } from '@/app/Componentes/ModalRRHH/ComoFuncionanTestsModal';
 
 type ActiveTab = "technical";
 
@@ -12,6 +14,7 @@ export default function TestPage(){
 
   // Loading State
   const [loading, setLoading] = useState<boolean>(true);
+  const [mostrarGuia, setMostrarGuia] = useState(false);
 
   // Technical Tests State
   const [testsByProfession, setTestsByProfession] = useState<TestsByProfession>({});
@@ -146,13 +149,26 @@ export default function TestPage(){
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="font-heading text-4xl font-bold text-foreground mb-2">
-            Gestión de Tests
-          </h1>
+          <div className="flex items-center gap-3">
+            <h1 className="font-heading text-4xl font-bold text-foreground mb-2">
+              Gestión de Tests
+            </h1>
+            <button
+              type="button"
+              onClick={() => setMostrarGuia(true)}
+              className="text-muted-foreground hover:text-primary transition-colors mb-2"
+              aria-label="Cómo funciona Gestión de Tests"
+              title="Cómo funciona Gestión de Tests"
+            >
+              <CircleAlert size={22} />
+            </button>
+          </div>
           <p className="text-muted-foreground">
             Administra tests técnicos para diferentes profesiones
           </p>
         </div>
+
+        {mostrarGuia && <ComoFuncionanTestsModal onClose={() => setMostrarGuia(false)} />}
 
         {/* Tab Navigation */}
         <div className="flex border-b border-border mb-6">
