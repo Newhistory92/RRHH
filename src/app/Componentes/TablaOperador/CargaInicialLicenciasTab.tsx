@@ -89,23 +89,50 @@ export const CargaInicialLicenciasTab = ({ employee }: { employee: Employee }) =
     const siguiente = new Map(cambios);
     // Vacio y cero son distintos: vacio deja que rija el calculo del sistema,
     // cero afirma que no le queda ningun dia.
-    siguiente.set(clave(fila), crudo.trim() === "" ? null : Number(crudo));
+    //
+    // Lo que no sea un numero finito se trata como vacio: sin esto, un NaN
+    // viajaba como null en el JSON y el backend contestaba un 422 crudo en
+    // vez del mensaje que tiene preparado.
+    const n = Number(crudo);
+    const limpio = crudo.trim() === "" || !Number.isFinite(n) ? null : n;
+    siguiente.set(clave(fila), limpio);
     setCambios(siguiente);
   };
 
-  const valorDe = (fila: SaldoCargaInicial): string => {
+  // El valor que rige para un casillero, en orden de prioridad: lo que RRHH
+  // acaba de escribir, lo que ya estaba guardado, y por ultimo el tope
+  // configurado como sugerencia. Lo usan tanto el input como el guardado: si
+  // se calcularan por separado, se guardaria algo distinto de lo que se ve.
+  const efectivo = (fila: SaldoCargaInicial): number | null => {
     const k = clave(fila);
-    const v = cambios.has(k) ? cambios.get(k)! : fila.diasPendientes;
+    if (cambios.has(k)) return cambios.get(k)!;
+    // != null a proposito: un 0 ya guardado tiene que ganarle al default.
+    if (fila.diasPendientes != null) return fila.diasPendientes;
+    return fila.diasConfigurados;
+  };
+
+  const valorDe = (fila: SaldoCargaInicial): string => {
+    const v = efectivo(fila);
     return v === null || v === undefined ? "" : String(v);
   };
 
+  // Todo casillero con un numero se guarda, no solo los editados: la pantalla
+  // llega con las anuales ya completas con el tope configurado, y la idea es
+  // que RRHH revise, corrija las excepciones y guarde de una sola vez.
+  const aGuardar = (): { anio: number; categoria: string; diasPendientes: number }[] => {
+    if (!catalogo) return [];
+    return [...catalogo.acumulables, ...catalogo.anuales]
+      .map((f) => ({ fila: f, dias: efectivo(f) }))
+      .filter((x) => x.dias !== null && x.dias !== undefined)
+      .map((x) => ({
+        anio: x.fila.anio,
+        categoria: x.fila.categoria,
+        diasPendientes: x.dias as number,
+      }));
+  };
+
   const guardar = async () => {
-    const saldos = Array.from(cambios.entries())
-      .filter(([, dias]) => dias !== null)
-      .map(([k, dias]) => {
-        const [anio, categoria] = k.split("|");
-        return { anio: Number(anio), categoria, diasPendientes: dias as number };
-      });
+    const saldos = aGuardar();
 
     if (saldos.length === 0) return;
 
@@ -140,9 +167,11 @@ export const CargaInicialLicenciasTab = ({ employee }: { employee: Employee }) =
           <p className="text-sm text-warning-soft-foreground">
             <strong>Carga inicial, por unica vez.</strong> Se cargan los dias que
             al empleado <strong>le quedan por tomarse</strong>, no los que ya se
-            tomo. Dejar un casillero vacio significa no cargar nada y que rija el
-            calculo del sistema; escribir <strong>0</strong> significa que no le
-            queda ningun dia.
+            tomo. Las licencias del año en curso vienen con el tope configurado
+            ya puesto: revisá y corregí solo las que el empleado ya usó. Al
+            guardar se registran <strong>todos los casilleros con un numero</strong>,
+            no solo los que edites. Un casillero vacio no se guarda; escribir{" "}
+            <strong>0</strong> significa que no le queda ningun dia.
           </p>
         </div>
       </div>
@@ -169,7 +198,7 @@ export const CargaInicialLicenciasTab = ({ employee }: { employee: Employee }) =
 
       <button
         onClick={guardar}
-        disabled={guardando || cambios.size === 0}
+        disabled={guardando || aGuardar().length === 0}
         className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
       >
         <Save size={16} />
