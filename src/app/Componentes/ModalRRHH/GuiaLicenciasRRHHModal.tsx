@@ -176,6 +176,20 @@ export function GuiaLicenciasRRHHModal({ onClose }: Props) {
               fecha, el sistema las mide contra el ciclo al que van a pertenecer,
               no contra el de hoy.
             </p>
+            <div className="rounded-xl border-l-4 border-primary bg-muted p-4 mb-3">
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">
+                  Por eso el año que figura en el saldo puede ser el anterior al
+                  calendario.
+                </strong>{" "}
+                En septiembre de 2026, las vacaciones de una persona aparecen bajo
+                &ldquo;Año 2025&rdquo;: es el período vigente, no un saldo
+                vencido. Ese período se muestra siempre, aunque nadie le haya
+                cargado nada y no tenga consumo — los días salen de su antigüedad
+                o de la configuración de su contrato. Los períodos anteriores, en
+                cambio, solo aparecen si tienen saldo cargado o consumo real.
+              </p>
+            </div>
             <p className="text-sm text-muted-foreground">
               Desde <strong>Carga Manual</strong> (en el perfil de la persona,
               solapa Historial de Licencias), RRHH puede registrar vacaciones
