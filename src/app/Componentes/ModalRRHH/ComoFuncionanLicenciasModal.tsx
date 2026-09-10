@@ -94,9 +94,8 @@ export function ComoFuncionanLicenciasModal({ onClose }: Props) {
               </h3>
             </div>
             <p className="text-sm text-muted-foreground">
-              La lista se adapta a cada persona. Las licencias por nacimiento y por
-              embarazo se muestran según corresponda, y las de encuadre médico o
-              excepcional — accidente de trabajo, enfermedad profesional, licencia
+              La lista de encuadre médico o
+              excepcional — accidente de trabajo, guarda, licencia
               sin goce de haberes — las gestiona RRHH directamente y no aparecen
               para solicitarlas por el circuito común. Tampoco figuran en tu saldo
               hasta que RRHH te carga los días que correspondan.
@@ -113,15 +112,11 @@ export function ComoFuncionanLicenciasModal({ onClose }: Props) {
             <p className="text-sm text-muted-foreground mb-3">
               Las vacaciones no se cuentan por año calendario sino por período,
               y cada período se habilita el <strong>1° de octubre</strong>. Hasta
-              esa fecha sigue vigente el período anterior: por eso, si estás en
-              septiembre de 2026, tu saldo de vacaciones aparece bajo{" "}
-              <strong>&ldquo;Año 2025&rdquo;</strong> — y esos son los días que
-              podés tomar hoy, no un saldo vencido. El 1° de octubre de 2026 se
-              abre el período 2026.
+              esa fecha sigue vigente el período anterior y esos son los días que
+              podés tomar hoy.
             </p>
             <p className="text-sm text-muted-foreground mb-3">
-              Ese año aparece siempre, incluso sin movimientos: es el período
-              que te corresponde. Los períodos anteriores solo se muestran si
+              Los períodos anteriores solo se muestran si
               tienen algo real — días que te quedaron sin usar o licencias ya
               tomadas.
             </p>

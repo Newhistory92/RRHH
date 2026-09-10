@@ -88,7 +88,7 @@ export function ComoFuncionaFeedbackModal({ onClose }: Props) {
               </h3>
             </div>
             <p className="text-sm text-muted-foreground">
-              Los resultados de una persona no se muestran hasta que la evaluaron
+              Los resultados de una persona no se muestran Nombres y  hasta que la evaluaron
               al menos <strong>3 personas distintas</strong>. Por debajo de ese
               piso, tu respuesta individual sería fácil de identificar, así que el
               sistema directamente no muestra nada hasta juntar ese mínimo.
@@ -103,8 +103,8 @@ export function ComoFuncionaFeedbackModal({ onClose }: Props) {
               </h3>
             </div>
             <p className="text-sm text-muted-foreground">
-              La encuesta se abre por ciclos — según cómo esté configurado, cada
-              trimestre, semestre o año. Dentro de un mismo ciclo podés ir
+              La encuesta se abre , cada
+              trimestre. Dentro de un mismo ciclo podés ir
               contestando de a una pregunta por vez; el sistema te muestra la
               siguiente pendiente cada vez que entrás.
             </p>

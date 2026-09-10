@@ -56,7 +56,7 @@ export function ComoFuncionanTestsModal({ onClose }: Props) {
             </div>
             <p className="text-sm text-muted-foreground">
               Esta pantalla arma el catálogo: los tests técnicos con sus preguntas,
-              agrupados por profesión, y el catálogo de habilidades blandas que las
+              agrupados por profesión que las
               personas se autoevalúan en su CV. Acá no rinde el test nadie — esto
               es lo que después le aparece disponible a cada empleado.
             </p>
