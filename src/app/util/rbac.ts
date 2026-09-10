@@ -33,12 +33,9 @@ export const PAGE_CONFIG: PageConfig[] = [
   { id: "organigrama", label: "Organigrama", icon: "GitMerge", section: "Organización", permiso: "organigrama.ver" },
   { id: "test", label: "Tests", icon: "ClipboardList", section: "Aprendizaje", permiso: "test.gestionar" },
   { id: "editar-perfil", label: "Mi Perfil", icon: "UserCircle", section: "Agente", permiso: "perfil.editar", ocultaEnSidebar: true },
-  // licencias.propias lo tienen todos los roles (esta en _BASE, backend
-  // app/permisos.py), asi que no hay permiso positivo que distinga "solo
-  // USER". Se oculta con un permiso elevado que ningun USER tiene: uno por
-  // cada rol de gestion (RRHH, ESTADISTA, TECNICO/PATRIMONIO, ADMIN via
-  // comodin). Sigue accesible por el menu de perfil para todos los roles.
-  { id: "licencias", label: "Licencias", icon: "FileText", section: "Organización", permiso: "licencias.propias", ocultaSiTienePermiso: ["rrhh.gestionar", "estadisticas.ver", "activos.configurar", "admin.gestionar"] },
+  // Ya esta en el menu de perfil (arriba a la derecha) para todos los
+  // roles, asi que no hace falta duplicarla en el sidebar.
+  { id: "licencias", label: "Licencias", icon: "FileText", section: "Organización", permiso: "licencias.propias", ocultaEnSidebar: true },
   { id: "documentos", label: "Documentos", icon: "Folder", section: "Agente", permiso: "documentos.propios", ocultaSiTienePermiso: ["rrhh.gestionar", "admin.gestionar"] },
   { id: "feedback", label: "Feedback", icon: "MessageSquare", section: "Agente", permiso: "feedback.participar", ocultaEnSidebar: true },
   { id: "asistencia", label: "Asistencia", icon: "Clock", section: "Agente", permiso: "asistencia.propia" },
