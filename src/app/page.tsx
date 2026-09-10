@@ -53,7 +53,14 @@ export default function App() {
       const token = localStorage.getItem('token');
       const employeeId = localStorage.getItem('employeeId');
       if (!token) {
-        router.push('/');
+        // Sin token no hay nada que cargar en "/": antes esto empujaba a "/"
+        // -la misma ruta en la que ya estábamos-, así que el router no
+        // navegaba a ningún lado e isLoading quedaba en true para siempre,
+        // dejando el "Cargando..." de abajo girando indefinidamente en vez
+        // de avisar y mandar al login. isLoading se deja en true a
+        // propósito: la pantalla sigue en "Cargando..." mientras el router
+        // hace la transición, en vez de destellar el shell sin datos.
+        router.push('/pages/Login');
         return;
       }
 

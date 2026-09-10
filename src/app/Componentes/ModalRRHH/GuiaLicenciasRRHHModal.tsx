@@ -140,12 +140,63 @@ export function GuiaLicenciasRRHHModal({ onClose }: Props) {
                 Por qué cada persona ve un listado distinto
               </h3>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mb-3">
               El listado se adapta a cada persona. Las licencias por nacimiento y
               por embarazo se muestran según corresponda, y las de encuadre médico
-              o excepcional — accidente de trabajo, enfermedad profesional,
-              licencia sin goce de haberes — las gestiona RRHH directamente y no
-              aparecen para que la persona las solicite por el circuito común.
+              o excepcional — por ejemplo accidente de trabajo, enfermedad
+              profesional, licencia sin goce de haberes o guarda o tenencia — las
+              gestiona RRHH directamente y no aparecen en el circuito común.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Estas últimas son de <strong>carga manual</strong>: no tienen un tope
+              anual configurado que la persona consuma por su cuenta, sino que
+              RRHH le asigna el saldo puntualmente (en Carga Inicial de Licencias)
+              cuando corresponde. Recién ahí la categoría aparece en el saldo
+              personal de esa persona, con el número que se cargó — antes de eso
+              no figura para nadie, tenga o no rol de RRHH.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <CalendarDays size={20} className="text-primary shrink-0" aria-hidden="true" />
+              <h3 className="font-heading text-lg font-semibold text-foreground">
+                Ventana y ciclo de vacaciones
+              </h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3">
+              Por circuito común, una persona solo puede solicitar vacaciones
+              entre el <strong>1° de octubre y el 30 de abril</strong>. El sistema
+              rechaza cualquier solicitud de autogestión fuera de ese rango.
+            </p>
+            <p className="text-sm text-muted-foreground mb-3">
+              El saldo de vacaciones del año se habilita el 1° de octubre: hasta
+              esa fecha rige el saldo del año anterior. Por eso, si alguien pide
+              vacaciones antes del 1° de octubre para tomarlas después de esa
+              fecha, el sistema las mide contra el ciclo al que van a pertenecer,
+              no contra el de hoy.
+            </p>
+            <div className="rounded-xl border-l-4 border-primary bg-muted p-4 mb-3">
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">
+                  Por eso el año que figura en el saldo puede ser el anterior al
+                  calendario.
+                </strong>{" "}
+                En septiembre de 2026, las vacaciones de una persona aparecen bajo
+                &ldquo;Año 2025&rdquo;: es el período vigente, no un saldo
+                vencido. Ese período se muestra siempre, aunque nadie le haya
+                cargado nada y no tenga consumo — los días salen de su antigüedad
+                o de la configuración de su contrato. Los períodos anteriores, en
+                cambio, solo aparecen si tienen saldo cargado o consumo real.
+              </p>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Desde <strong>Carga Manual</strong> (en el perfil de la persona,
+              solapa Historial de Licencias), RRHH puede registrar vacaciones
+              fuera de la ventana octubre–abril — por ejemplo, días ya tomados o
+              acordados de otra forma. Esto no relaja el control de saldo: RRHH
+              tampoco puede cargar más días de los que la persona realmente
+              tiene disponibles.
             </p>
           </section>
 
@@ -161,6 +212,11 @@ export function GuiaLicenciasRRHHModal({ onClose }: Props) {
               <Paso n="2" texto="La solicitud le llega a su superior, que la aprueba o la rechaza." />
               <Paso n="3" texto="Aprobada, RRHH la aplica y recién ahí se descuentan los días del saldo." ultimo />
             </div>
+            <p className="text-sm text-muted-foreground mt-3">
+              Si varios años de vacaciones acumuladas cubren la solicitud, el
+              sistema los combina tomando primero los días más antiguos: la nota
+              generada explica cuántos días se toman de cada año.
+            </p>
           </section>
 
           {tipos.length > 0 && (

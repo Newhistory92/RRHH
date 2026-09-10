@@ -25,7 +25,6 @@ import { SoftSkill } from '@/app/Interfas/Interfaces';
 
 interface ConfiguracionLicencia {
     id: number;
-    anio: number;
     tipo: string;       // key del Tipo de Contrato (permanente, contratado, etc)
     categoria: string;  // Nombre de la Licencia (Vacaciones, etc)
     diasTotales: number;
@@ -121,13 +120,13 @@ export default function ConfiguracionGeneral() {
 
 
     // Sorting
-    const [sortField, setSortField] = useState<'anio' | 'tipo' | 'categoria' | 'diasTotales'>('anio');
+    const [sortField, setSortField] = useState<'tipo' | 'categoria' | 'diasTotales'>('categoria');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
     // Modals
     const [showLicenciaModal, setShowLicenciaModal] = useState(false);
     const [isEditingLicencia, setIsEditingLicencia] = useState(false);
-    const [licenciaForm, setLicenciaForm] = useState<Partial<ConfiguracionLicencia>>({ anio: new Date().getFullYear(), tipo: "", categoria: "", diasTotales: 0 });
+    const [licenciaForm, setLicenciaForm] = useState<Partial<ConfiguracionLicencia>>({ tipo: "", categoria: "", diasTotales: 0 });
 
     const [showContractModal, setShowContractModal] = useState(false);
     const [isEditingContract, setIsEditingContract] = useState(false);
@@ -380,8 +379,7 @@ export default function ConfiguracionGeneral() {
     const sortedLicencias = useMemo(() => {
         const filtered = configuraciones.filter(c =>
             c.categoria.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            c.tipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            c.anio.toString().includes(searchTerm)
+            c.tipo.toLowerCase().includes(searchTerm.toLowerCase())
         );
         return [...filtered].sort((a, b) => {
             const valA = a[sortField];
@@ -474,7 +472,7 @@ export default function ConfiguracionGeneral() {
                                         </div>
                                         <button
                                             onClick={() => {
-                                                setLicenciaForm({ anio: new Date().getFullYear(), tipo: contracts[0]?.key || "", categoria: "", diasTotales: 5 });
+                                                setLicenciaForm({ tipo: contracts[0]?.key || "", categoria: "", diasTotales: 5 });
                                                 setIsEditingLicencia(false);
                                                 setShowLicenciaModal(true);
                                             }}
@@ -488,9 +486,6 @@ export default function ConfiguracionGeneral() {
                                     <table className="w-full text-left border-collapse">
                                         <thead>
                                             <tr className="bg-muted border-b border-border uppercase tracking-wider text-[10px] text-muted-foreground font-bold">
-                                                <th className="px-6 py-4 cursor-pointer hover:text-primary" onClick={() => toggleSort('anio')}>
-                                                    <div className="flex items-center">Año <SortIcon field="anio" /></div>
-                                                </th>
                                                 <th className="px-6 py-4 cursor-pointer hover:text-primary" onClick={() => toggleSort('tipo')}>
                                                     <div className="flex items-center">Contrato / Perfil <SortIcon field="tipo" /></div>
                                                 </th>
@@ -506,7 +501,6 @@ export default function ConfiguracionGeneral() {
                                         <tbody className="divide-y divide-border text-sm">
                                             {sortedLicencias.length > 0 ? sortedLicencias.map((config) => (
                                                 <tr key={config.id} className="hover:bg-muted group">
-                                                    <td className="px-6 py-4 text-muted-foreground font-medium">{config.anio}</td>
                                                     <td className="px-6 py-4">
                                                         <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/15 text-primary">
                                                             {contracts.find(c => c.key === config.tipo)?.nombre || config.tipo}
@@ -788,19 +782,13 @@ export default function ConfiguracionGeneral() {
                     <div className="absolute inset-0 bg-overlay backdrop-blur-sm" onClick={() => setShowLicenciaModal(false)} />
                     <div className="relative bg-card w-full max-w-lg rounded-3xl border border-border shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center mb-6 pb-3 border-b border-border">
-                            <h3 className="font-heading text-lg font-bold text-foreground">{isEditingLicencia ? 'Editar Regla de Licencia' : 'Nueva Regla Anual'}</h3>
+                            <h3 className="font-heading text-lg font-bold text-foreground">{isEditingLicencia ? 'Editar Regla de Licencia' : 'Nueva Regla'}</h3>
                             <button onClick={() => setShowLicenciaModal(false)} className="text-muted-foreground hover:text-foreground"><X size={20} /></button>
                         </div>
                         <form onSubmit={handleSaveLicencia} className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-bold text-foreground mb-1">Año Fiscal</label>
-                                    <input type="number" required className="w-full px-3 py-2 border rounded-xl" value={licenciaForm.anio} onChange={e => setLicenciaForm({ ...licenciaForm, anio: parseInt(e.target.value) })} />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-foreground mb-1">Días Totales</label>
-                                    <input type="number" required min="0" className="w-full px-3 py-2 border rounded-xl" value={licenciaForm.diasTotales || 0} onChange={e => setLicenciaForm({ ...licenciaForm, diasTotales: parseInt(e.target.value) })} />
-                                </div>
+                            <div>
+                                <label className="block text-sm font-bold text-foreground mb-1">Días Totales</label>
+                                <input type="number" required min="0" className="w-full px-3 py-2 border rounded-xl" value={licenciaForm.diasTotales || 0} onChange={e => setLicenciaForm({ ...licenciaForm, diasTotales: parseInt(e.target.value) })} />
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-foreground mb-1">Tipo de Contrato</label>

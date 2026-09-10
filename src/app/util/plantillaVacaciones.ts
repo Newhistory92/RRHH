@@ -53,7 +53,7 @@ export function generarPlantillaVacaciones({
   // licencia con el saldo restante (en vez de una fila vacía con puntos).
   const lineasAdeudadas = licenciasAdeudadas.length > 0
     ? licenciasAdeudadas
-      .map(l => `Año: ${l.anio}          Días restantes: ${l.dias}`)
+      .map(l => `Año: ${l.anio}          Días tomados: ${l.dias}`)
       .join('\n')
     : `Año: ${anioLic}          Días restantes: ${totalDias}`;
 

@@ -26,7 +26,7 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [usuario, setUsuario] = useState("");
   const [roleName, setRoleName] = useState("");
@@ -98,8 +98,17 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
       }}
     >
       <div className="flex h-full items-center justify-between gap-3 px-4 sm:px-6">
+      {/* resolvedTheme (no theme) porque theme puede valer "system" -- lo que
+          hay que saber es como se ve la pagina, no que eligio el usuario.
+          Antes de montar no hay tema resuelto todavia: se muestra el rojo
+          como base fija para que el primer render en servidor y en cliente
+          coincidan (evita el parpadeo de hidratacion). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/meridia.png" alt="Meridia" className="h-8 w-auto shrink-0" />
+      <img
+        src={mounted && resolvedTheme === "dark" ? "/logo-osp-blanco.webp" : "/logo-osp-rojo.webp"}
+        alt="OSP"
+        className="h-[3.125rem] w-auto shrink-0"
+      />
 
       <div className="flex items-center gap-3">
         {/* Campanita con notificaciones reales */}

@@ -55,6 +55,9 @@ const ICONOS: Record<string, React.ReactNode> = {
 
 const getIcon = (tipo: string) => ICONOS[tipo] || <FileText size={14} className="text-primary" />;
 
+// Solo para mostrar: el dato real sigue siendo "Vacaciones" en toda la app.
+const nombreMostrado = (tipo: string) => tipo === 'Vacaciones' ? 'Licencia por vacaciones' : tipo;
+
 const fmt = (d: string | Date) => new Date(d).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
 
 const StatusChip = ({ status, observacion }: { status: LicenseStatus; observacion?: string }) => {
@@ -138,7 +141,7 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
                           <div key={tipo} className="border border-border rounded-xl p-3 hover:border-primary/40 transition">
                             <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
                               {getIcon(tipo)}
-                              <span className="font-medium truncate">{tipo}</span>
+                              <span className="font-medium truncate">{nombreMostrado(tipo)}</span>
                             </div>
                             <div className="flex items-baseline gap-1 mb-1">
                               <p className="text-xl font-bold text-primary">{disponibles}</p>

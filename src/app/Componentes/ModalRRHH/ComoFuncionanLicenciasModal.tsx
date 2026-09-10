@@ -73,9 +73,9 @@ export function ComoFuncionanLicenciasModal({ onClose }: Props) {
               <div className="flex gap-3">
                 <AlertTriangle className="text-warning shrink-0 mt-0.5" size={18} aria-hidden="true" />
                 <p className="text-sm text-warning-soft-foreground">
-                  <strong>Solo las vacaciones se acumulan, y vencen a los 3 años.</strong>{" "}
-                  Lo que no uses de un año pasa al siguiente, pero el sistema da de
-                  baja automáticamente el saldo que cumple tres años sin usarse.
+                  <strong>Solo las licencias por vacaciones se acumulan de un año a otro, con un límite máximo de acumulación de hasta 3 años.</strong>{" "}
+                  El saldo que no se utilice durante un año permanecerá disponible; sin embargo, al cumplirse los 3 años sin utilizarse, 
+                  el sistema dará de baja automáticamente el saldo correspondiente al período más antiguo.
                 </p>
               </div>
             </div>
@@ -94,11 +94,38 @@ export function ComoFuncionanLicenciasModal({ onClose }: Props) {
               </h3>
             </div>
             <p className="text-sm text-muted-foreground">
-              La lista se adapta a cada persona. Las licencias por nacimiento y por
-              embarazo se muestran según corresponda, y las de encuadre médico o
-              excepcional — accidente de trabajo, enfermedad profesional, licencia
+              La lista de encuadre médico o
+              excepcional — accidente de trabajo, guarda, licencia
               sin goce de haberes — las gestiona RRHH directamente y no aparecen
-              para solicitarlas por el circuito común.
+              para solicitarlas por el circuito común. Tampoco figuran en tu saldo
+              hasta que RRHH te carga los días que correspondan.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <CalendarDays size={20} className="text-primary shrink-0" aria-hidden="true" />
+              <h3 className="font-heading text-lg font-semibold text-foreground">
+                Vacaciones: por qué el año que ves puede ser el anterior
+              </h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3">
+              Las vacaciones no se cuentan por año calendario sino por período,
+              y cada período se habilita el <strong>1° de octubre</strong>. Hasta
+              esa fecha sigue vigente el período anterior y esos son los días que
+              podés tomar hoy.
+            </p>
+            <p className="text-sm text-muted-foreground mb-3">
+              Los períodos anteriores solo se muestran si
+              tienen algo real — días que te quedaron sin usar o licencias ya
+              tomadas.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Además, las vacaciones solo pueden solicitarse entre el{" "}
+              <strong>1° de octubre y el 30 de abril</strong>. Si tenés días
+              acumulados de varios períodos, el sistema los combina tomando
+              primero los más antiguos, y la nota que genera aclara cuántos días
+              salen de cada año.
             </p>
           </section>
 

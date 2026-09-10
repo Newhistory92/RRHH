@@ -13,6 +13,9 @@ import { apiClient } from '@/app/util/apiClient';
 import { getAvailableLicenses } from '@/app/util/licenseFilters';
 import { generarPlantillaVacaciones } from '@/app/util/plantillaVacaciones';
 
+// Solo para mostrar: el dato real sigue siendo "Vacaciones" en toda la app.
+const nombreMostradoTipo = (tipo: string) => tipo === 'Vacaciones' ? 'Licencia por vacaciones' : tipo;
+
 // Interfaz para los tipos de licencia devueltos por el backend
 interface TipoDisponible {
   nombre: string;
@@ -246,12 +249,17 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
 
       const filaActual = vacacionesPorAnio.find(v => v.anio === anioActual) || vacacionesPorAnio[0];
 
+      const typeToAllocate = selectedType!.name;
+
+      // La nota tiene que explicar de donde salen los dias de ESTA solicitud,
+      // no cuanto saldo le queda al empleado. La asignacion real (mas antiguo
+      // primero) ya la calcula el useEffect de solicitudDias; aca solo la leemos.
       const licenciasAdeudadas = vacacionesPorAnio
-        .filter(s => s.disponibles > 0 && s.anio !== anioActual)
         .map(s => ({
           anio: s.anio,
-          dias: s.disponibles
-        }));
+          dias: solicitudDias[s.anio]?.[typeToAllocate] || 0
+        }))
+        .filter(s => s.dias > 0);
 
       const totalDisponible = vacacionesPorAnio.reduce((acc, s) => acc + (s.disponibles || 0), 0);
       const totalDiasSaldo = totalDisponible - diasCalculados;
@@ -391,6 +399,8 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
             onChange={e => handleTypeChange(e.value)}
             options={tiposLicencia}
             optionLabel="name"
+            itemTemplate={(option: { name: string }) => nombreMostradoTipo(option.name)}
+            valueTemplate={(option: { name: string } | null) => option ? nombreMostradoTipo(option.name) : 'Seleccioná un tipo...'}
             showClear
             placeholder="Seleccioná un tipo..."
             className="w-full mb-4"
@@ -401,7 +411,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
             {typeKey && tiposData[typeKey] && (
               <div className="border border-border rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold">{typeKey}</span>
+                  <span className="text-sm font-semibold">{nombreMostradoTipo(typeKey)}</span>
                   <span className="text-xs text-muted-foreground">
                     {tiposData[typeKey].consumidos}/{tiposData[typeKey].diasTotales} consumidos
                   </span>
