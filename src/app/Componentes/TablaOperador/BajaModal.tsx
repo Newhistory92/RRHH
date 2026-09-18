@@ -35,7 +35,10 @@ interface Props {
   onHecho: () => void;
 }
 
-const aISO = (d: Date) => d.toISOString().split("T")[0];
+// Desde los componentes locales y no con toISOString(): este pasa a UTC antes
+// de cortar, y en Argentina (UTC-3) entre las 21 y las 24 manda el dia siguiente.
+const aISO = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 export default function BajaModal({
   employeeId,
