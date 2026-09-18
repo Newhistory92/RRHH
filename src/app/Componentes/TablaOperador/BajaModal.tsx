@@ -62,6 +62,8 @@ export default function BajaModal({
   // Aprobaciones que tenía pendientes como supervisor y no se pudieron pasar
   // a su superior: el modal queda abierto avisándolo hasta que RRHH lo lea.
   const [aviso, setAviso] = useState<string | null>(null);
+  // Corregir y cancelar borran la fila sin dejar rastro: piden un paso más.
+  const [confirmandoBorrado, setConfirmandoBorrado] = useState(false);
   const toast = useRef<Toast>(null);
 
   const fallar = (e: unknown) =>
@@ -169,6 +171,31 @@ export default function BajaModal({
               <Button label="Entendido" onClick={onClose} />
             </div>
           </div>
+        ) : baja && confirmandoBorrado ? (
+          <div className="space-y-4">
+            <div className="rounded-lg border border-error bg-error-soft p-3">
+              <p className="text-sm text-error-soft-foreground">
+                {baja.vigente
+                  ? `¿Borrar la baja de ${employeeName}? Se borra como si nunca se hubiera cargado y recupera todos sus permisos. Si volvió a trabajar, lo que corresponde es reincorporarla.`
+                  : `¿Cancelar la baja programada de ${employeeName} para el ${baja.fechaBaja}? Se borra como si nunca se hubiera cargado.`}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Button
+                label={baja.vigente ? "Sí, borrar la baja" : "Sí, cancelarla"}
+                severity="danger"
+                onClick={corregir}
+                disabled={enviando}
+              />
+              <Button
+                label="No, volver"
+                severity="secondary"
+                outlined
+                onClick={() => setConfirmandoBorrado(false)}
+                disabled={enviando}
+              />
+            </div>
+          </div>
         ) : baja && !baja.vigente ? (
           <div className="space-y-4">
             <p className="text-sm text-foreground">
@@ -181,7 +208,7 @@ export default function BajaModal({
                 label="Cancelar baja programada"
                 severity="danger"
                 outlined
-                onClick={corregir}
+                onClick={() => setConfirmandoBorrado(true)}
                 disabled={enviando}
               />
               <Button
@@ -229,7 +256,7 @@ export default function BajaModal({
                 label="Corregir (fue un error)"
                 severity="secondary"
                 outlined
-                onClick={corregir}
+                onClick={() => setConfirmandoBorrado(true)}
                 disabled={enviando}
               />
             </div>

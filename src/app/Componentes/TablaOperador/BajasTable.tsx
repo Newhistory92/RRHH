@@ -99,9 +99,9 @@ export default function BajasTable({ onVolver }: Props) {
         <div>
           <h2 className="font-heading text-xl text-foreground">Bajas</h2>
           <p className="text-sm text-muted-foreground">
-            {total} baja{total === 1 ? "" : "s"} registrada
-            {total === 1 ? "" : "s"}. El saldo de cada persona quedó congelado
-            en su último día.
+            {total} baja{total === 1 ? "" : "s"} efectiva
+            {total === 1 ? "" : "s"}, sin contar las programadas. El saldo de
+            cada persona quedó congelado en su último día.
           </p>
         </div>
         <button

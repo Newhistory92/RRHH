@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 // app/page.tsx — Shell principal de la aplicación.
-// RBAC: usa los códigos de permiso que el backend devuelve al loguear
-// (GET /auth/permisos), y los helpers de util/rbac.ts para navegación
-// y sidebar. No hay IDs de rol en este archivo.
+// RBAC: arranca con los códigos de permiso que guardó el login y los refresca
+// al montar desde GET /auth/permisos; los helpers de util/rbac.ts arman la
+// navegación y el sidebar. No hay IDs de rol en este archivo.
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -36,7 +36,7 @@ import {
   canAccess,
   getDefaultPage,
 } from "@/app/util/rbac";
-import { leerPermisos, tienePermiso } from "@/app/util/permisos";
+import { guardarPermisos, leerPermisos, tienePermiso } from "@/app/util/permisos";
 
 export default function App() {
   const router = useRouter();
@@ -67,6 +67,18 @@ export default function App() {
       const permisosGuardados = leerPermisos();
       setPermisos(permisosGuardados);
       setPage(getDefaultPage(permisosGuardados));
+
+      // Los guardados son los del login. Se refrescan desde el servidor para
+      // que una baja programada que entró en efecto, o una reincorporación, se
+      // reflejen sin tener que volver a loguearse.
+      try {
+        const { permisos: frescos } = await apiClient.get<{ permisos: string[] }>('/auth/permisos');
+        guardarPermisos(frescos);
+        setPermisos(frescos);
+        setPage(getDefaultPage(frescos));
+      } catch (err) {
+        console.error('Error al refrescar permisos:', err);
+      }
 
       // Fetch de datos del empleado — usa apiClient para interceptar 401
       if (employeeId) {
