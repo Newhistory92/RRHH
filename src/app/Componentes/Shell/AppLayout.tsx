@@ -29,7 +29,7 @@ export function AppLayout({
     <div className="min-h-screen bg-background text-foreground">
       {/* El navbar es fixed y cruza todo el ancho, asi que va fuera del
           contenedor desplazado y el contenido compensa su alto con pt-16. */}
-      <AppHeader setPage={setPage} employeeData={employeeData} />
+      <AppHeader setPage={setPage} employeeData={employeeData} permisos={permisos} />
       <AppSidebar
         activePage={activePage}
         setPage={setPage}
