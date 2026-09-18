@@ -29,6 +29,12 @@ const MOTIVOS: MotivoBaja[] = [
   "Abandono de cargo",
 ];
 
+interface RespuestaBaja {
+  vigente: boolean;
+  aprobacionesReasignadas: number;
+  aprobacionesSinReasignar: number;
+}
+
 interface Props {
   employeeId: number;
   employeeName: string;
@@ -53,6 +59,9 @@ export default function BajaModal({
   const [fecha, setFecha] = useState<Date | null>(new Date());
   const [observaciones, setObservaciones] = useState("");
   const [enviando, setEnviando] = useState(false);
+  // Aprobaciones que tenía pendientes como supervisor y no se pudieron pasar
+  // a su superior: el modal queda abierto avisándolo hasta que RRHH lo lea.
+  const [aviso, setAviso] = useState<string | null>(null);
   const toast = useRef<Toast>(null);
 
   const fallar = (e: unknown) =>
@@ -75,12 +84,28 @@ export default function BajaModal({
     }
     setEnviando(true);
     try {
-      await apiClient.post(`/rrhh/employee/${employeeId}/baja`, {
+      const r = await apiClient.post<RespuestaBaja>(`/rrhh/employee/${employeeId}/baja`, {
         motivo,
         fechaBaja: aISO(fecha),
         observaciones: observaciones || null,
       });
       onHecho();
+      const trabadas = r.aprobacionesSinReasignar ?? 0;
+      if (trabadas > 0) {
+        const texto =
+          `${employeeName} tenía ${trabadas} ` +
+          (trabadas === 1 ? "aprobación de licencia pendiente" : "aprobaciones de licencia pendientes") +
+          " como supervisor y no tiene un superior disponible a quien pasárselas. " +
+          "Quedaron sin nadie que las resuelva: asignale un superior o resolvelas desde Licencias.";
+        setAviso(texto);
+        toast.current?.show({
+          severity: "warn",
+          summary: "Aprobaciones sin reasignar",
+          detail: texto,
+          life: 8000,
+        });
+        return;
+      }
       onClose();
     } catch (e) {
       fallar(e);
@@ -123,7 +148,9 @@ export default function BajaModal({
       <Toast ref={toast} />
       <Dialog
         header={
-          !baja
+          aviso
+            ? "Baja registrada"
+            : !baja
             ? "Dar de baja"
             : baja.vigente
               ? "Baja registrada"
@@ -133,7 +160,16 @@ export default function BajaModal({
         style={{ width: "90vw", maxWidth: "540px" }}
         onHide={onClose}
       >
-        {baja && !baja.vigente ? (
+        {aviso ? (
+          <div className="space-y-4">
+            <div className="rounded-lg border border-warning bg-warning-soft p-3">
+              <p className="text-sm text-warning-soft-foreground">{aviso}</p>
+            </div>
+            <div className="flex pt-2">
+              <Button label="Entendido" onClick={onClose} />
+            </div>
+          </div>
+        ) : baja && !baja.vigente ? (
           <div className="space-y-4">
             <p className="text-sm text-foreground">
               <strong>{employeeName}</strong> tiene una baja programada por{" "}
@@ -252,6 +288,10 @@ export default function BajaModal({
                 <li>solo ve su documentación: pierde inicio, CV, asistencia, licencias y encuesta</li>
                 <li>deja de acumular vacaciones y saldo de asistencia</li>
                 <li>pierde las solicitudes de licencia que tenga sin resolver</li>
+                <li>
+                  si es supervisor, sus aprobaciones pendientes pasan a su propio
+                  superior
+                </li>
               </ul>
             </div>
             <div className="flex gap-3 pt-2">
