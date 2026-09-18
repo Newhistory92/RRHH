@@ -229,7 +229,7 @@ export const EmployeeTableView = ({
             }}
           >
             <option value="">Todos los Estados</option>
-            {["Activo", "De licencia", "Parte médico"].map((e) => (
+            {["Activo", "De licencia", "Parte médico", "Baja"].map((e) => (
               <option key={e} value={e}>
                 {e}
               </option>
