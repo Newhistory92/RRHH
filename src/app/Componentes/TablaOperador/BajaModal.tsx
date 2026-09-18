@@ -1,6 +1,8 @@
 "use client";
 
 // Dar de baja a un empleado, corregir el error de carga o reincorporarlo.
+// Con una baja programada -fecha futura, todavía sin efecto- lo único que
+// ofrece es cancelarla: no hay nada de qué reincorporar.
 //
 // Va como acción propia y no como un campo más del formulario de condición
 // laboral: aquel edita datos descriptivos, esto le recorta a una persona todo
@@ -15,7 +17,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { apiClient } from "@/app/util/apiClient";
-import { MotivoBaja } from "@/app/Interfas/Interfaces";
+import { BajaAbierta, MotivoBaja } from "@/app/Interfas/Interfaces";
 
 const MOTIVOS: MotivoBaja[] = [
   "Jubilación",
@@ -30,7 +32,7 @@ const MOTIVOS: MotivoBaja[] = [
 interface Props {
   employeeId: number;
   employeeName: string;
-  bajaVigente: { motivo: string; fechaBaja: string } | null;
+  baja: BajaAbierta | null;
   onClose: () => void;
   onHecho: () => void;
 }
@@ -43,7 +45,7 @@ const aISO = (d: Date) =>
 export default function BajaModal({
   employeeId,
   employeeName,
-  bajaVigente,
+  baja,
   onClose,
   onHecho,
 }: Props) {
@@ -120,17 +122,51 @@ export default function BajaModal({
     <>
       <Toast ref={toast} />
       <Dialog
-        header={bajaVigente ? "Baja registrada" : "Dar de baja"}
+        header={
+          !baja
+            ? "Dar de baja"
+            : baja.vigente
+              ? "Baja registrada"
+              : "Baja programada"
+        }
         visible
         style={{ width: "90vw", maxWidth: "540px" }}
         onHide={onClose}
       >
-        {bajaVigente ? (
+        {baja && !baja.vigente ? (
+          <div className="space-y-4">
+            <p className="text-sm text-foreground">
+              <strong>{employeeName}</strong> tiene una baja programada por{" "}
+              <strong>{baja.motivo}</strong> para el {baja.fechaBaja}. Hasta
+              ese día sigue trabajando con todos sus permisos.
+            </p>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Button
+                label="Cancelar baja programada"
+                severity="danger"
+                outlined
+                onClick={corregir}
+                disabled={enviando}
+              />
+              <Button
+                label="Cerrar"
+                severity="secondary"
+                outlined
+                onClick={onClose}
+                disabled={enviando}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Cancelarla la borra sin dejar rastro, como si nunca se hubiera
+              cargado. Si la fecha era otra, cancelala y cargala de nuevo.
+            </p>
+          </div>
+        ) : baja ? (
           <div className="space-y-4">
             <p className="text-sm text-foreground">
               <strong>{employeeName}</strong> está de baja por{" "}
-              <strong>{bajaVigente.motivo}</strong> desde el{" "}
-              {bajaVigente.fechaBaja}.
+              <strong>{baja.motivo}</strong> desde el{" "}
+              {baja.fechaBaja}.
             </p>
             <div>
               <label className="block text-sm font-semibold mb-1">

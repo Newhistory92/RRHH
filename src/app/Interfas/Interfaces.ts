@@ -396,8 +396,17 @@ export interface Employee {
   performanceReviews: performanceReviews[];
   satisfactionMetrics: satisfactionMetrics;
   criticalEvents: CriticalEvents[];
-  /** La baja vigente de esta persona, o null si sigue trabajando. */
-  baja?: { motivo: string; fechaBaja: string } | null;
+  /** La baja abierta de esta persona (programada o vigente), o null si no
+   *  tiene ninguna. */
+  baja?: BajaAbierta | null;
+}
+
+/** La baja sin reingreso de un empleado. `vigente` false es una baja
+ *  programada: fecha futura, todavía sin efecto, y se puede cancelar. */
+export interface BajaAbierta {
+  motivo: string;
+  fechaBaja: string;
+  vigente: boolean;
 }
 // Department interface
 export interface Department {

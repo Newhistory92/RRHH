@@ -67,7 +67,13 @@ export const EmployeeDetailView = ({
           </div>
         </div>
         <Button
-          label={employee.baja ? 'Ver baja' : 'Dar de baja'}
+          label={
+            !employee.baja
+              ? 'Dar de baja'
+              : employee.baja.vigente
+                ? 'Ver baja'
+                : 'Baja programada'
+          }
           icon="pi pi-user-minus"
           severity="danger"
           outlined
@@ -79,7 +85,7 @@ export const EmployeeDetailView = ({
           <BajaModal
             employeeId={employee.id}
             employeeName={employee.name}
-            bajaVigente={employee.baja ?? null}
+            baja={employee.baja ?? null}
             onClose={() => setMostrarBaja(false)}
             onHecho={() => void onSave?.()}
           />
