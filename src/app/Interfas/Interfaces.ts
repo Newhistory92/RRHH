@@ -1261,20 +1261,39 @@ export interface GlobalStatsData {
   departmentProductivity: { name: string; productividad: number }[];
 }
 
-/** Fila del tablero de jubilados. */
-export interface EmpleadoJubilado {
+export type MotivoBaja =
+  | 'Jubilación'
+  | 'Renuncia'
+  | 'Despido'
+  | 'Fin de contrato'
+  | 'Fallecimiento'
+  | 'Traslado a otro organismo'
+  | 'Abandono de cargo';
+
+/** Estado de una baja: si tiene efecto hoy, si la persona volvió, o si está
+ *  cargada con fecha futura y todavía no aplica. */
+export type EstadoBaja = 'vigente' | 'reincorporada' | 'programada';
+
+/** Fila del tablero de bajas. Cada fila es un evento de baja, no una persona:
+ *  quien se fue, volvió y se fue de nuevo aparece dos veces. */
+export interface EmpleadoBaja {
   id: number;
+  employeeId: number;
   name: string;
   dni: string | null;
   email: string | null;
   photo: string | null;
-  status: string;
   departamento: string | null;
   oficina: string | null;
   tipoContrato: string | null;
+  motivo: MotivoBaja;
+  observaciones: string | null;
   fechaIngreso: string | null;
-  fechaJubilacion: string | null;
+  fechaBaja: string | null;
+  fechaReingreso: string | null;
+  antiguedadAnios: number | null;
   saldoFinal: number;
+  estado: EstadoBaja;
 }
 
 /** Fila del tablero de importación de usuarios institucionales. */

@@ -5,7 +5,7 @@ import { Toast } from "primereact/toast";
 import { EmployeeDetailView } from "@/app/Componentes/TablaOperador/Perfildetail";
 import { MessagesView } from "@/app/Componentes/TablaOperador/MensajeDetail";
 import { EmployeeTableView } from "@/app/Componentes/TablaOperador/Table";
-import JubiladosTable from "@/app/Componentes/TablaOperador/JubiladosTable";
+import BajasTable from "@/app/Componentes/TablaOperador/BajasTable";
 import {LicenseDetailModal,PermissionModal} from "@/app/Componentes/ModalRRHH/LicenseModal";
 import { getBackendUrl } from "@/app/util/backendUrl";
 
@@ -23,7 +23,7 @@ export interface ArchivedMessage extends Message {
   employeeName: string;
 }
 export interface ViewState {
-  name: "table" | "detail" | "messages" | "jubilados";
+  name: "table" | "detail" | "messages" | "bajas";
   id?: number;
 }
 export default function RecursosHumanosPage() {
@@ -146,9 +146,9 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
             onApplyLicense={handleApplyLicense}
           />
         );
-      case "jubilados":
+      case "bajas":
         return (
-          <JubiladosTable onVolver={() => setCurrentView({ name: "table" })} />
+          <BajasTable onVolver={() => setCurrentView({ name: "table" })} />
         );
       case "table":
       default:
@@ -160,7 +160,7 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
             }
             onShowMessages={() => setCurrentView({ name: "messages" })}
             onOpenPermissionModal={setPermissionModalEmployeeId}
-            onShowJubilados={() => setCurrentView({ name: "jubilados" })}
+            onShowBajas={() => setCurrentView({ name: "bajas" })}
           />
         );
     }
