@@ -320,8 +320,6 @@ export interface CondicionLaboral {
   categoria: string;
   fechaCategoria: Date | null;
   position: string;
-  /** Fecha de jubilación. Con fecha cumplida el empleado queda desactivado. */
-  fechaJubilacion: Date | null;
 }
 // export interface SalaryHistory {
 //   currentSalary: number;
@@ -398,6 +396,8 @@ export interface Employee {
   performanceReviews: performanceReviews[];
   satisfactionMetrics: satisfactionMetrics;
   criticalEvents: CriticalEvents[];
+  /** La baja vigente de esta persona, o null si sigue trabajando. */
+  baja?: { motivo: string; fechaBaja: string } | null;
 }
 // Department interface
 export interface Department {
