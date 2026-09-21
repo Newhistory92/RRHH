@@ -13,6 +13,8 @@ import { EmpleadoBaja } from "@/app/Interfas/Interfaces";
 
 interface Props {
   onVolver: () => void;
+  /** Abre el perfil: es desde ahí que RRHH corrige, cancela o reincorpora. */
+  onSelectEmployee: (employeeId: number) => void;
 }
 
 interface Respuesta {
@@ -27,7 +29,7 @@ const ETIQUETA_ESTADO: Record<EmpleadoBaja["estado"], string> = {
   programada: "Programada",
 };
 
-export default function BajasTable({ onVolver }: Props) {
+export default function BajasTable({ onVolver, onSelectEmployee }: Props) {
   const [datos, setDatos] = useState<Respuesta | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -102,6 +104,10 @@ export default function BajasTable({ onVolver }: Props) {
             {total} baja{total === 1 ? "" : "s"} efectiva
             {total === 1 ? "" : "s"}, sin contar las programadas. El saldo de
             cada persona quedó congelado en su último día.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Hacé clic en una fila para abrir el perfil y corregir, cancelar o
+            reincorporar.
           </p>
         </div>
         <button
@@ -178,7 +184,11 @@ export default function BajasTable({ onVolver }: Props) {
           </thead>
           <tbody>
             {filtradas.map((b) => (
-              <tr key={b.id} className="border-b border-border last:border-0">
+              <tr
+                key={b.id}
+                onClick={() => onSelectEmployee(b.employeeId)}
+                className="border-b border-border last:border-0 cursor-pointer transition-colors hover:bg-muted"
+              >
                 <td className="py-3 px-4 text-foreground">{b.name}</td>
                 <td className="py-3 px-4 text-muted-foreground">{b.dni ?? "—"}</td>
                 <td className="py-3 px-4 text-muted-foreground">

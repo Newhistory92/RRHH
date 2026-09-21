@@ -17,6 +17,8 @@ export interface EmployeeTableViewProps {
 export interface ViewState {
   name: 'table' | 'detail' | 'messages' | 'bajas';
   id?: number;
+  /** Desde qué vista se abrió el detalle, para que "Volver" regrese ahí. */
+  desde?: 'table' | 'bajas';
 }
 type SortableKeys = keyof Employee | null;
 
@@ -229,7 +231,7 @@ export const EmployeeTableView = ({
             }}
           >
             <option value="">Todos los Estados</option>
-            {["Activo", "De licencia", "Parte médico", "Baja"].map((e) => (
+            {["Activo", "De licencia", "Parte médico"].map((e) => (
               <option key={e} value={e}>
                 {e}
               </option>

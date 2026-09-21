@@ -25,6 +25,8 @@ export interface ArchivedMessage extends Message {
 export interface ViewState {
   name: "table" | "detail" | "messages" | "bajas";
   id?: number;
+  /** Desde qué vista se abrió el detalle, para que "Volver" regrese ahí. */
+  desde?: "table" | "bajas";
 }
 export default function RecursosHumanosPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -132,7 +134,7 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
         return (
           <EmployeeDetailView
             employee={selectedEmployee}
-            onBack={() => setCurrentView({ name: "table" })}
+            onBack={() => setCurrentView({ name: currentView.desde ?? "table" })}
             onLicenseClick={setSelectedLicense}
             onSave={fetchEmployeeData}
           />
@@ -148,13 +150,21 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
         );
       case "bajas":
         return (
-          <BajasTable onVolver={() => setCurrentView({ name: "table" })} />
+          <BajasTable
+            onVolver={() => setCurrentView({ name: "table" })}
+            onSelectEmployee={(id: number) =>
+              setCurrentView({ name: "detail", id, desde: "bajas" })
+            }
+          />
         );
       case "table":
       default:
         return (
           <EmployeeTableView
-            employees={employees}
+            // Quien tiene una baja vigente sale de la lista principal: se lo
+            // encuentra en "Ver bajas". El arreglo completo se conserva porque
+            // el detalle se resuelve desde ahí, y desde el detalle se reincorpora.
+            employees={employees.filter((e) => !e.baja?.vigente)}
             onSelectEmployee={(id: number) =>
               setCurrentView({ name: "detail", id })
             }
