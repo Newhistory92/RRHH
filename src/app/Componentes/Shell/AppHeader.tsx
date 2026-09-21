@@ -17,15 +17,17 @@ import { logoutFromClient } from "@/app/util/authClient";
 import { apiClient } from "@/app/util/apiClient";
 import { NotificationDialog } from "@/app/Componentes/Perfil/NotificationDialog";
 import { formatearFechaHora } from "@/app/lib/dates";
+import { tienePermiso } from "@/app/util/permisos";
 
 const DEFAULT_AVATAR = "/Default-avatar.webp";
 
 interface AppHeaderProps {
   setPage: (page: Page) => void;
   employeeData?: Employee | null;
+  permisos: string[];
 }
 
-export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
+export function AppHeader({ setPage, employeeData, permisos }: AppHeaderProps) {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [usuario, setUsuario] = useState("");
@@ -190,21 +192,31 @@ export function AppHeader({ setPage, employeeData }: AppHeaderProps) {
               </p>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setPage("editar-perfil")}>
-              <UserCircle size={16} className="mr-2" /> Editar Perfil
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setPage("mi-asistencia")}>
-              <Clock size={16} className="mr-2" /> Mi Asistencia
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setPage("licencias")}>
-              <FileText size={16} className="mr-2" /> Licencias
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setPage("documentos")}>
-              <Folder size={16} className="mr-2" /> Documentos
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setPage("feedback")}>
-              <MessageSquare size={16} className="mr-2" /> Encuesta
-            </DropdownMenuItem>
+            {tienePermiso(permisos, "perfil.editar") && (
+              <DropdownMenuItem onClick={() => setPage("editar-perfil")}>
+                <UserCircle size={16} className="mr-2" /> Editar Perfil
+              </DropdownMenuItem>
+            )}
+            {tienePermiso(permisos, "asistencia.propia") && (
+              <DropdownMenuItem onClick={() => setPage("mi-asistencia")}>
+                <Clock size={16} className="mr-2" /> Mi Asistencia
+              </DropdownMenuItem>
+            )}
+            {tienePermiso(permisos, "licencias.propias") && (
+              <DropdownMenuItem onClick={() => setPage("licencias")}>
+                <FileText size={16} className="mr-2" /> Licencias
+              </DropdownMenuItem>
+            )}
+            {tienePermiso(permisos, "documentos.propios") && (
+              <DropdownMenuItem onClick={() => setPage("documentos")}>
+                <Folder size={16} className="mr-2" /> Documentos
+              </DropdownMenuItem>
+            )}
+            {tienePermiso(permisos, "feedback.participar") && (
+              <DropdownMenuItem onClick={() => setPage("feedback")}>
+                <MessageSquare size={16} className="mr-2" /> Encuesta
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-error">
               <LogOut size={16} className="mr-2" /> Cerrar Sesión

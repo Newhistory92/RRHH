@@ -11,12 +11,14 @@ export interface EmployeeTableViewProps {
   onSelectEmployee: (id: number) => void;
   onShowMessages: () => void;
   onOpenPermissionModal: (employeeId: number | null) => void;
-  onShowJubilados: () => void;
+  onShowBajas: () => void;
 }
 
 export interface ViewState {
-  name: 'table' | 'detail' | 'messages' | 'jubilados';
+  name: 'table' | 'detail' | 'messages' | 'bajas';
   id?: number;
+  /** Desde qué vista se abrió el detalle, para que "Volver" regrese ahí. */
+  desde?: 'table' | 'bajas';
 }
 type SortableKeys = keyof Employee | null;
 
@@ -34,7 +36,7 @@ export const EmployeeTableView = ({
   onSelectEmployee,
   onShowMessages,
   onOpenPermissionModal,
-  onShowJubilados,
+  onShowBajas,
 }: EmployeeTableViewProps) => {
   const [mostrarGuiaLicencias, setMostrarGuiaLicencias] = useState(false);
   const [filters, setFilters] = useState({
@@ -180,10 +182,10 @@ export const EmployeeTableView = ({
               lleva borde + texto en --primary para que se note que es
               accionable. */}
           <button
-            onClick={onShowJubilados}
+            onClick={onShowBajas}
             className="rounded-md border border-primary/50 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            Ver jubilados
+            Ver bajas
           </button>
           <button
             onClick={onShowMessages}

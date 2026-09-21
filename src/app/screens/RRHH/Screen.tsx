@@ -5,7 +5,7 @@ import { Toast } from "primereact/toast";
 import { EmployeeDetailView } from "@/app/Componentes/TablaOperador/Perfildetail";
 import { MessagesView } from "@/app/Componentes/TablaOperador/MensajeDetail";
 import { EmployeeTableView } from "@/app/Componentes/TablaOperador/Table";
-import JubiladosTable from "@/app/Componentes/TablaOperador/JubiladosTable";
+import BajasTable from "@/app/Componentes/TablaOperador/BajasTable";
 import {LicenseDetailModal,PermissionModal} from "@/app/Componentes/ModalRRHH/LicenseModal";
 import { getBackendUrl } from "@/app/util/backendUrl";
 
@@ -23,8 +23,10 @@ export interface ArchivedMessage extends Message {
   employeeName: string;
 }
 export interface ViewState {
-  name: "table" | "detail" | "messages" | "jubilados";
+  name: "table" | "detail" | "messages" | "bajas";
   id?: number;
+  /** Desde qué vista se abrió el detalle, para que "Volver" regrese ahí. */
+  desde?: "table" | "bajas";
 }
 export default function RecursosHumanosPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -132,7 +134,7 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
         return (
           <EmployeeDetailView
             employee={selectedEmployee}
-            onBack={() => setCurrentView({ name: "table" })}
+            onBack={() => setCurrentView({ name: currentView.desde ?? "table" })}
             onLicenseClick={setSelectedLicense}
             onSave={fetchEmployeeData}
           />
@@ -146,21 +148,29 @@ const permissionModalEmployee = useMemo(() => employees.find((e) => e.id === per
             onApplyLicense={handleApplyLicense}
           />
         );
-      case "jubilados":
+      case "bajas":
         return (
-          <JubiladosTable onVolver={() => setCurrentView({ name: "table" })} />
+          <BajasTable
+            onVolver={() => setCurrentView({ name: "table" })}
+            onSelectEmployee={(id: number) =>
+              setCurrentView({ name: "detail", id, desde: "bajas" })
+            }
+          />
         );
       case "table":
       default:
         return (
           <EmployeeTableView
-            employees={employees}
+            // Quien tiene una baja vigente sale de la lista principal: se lo
+            // encuentra en "Ver bajas". El arreglo completo se conserva porque
+            // el detalle se resuelve desde ahí, y desde el detalle se reincorpora.
+            employees={employees.filter((e) => !e.baja?.vigente)}
             onSelectEmployee={(id: number) =>
               setCurrentView({ name: "detail", id })
             }
             onShowMessages={() => setCurrentView({ name: "messages" })}
             onOpenPermissionModal={setPermissionModalEmployeeId}
-            onShowJubilados={() => setCurrentView({ name: "jubilados" })}
+            onShowBajas={() => setCurrentView({ name: "bajas" })}
           />
         );
     }
