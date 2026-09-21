@@ -91,15 +91,18 @@ export const EmployeeDetailView = ({
           />
         )}
       </div>
-      <div className="border-b border-border no-print overflow-x-auto">
-        <nav className="-mb-px flex space-x-6 min-w-max" aria-label="Tabs">
+      {/* overflow-x-auto arrastra overflow-y a auto; con el -mb-px de las
+          pestañas eso dibujaba una barra vertical de 1px. Por eso el borde
+          vive en la nav y el contenedor corta el eje vertical. */}
+      <div className="no-print overflow-x-auto overflow-y-hidden">
+        <nav className="flex space-x-6 min-w-max border-b border-border" aria-label="Tabs">
           <button
             onClick={() => setActiveTab("perfil")}
             className={`${
               activeTab === "perfil"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
           >
             Perfil
           </button>
@@ -109,7 +112,7 @@ export const EmployeeDetailView = ({
               activeTab === "licencias"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
           >
             Historial de Licencias
           </button>
@@ -119,7 +122,7 @@ export const EmployeeDetailView = ({
               activeTab === "permisos"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
           >
             Historial de Permisos
           </button>
@@ -129,7 +132,7 @@ export const EmployeeDetailView = ({
               activeTab === "documentos"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
           >
             Documentos
           </button>
@@ -139,7 +142,7 @@ export const EmployeeDetailView = ({
               activeTab === "feedback360"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
           >
             Feedback 360°
           </button>
@@ -149,7 +152,7 @@ export const EmployeeDetailView = ({
               activeTab === "asistencia"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
           >
             Asistencia
           </button>
@@ -159,7 +162,7 @@ export const EmployeeDetailView = ({
               activeTab === "alertas"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
           >
             Alertas de tolerancia
           </button>
@@ -170,7 +173,7 @@ export const EmployeeDetailView = ({
                 activeTab === "cargaInicial"
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+              } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
             >
               Carga inicial de saldos
             </button>
@@ -181,7 +184,7 @@ export const EmployeeDetailView = ({
               activeTab === "ausencias"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
           >
             Ausencias
           </button>
