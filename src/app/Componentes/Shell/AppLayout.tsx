@@ -22,6 +22,7 @@ export function AppLayout({
   children,
 }: AppLayoutProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [menuMobileAbierto, setMenuMobileAbierto] = useState(false);
 
   const hasSidebar = getSidebarSections(permisos).length > 0;
 
@@ -29,13 +30,21 @@ export function AppLayout({
     <div className="min-h-screen bg-background text-foreground">
       {/* El navbar es fixed y cruza todo el ancho, asi que va fuera del
           contenedor desplazado y el contenido compensa su alto con pt-16. */}
-      <AppHeader setPage={setPage} employeeData={employeeData} permisos={permisos} />
+      <AppHeader
+        setPage={setPage}
+        employeeData={employeeData}
+        permisos={permisos}
+        hayMenu={hasSidebar}
+        onAbrirMenu={() => setMenuMobileAbierto(true)}
+      />
       <AppSidebar
         activePage={activePage}
         setPage={setPage}
         permisos={permisos}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed((prev) => !prev)}
+        mobileAbierto={menuMobileAbierto}
+        onCerrarMobile={() => setMenuMobileAbierto(false)}
       />
       <div
         className={`pt-16 transition-all duration-300 ${

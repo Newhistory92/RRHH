@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare, Folder, Clock } from "lucide-react";
+import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare, Folder, Clock, Menu } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -25,9 +25,19 @@ interface AppHeaderProps {
   setPage: (page: Page) => void;
   employeeData?: Employee | null;
   permisos: string[];
+  /** Abre el menú lateral en pantallas chicas, donde el sidebar está fuera de vista. */
+  onAbrirMenu?: () => void;
+  /** Si hay secciones que mostrar: sin ellas el botón de menú no abriría nada. */
+  hayMenu?: boolean;
 }
 
-export function AppHeader({ setPage, employeeData, permisos }: AppHeaderProps) {
+export function AppHeader({
+  setPage,
+  employeeData,
+  permisos,
+  onAbrirMenu,
+  hayMenu = false,
+}: AppHeaderProps) {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [usuario, setUsuario] = useState("");
@@ -105,12 +115,25 @@ export function AppHeader({ setPage, employeeData, permisos }: AppHeaderProps) {
           Antes de montar no hay tema resuelto todavia: se muestra el rojo
           como base fija para que el primer render en servidor y en cliente
           coincidan (evita el parpadeo de hidratacion). */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={mounted && resolvedTheme === "dark" ? "/logo-osp-blanco.webp" : "/logo-osp-rojo.webp"}
-        alt="OSP"
-        className="h-[3.125rem] w-auto shrink-0"
-      />
+      <div className="flex items-center gap-2">
+        {/* Solo en móvil: ahí el sidebar está fuera de pantalla y sin este
+            botón no habría forma de navegar a ninguna sección. */}
+        {hayMenu && (
+          <button
+            onClick={onAbrirMenu}
+            className="md:hidden p-2 rounded-md hover:bg-surface-muted text-foreground transition-colors"
+            aria-label="Abrir menú de navegación"
+          >
+            <Menu size={22} />
+          </button>
+        )}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={mounted && resolvedTheme === "dark" ? "/logo-osp-blanco.webp" : "/logo-osp-rojo.webp"}
+          alt="OSP"
+          className="h-[3.125rem] w-auto shrink-0"
+        />
+      </div>
 
       <div className="flex items-center gap-3">
         {/* Campanita con notificaciones reales */}

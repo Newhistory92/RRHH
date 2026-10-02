@@ -55,6 +55,9 @@ interface AppSidebarProps {
   permisos: string[];
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  /** En móvil el sidebar vive fuera de pantalla y entra con este estado. */
+  mobileAbierto?: boolean;
+  onCerrarMobile?: () => void;
 }
 
 export function AppSidebar({
@@ -63,23 +66,43 @@ export function AppSidebar({
   permisos,
   isCollapsed,
   onToggleCollapse,
+  mobileAbierto = false,
+  onCerrarMobile,
 }: AppSidebarProps) {
   const sections = getSidebarSections(permisos);
 
   // Sin páginas visibles no hay sidebar que dibujar (caso USER).
   if (sections.length === 0) return null;
 
+  // Colapsado es de escritorio: en el panel móvil siempre van las etiquetas,
+  // que es lo único que hace navegable un menú chico.
+  const colapsado = isCollapsed && !mobileAbierto;
+
+  const irA = (page: Page) => {
+    setPage(page);
+    onCerrarMobile?.();
+  };
+
   return (
     <TooltipProvider delayDuration={200}>
+      {/* Fondo que atenúa el contenido mientras el panel está abierto; tocarlo
+          lo cierra, que es el gesto que se espera en un cajón lateral. */}
+      {mobileAbierto && (
+        <div
+          onClick={onCerrarMobile}
+          className="md:hidden fixed inset-0 top-16 bg-overlay z-30"
+          aria-hidden="true"
+        />
+      )}
       {/* Arranca en top-16, debajo del navbar, que ahora cruza todo el ancho. */}
       <aside
-        className={`bg-muted border-r border-border fixed top-16 left-0 h-[calc(100vh-4rem)] z-30 hidden md:flex flex-col transition-all duration-300 ease-in-out ${
-          isCollapsed ? "w-16" : "w-64"
-        }`}
+        className={`bg-muted border-r border-border fixed top-16 left-0 h-[calc(100vh-4rem)] z-40 flex flex-col transition-all duration-300 ease-in-out w-64 ${
+          mobileAbierto ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 ${isCollapsed ? "md:w-16" : "md:w-64"}`}
       >
         <button
           onClick={onToggleCollapse}
-          className="absolute top-4 -right-3 bg-primary text-primary-foreground rounded-full p-1.5 shadow-md hover:opacity-90 transition-opacity z-50"
+          className="hidden md:block absolute top-4 -right-3 bg-primary text-primary-foreground rounded-full p-1.5 shadow-md hover:opacity-90 transition-opacity z-50"
           aria-label={isCollapsed ? "Expandir sidebar" : "Colapsar sidebar"}
         >
           {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
@@ -89,7 +112,7 @@ export function AppSidebar({
           {sections.map((section, idx) => (
             <div key={section.label}>
               {idx > 0 && <Separator className="mb-3" />}
-              {!isCollapsed && (
+              {!colapsado && (
                 <p className="px-3 mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   {section.label}
                 </p>
@@ -103,22 +126,22 @@ export function AppSidebar({
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
-                        setPage(item.id);
+                        irA(item.id);
                       }}
                       className={`flex items-center px-3 py-2 rounded-md text-sm transition-colors ${
                         isActive
                           ? "bg-warm-contrast text-warm-contrast-foreground"
                           : "text-foreground hover:bg-surface-muted"
-                      } ${isCollapsed ? "justify-center" : ""}`}
+                      } ${colapsado ? "justify-center" : ""}`}
                     >
                       <IconComponent size={18} className="flex-shrink-0" />
-                      {!isCollapsed && <span className="ml-3 truncate">{item.label}</span>}
+                      {!colapsado && <span className="ml-3 truncate">{item.label}</span>}
                     </a>
                   );
 
                   return (
                     <li key={item.id}>
-                      {isCollapsed ? (
+                      {colapsado ? (
                         <Tooltip>
                           <TooltipTrigger asChild>{link}</TooltipTrigger>
                           <TooltipContent side="right">{item.label}</TooltipContent>
