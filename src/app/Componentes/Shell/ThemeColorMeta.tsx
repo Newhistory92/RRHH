@@ -20,6 +20,9 @@ export function ThemeColorMeta() {
 
   useEffect(() => {
     const color = resolvedTheme === "dark" ? COLORES.dark : COLORES.light;
+    // El viewport.themeColor de layout.tsx ya deja este meta tag en el HTML
+    // servido; lo normal es encontrarlo y solo actualizar su content. Crearlo
+    // acá es un respaldo defensivo, no el camino esperado.
     let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
     if (!meta) {
       meta = document.createElement("meta");
