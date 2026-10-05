@@ -129,3 +129,29 @@ export function getSidebarSections(permisos: string[]): NavSection[] {
     pages: visibles.filter((p) => p.section === section),
   })).filter((group) => group.pages.length > 0);
 }
+
+/**
+ * Los permisos que marcan un rol de gestión.
+ *
+ * Se declaran juntos y con nombre porque de esta lista depende qué navegación
+ * ve cada rol, y una copia suelta en otro archivo se desincroniza sin que
+ * nadie lo note.
+ */
+export const PERMISOS_DE_GESTION: readonly string[] = [
+  "rrhh.gestionar",
+  "estadisticas.ver",
+  "activos.configurar",
+  "admin.gestionar",
+];
+
+/**
+ * Si a esta persona le alcanza una barra inferior de cuatro secciones.
+ *
+ * Hoy es el rol USER y nadie más: ESTADISTA tiene estadisticas.ver, TECNICO y
+ * PATRIMONIO tienen activos.configurar, RRHH tiene rrhh.gestionar y ADMIN
+ * pasa cualquier chequeo por el comodín. Todos esos tienen diez o más
+ * secciones y siguen con el cajón lateral.
+ */
+export function tieneNavegacionSimple(permisos: string[]): boolean {
+  return !PERMISOS_DE_GESTION.some((permiso) => tienePermiso(permisos, permiso));
+}
