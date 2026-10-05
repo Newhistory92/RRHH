@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare, Folder, Clock, Menu } from "lucide-react";
+import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare, Folder, Clock, Menu, ArrowLeftRight } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -18,6 +18,7 @@ import { apiClient } from "@/app/util/apiClient";
 import { NotificationDialog } from "@/app/Componentes/Perfil/NotificationDialog";
 import { formatearFechaHora } from "@/app/lib/dates";
 import { tienePermiso } from "@/app/util/permisos";
+import { canAccess, tieneNavegacionSimple } from "@/app/util/rbac";
 
 const DEFAULT_AVATAR = "/Default-avatar.webp";
 
@@ -92,6 +93,13 @@ export function AppHeader({
   };
 
   const unreadCount = notifications.filter(n => n.status === "nueva").length;
+
+  // Quien tiene barra inferior ya llega a Asistencia, Licencias y Documentos
+  // desde ahí: en celular se esconden de este menú para no duplicarlas. En
+  // escritorio no hay barra y este menú sigue siendo el único acceso a
+  // Licencias, así que ahí se muestran igual.
+  const navegacionSimple = tieneNavegacionSimple(permisos);
+  const soloEscritorio = navegacionSimple ? "hidden md:block" : "";
 
   return (
     // Navbar de punta a punta, fixed sobre todo el ancho. El material glass
@@ -221,24 +229,39 @@ export function AppHeader({
               </DropdownMenuItem>
             )}
             {tienePermiso(permisos, "asistencia.propia") && (
-              <DropdownMenuItem onClick={() => setPage("mi-asistencia")}>
-                <Clock size={16} className="mr-2" /> Mi Asistencia
-              </DropdownMenuItem>
+              <div className={soloEscritorio}>
+                <DropdownMenuItem onClick={() => setPage("mi-asistencia")}>
+                  <Clock size={16} className="mr-2" /> Mi Asistencia
+                </DropdownMenuItem>
+              </div>
             )}
             {tienePermiso(permisos, "licencias.propias") && (
-              <DropdownMenuItem onClick={() => setPage("licencias")}>
-                <FileText size={16} className="mr-2" /> Licencias
-              </DropdownMenuItem>
+              <div className={soloEscritorio}>
+                <DropdownMenuItem onClick={() => setPage("licencias")}>
+                  <FileText size={16} className="mr-2" /> Licencias
+                </DropdownMenuItem>
+              </div>
             )}
             {tienePermiso(permisos, "documentos.propios") && (
-              <DropdownMenuItem onClick={() => setPage("documentos")}>
-                <Folder size={16} className="mr-2" /> Documentos
-              </DropdownMenuItem>
+              <div className={soloEscritorio}>
+                <DropdownMenuItem onClick={() => setPage("documentos")}>
+                  <Folder size={16} className="mr-2" /> Documentos
+                </DropdownMenuItem>
+              </div>
             )}
             {tienePermiso(permisos, "feedback.participar") && (
               <DropdownMenuItem onClick={() => setPage("feedback")}>
                 <MessageSquare size={16} className="mr-2" /> Encuesta
               </DropdownMenuItem>
+            )}
+            {/* Reubicación vive en el sidebar, que en celular no existe para
+                quien tiene barra inferior: ahí se la agrega acá. */}
+            {navegacionSimple && canAccess(permisos, "reubicacion") && (
+              <div className="md:hidden">
+                <DropdownMenuItem onClick={() => setPage("reubicacion")}>
+                  <ArrowLeftRight size={16} className="mr-2" /> Reubicación
+                </DropdownMenuItem>
+              </div>
             )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-error">
