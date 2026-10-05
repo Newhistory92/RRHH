@@ -19,6 +19,7 @@ import { NotificationDialog } from "@/app/Componentes/Perfil/NotificationDialog"
 import { formatearFechaHora } from "@/app/lib/dates";
 import { tienePermiso } from "@/app/util/permisos";
 import { canAccess, tieneNavegacionSimple } from "@/app/util/rbac";
+import { InstalarAppItem, InstruccionesIOS } from "@/app/Componentes/Shell/InstalarApp";
 
 const DEFAULT_AVATAR = "/Default-avatar.webp";
 
@@ -47,6 +48,7 @@ export function AppHeader({
   const [userName, setUserName] = useState("Usuario");
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notifAbierta, setNotifAbierta] = useState<Notification | null>(null);
+  const [mostrarInstruccionesIOS, setMostrarInstruccionesIOS] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -263,6 +265,9 @@ export function AppHeader({
                 </DropdownMenuItem>
               </div>
             )}
+            <InstalarAppItem
+              onPedirInstruccionesIOS={() => setMostrarInstruccionesIOS(true)}
+            />
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-error">
               <LogOut size={16} className="mr-2" /> Cerrar Sesión
@@ -278,6 +283,9 @@ export function AppHeader({
         userPhoto={userPhoto}
         onMarkAsRead={handleMarkAsRead}
       />
+      {mostrarInstruccionesIOS && (
+        <InstruccionesIOS onCerrar={() => setMostrarInstruccionesIOS(false)} />
+      )}
     </header>
   );
 }
