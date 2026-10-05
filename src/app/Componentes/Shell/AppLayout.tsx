@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { AppSidebar } from "@/app/Componentes/Shell/AppSidebar";
 import { AppHeader } from "@/app/Componentes/Shell/AppHeader";
+import { AppBottomNav } from "@/app/Componentes/Shell/AppBottomNav";
 import { Employee, Page } from "@/app/Interfas/Interfaces";
-import { getSidebarSections } from "@/app/util/rbac";
+import { getSidebarSections, tieneNavegacionSimple } from "@/app/util/rbac";
 
 interface AppLayoutProps {
   activePage: Page;
@@ -25,6 +26,7 @@ export function AppLayout({
   const [menuMobileAbierto, setMenuMobileAbierto] = useState(false);
 
   const hasSidebar = getSidebarSections(permisos).length > 0;
+  const navegacionSimple = tieneNavegacionSimple(permisos);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -34,7 +36,7 @@ export function AppLayout({
         setPage={setPage}
         employeeData={employeeData}
         permisos={permisos}
-        hayMenu={hasSidebar}
+        hayMenu={hasSidebar && !navegacionSimple}
         onAbrirMenu={() => setMenuMobileAbierto(true)}
       />
       <AppSidebar
@@ -46,10 +48,13 @@ export function AppLayout({
         mobileAbierto={menuMobileAbierto}
         onCerrarMobile={() => setMenuMobileAbierto(false)}
       />
+      {navegacionSimple && (
+        <AppBottomNav activePage={activePage} setPage={setPage} permisos={permisos} />
+      )}
       <div
         className={`pt-16 transition-all duration-300 ${
           hasSidebar ? (isCollapsed ? "md:pl-16" : "md:pl-64") : ""
-        }`}
+        } ${navegacionSimple ? "pb-20 md:pb-0" : ""}`}
       >
         <main className="p-6 max-w-7xl mx-auto">{children}</main>
       </div>
