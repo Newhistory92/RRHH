@@ -56,7 +56,10 @@ self.addEventListener("fetch", (event) => {
       .then((respuesta) => {
         if (respuesta.ok && respuesta.type === "basic") {
           const copia = respuesta.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, copia));
+          // waitUntil, no una promesa suelta: sin esto el navegador puede
+          // matar el worker (p. ej. al cerrar la pestaña) antes de que la
+          // escritura a cache termine, y la copia nunca queda guardada.
+          event.waitUntil(caches.open(CACHE).then((cache) => cache.put(request, copia)));
         }
         return respuesta;
       })
