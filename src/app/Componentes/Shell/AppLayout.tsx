@@ -54,7 +54,7 @@ export function AppLayout({
       <div
         className={`pt-16 transition-all duration-300 ${
           hasSidebar ? (isCollapsed ? "md:pl-16" : "md:pl-64") : ""
-        } ${navegacionSimple ? "pb-20 md:pb-0" : ""}`}
+        } ${navegacionSimple ? "pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0" : ""}`}
       >
         <main className="p-6 max-w-7xl mx-auto">{children}</main>
       </div>

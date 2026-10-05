@@ -5,8 +5,15 @@
 // En Android el navegador avisa con beforeinstallprompt y el cartel se dispara
 // desde la app. En iPhone ese evento no existe: Safari obliga a hacerlo a mano
 // desde Compartir, así que ahí lo único que se puede hacer es explicarlo.
+//
+// El listener de beforeinstallprompt vive a nivel de módulo, no dentro de un
+// efecto de componente: este hook se usa desde el ítem del menú del avatar, y
+// el contenido del menú de Radix se desmonta cuando está cerrado. Si el
+// listener viviera en un efecto de ese componente, se perdería el evento
+// cada vez que Chrome lo dispara con el menú cerrado -- que es casi siempre,
+// porque lo dispara una sola vez, apenas la página es instalable.
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 // Todavía no está en los tipos del DOM.
 interface BeforeInstallPromptEvent extends Event {
@@ -16,20 +23,42 @@ interface BeforeInstallPromptEvent extends Event {
 
 export type EstadoInstalacion = "no-disponible" | "disponible" | "instrucciones-ios";
 
+let eventoGuardado: BeforeInstallPromptEvent | null = null;
+const listeners = new Set<() => void>();
+
+function notificar() {
+  listeners.forEach((listener) => listener());
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeinstallprompt", (e) => {
+    // Sin esto el navegador muestra su propio cartel cuando quiere, en vez
+    // de cuando la persona toca el botón.
+    e.preventDefault();
+    eventoGuardado = e as BeforeInstallPromptEvent;
+    notificar();
+  });
+}
+
+function suscribirse(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function leerEvento() {
+  return eventoGuardado;
+}
+
+function leerEventoServidor() {
+  return null;
+}
+
 export function useInstalarApp() {
-  const [evento, setEvento] = useState<BeforeInstallPromptEvent | null>(null);
+  const evento = useSyncExternalStore(suscribirse, leerEvento, leerEventoServidor);
   const [esIOS, setEsIOS] = useState(false);
   const [yaInstalada, setYaInstalada] = useState(false);
 
   useEffect(() => {
-    const alEvento = (e: Event) => {
-      // Sin esto el navegador muestra su propio cartel cuando quiere, en vez
-      // de cuando la persona toca el botón.
-      e.preventDefault();
-      setEvento(e as BeforeInstallPromptEvent);
-    };
-    window.addEventListener("beforeinstallprompt", alEvento);
-
     // display-mode cubre Android y escritorio; navigator.standalone es la
     // bandera propia de iOS, que no implementa display-mode: standalone.
     const standalone =
@@ -38,8 +67,6 @@ export function useInstalarApp() {
     setYaInstalada(standalone);
 
     setEsIOS(/iPad|iPhone|iPod/.test(window.navigator.userAgent));
-
-    return () => window.removeEventListener("beforeinstallprompt", alEvento);
   }, []);
 
   const estado: EstadoInstalacion = yaInstalada
@@ -51,13 +78,16 @@ export function useInstalarApp() {
         : "no-disponible";
 
   const instalar = async () => {
-    if (!evento) return;
+    if (!eventoGuardado) return;
     // Se saca el evento de inmediato, antes de esperar el prompt: así un
     // segundo click mientras el cartel está abierto no dispara otro prompt()
-    // sobre un evento ya consumido.
-    setEvento(null);
+    // sobre un evento ya consumido. Es de un solo uso: una vez consumido, el
+    // navegador no lo vuelve a emitir hasta la próxima visita.
+    const actual = eventoGuardado;
+    eventoGuardado = null;
+    notificar();
     try {
-      await evento.prompt();
+      await actual.prompt();
     } catch (error) {
       console.error("No se pudo mostrar el cartel de instalación:", error);
     }
