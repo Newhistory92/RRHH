@@ -52,10 +52,15 @@ export function useInstalarApp() {
 
   const instalar = async () => {
     if (!evento) return;
-    await evento.prompt();
-    // El evento es de un solo uso: una vez consumido, el navegador no lo
-    // vuelve a emitir hasta la próxima visita.
+    // Se saca el evento de inmediato, antes de esperar el prompt: así un
+    // segundo click mientras el cartel está abierto no dispara otro prompt()
+    // sobre un evento ya consumido.
     setEvento(null);
+    try {
+      await evento.prompt();
+    } catch (error) {
+      console.error("No se pudo mostrar el cartel de instalación:", error);
+    }
   };
 
   return { estado, instalar };
