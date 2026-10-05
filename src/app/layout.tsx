@@ -3,6 +3,7 @@ import { Fraunces, Inter, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/app/providers/ThemeProvider";
 import { PrimeReactTheme } from "@/app/Componentes/Shell/PrimeReactTheme";
 import { ThemeColorMeta } from "@/app/Componentes/Shell/ThemeColorMeta";
+import { ServiceWorkerRegistrar } from "@/app/Componentes/Shell/ServiceWorkerRegistrar";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -56,6 +57,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <PrimeReactTheme />
           <ThemeColorMeta />
+          <ServiceWorkerRegistrar />
           {children}
         </ThemeProvider>
       </body>
