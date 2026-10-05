@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/app/providers/ThemeProvider";
 import { PrimeReactTheme } from "@/app/Componentes/Shell/PrimeReactTheme";
+import { ThemeColorMeta } from "@/app/Componentes/Shell/ThemeColorMeta";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -29,8 +30,17 @@ export const metadata: Metadata = {
   // Los iconos (favicon.ico, icon1.png, apple-icon.png) y el manifest.json
   // se detectan solos por convencion de archivos en src/app.
   appleWebApp: {
+    capable: true,
     title: "RRHH",
   },
+};
+
+export const viewport: Viewport = {
+  // Valor inicial; ThemeColorMeta lo actualiza según el tema elegido.
+  themeColor: "#F6F7F4",
+  // Imprescindible: sin esto env(safe-area-inset-bottom) vale siempre 0 y la
+  // barra inferior queda debajo del indicador de inicio del iPhone.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -45,6 +55,7 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <PrimeReactTheme />
+          <ThemeColorMeta />
           {children}
         </ThemeProvider>
       </body>
