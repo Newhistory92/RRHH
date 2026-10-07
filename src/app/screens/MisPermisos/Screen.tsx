@@ -89,7 +89,12 @@ export default function MisPermisos() {
             onChange={(e) => setAnio(Number(e.target.value))}
             className="border border-border rounded-md px-3 py-1.5 text-sm bg-background text-foreground"
           >
-            {(datos?.aniosConDatos ?? [ANIO_ACTUAL]).map((a) => (
+            {/* El backend siempre incluye el año elegido en aniosConDatos, pero
+                si alguna vez no lo hiciera, el <select> quedaría mostrando un
+                value sin <option> que lo respalde. Se lo suma acá como red. */}
+            {Array.from(new Set([...(datos?.aniosConDatos ?? [ANIO_ACTUAL]), anio]))
+              .sort((a, b) => b - a)
+              .map((a) => (
               <option key={a} value={a}>
                 {a}
               </option>
