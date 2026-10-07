@@ -47,6 +47,9 @@ interface JornadaLaboral {
     id?: number;
     nombre: string;
     horasDia: number;
+    /** Horas de permiso libres por año antes de que empiecen a acumular
+     *  horas a recuperar. */
+    horasPermisoAnual: number;
 }
 
 interface Horario {
@@ -138,7 +141,7 @@ export default function ConfiguracionGeneral() {
 
     const [showJornadaModal, setShowJornadaModal] = useState(false);
     const [isEditingJornada, setIsEditingJornada] = useState(false);
-    const [jornadaForm, setJornadaForm] = useState<JornadaLaboral>({ nombre: "", horasDia: 8 });
+    const [jornadaForm, setJornadaForm] = useState<JornadaLaboral>({ nombre: "", horasDia: 8, horasPermisoAnual: 12 });
 
     const showToast = (message: string, type: 'success' | 'error') => {
         setNotification({ message, type });
@@ -623,7 +626,7 @@ export default function ConfiguracionGeneral() {
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="font-heading font-bold text-foreground">Jornadas Laborales (Contratos vs Horas)</h3>
                                         <button
-                                            onClick={() => { setJornadaForm({ nombre: "", horasDia: 8 }); setIsEditingJornada(false); setShowJornadaModal(true); }}
+                                            onClick={() => { setJornadaForm({ nombre: "", horasDia: 8, horasPermisoAnual: 12 }); setIsEditingJornada(false); setShowJornadaModal(true); }}
                                             className="flex items-center gap-1.5 text-primary hover:bg-primary/10 border border-primary/30 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
                                         >
                                             <Plus size={14} /> Nueva Jornada
@@ -635,6 +638,7 @@ export default function ConfiguracionGeneral() {
                                                 <div>
                                                     <h4 className="font-bold text-foreground text-sm">{j.nombre}</h4>
                                                     <p className="text-xs text-muted-foreground mt-1 font-mono">{j.horasDia} hrs/día</p>
+                                                    <p className="text-xs text-muted-foreground font-mono">{j.horasPermisoAnual ?? 0} hrs permiso/año</p>
                                                 </div>
                                                 <div className="flex items-center gap-1">
                                                     <button onClick={() => { setJornadaForm(j); setIsEditingJornada(true); setShowJornadaModal(true); }} className="p-1.5 text-muted-foreground hover:text-primary"><Edit2 size={14} /></button>
@@ -891,6 +895,24 @@ export default function ConfiguracionGeneral() {
                             <div>
                                 <label className="block text-sm font-bold text-foreground mb-1">Horas Diarias</label>
                                 <input type="number" required min="1" max="24" className="w-full px-3 py-2 border rounded-xl" value={jornadaForm.horasDia} onChange={e => setJornadaForm({ ...jornadaForm, horasDia: parseFloat(e.target.value) })} />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-foreground mb-1">Horas de Permiso al Año</label>
+                                <input
+                                    type="number"
+                                    required
+                                    min="0"
+                                    max="2000"
+                                    step="0.5"
+                                    className="w-full px-3 py-2 border rounded-xl"
+                                    value={jornadaForm.horasPermisoAnual}
+                                    onChange={e => setJornadaForm({ ...jornadaForm, horasPermisoAnual: parseFloat(e.target.value) })}
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Horas libres por año para permisos. Agotadas, los permisos
+                                    siguientes pasan a contarse como horas a recuperar. Cambiarlo
+                                    recalcula el año en curso de todos los agentes de esta jornada.
+                                </p>
                             </div>
                             <div className="flex gap-3 pt-4">
                                 <button type="button" onClick={() => setShowJornadaModal(false)} className="flex-1 py-2 bg-muted hover:bg-border rounded-xl text-sm font-bold">Cancelar</button>

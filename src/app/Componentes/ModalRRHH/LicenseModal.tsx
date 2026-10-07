@@ -246,7 +246,8 @@ export const PermissionModal = ({ employee, onClose, onSuccess }: PermissionModa
               <span className="text-sm text-foreground">Permiso oficial</span>
             </label>
             <p className="text-xs text-muted-foreground mt-1">
-              Un permiso oficial no consume el cupo de 12 h anuales ni genera horas a recuperar.
+              Un permiso oficial no consume el cupo anual de permisos del agente
+              ni genera horas a recuperar.
             </p>
           </div>
 
