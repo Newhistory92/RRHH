@@ -21,9 +21,9 @@ interface PermisoPropio {
 interface MisPermisosResp {
   anio: number;
   tieneJornada: boolean;
-  cupoAnual: number;
+  cupoAnual: number | null;
   consumido: number;
-  restante: number;
+  restante: number | null;
   deuda: number;
   permisos: PermisoPropio[];
   aniosConDatos: number[];
@@ -135,41 +135,71 @@ export default function MisPermisos() {
               <h2 className="font-heading text-lg text-foreground mb-4">
                 Tu cupo de {datos.anio}
               </h2>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Cupo del año</p>
-                  <p className="text-2xl font-heading text-foreground">
-                    {fmtHoras(datos.cupoAnual)}
-                  </p>
+              {datos.cupoAnual !== null && datos.restante !== null ? (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Cupo del año</p>
+                    <p className="text-2xl font-heading text-foreground">
+                      {fmtHoras(datos.cupoAnual)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Usado</p>
+                    <p className="text-2xl font-heading text-foreground">
+                      {fmtHoras(datos.consumido)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Te queda</p>
+                    <p className="text-2xl font-heading text-success">
+                      {fmtHoras(datos.restante)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">A recuperar</p>
+                    <p
+                      className={`text-2xl font-heading ${
+                        datos.deuda > 0 ? "text-error" : "text-muted-foreground"
+                      }`}
+                    >
+                      {fmtHoras(datos.deuda)}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Usado</p>
-                  <p className="text-2xl font-heading text-foreground">
-                    {fmtHoras(datos.consumido)}
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Usado</p>
+                      <p className="text-2xl font-heading text-foreground">
+                        {fmtHoras(datos.consumido)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">A recuperar</p>
+                      <p
+                        className={`text-2xl font-heading ${
+                          datos.deuda > 0 ? "text-error" : "text-muted-foreground"
+                        }`}
+                      >
+                        {fmtHoras(datos.deuda)}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-4">
+                    El cupo de años anteriores no se muestra: el cupo configurado es
+                    el vigente hoy, y puede no ser el que regía en {datos.anio}. Usado
+                    y a recuperar sí son datos reales de ese año.
                   </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Te queda</p>
-                  <p className="text-2xl font-heading text-success">
-                    {fmtHoras(datos.restante)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">A recuperar</p>
-                  <p
-                    className={`text-2xl font-heading ${
-                      datos.deuda > 0 ? "text-error" : "text-muted-foreground"
-                    }`}
-                  >
-                    {fmtHoras(datos.deuda)}
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground mt-4">
-                {datos.restante > 0
-                  ? "Mientras te quede cupo, los permisos no te descuentan horas."
-                  : "Se te agotó el cupo del año: los permisos comunes que pidas ahora se cuentan como horas a recuperar."}
-              </p>
+                </>
+              )}
+              {datos.restante !== null && (
+                <p className="text-sm text-muted-foreground mt-4">
+                  {datos.restante > 0
+                    ? "Mientras te quede cupo, los permisos no te descuentan horas."
+                    : "Se te agotó el cupo del año: los permisos comunes que pidas ahora se cuentan como horas a recuperar."}
+                </p>
+              )}
               {datos.deuda > 0 && (
                 <p className="text-sm text-muted-foreground mt-2">
                   Las horas a recuperar ya están incluidas en el saldo acumulado
