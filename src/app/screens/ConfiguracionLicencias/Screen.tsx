@@ -641,7 +641,7 @@ export default function ConfiguracionGeneral() {
                                                     <p className="text-xs text-muted-foreground font-mono">{j.horasPermisoAnual ?? 0} hrs permiso/año</p>
                                                 </div>
                                                 <div className="flex items-center gap-1">
-                                                    <button onClick={() => { setJornadaForm(j); setIsEditingJornada(true); setShowJornadaModal(true); }} className="p-1.5 text-muted-foreground hover:text-primary"><Edit2 size={14} /></button>
+                                                    <button onClick={() => { setJornadaForm({ ...j, horasPermisoAnual: j.horasPermisoAnual ?? 12 }); setIsEditingJornada(true); setShowJornadaModal(true); }} className="p-1.5 text-muted-foreground hover:text-primary"><Edit2 size={14} /></button>
                                                     <button onClick={() => j.id && handleDeleteJornada(j.id)} className="p-1.5 text-muted-foreground hover:text-error"><Trash2 size={14} /></button>
                                                 </div>
                                             </div>
