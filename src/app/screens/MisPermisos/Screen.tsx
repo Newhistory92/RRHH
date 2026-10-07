@@ -20,6 +20,7 @@ interface PermisoPropio {
 
 interface MisPermisosResp {
   anio: number;
+  tieneJornada: boolean;
   cupoAnual: number;
   consumido: number;
   restante: number;
@@ -72,7 +73,7 @@ export default function MisPermisos() {
     };
   }, [anio]);
 
-  const sinJornada = datos !== null && datos.cupoAnual === 0;
+  const sinJornada = datos !== null && !datos.tieneJornada;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">

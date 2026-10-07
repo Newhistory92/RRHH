@@ -19,6 +19,7 @@ import {
   Package,
   Cpu,
   ArrowLeftRight,
+  CalendarClock,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -47,6 +48,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Package,
   Cpu,
   ArrowLeftRight,
+  CalendarClock,
 };
 
 interface AppSidebarProps {
