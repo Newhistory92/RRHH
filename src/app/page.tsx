@@ -27,6 +27,7 @@ import ActivosInventario from '@/app/screens/ActivosInventario/Screen';
 import ActivosModelos from '@/app/screens/ActivosModelos/Screen';
 import AsistenciaPage from '@/app/screens/Asistencia/Screen';
 import MiAsistencia from '@/app/Componentes/Asistencia/MiAsistencia';
+import MisPermisos from '@/app/screens/MisPermisos/Screen';
 import { PrimeReactProvider } from 'primereact/api';
 import 'primeicons/primeicons.css';
 import TestPage from './screens/TestConfig/Screen';
@@ -165,6 +166,8 @@ export default function App() {
         return <AsistenciaPage puedeGestionar={tienePermiso(permisos, 'asistencia.gestionar')} />;
       case 'mi-asistencia':
         return <MiAsistencia />;
+      case 'mis-permisos':
+        return <MisPermisos />;
       case 'feedback':
         if (globalSettings["Feedback"] === false) {
           return (

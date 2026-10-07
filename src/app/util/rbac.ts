@@ -40,6 +40,11 @@ export const PAGE_CONFIG: PageConfig[] = [
   { id: "feedback", label: "Feedback", icon: "MessageSquare", section: "Agente", permiso: "feedback.participar", ocultaEnSidebar: true },
   { id: "asistencia", label: "Asistencia", icon: "Clock", section: "Agente", permiso: "asistencia.propia" },
   { id: "mi-asistencia", label: "Mi Asistencia", icon: "Clock", section: "Agente", permiso: "asistencia.propia", ocultaEnSidebar: true },
+  // Sin ocultaSiTienePermiso a proposito: si se escondiera del sidebar para
+  // los roles de gestion, RRHH y ADMIN se quedarian sin ningun lugar donde
+  // ver sus PROPIOS permisos, porque la entrada del menu del avatar esta
+  // condicionada a tener navegacion simple.
+  { id: "mis-permisos", label: "Mis Permisos", icon: "CalendarClock", section: "Agente", permiso: "asistencia.propia" },
   { id: "activos-config", label: "Configuración de Activos", icon: "Boxes", section: "Activos", permiso: "activos.configurar" },
   { id: "activos-inventario", label: "Inventario", icon: "Package", section: "Activos", permiso: "activos.inventario" },
   { id: "activos-modelos", label: "Modelos de PC", icon: "Cpu", section: "Activos", permiso: "activos.modelos" },

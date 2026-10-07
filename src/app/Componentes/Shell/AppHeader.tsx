@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare, Folder, Clock, Menu, ArrowLeftRight } from "lucide-react";
+import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare, Folder, Clock, Menu, ArrowLeftRight, CalendarClock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -262,6 +262,15 @@ export function AppHeader({
               <div className="md:hidden">
                 <DropdownMenuItem onClick={() => setPage("reubicacion")}>
                   <ArrowLeftRight size={16} className="mr-2" /> Reubicación
+                </DropdownMenuItem>
+              </div>
+            )}
+            {/* Mis Permisos vive en el sidebar, que en celular no existe para
+                quien tiene barra inferior: ahí se la agrega acá. */}
+            {navegacionSimple && canAccess(permisos, "mis-permisos") && (
+              <div className="md:hidden">
+                <DropdownMenuItem onClick={() => setPage("mis-permisos")}>
+                  <CalendarClock size={16} className="mr-2" /> Mis Permisos
                 </DropdownMenuItem>
               </div>
             )}

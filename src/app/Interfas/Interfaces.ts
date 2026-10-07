@@ -697,6 +697,7 @@ export type Page =
   | "estadisticas"
   | "asistencia"
   | "mi-asistencia"
+  | "mis-permisos"
   | "recursos-humanos"
   | "configuracion-licencias"
   | "ia"
