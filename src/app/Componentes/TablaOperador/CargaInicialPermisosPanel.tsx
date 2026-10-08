@@ -58,6 +58,11 @@ export function CargaInicialPermisosPanel({ employeeId, onCerrar }: Props) {
   };
 
   const sinJornada = datos !== null && datos.cupoAnual === 0;
+  // El input type="number" normalmente bloquea texto no numérico, pero un
+  // valor pegado o un estado transitorio ("-", "e") puede colar un NaN.
+  // Number(NaN) serializa a null en el body, lo que mandaría
+  // horasConsumidas: null al backend y rompería la distinción null/0.
+  const valorInvalido = valor !== "" && Number.isNaN(Number(valor));
 
   return (
     <div
@@ -147,7 +152,7 @@ export function CargaInicialPermisosPanel({ employeeId, onCerrar }: Props) {
               <button
                 type="button"
                 onClick={guardar}
-                disabled={guardando || valor === ""}
+                disabled={guardando || valor === "" || valorInvalido}
                 className="flex-1 py-2 bg-primary hover:opacity-90 text-primary-foreground rounded-xl text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {guardando ? "Guardando…" : "Guardar"}
