@@ -16,6 +16,8 @@ import DateRangePicker from '../../GestionLicencias/Calendario';
 import { apiClient } from '../../util/apiClient';
 import { getAvailableLicenses } from '../../util/licenseFilters';
 import { ProgressBar } from "primereact/progressbar";
+import { CargaInicialPermisosPanel } from "./CargaInicialPermisosPanel";
+import { leerPermisos, tienePermiso } from "@/app/util/permisos";
 
 interface LicenseHistoryTabProps {
   licenses: Licenses;
@@ -906,11 +908,32 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
   );
 };
 
-export const PermissionHistoryTab = ({ permisos }: { permisos: Permit[] }) => (
-  console.log(permisos),
+export const PermissionHistoryTab = ({
+  permisos,
+  employeeId,
+}: {
+  permisos: Permit[];
+  employeeId: number;
+}) => {
+  const [panelAbierto, setPanelAbierto] = useState(false);
+  // Transitorio: el permiso se revoca cuando termina la migracion y el boton
+  // desaparece para todos, sin tocar codigo.
+  const puedeCargar = tienePermiso(leerPermisos(), "asistencia.cargaInicialPermisos");
 
+  return (
   <div className="mt-4 flow-root">
     <div className="bg-card p-6 rounded-lg shadow-sm">
+      {puedeCargar && (
+        <div className="flex justify-end mb-4">
+          <button
+            type="button"
+            onClick={() => setPanelAbierto(true)}
+            className="text-primary hover:bg-primary/10 border border-primary/30 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+          >
+            Cargar horas ya consumidas
+          </button>
+        </div>
+      )}
       <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
           <table className="min-w-full divide-y divide-border">
@@ -975,8 +998,15 @@ export const PermissionHistoryTab = ({ permisos }: { permisos: Permit[] }) => (
         </div>
       </div>
     </div>
-  </div>
-);
+      {panelAbierto && (
+        <CargaInicialPermisosPanel
+          employeeId={employeeId}
+          onCerrar={() => setPanelAbierto(false)}
+        />
+      )}
+    </div>
+  );
+};
 
 // ---------------------------------------------------------------------------
 // Tab: Documentos adjuntos del legajo

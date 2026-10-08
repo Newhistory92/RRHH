@@ -200,7 +200,7 @@ export const EmployeeDetailView = ({
           />
         )}
         {activeTab === "permisos" && (
-          <PermissionHistoryTab permisos={employee.permisos} />
+          <PermissionHistoryTab permisos={employee.permisos} employeeId={employee.id} />
         )}
         {activeTab === "documentos" && <DocumentsTab employee={employee} />}
         {activeTab === "feedback360" && <FeedbackIndicatorsTab employee={employee} />}
