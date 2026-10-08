@@ -22,6 +22,7 @@ interface MisPermisosResp {
   anio: number;
   tieneJornada: boolean;
   cupoAnual: number | null;
+  consumoInicial: number | null;
   consumido: number;
   restante: number | null;
   deuda: number;
@@ -136,13 +137,29 @@ export default function MisPermisos() {
                 Tu cupo de {datos.anio}
               </h2>
               {datos.cupoAnual !== null && datos.restante !== null ? (
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                <div
+                  className={`grid grid-cols-2 gap-6 ${
+                    datos.consumoInicial !== null && datos.consumoInicial > 0
+                      ? "lg:grid-cols-5"
+                      : "lg:grid-cols-4"
+                  }`}
+                >
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Cupo del año</p>
                     <p className="text-2xl font-heading text-foreground">
                       {fmtHoras(datos.cupoAnual)}
                     </p>
                   </div>
+                  {datos.consumoInicial !== null && datos.consumoInicial > 0 && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Ya usadas antes del registro
+                      </p>
+                      <p className="text-2xl font-heading text-foreground">
+                        {fmtHoras(datos.consumoInicial)}
+                      </p>
+                    </div>
+                  )}
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Usado</p>
                     <p className="text-2xl font-heading text-foreground">
@@ -198,6 +215,14 @@ export default function MisPermisos() {
                   {datos.restante > 0
                     ? "Mientras te quede cupo, los permisos no te descuentan horas."
                     : "Se te agotó el cupo del año: los permisos comunes que pidas ahora se cuentan como horas a recuperar."}
+                </p>
+              )}
+              {datos.consumoInicial !== null && datos.consumoInicial > 0 && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Las horas &quot;ya usadas antes del registro&quot; las cargó
+                  Recursos Humanos: son permisos que te tomaste antes de que el
+                  sistema los registrara, y por eso no figuran en la lista de
+                  abajo.
                 </p>
               )}
               {datos.deuda > 0 && (
