@@ -5,6 +5,7 @@ import { Toast } from "primereact/toast";
 import { apiClient } from "@/app/util/apiClient";
 import { AlertaTolerancia, JornadaIncompleta, TableroFila } from "@/app/Interfas/Interfaces";
 import AlertasToleranciaPanel from "./AlertasToleranciaPanel";
+import ExtensionToleranciaModal from "./ExtensionToleranciaModal";
 
 const fmtHoras = (h: number) => {
   const signo = h < 0 ? "-" : h > 0 ? "+" : "";
@@ -43,6 +44,7 @@ export default function AsistenciaTablero() {
   const [recalculando, setRecalculando] = useState(false);
   const [reseteando, setReseteando] = useState(false);
   const [huerfanosAbierto, setHuerfanosAbierto] = useState(false);
+  const [extensionAbierta, setExtensionAbierta] = useState(false);
   const toast = useRef<Toast>(null);
 
   const hoy = new Date().toISOString().split('T')[0];
@@ -202,6 +204,13 @@ export default function AsistenciaTablero() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-2xl text-foreground">Asistencia</h1>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setExtensionAbierta(true)}
+            className="px-4 py-2 rounded-lg bg-muted text-foreground text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
+          >
+            <i className="pi pi-clock text-sm" />
+            Extender tolerancia
+          </button>
           <button
             onClick={resetearDesdeHoy}
             disabled={reseteando || recalculando}
@@ -504,6 +513,10 @@ export default function AsistenciaTablero() {
             </div>
           </div>
         </div>
+      )}
+
+      {extensionAbierta && (
+        <ExtensionToleranciaModal onCerrar={() => setExtensionAbierta(false)} />
       )}
     </div>
   );
