@@ -33,9 +33,7 @@ export const PAGE_CONFIG: PageConfig[] = [
   { id: "organigrama", label: "Organigrama", icon: "GitMerge", section: "Organización", permiso: "organigrama.ver" },
   { id: "test", label: "Tests", icon: "ClipboardList", section: "Aprendizaje", permiso: "test.gestionar" },
   { id: "editar-perfil", label: "Mi Perfil", icon: "UserCircle", section: "Agente", permiso: "perfil.editar", ocultaEnSidebar: true },
-  // Ya esta en el menu de perfil (arriba a la derecha) para todos los
-  // roles, asi que no hace falta duplicarla en el sidebar.
-  { id: "licencias", label: "Licencias", icon: "FileText", section: "Organización", permiso: "licencias.propias", ocultaEnSidebar: true },
+  { id: "licencias", label: "Licencias", icon: "FileText", section: "Organización", permiso: "licencias.propias" },
   { id: "documentos", label: "Documentos", icon: "Folder", section: "Agente", permiso: "documentos.propios", ocultaSiTienePermiso: ["rrhh.gestionar", "admin.gestionar"] },
   { id: "feedback", label: "Feedback", icon: "MessageSquare", section: "Agente", permiso: "feedback.participar", ocultaEnSidebar: true },
   { id: "asistencia", label: "Asistencia", icon: "Clock", section: "Agente", permiso: "asistencia.propia" },

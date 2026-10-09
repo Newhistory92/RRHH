@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Bell, Sun, Moon, LogOut, UserCircle, FileText, MessageSquare, Folder, Clock, Menu, ArrowLeftRight, CalendarClock } from "lucide-react";
+import { Bell, Sun, Moon, LogOut, UserCircle, MessageSquare, Folder, Clock, Menu, ArrowLeftRight, CalendarClock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -96,10 +96,10 @@ export function AppHeader({
 
   const unreadCount = notifications.filter(n => n.status === "nueva").length;
 
-  // Quien tiene barra inferior ya llega a Asistencia, Licencias y Documentos
-  // desde ahí: en celular se esconden de este menú para no duplicarlas. En
-  // escritorio no hay barra y este menú sigue siendo el único acceso a
-  // Licencias, así que ahí se muestran igual.
+  // Quien tiene barra inferior ya llega a Mi Asistencia desde ahí (como
+  // "Asistencia"): en celular se esconde de este menú para no duplicarla.
+  // En escritorio no hay barra y este menú sigue siendo el único acceso a
+  // esa pantalla, así que ahí se muestra igual.
   const navegacionSimple = tieneNavegacionSimple(permisos);
   const soloEscritorio = navegacionSimple ? "hidden md:block" : "";
 
@@ -108,13 +108,17 @@ export function AppHeader({
     // tiene 4 capas, no solo blur+transparencia (eso sobre un fondo de pagina
     // liso lee como un blanco sucio, no como vidrio):
     //   1. bg-glass: base tenida con --primary, no blanco/negro puro.
-    //   2. backdrop-blur-xl + saturate(180%): satura lo que SI pasa por abajo
+    //   2. backdrop-blur-2xl + saturate(200%): satura lo que SI pasa por abajo
     //      (tarjetas, badges) antes de desenfocarlo, para que se note.
-    //   3. glass-highlight: filo de luz interior arriba, el borde que
-    //      "atrapa" la luz en un vidrio real.
+    //   3. border-glass-border + glass-highlight: el borde marca el canto del
+    //      vidrio y el highlight es el filo de luz interior arriba, el brillo
+    //      que "atrapa" la luz en un vidrio real -ambos mas marcados que un
+    //      borde apenas perceptible, porque sobre un fondo de pagina liso
+    //      (sin nada vistoso detras para desenfocar) es lo unico que dice
+    //      "esto es un panel de vidrio" en vez de "esto es gris solido".
     //   4. glass-shadow: sombra de elevacion, separa la barra del contenido.
     <header
-      className="fixed inset-x-0 top-0 z-40 h-16 border-b border-glass-border bg-glass backdrop-blur-xl backdrop-saturate-[180%]"
+      className="fixed inset-x-0 top-0 z-40 h-16 border-b border-glass-border bg-glass backdrop-blur-2xl backdrop-saturate-[200%]"
       style={{
         boxShadow: `inset 0 1px 0 var(--glass-highlight), var(--glass-shadow)`,
       }}
@@ -234,13 +238,6 @@ export function AppHeader({
               <div className={soloEscritorio}>
                 <DropdownMenuItem onClick={() => setPage("mi-asistencia")}>
                   <Clock size={16} className="mr-2" /> Mi Asistencia
-                </DropdownMenuItem>
-              </div>
-            )}
-            {tienePermiso(permisos, "licencias.propias") && (
-              <div className={soloEscritorio}>
-                <DropdownMenuItem onClick={() => setPage("licencias")}>
-                  <FileText size={16} className="mr-2" /> Licencias
                 </DropdownMenuItem>
               </div>
             )}
