@@ -56,9 +56,9 @@
      (texto oscuro en claro) da 6.12:1 -- ver la variante .dark para el piso
      ahi, que es mas alto (0.76) porque el tinte se compone distinto. */
   --glass: rgba(233, 238, 239, 0.72);
-  --glass-border: rgba(30, 85, 97, 0.18);
-  --glass-highlight: rgba(255, 255, 255, 0.55);
-  --glass-shadow: 0 8px 32px rgba(30, 85, 97, 0.10), 0 1px 2px rgba(55, 54, 62, 0.06);
+  --glass-border: rgba(30, 85, 97, 0.32);
+  --glass-highlight: rgba(255, 255, 255, 0.7);
+  --glass-shadow: 0 8px 32px rgba(30, 85, 97, 0.14), 0 1px 2px rgba(55, 54, 62, 0.08);
 
   --warm-contrast: #37363E;           /* con blanco encima: 11.93:1 */
   --warm-contrast-foreground: #FFFFFF;
@@ -206,9 +206,9 @@
   /* rgb(44,53,61) = 14% de --primary (#5FA3B2) sobre el fondo oscuro.
      alpha 0.76: en el peor caso (texto claro pasando por abajo) da 5.01:1. */
   --glass: rgba(44, 53, 61, 0.76);
-  --glass-border: rgba(95, 163, 178, 0.16);
-  --glass-highlight: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
+  --glass-border: rgba(95, 163, 178, 0.32);
+  --glass-highlight: rgba(255, 255, 255, 0.16);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
 
   --warm-contrast: #C3D184;
   --warm-contrast-foreground: #37363E;
