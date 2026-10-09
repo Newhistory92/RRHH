@@ -81,6 +81,41 @@ export const ProfileTab = ({ employee, onSave }: { employee: Employee; onSave?: 
   const [relojSinConexion, setRelojSinConexion] = useState(false);
   const [profesiones, setProfesiones] = useState<string[]>([]);
 
+  // El check se guarda al tocarlo: la tarjeta "Datos Personales" es de solo
+  // lectura y no vale la pena montarle un modo de edición entero por un
+  // control. Se muestra deshabilitado -no oculto- para quien no es RRHH: que
+  // el agente vea cómo está cargado su propio dato es parte de que la
+  // decisión sea auditable.
+  const [fueraAnillo, setFueraAnillo] = useState(
+    employee.fueraAnilloCircunvalacion ?? false
+  );
+  const [guardandoAnillo, setGuardandoAnillo] = useState(false);
+  const puedeEditarAnillo = tienePermiso(leerPermisos(), "rrhh.gestionar");
+
+  const guardarAnillo = async (valor: boolean) => {
+    // Optimista: el check responde al toque y vuelve atrás si el PUT falla.
+    setFueraAnillo(valor);
+    setGuardandoAnillo(true);
+    try {
+      await apiClient.put(`/employee/${employee.id}`, {
+        fueraAnilloCircunvalacion: valor,
+      });
+      void onSave?.();
+    } catch (error) {
+      setFueraAnillo(!valor);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: error instanceof Error
+          ? error.message
+          : "No se pudo guardar el domicilio fuera del anillo",
+        life: 5000,
+      });
+    } finally {
+      setGuardandoAnillo(false);
+    }
+  };
+
   // Las posiciones salen del catalogo de Configuracion > Profesiones y cargos,
   // el mismo endpoint que administra esa pantalla. Antes estaban hardcodeadas
   // aca, asi que lo que se cargaba en configuracion no llegaba al perfil.
@@ -260,6 +295,27 @@ export const ProfileTab = ({ employee, onSave }: { employee: Employee; onSave?: 
               </InfoCard>
               <InfoCard icon={Home} title="Domicilio">
                 {employee.address}
+                <label
+                  className="mt-2 flex items-start gap-2 cursor-pointer"
+                  title={
+                    "Tildado: este agente vive fuera del anillo y recibe las " +
+                    "extensiones de tolerancia que RRHH otorgue para un día " +
+                    "puntual. Sin tildar: mantiene siempre los 15 minutos de " +
+                    "tolerancia."
+                  }
+                >
+                  <input
+                    type="checkbox"
+                    checked={fueraAnillo}
+                    disabled={!puedeEditarAnillo || guardandoAnillo}
+                    onChange={(e) => void guardarAnillo(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 accent-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    Fuera del anillo de Circunvalación
+                    {guardandoAnillo && " · guardando…"}
+                  </span>
+                </label>
               </InfoCard>
               <InfoCard icon={Cake} title="Fecha de Nacimiento">
                 {formatDate(employee.birthDate)}

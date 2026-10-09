@@ -342,6 +342,9 @@ export interface Employee {
   email: string;
   phone: string;
   address: string;
+  /** Vive fuera del anillo de Circunvalación: recibe las extensiones de
+   *  tolerancia que RRHH otorga para un día puntual. */
+  fueraAnilloCircunvalacion: boolean;
   birthDate: Date | null;
   gender?: string;
   photo: string;
