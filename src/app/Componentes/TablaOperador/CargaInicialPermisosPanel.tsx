@@ -173,7 +173,11 @@ export function CargaInicialPermisosPanel({ employeeId, onCerrar }: Props) {
                       type="button"
                       onClick={() => borrar(a.id)}
                       disabled={guardando}
-                      aria-label={`Borrar la carga de ${fmtHoras(a.horasConsumidas)}`}
+                      // Dos asientos pueden tener las mismas horas; la fecha
+                      // es lo que distingue cuál se está por borrar.
+                      aria-label={`Borrar la carga de ${fmtHoras(a.horasConsumidas)} del ${
+                        a.cargadoEn ? a.cargadoEn.slice(0, 10) : "sin fecha"
+                      }`}
                       className="text-error hover:opacity-80 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       Borrar
