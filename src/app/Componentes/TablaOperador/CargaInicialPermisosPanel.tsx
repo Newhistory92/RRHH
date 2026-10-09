@@ -10,6 +10,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { apiClient } from "@/app/util/apiClient";
+import { timeStringToDecimal } from "@/app/Componentes/TablaOperador/employeeApi";
 
 interface Asiento {
   id: number;
@@ -30,13 +31,19 @@ interface Props {
   onCerrar: () => void;
 }
 
-const fmtHoras = (h: number) => `${h} h`;
+// Mismo formato que ya usa "Mis permisos", para que las horas se lean igual
+// en las dos pantallas.
+const fmtHoras = (h: number) => {
+  const horas = Math.floor(h);
+  const min = Math.round((h - horas) * 60);
+  return `${horas}h ${String(min).padStart(2, "0")}m`;
+};
 
 export function CargaInicialPermisosPanel({ employeeId, onCerrar }: Props) {
   const [datos, setDatos] = useState<CargaInicialPermisos | null>(null);
-  // Texto y no número: el campo tiene que distinguir vacío ("no se cargó
-  // nada") de "0" ("se determinó que no usó ninguna"), y un input numérico
-  // colapsa los dos casos.
+  // "HH:MM" o vacío. Vacío distingue "no se cargó nada" de "00:00"
+  // ("se determinó que no usó ninguna"): un input numérico sin el estado
+  // en texto colapsaría esos dos casos.
   const [valor, setValor] = useState("");
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
@@ -57,18 +64,19 @@ export function CargaInicialPermisosPanel({ employeeId, onCerrar }: Props) {
       .finally(() => setCargando(false));
   }, [recargar]);
 
-  // El input type="number" normalmente bloquea texto no numérico, pero un
-  // valor pegado o un estado transitorio ("-", "e") puede colar un NaN.
-  // Number(NaN) serializa a null en el body, lo que mandaría
-  // horasConsumidas: null al backend.
-  const valorInvalido = valor !== "" && Number.isNaN(Number(valor));
+  // El input type="time" solo entrega "" o un "HH:MM" bien formado -el
+  // navegador no deja escribir otra cosa-, así que no hace falta blindarse
+  // contra NaN como con un input numérico: el valor siempre es válido o
+  // está vacío.
+  const horasDecimales = valor === "" ? null : timeStringToDecimal(valor);
 
   const agregar = async () => {
+    if (horasDecimales === null) return;
     setGuardando(true);
     setError(null);
     try {
       await apiClient.post(`/asistencia/carga-inicial-permisos/${employeeId}`, {
-        horasConsumidas: Number(valor),
+        horasConsumidas: horasDecimales,
       });
       // No se cierra el panel: RRHH suele cargar varios asientos de una
       // pasada y necesita ver el total actualizándose.
@@ -196,27 +204,23 @@ export function CargaInicialPermisosPanel({ employeeId, onCerrar }: Props) {
             <div className="flex gap-2">
               <input
                 id="horas-consumidas"
-                type="number"
-                min="0"
-                max="2000"
-                step="0.5"
+                type="time"
                 value={valor}
                 onChange={(e) => setValor(e.target.value)}
-                placeholder="Horas"
                 className="flex-1 px-3 py-2 rounded-md border border-border bg-background text-foreground"
               />
               <button
                 type="button"
                 onClick={agregar}
-                disabled={guardando || valor === "" || valorInvalido}
+                disabled={guardando || horasDecimales === null}
                 className="px-4 py-2 bg-primary hover:opacity-90 text-primary-foreground rounded-md text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {guardando ? "Guardando…" : "Agregar"}
               </button>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Cada carga se suma. Para corregir una equivocada, borrala de la
-              lista y cargá la correcta.
+              Formato horas:minutos. Cada carga se suma. Para corregir una
+              equivocada, borrala de la lista y cargá la correcta.
             </p>
 
             {error && <p className="text-sm text-error mt-3">{error}</p>}
