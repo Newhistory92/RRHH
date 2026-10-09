@@ -206,7 +206,7 @@ export default function AsistenciaTablero() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setExtensionAbierta(true)}
-            className="px-4 py-2 rounded-lg bg-muted text-foreground text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
+            className="px-4 py-2 rounded-lg border border-border bg-muted text-foreground text-sm font-medium shadow-soft hover:shadow-md hover:opacity-90 transition-all flex items-center gap-2"
           >
             <i className="pi pi-clock text-sm" />
             Extender tolerancia
@@ -214,7 +214,7 @@ export default function AsistenciaTablero() {
           <button
             onClick={resetearDesdeHoy}
             disabled={reseteando || recalculando}
-            className="px-4 py-2 rounded-lg bg-muted text-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity flex items-center gap-2"
+            className="px-4 py-2 rounded-lg border border-border bg-muted text-foreground text-sm font-medium shadow-soft hover:shadow-md hover:opacity-90 disabled:opacity-50 disabled:shadow-none transition-all flex items-center gap-2"
           >
             <i className={`pi ${reseteando ? "pi-spin pi-spinner" : "pi-calendar"} text-sm`} />
             {reseteando ? "Reseteando…" : "Empezar desde hoy"}
@@ -222,7 +222,7 @@ export default function AsistenciaTablero() {
           <button
             onClick={lanzarRecalculo}
             disabled={recalculando || reseteando}
-            className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity flex items-center gap-2"
+            className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium shadow-soft hover:shadow-md hover:opacity-90 disabled:opacity-50 disabled:shadow-none transition-all flex items-center gap-2"
           >
             <i className={`pi ${recalculando ? "pi-spin pi-spinner" : "pi-refresh"} text-sm`} />
             {recalculando ? "Iniciando…" : "Recalcular todo"}
