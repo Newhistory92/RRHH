@@ -28,10 +28,26 @@ interface BiometricoHuerfano {
   ultimaMarcacion: string;
 }
 
+interface ErrorDeRecalculo {
+  employeeId: number | null;
+  nombre: string | null;
+  error: string;
+}
+
+interface BarridoConErrores {
+  id: number;
+  origen: string;
+  finalizadoAt: string | null;
+  procesados: number;
+  errores: ErrorDeRecalculo[];
+}
+
 export default function AsistenciaTablero() {
   const [filas, setFilas] = useState<TableroFila[]>([]);
   const [incompletas, setIncompletas] = useState<JornadaIncompleta[]>([]);
   const [huerfanos, setHuerfanos] = useState<BiometricoHuerfano[]>([]);
+  const [barridoFallido, setBarridoFallido] = useState<BarridoConErrores | null>(null);
+  const [erroresAbierto, setErroresAbierto] = useState(false);
   const [alertas, setAlertas] = useState<AlertaTolerancia[]>([]);
   const [diasRachaAlerta, setDiasRachaAlerta] = useState(3);
   const [tab, setTab] = useState<"saldo" | "alertas">("saldo");
@@ -55,17 +71,19 @@ export default function AsistenciaTablero() {
   const cargar = async () => {
     setCargando(true);
     try {
-      const [t, i, h, a] = await Promise.all([
+      const [t, i, h, a, e] = await Promise.all([
         apiClient.get<{ empleados: TableroFila[] }>(`/asistencia/tablero?desde=${desdeTablero}&hasta=${hastaTablero}`),
         apiClient.get<{ jornadas: JornadaIncompleta[] }>("/asistencia/incompletas"),
         apiClient.get<{ huerfanos: BiometricoHuerfano[] }>("/asistencia/biometricos-huerfanos"),
         apiClient.get<{ empleados: AlertaTolerancia[]; diasRachaAlerta: number }>(`/asistencia/alertas-tolerancia?desde=${desdeTablero}&hasta=${hastaTablero}`),
+        apiClient.get<{ ultimoBarrido: BarridoConErrores | null }>("/asistencia/recalculos/errores"),
       ]);
       setFilas(t.empleados);
       setIncompletas(i.jornadas);
       setHuerfanos(h.huerfanos);
       setAlertas(a.empleados);
       setDiasRachaAlerta(a.diasRachaAlerta);
+      setBarridoFallido(e.ultimoBarrido);
     } catch (e) {
       toast.current?.show({
         severity: "error",
@@ -295,6 +313,65 @@ export default function AsistenciaTablero() {
 
       {tab === "saldo" && (
       <>
+      {/* ── Empleados que el último recálculo no pudo calcular ───── */}
+      {barridoFallido && (
+        <div className="mb-8 bg-card rounded-lg shadow-sm border border-error overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setErroresAbierto((a) => !a)}
+            className="w-full flex items-center justify-between gap-2 p-4 text-left hover:bg-surface-muted transition-colors"
+            aria-expanded={erroresAbierto}
+          >
+            <h2 className="font-heading text-lg text-foreground flex items-center gap-2">
+              <i className="pi pi-times-circle text-error" />
+              Empleados que no se pudieron calcular ({barridoFallido.errores.length})
+            </h2>
+            <i className={`pi ${erroresAbierto ? "pi-chevron-up" : "pi-chevron-down"} text-muted-foreground`} />
+          </button>
+
+          {erroresAbierto && (
+            <div className="px-4 pb-4">
+              <p className="text-sm text-muted-foreground mb-4">
+                La asistencia de estas personas quedó sin actualizar: el último
+                recálculo falló al procesarlas y siguió con el resto. Una vez
+                corregida la causa, &quot;Recalcular todo&quot; las vuelve a
+                procesar y este aviso desaparece solo.
+              </p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-muted-foreground border-b border-border">
+                      <th className="py-2 pr-4">Legajo</th>
+                      <th className="py-2 pr-4">Empleado</th>
+                      <th className="py-2">Error</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {barridoFallido.errores.map((e, i) => (
+                      <tr key={`${e.employeeId ?? "sin-legajo"}-${i}`} className="border-b border-border last:border-0">
+                        <td className="py-2 pr-4 font-mono font-semibold text-error">
+                          {e.employeeId ?? "—"}
+                        </td>
+                        <td className="py-2 pr-4">{e.nombre ?? "—"}</td>
+                        <td className="py-2 font-mono text-xs text-muted-foreground break-all">
+                          {e.error}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Corrida #{barridoFallido.id} ({barridoFallido.origen})
+                {barridoFallido.finalizadoAt &&
+                  ` · ${barridoFallido.finalizadoAt.slice(0, 16).replace("T", " ")}`}
+                {" · "}{barridoFallido.procesados} empleados procesados bien
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── IDs del reloj sin vincular ───────────────────────────── */}
       {huerfanos.length > 0 && (
         <div className="mb-8 bg-card rounded-lg shadow-sm border border-warning overflow-hidden">
