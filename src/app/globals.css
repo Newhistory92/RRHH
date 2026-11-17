@@ -138,6 +138,26 @@
     cursor: not-allowed !important;
 }
 
+/* SelectButton (usado en la encuesta de feedback 360) arma cada opcion como
+   un .p-button sin severity, asi que el override de arriba le pintaba el
+   fondo primario a TODAS las opciones por igual, elegida o no -- la unica
+   diferencia visible quedaba en un anillo de foco casi invisible sobre fondo
+   oscuro. Se le da mas especificidad a la opcion no elegida para que vuelva
+   a un fondo neutro, y la elegida mantiene el acento de marca. */
+.p-selectbutton .p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-link):not(.p-button-success):not(.p-button-danger):not(.p-button-warning):not(.p-button-info):not(.p-button-secondary):not(.p-button-help):not(.p-highlight) {
+    background: var(--background) !important;
+    border-color: var(--border) !important;
+    color: var(--foreground) !important;
+}
+.p-selectbutton .p-button:not(.p-highlight):hover {
+    background: var(--muted) !important;
+}
+.p-selectbutton .p-button.p-highlight {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: var(--primary-foreground) !important;
+}
+
 /* El override de arriba excluye a proposito los botones con severity: sin
    esto, p-button-info/success/danger/secondary se quedan con los colores de
    fabrica del tema de PrimeReact (celeste, verde, rojo, gris genericos) en
