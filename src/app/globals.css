@@ -2,92 +2,113 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  /* ===== Paleta base ===== */
-  --brand-charcoal: #37363E;
-  --brand-teal:     #1E5561;
-  --brand-olive:    #C3D184;
-  --brand-red:      #EF4444;
-  --brand-sage:     #6AA69B;
-  --brand-amber:    #D97706;
+  /* ===== Paleta base — 60/30/10 =====
+     60% Crema Clasica: superficies (fondo, tarjetas). 30% Verde Abeto:
+     texto, marca, navegacion. 10% Rojo Tomate: reservado para lo que pide
+     atencion (badges de alerta, acciones destructivas) -- nunca fondo de
+     seccion. Ver docs/paleta-colores.md. */
+  --brand-cream:  #F1E8D8;
+  --brand-fir:    #1B3A2B;
+  --brand-tomato: #EE4129;
+
+  /* Excepcion documentada: no hay un cuarto color de marca para "warning"
+     distinto de error. Un ocre terroso cumple ese rol sin salirse del
+     mundo de la paleta (crema+tomate), atenuado para no competir con el
+     10% de tomate. Ver docs/paleta-colores.md s3. */
+  --brand-ocre: #8A5A12;
 
   /* Scrim de overlays/modales: fijo en ambos temas a propósito, un scrim
      siempre debe oscurecer el fondo, sin importar el tema activo. */
   --overlay: rgba(36, 35, 42, 0.6);
 
   /* ===== Variantes accesibles para TEXTO sobre fondo claro =====
-     Los colores base fallan AA como color de texto sobre blanco:
-     oliva 1.64:1 · sage 2.78:1 · rojo 3.76:1 · ámbar 2.96:1.
-     Estas variantes son las que se usan cuando el color es TEXTO. */
-  --brand-sage-text:  #3D7065; /* 5.67:1 */
-  --brand-olive-text: #616D33; /* 5.61:1 */
-  --brand-red-text:   #C42B2B; /* 5.63:1 */
-  --brand-amber-text: #A2570A; /* 5.38:1 */
+     Blanco sobre tomate da 3.87:1, no alcanza AA (necesita 4.5) -- tampoco
+     alcanza el propio verde abeto como texto sobre tomate (3.22:1). Estas
+     dos variantes son las que se usan cuando el color es TEXTO/fill con
+     texto encima. */
+  --brand-tomato-text: #BA3320; /* 4.82:1 sobre crema */
+  --brand-ink:         #130503; /* 5.42:1+ sobre tomate; texto para fills de tomate */
+  /* Fir y ocre YA sirven como texto en claro (10+:1 y 4.86:1), pero su hex
+     base se hunde en oscuro (1.22:1 y 2.57:1 sobre --card ahi). Estas dos
+     variantes conmutan solas entre temas -- mismo patron que las -text
+     viejas del sistema anterior. */
+  --brand-fir-text:  #1B3A2B;   /* = fir; valido en claro */
+  --brand-ocre-text: #8A5A12;   /* = ocre; valido en claro */
 
   --radius: 1rem;
 
-  --background: #F6F7F4;
-  --foreground: #37363E;              /* 11.10:1 */
-  --card: #FFFFFF;
-  --card-foreground: #37363E;         /* 11.93:1 */
-  --popover: #FFFFFF;
-  --popover-foreground: #37363E;
+  --background: #F1E8D8;
+  --foreground: #1B3A2B;              /* 10.24:1 */
+  --card: #F7F2EA;
+  --card-foreground: #1B3A2B;         /* 11.17:1 */
+  --popover: #F7F2EA;
+  --popover-foreground: #1B3A2B;
 
-  --primary: #1E5561;                 /* con blanco encima: 8.31:1 */
+  --primary: #1B3A2B;                 /* con blanco encima: 12.45:1 */
   --primary-foreground: #FFFFFF;
-  --secondary: #C9DEDA;               /* tinte sage; con charcoal: 8.49:1 */
-  --secondary-foreground: #37363E;
-  --muted: #F3F3F4;
-  --muted-foreground: #6B6A73;        /* 4.81:1 sobre muted */
-  --accent: #C3D184;                  /* con charcoal encima: 7.26:1 */
-  --accent-foreground: #37363E;
-  --destructive: #C42B2B;             /* con blanco encima: 5.63:1 */
-  --destructive-foreground: #FFFFFF;
+  --secondary: #D7D3C3;               /* tinte fir sobre crema; con fir: 8.30:1 */
+  --secondary-foreground: #1B3A2B;
+  --muted: #E4DECE;
+  --muted-foreground: #4A6051;        /* 5.07:1 sobre muted */
+  /* --accent es el hover/seleccion NEUTRO que usan los componentes shadcn
+     (dropdown, boton ghost, skeleton) en toda la app -- a proposito NO es
+     el rojo tomate. Si lo fuera, cada hover de cada menu se pondria rojo,
+     que es lo opuesto a "el acento debe sentirse escaso" (regla 1). El
+     tomate vive solo en --destructive y en --color-error/-soft, que son
+     los lugares que ya significan "atencion" en este codebase. */
+  --accent: #DED8C8;                  /* con fir encima: 8.75:1 */
+  --accent-foreground: #1B3A2B;
+  --destructive: #EE4129;             /* con --brand-ink encima: 5.42:1 */
+  --destructive-foreground: #130503;
 
-  --border: color-mix(in srgb, #37363E 16%, transparent);
-  --input:  color-mix(in srgb, #37363E 16%, transparent);
-  --ring:   color-mix(in srgb, #1E5561 55%, transparent);
+  --border: color-mix(in srgb, #1B3A2B 16%, transparent);
+  --input:  color-mix(in srgb, #1B3A2B 16%, transparent);
+  --ring:   color-mix(in srgb, #1B3A2B 55%, transparent);
 
   /* Superficie glass del navbar. Blanco puro + blur no lee como vidrio sobre
-     un fondo de pagina liso (#F6F7F4): no hay color detras para desenfocar.
-     Se tine la base con un 10% de --primary antes de bajarla a alpha, y el
+     un fondo de pagina liso: no hay color detras para desenfocar. Se tine
+     la base con un 10% de --primary antes de bajarla a alpha, y el
      backdrop-filter suma saturate() para que lo que sí pasa por abajo (tarjetas,
-     badges) salga mas vivo. rgb(233,238,239) = 10% de #1E5561 sobre blanco.
-     alpha 0.72 es el piso medido: con el peor fondo posible pasando por abajo
-     (texto oscuro en claro) da 6.12:1 -- ver la variante .dark para el piso
-     ahi, que es mas alto (0.76) porque el tinte se compone distinto. */
-  --glass: rgba(233, 238, 239, 0.72);
-  --glass-border: rgba(30, 85, 97, 0.32);
+     badges) salga mas vivo. rgb(232,235,234) = 10% de #1B3A2B sobre blanco.
+     alpha 0.72 es el piso heredado del retheme anterior -- ver la variante
+     .dark para el piso ahi (0.76). */
+  --glass: rgba(232, 235, 234, 0.72);
+  --glass-border: rgba(27, 58, 43, 0.32);
   --glass-highlight: rgba(255, 255, 255, 0.7);
-  --glass-shadow: 0 8px 32px rgba(30, 85, 97, 0.14), 0 1px 2px rgba(55, 54, 62, 0.08);
+  --glass-shadow: 0 8px 32px rgba(27, 58, 43, 0.14), 0 1px 2px rgba(27, 58, 43, 0.08);
 
-  --warm-contrast: #37363E;           /* con blanco encima: 11.93:1 */
+  --warm-contrast: #1B3A2B;           /* = --primary; con blanco encima: 12.45:1 */
   --warm-contrast-foreground: #FFFFFF;
-  --shadow-soft: 0 2px 10px rgba(55, 54, 62, 0.08);
+  --shadow-soft: 0 2px 10px rgba(27, 58, 43, 0.08);
 
-  --color-success: #3D7065;
+  --color-success: #1B3A2B;
   --color-success-foreground: #FFFFFF;
-  --color-warning: #A2570A;
+  --color-warning: #8A5A12;
   --color-warning-foreground: #FFFFFF;
-  --color-error: #C42B2B;
-  --color-error-foreground: #FFFFFF;
-  --color-info: #1E5561;
+  --color-error: #EE4129;
+  --color-error-foreground: #130503;
+  /* No hay un cuarto color para "info" sin salir de la paleta de 3 colores;
+     se alinea con success (verde abeto). Es un alcance chico: el unico uso
+     real de 'info' hoy esta en Login, fuera de este pase. */
+  --color-info: #1B3A2B;
   --color-info-foreground: #FFFFFF;
 
-  --color-success-soft: #E6F1EF;              /* + #3D7065 = 4.91:1 */
-  --color-success-soft-foreground: #3D7065;
-  --color-warning-soft: #FDF3E7;              /* + #A2570A = 4.91:1 */
-  --color-warning-soft-foreground: #A2570A;
-  --color-error-soft: #FDEAEA;                /* + #C42B2B = 4.86:1 */
-  --color-error-soft-foreground: #C42B2B;
-  --color-info-soft: #DCE7EA;                 /* + #1E5561 = 6.59:1 */
-  --color-info-soft-foreground: #1E5561;
+  --color-success-soft: #E4DECE;               /* + #1B3A2B = 9.27:1 */
+  --color-success-soft-foreground: #1B3A2B;
+  --color-warning-soft: #EEE4D2;               /* + #8A5A12 = 4.69:1 */
+  --color-warning-soft-foreground: #8A5A12;
+  --color-error-soft: #F1E3D3;                 /* + #BA3320 = 4.65:1 */
+  --color-error-soft-foreground: #BA3320;
+  --color-info-soft: #E4DECE;                  /* = success-soft */
+  --color-info-soft-foreground: #1B3A2B;
 
-  /* Rampa de 5 pasos para medidores de desempeño (fondo, siempre con texto #37363E) */
-  --scale-1: #3D7065;  /* mejor */
-  --scale-2: #6AA69B;
-  --scale-3: #C3D184;
-  --scale-4: #D97706;
-  --scale-5: #C42B2B;  /* peor */
+  /* Rampa de 5 pasos para medidores de desempeño (fondo, siempre con texto
+     --brand-ink o --foreground segun el paso). Sin uso en vivo hoy. */
+  --scale-1: #1B3A2B;  /* mejor: fir */
+  --scale-2: #534A1F;
+  --scale-3: #8A5A12;  /* ocre */
+  --scale-4: #BC4E1E;
+  --scale-5: #EE4129;  /* peor: tomate */
 }
 
 .p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-link):not(.p-button-success):not(.p-button-danger):not(.p-button-warning):not(.p-button-info):not(.p-button-secondary):not(.p-button-help) {
@@ -174,63 +195,69 @@
 
 .dark {
   /* Las variantes -text de :root son tonos oscuros pensados para fondo claro:
-     sobre #24232A serian ilegibles. En oscuro el rol se invierte y los que
-     sirven como texto son los tonos claros. */
-  --brand-sage-text:  #8FC0B6;        /* 6.72:1 sobre --card */
-  --brand-olive-text: #C3D184;        /* 8.27:1 sobre --card */
-  --brand-red-text:   #F87171;        /* 4.91:1 sobre --card */
-  --brand-amber-text: #FBBF24;        /* 8.14:1 sobre --card */
+     sobre #171F1B serian ilegibles o se hundirian. En oscuro el rol se
+     invierte y los que sirven como texto son los tonos claros. Los brand-*
+     base (--brand-cream/fir/tomato/ocre) NO se tocan aca a proposito: son
+     la referencia constante de marca en los dos temas, igual que el teal y
+     el oliva nunca cambiaban de hex en el sistema anterior. */
+  --brand-tomato-text: #FF7A5C;       /* 7.31:1 sobre --brand-ink */
+  --brand-fir-text:    #5CA87D;       /* 5.32:1 sobre --card */
+  --brand-ocre-text:   #E2A54A;       /* 7.03:1 sobre --card */
+  --brand-ink:         #0A140F;       /* texto sobre los tres fills de arriba */
 
-  --background: #24232A;
-  --foreground: #EDECF0;              /* 13.24:1 */
-  --card: #2E2D36;
-  --card-foreground: #EDECF0;         /* 11.56:1 */
-  --popover: #2E2D36;
-  --popover-foreground: #EDECF0;
+  --background: #171F1B;
+  --foreground: #EDE8DC;              /* 13.76:1 */
+  --card: #1E2822;
+  --card-foreground: #EDE8DC;         /* 12.43:1 */
+  --popover: #1E2822;
+  --popover-foreground: #EDE8DC;
 
-  --primary: #5FA3B2;                 /* 5.46:1 — el teal base falla acá (1.87:1) */
-  --primary-foreground: #14262B;
-  --secondary: #3A4644;               /* con foreground encima: 8.35:1 */
-  --secondary-foreground: #EDECF0;
-  --muted: #33323B;
-  --muted-foreground: #A3A1AC;        /* 4.97:1 sobre muted */
-  --accent: #C3D184;                  /* 9.47:1 sobre el fondo */
-  --accent-foreground: #37363E;       /* 7.26:1 */
-  --destructive: #F87171;             /* 5.63:1 sobre el fondo */
-  --destructive-foreground: #24232A;
+  --primary: #5CA87D;                 /* 6.57:1 — el fir base falla acá (1.?:1, muy oscuro) */
+  --primary-foreground: #0A140F;
+  --secondary: #2A362F;               /* con foreground encima: 10.30:1 */
+  --secondary-foreground: #EDE8DC;
+  --muted: #232D27;
+  --muted-foreground: #9CA79D;        /* 5.71:1 sobre muted */
+  /* Mismo rol neutro que en claro: hover/seleccion de shadcn, no el acento
+     de marca. */
+  --accent: #2A362F;
+  --accent-foreground: #EDE8DC;
+  --destructive: #FF7A5C;             /* con --brand-ink encima: 7.31:1 */
+  --destructive-foreground: #0A140F;
 
-  --border: #45444F;
-  --input:  #45444F;
-  --ring:   color-mix(in srgb, #5FA3B2 55%, transparent);
+  --border: #34443B;
+  --input:  #34443B;
+  --ring:   color-mix(in srgb, #5CA87D 55%, transparent);
 
-  /* rgb(44,53,61) = 14% de --primary (#5FA3B2) sobre el fondo oscuro.
-     alpha 0.76: en el peor caso (texto claro pasando por abajo) da 5.01:1. */
-  --glass: rgba(44, 53, 61, 0.76);
-  --glass-border: rgba(95, 163, 178, 0.32);
+  /* rgb(33,50,41) = 14% de --primary (#5CA87D) sobre el fondo oscuro.
+     Misma alpha que el retheme anterior (0.76) para el mismo piso de
+     contraste en el peor caso. */
+  --glass: rgba(33, 50, 41, 0.76);
+  --glass-border: rgba(92, 168, 125, 0.32);
   --glass-highlight: rgba(255, 255, 255, 0.16);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
 
-  --warm-contrast: #C3D184;
-  --warm-contrast-foreground: #37363E;
+  --warm-contrast: #5CA87D;           /* = --primary en oscuro */
+  --warm-contrast-foreground: #0A140F;
   --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.35);
 
-  --color-success: #8FC0B6;
-  --color-success-foreground: #24352F;
-  --color-warning: #FBBF24;
-  --color-warning-foreground: #3A2E1A;
-  --color-error: #F87171;
-  --color-error-foreground: #3A2323;
-  --color-info: #5FA3B2;
-  --color-info-foreground: #1B333A;
+  --color-success: #5CA87D;
+  --color-success-foreground: #0A140F;
+  --color-warning: #E2A54A;
+  --color-warning-foreground: #0A140F;
+  --color-error: #FF7A5C;
+  --color-error-foreground: #0A140F;
+  --color-info: #5CA87D;
+  --color-info-foreground: #0A140F;
 
-  --color-success-soft: #24352F;
-  --color-success-soft-foreground: #8FC0B6;   /* 6.39:1 */
-  --color-warning-soft: #3A2E1A;
-  --color-warning-soft-foreground: #FBBF24;   /* 7.93:1 */
-  --color-error-soft: #3A2323;
-  --color-error-soft-foreground: #F87171;     /* 5.26:1 */
-  --color-info-soft: #1B333A;
-  --color-info-soft-foreground: #5FA3B2;      /* 4.66:1 */
+  --color-success-soft: #1E2D25;
+  --color-success-soft-foreground: #5CA87D;   /* 5.05:1 */
+  --color-warning-soft: #272A1F;
+  --color-warning-soft-foreground: #E2A54A;   /* 6.76:1 */
+  --color-error-soft: #2A2620;
+  --color-error-soft-foreground: #FF7A5C;     /* 5.86:1 */
+  --color-info-soft: #1E2D25;
+  --color-info-soft-foreground: #5CA87D;      /* = success-soft */
 }
 
 @theme inline {
@@ -257,15 +284,19 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  /* Acentos usables como COLOR DE TEXTO/icono. Los tonos base (oliva, sage,
-     ambar) fallan AA como foreground sobre fondo claro -- el oliva da 1.64:1.
-     Estas variantes conmutan solas entre claro y oscuro.
+  /* Acentos usables como COLOR DE TEXTO/icono (herencia del tema anterior,
+     con tres categorias -oliva/sage/ambar-; ahora la paleta solo tiene dos
+     hues no-neutras, asi que oliva y sage colapsan al mismo verde abeto en
+     vez de inventarse una variante casi identica solo para tener tres
+     colores "distintos" -- la regla 4 del usuario pide un solo tono por
+     color, sin variaciones de saturacion al voleo). Ambar pasa al ocre de
+     --brand-ocre, el unico exceso documentado de la paleta.
      Ver docs/paleta-colores.md. */
   --color-glass: var(--glass);
   --color-glass-border: var(--glass-border);
-  --color-olive-strong: var(--brand-olive-text);
-  --color-sage-strong: var(--brand-sage-text);
-  --color-amber-strong: var(--brand-amber-text);
+  --color-olive-strong: var(--brand-fir-text);
+  --color-sage-strong: var(--brand-fir-text);
+  --color-amber-strong: var(--brand-ocre-text);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
@@ -300,7 +331,7 @@ body {
 }
 
 :root {
-  --primary-color: #1E5561;
+  --primary-color: #1B3A2B;
   --primary-color-text: #FFFFFF;
 }
 

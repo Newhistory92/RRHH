@@ -201,13 +201,10 @@ export const EmployeeTableView = ({
           <h1 className="font-heading text-2xl font-semibold text-foreground">
             Lista de empleados
           </h1>
-          {/* La guia es ayuda secundaria, no una alerta: antes latia en bucle
-              con los colores de warning y se llevaba la atencion que necesita
-              el padron. Queda como un icono quieto que se enciende al pasar. */}
           <button
             type="button"
             onClick={() => setMostrarGuiaLicencias(true)}
-            className="shrink-0 rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="shrink-0 rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring animate-heartbeat"
             aria-label="Cómo funcionan las licencias"
             title="Cómo funcionan las licencias"
           >
