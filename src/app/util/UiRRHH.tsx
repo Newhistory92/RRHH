@@ -991,7 +991,7 @@ export const StatCard: React.FC<StatCardProps> = ({ icon, title, value, colorCla
   <div className="bg-card p-5 rounded-xl shadow-sm border border-border hover:shadow-md hover:border-primary/40 transition-all">
     <div className="flex items-center justify-between">
       <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">{title}</p>
+        <p className="text-xs font-medium text-muted-foreground mb-1">{title}</p>
         <p className="text-3xl font-bold text-foreground">{value}</p>
       </div>
       <div className={`p-3 rounded-xl ${colorClass}`}>{icon}</div>

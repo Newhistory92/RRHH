@@ -10,6 +10,18 @@ type PredictiveAnalysisProps = {
   onBack: () => void;
 };
 
+// dept.color llega del backend como una clase ya armada ("border-green-500"),
+// así que `bg-${dept.color}-500` componía "bg-border-green-500-500" --
+// una clase que no existe, y la barra se renderizaba invisible. turnoverRisk
+// ya trae la misma información en 4 valores fijos, así que se deriva de ahí
+// con los tokens de marca en vez de leer el campo roto del backend.
+const BARRA_RIESGO: Record<DepartmentAnalysis["turnoverRisk"], string> = {
+  "Bajo": "bg-success",
+  "Medio": "bg-warning",
+  "Alto": "bg-warning",
+  "Crítico": "bg-error",
+};
+
 export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) {
   const [analysis, setAnalysis] = useState<DepartmentAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
@@ -104,11 +116,15 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
             value={analysis.filter(d => d.turnoverRisk === 'Alto' || d.turnoverRisk === 'Crítico').length}
             colorClass="bg-error-soft"
           />
+          {/* Neutro a proposito: no es un numero de riesgo, es un promedio
+              informativo. Con el colapso de oliva/sage al mismo verde de
+              marca, darle el mismo tono que "Empleados Analizados" los haria
+              ver como la misma tarjeta repetida. */}
           <StatCard
-            icon={<Target size={24} className="text-olive-strong" />}
+            icon={<Target size={24} className="text-muted-foreground" />}
             title="Productividad Promedio"
             value={`${(analysis.reduce((sum, d) => sum + d.avgProductivity, 0) / analysis.length).toFixed(1)}/10`}
-            colorClass="bg-accent/15"
+            colorClass="bg-muted"
           />
         </div>
 
@@ -119,7 +135,7 @@ export default function PredictiveAnalysis({ onBack }: PredictiveAnalysisProps) 
               key={dept.name}
               className="bg-card rounded-xl shadow-md border border-border transition-all hover:shadow-xl hover:border-primary overflow-hidden"
             >
-              <div className={`h-2 w-full bg-${dept.color}-500`}></div>
+              <div className={`h-2 w-full ${BARRA_RIESGO[dept.turnoverRisk]}`}></div>
               <div className="p-6">
                 {/* Header de la tarjeta */}
                 <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4 mb-6">

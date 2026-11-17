@@ -230,12 +230,17 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
         </div>
       </div>
 
-      {/* Stat Cards */}
+      {/* Stat Cards. Empleados/Departamentos son solo el denominador -- quedan
+          neutros. Riesgo Alto y Reubicaciones son los dos numeros que piden
+          accion, asi que son los unicos con color: riesgo en el tomate de
+          atencion, reubicaciones en el verde de marca ("hay una oportunidad
+          para actuar"). Antes eran cyan/verde/rojo/violeta sin ningun
+          significado -- puro arcoiris decorativo. */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={<Users size={22} />} color="cyan" label="Empleados" value={metadata?.totalEmployees ?? 0} />
-        <StatCard icon={<Target size={22} />} color="green" label="Departamentos" value={metadata?.totalDepartments ?? 0} />
-        <StatCard icon={<AlertTriangle size={22} />} color="red" label="Depts en Riesgo Alto" value={highRiskCount} />
-        <StatCard icon={<ArrowRightLeft size={22} />} color="purple" label="Reubicaciones Sugeridas" value={report.relocationProposals.length} />
+        <StatCard icon={<Users size={22} />} color="neutral" label="Empleados" value={metadata?.totalEmployees ?? 0} />
+        <StatCard icon={<Target size={22} />} color="neutral" label="Departamentos" value={metadata?.totalDepartments ?? 0} />
+        <StatCard icon={<AlertTriangle size={22} />} color="error" label="Depts en Riesgo Alto" value={highRiskCount} />
+        <StatCard icon={<ArrowRightLeft size={22} />} color="primary" label="Reubicaciones Sugeridas" value={report.relocationProposals.length} />
       </div>
 
       {/* 1. Resumen Ejecutivo */}
@@ -257,10 +262,10 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-border">
-                <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Departamento</th>
-                <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Riesgo</th>
-                <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Empleados</th>
-                <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Detalle</th>
+                <th className="p-3 text-xs font-semibold text-muted-foreground">Departamento</th>
+                <th className="p-3 text-xs font-semibold text-muted-foreground">Riesgo</th>
+                <th className="p-3 text-xs font-semibold text-muted-foreground">Empleados</th>
+                <th className="p-3 text-xs font-semibold text-muted-foreground">Detalle</th>
               </tr>
             </thead>
             <tbody>
@@ -307,7 +312,7 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
       {/* 4. Propuestas de Reubicación */}
       <Section
         title="Propuestas de Reubicación"
-        icon={<ArrowRightLeft size={20} className="text-sage-strong" />}
+        icon={<ArrowRightLeft size={20} className="text-primary" />}
         count={report.relocationProposals.length}
       >
         {report.relocationProposals.length === 0 ? (
@@ -319,10 +324,10 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Empleado</th>
-                  <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dept. Actual</th>
-                  <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dept. Sugerido</th>
-                  <th className="p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Razón</th>
+                  <th className="p-3 text-xs font-semibold text-muted-foreground">Empleado</th>
+                  <th className="p-3 text-xs font-semibold text-muted-foreground">Dept. actual</th>
+                  <th className="p-3 text-xs font-semibold text-muted-foreground">Dept. sugerido</th>
+                  <th className="p-3 text-xs font-semibold text-muted-foreground">Razón</th>
                 </tr>
               </thead>
               <tbody>
@@ -331,7 +336,7 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
                     <td className="p-3 font-medium text-foreground">{p.employeeName}</td>
                     <td className="p-3 text-muted-foreground">{p.currentDept}</td>
                     <td className="p-3">
-                      <span className="bg-sage-strong/15 text-sage-strong text-xs font-bold px-2.5 py-1 rounded-full">
+                      <span className="bg-primary/15 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
                         {p.suggestedDept}
                       </span>
                     </td>
@@ -404,10 +409,9 @@ export const DepartmentOptimization = ({ onBack }: DepartmentOptimizationProps) 
 
 function StatCard({ icon, color, label, value }: { icon: React.ReactNode; color: string; label: string; value: number | string }) {
   const colorMap: Record<string, string> = {
-    cyan: "bg-primary/15 text-primary",
-    green: "bg-accent/15 text-olive-strong",
-    red: "bg-error-soft text-error",
-    purple: "bg-sage-strong/15 text-sage-strong",
+    neutral: "bg-muted text-muted-foreground",
+    primary: "bg-primary/15 text-primary",
+    error: "bg-error-soft text-error",
   };
 
   return (
