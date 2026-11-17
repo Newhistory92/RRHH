@@ -488,19 +488,19 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
           ) : <p className="text-xs italic text-muted-foreground">Consultando jerarquía...</p>}
         </Section>
 
-        <Section>
+        <Section className="lg:col-span-2">
           <StepLabel n={4} label="Vista previa de la nota" />
           <InputTextarea
             value={mensaje}
             onChange={(e) => setMensaje(e.target.value)}
             rows={15}
             autoResize
-            className="w-full text-xs text-foreground border-none bg-muted rounded-lg p-3"
+            className="w-full text-sm text-foreground border-none bg-muted rounded-lg p-3"
           />
         </Section>
       </div>
 
-      <div className="flex items-center justify-between pt-4">
+      <div className="flex items-center justify-end gap-3 pt-4">
         <button onClick={onCancel} className="text-sm text-muted-foreground font-medium px-4 py-2 rounded-lg hover:bg-muted">
           Cancelar
         </button>

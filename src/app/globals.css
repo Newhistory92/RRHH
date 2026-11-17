@@ -229,6 +229,22 @@
     color: var(--muted-foreground) !important;
 }
 
+/* Mismo problema que el bloque de arriba: PrimeReact trae su propio celeste
+   de fabrica para el anillo de foco de inputs/dropdown/calendario/textarea,
+   un cuarto color que no existe en la paleta de la app. Se alinea con el
+   tomate (el 10% reservado para "esto pide atencion"), ya que foco es
+   justamente eso. */
+.p-inputtext:enabled:focus,
+.p-inputtext:enabled:hover:focus,
+.p-dropdown:not(.p-disabled).p-focus,
+.p-multiselect:not(.p-disabled).p-focus,
+.p-calendar .p-inputtext:enabled:focus,
+.p-inputnumber-input:enabled:focus,
+.p-inputtextarea:enabled:focus {
+    border-color: var(--destructive) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--destructive) 25%, transparent) !important;
+}
+
 /* Listas desplegables de PrimeReact. El tema pinta el item seleccionado con el
    color primario pero deja el texto en el color por defecto, asi que sobre el
    verde la etiqueta queda invisible. Se fija el par fondo/texto en los tres
