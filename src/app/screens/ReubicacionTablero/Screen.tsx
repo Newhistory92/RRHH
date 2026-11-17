@@ -7,7 +7,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
-import { LayoutGrid, List } from 'lucide-react';
+import { LayoutGrid, List, Check, AlertTriangle } from 'lucide-react';
 import { apiClient } from '@/app/util/apiClient';
 
 const ESTADOS = ['Pendiente', 'En análisis', 'Recomendada', 'Aprobada', 'Rechazada', 'Ejecutada'];
@@ -288,14 +288,14 @@ export default function ReubicacionTablero() {
             />
             <button
               onClick={() => setVista('kanban')}
-              className={`p-2 rounded-lg border ${vista === 'kanban' ? 'bg-primary/15 border-primary text-primary' : 'border-border text-muted-foreground'}`}
+              className={`p-2 rounded-lg border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${vista === 'kanban' ? 'bg-primary/15 border-primary text-primary' : 'border-border text-muted-foreground hover:bg-muted'}`}
               title="Vista Kanban"
             >
               <LayoutGrid size={18} />
             </button>
             <button
               onClick={() => setVista('tabla')}
-              className={`p-2 rounded-lg border ${vista === 'tabla' ? 'bg-primary/15 border-primary text-primary' : 'border-border text-muted-foreground'}`}
+              className={`p-2 rounded-lg border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${vista === 'tabla' ? 'bg-primary/15 border-primary text-primary' : 'border-border text-muted-foreground hover:bg-muted'}`}
               title="Vista Tabla"
             >
               <List size={18} />
@@ -339,11 +339,11 @@ export default function ReubicacionTablero() {
           </div>
           <div>
             <label className="block text-xs font-semibold text-muted-foreground mb-1">Desde</label>
-            <input type="date" value={fechaDesde} onChange={(e) => setFechaDesde(e.target.value)} className="px-3 py-2 rounded-md border border-border bg-background text-foreground text-sm" />
+            <input type="date" value={fechaDesde} onChange={(e) => setFechaDesde(e.target.value)} className="px-3 py-2 rounded-md border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-muted-foreground mb-1">Hasta</label>
-            <input type="date" value={fechaHasta} onChange={(e) => setFechaHasta(e.target.value)} className="px-3 py-2 rounded-md border border-border bg-background text-foreground text-sm" />
+            <input type="date" value={fechaHasta} onChange={(e) => setFechaHasta(e.target.value)} className="px-3 py-2 rounded-md border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
           </div>
         </div>
 
@@ -450,7 +450,7 @@ export default function ReubicacionTablero() {
           <label className="block text-sm font-semibold text-foreground">Observación (opcional)</label>
           <InputTextarea value={observacion} onChange={(e) => setObservacion(e.target.value)} rows={4} className="w-full" />
           <div className="flex justify-end gap-2 pt-2">
-            <Button label="Cancelar" className="p-button-text" onClick={() => setSeleccionada(null)} />
+            <Button label="Cancelar" className="p-button-text p-button-secondary" onClick={() => setSeleccionada(null)} />
             <Button
               label="Confirmar"
               severity={seleccionada?.accion === 'Aprobada' ? 'success' : 'danger'}
@@ -486,7 +486,10 @@ export default function ReubicacionTablero() {
               <p className="text-sm font-semibold text-foreground mb-1">Beneficios esperados</p>
               <ul className="text-sm text-muted-foreground space-y-1">
                 {verRecomendacion.beneficios.map((b, i) => (
-                  <li key={i}>✓ {b}</li>
+                  <li key={i} className="flex items-start gap-1.5">
+                    <Check size={14} className="text-success shrink-0 mt-0.5" aria-hidden="true" />
+                    {b}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -494,7 +497,10 @@ export default function ReubicacionTablero() {
               <p className="text-sm font-semibold text-foreground mb-1">Riesgos</p>
               <ul className="text-sm text-muted-foreground space-y-1">
                 {verRecomendacion.riesgos.map((r, i) => (
-                  <li key={i}>⚠ {r}</li>
+                  <li key={i} className="flex items-start gap-1.5">
+                    <AlertTriangle size={14} className="text-warning shrink-0 mt-0.5" aria-hidden="true" />
+                    {r}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -537,7 +543,7 @@ export default function ReubicacionTablero() {
             Se moverá al empleado a este destino y se actualizará el organigrama.
           </p>
           <div className="flex justify-end gap-2 pt-2">
-            <Button label="Cancelar" className="p-button-text" onClick={() => setParaEjecutar(null)} />
+            <Button label="Cancelar" className="p-button-text p-button-secondary" onClick={() => setParaEjecutar(null)} />
             <Button
               label="Confirmar"
               severity="success"

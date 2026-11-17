@@ -20,6 +20,7 @@ import {
     ShieldCheck
 } from 'lucide-react';
 import { apiClient } from '@/app/util/apiClient';
+import { formatearFecha } from '@/app/lib/dates';
 import { SoftSkills } from '@/app/Componentes/TestComponent/SoftSkills';
 import { SoftSkill } from '@/app/Interfas/Interfaces';
 
@@ -241,7 +242,7 @@ export default function ConfiguracionGeneral() {
     const TabButton = ({ id, label, icon: Icon }: { id: TabId, label: string, icon: any }) => (
         <button
             onClick={() => { setActiveTab(id); setSearchTerm(""); }}
-            className={`flex items-center gap-2 whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-colors ${
+            className={`flex items-center gap-2 whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 activeTab === id
                     ? 'border-primary text-primary bg-primary/10'
                     : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
@@ -479,7 +480,7 @@ export default function ConfiguracionGeneral() {
                                                 setIsEditingLicencia(false);
                                                 setShowLicenciaModal(true);
                                             }}
-                                            className="flex items-center gap-2 bg-primary hover:opacity-90 text-primary-foreground px-4 py-2 rounded-xl font-bold text-sm transition-all"
+                                            className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                         >
                                             <Plus size={16} /> Nueva Regla
                                         </button>
@@ -488,7 +489,7 @@ export default function ConfiguracionGeneral() {
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left border-collapse">
                                         <thead>
-                                            <tr className="bg-muted border-b border-border uppercase tracking-wider text-[10px] text-muted-foreground font-bold">
+                                            <tr className="bg-muted border-b border-border text-xs text-muted-foreground font-medium">
                                                 <th className="px-6 py-4 cursor-pointer hover:text-primary" onClick={() => toggleSort('tipo')}>
                                                     <div className="flex items-center">Contrato / Perfil <SortIcon field="tipo" /></div>
                                                 </th>
@@ -505,7 +506,7 @@ export default function ConfiguracionGeneral() {
                                             {sortedLicencias.length > 0 ? sortedLicencias.map((config) => (
                                                 <tr key={config.id} className="hover:bg-muted group">
                                                     <td className="px-6 py-4">
-                                                        <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/15 text-primary">
+                                                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary/15 text-primary">
                                                             {contracts.find(c => c.key === config.tipo)?.nombre || config.tipo}
                                                         </span>
                                                     </td>
@@ -516,9 +517,12 @@ export default function ConfiguracionGeneral() {
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 text-right">
-                                                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <button onClick={() => { setLicenciaForm(config); setIsEditingLicencia(true); setShowLicenciaModal(true); }} className="p-2 text-muted-foreground hover:text-primary" title="Editar"><Edit2 size={16} /></button>
-                                                            <button onClick={() => handleDeleteLicencia(config.id)} className="p-2 text-muted-foreground hover:text-error" title="Eliminar"><Trash2 size={16} /></button>
+                                                        {/* group-focus-within ademas de group-hover: si solo reacciona al
+                                                            mouse, alguien que llega por teclado enfoca un boton que no
+                                                            puede ver hasta que lo activa a ciegas. */}
+                                                        <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                                                            <button onClick={() => { setLicenciaForm(config); setIsEditingLicencia(true); setShowLicenciaModal(true); }} className="rounded p-2 text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" title="Editar"><Edit2 size={16} /></button>
+                                                            <button onClick={() => handleDeleteLicencia(config.id)} className="rounded p-2 text-muted-foreground transition-colors hover:text-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" title="Eliminar"><Trash2 size={16} /></button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -540,7 +544,7 @@ export default function ConfiguracionGeneral() {
                                     <h2 className="font-heading text-lg font-bold text-foreground">Tipos de Contrato Disponibles</h2>
                                     <button
                                         onClick={() => { setContractForm({ nombre: "", key: "", descripcion: "" }); setIsEditingContract(false); setShowContractModal(true); }}
-                                        className="flex items-center gap-2 bg-primary hover:opacity-90 text-primary-foreground px-4 py-2 rounded-xl font-bold text-sm"
+                                        className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                     >
                                         <Plus size={16} /> Nuevo Contrato
                                     </button>
@@ -556,8 +560,8 @@ export default function ConfiguracionGeneral() {
                                                 <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{c.descripcion || 'Sin descripción disponible.'}</p>
                                             </div>
                                             <div className="flex justify-end gap-2 border-t border-border pt-3">
-                                                <button onClick={() => { setContractForm(c); setIsEditingContract(true); setShowContractModal(true); }} className="flex items-center gap-1 text-xs text-primary hover:bg-primary/10 px-2 py-1 rounded-md transition-all font-semibold"><Edit2 size={12} /> Editar</button>
-                                                <button onClick={() => c.id && handleDeleteContract(c.id)} className="flex items-center gap-1 text-xs text-error hover:bg-error-soft px-2 py-1 rounded-md transition-all font-semibold"><Trash2 size={12} /> Desactivar</button>
+                                                <button onClick={() => { setContractForm(c); setIsEditingContract(true); setShowContractModal(true); }} className="flex items-center gap-1 text-xs text-primary px-2 py-1 rounded-md font-semibold transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Edit2 size={12} /> Editar</button>
+                                                <button onClick={() => c.id && handleDeleteContract(c.id)} className="flex items-center gap-1 text-xs text-error px-2 py-1 rounded-md font-semibold transition-colors hover:bg-error-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Trash2 size={12} /> Desactivar</button>
                                             </div>
                                         </div>
                                     ))}
@@ -572,7 +576,7 @@ export default function ConfiguracionGeneral() {
                                     <h2 className="font-heading text-lg font-bold text-foreground">Catálogo de Profesiones y Cargos</h2>
                                     <button
                                         onClick={() => { setProfessionForm({ nombre: "", descripcion: "" }); setIsEditingProfession(false); setShowProfessionModal(true); }}
-                                        className="flex items-center gap-2 bg-primary hover:opacity-90 text-primary-foreground px-4 py-2 rounded-xl font-bold text-sm"
+                                        className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                     >
                                         <Plus size={16} /> Nueva Profesión
                                     </button>
@@ -580,7 +584,7 @@ export default function ConfiguracionGeneral() {
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left border-collapse">
                                         <thead>
-                                            <tr className="bg-muted border-b border-border uppercase tracking-wider text-[10px] text-muted-foreground font-bold">
+                                            <tr className="bg-muted border-b border-border text-xs text-muted-foreground font-medium">
                                                 <th className="px-6 py-4">Profesión / Cargo</th>
                                                 <th className="px-6 py-4">Descripción</th>
                                                 <th className="px-6 py-4 text-right">Acciones</th>
@@ -592,9 +596,12 @@ export default function ConfiguracionGeneral() {
                                                     <td className="px-6 py-4 font-bold text-foreground">{p.nombre}</td>
                                                     <td className="px-6 py-4 text-muted-foreground">{p.descripcion || 'Sin descripción.'}</td>
                                                     <td className="px-6 py-4 text-right">
-                                                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <button onClick={() => { setProfessionForm(p); setIsEditingProfession(true); setShowProfessionModal(true); }} className="p-2 text-muted-foreground hover:text-primary" title="Editar"><Edit2 size={16} /></button>
-                                                            <button onClick={() => p.id && handleDeleteProfession(p.id)} className="p-2 text-muted-foreground hover:text-error" title="Desactivar"><Trash2 size={16} /></button>
+                                                        {/* group-focus-within ademas de group-hover: si solo reacciona al
+                                                            mouse, alguien que llega por teclado enfoca un boton que no
+                                                            puede ver hasta que lo activa a ciegas. */}
+                                                        <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                                                            <button onClick={() => { setProfessionForm(p); setIsEditingProfession(true); setShowProfessionModal(true); }} className="rounded p-2 text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" title="Editar"><Edit2 size={16} /></button>
+                                                            <button onClick={() => p.id && handleDeleteProfession(p.id)} className="rounded p-2 text-muted-foreground transition-colors hover:text-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" title="Desactivar"><Trash2 size={16} /></button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -627,7 +634,7 @@ export default function ConfiguracionGeneral() {
                                         <h3 className="font-heading font-bold text-foreground">Jornadas Laborales (Contratos vs Horas)</h3>
                                         <button
                                             onClick={() => { setJornadaForm({ nombre: "", horasDia: 8, horasPermisoAnual: 12 }); setIsEditingJornada(false); setShowJornadaModal(true); }}
-                                            className="flex items-center gap-1.5 text-primary hover:bg-primary/10 border border-primary/30 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                                            className="flex items-center gap-1.5 text-primary border border-primary/30 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                         >
                                             <Plus size={14} /> Nueva Jornada
                                         </button>
@@ -641,8 +648,8 @@ export default function ConfiguracionGeneral() {
                                                     <p className="text-xs text-muted-foreground font-mono">{j.horasPermisoAnual ?? 0} hrs permiso/año</p>
                                                 </div>
                                                 <div className="flex items-center gap-1">
-                                                    <button onClick={() => { setJornadaForm({ ...j, horasPermisoAnual: j.horasPermisoAnual ?? 12 }); setIsEditingJornada(true); setShowJornadaModal(true); }} className="p-1.5 text-muted-foreground hover:text-primary"><Edit2 size={14} /></button>
-                                                    <button onClick={() => j.id && handleDeleteJornada(j.id)} className="p-1.5 text-muted-foreground hover:text-error"><Trash2 size={14} /></button>
+                                                    <button onClick={() => { setJornadaForm({ ...j, horasPermisoAnual: j.horasPermisoAnual ?? 12 }); setIsEditingJornada(true); setShowJornadaModal(true); }} className="rounded p-1.5 text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Edit2 size={14} /></button>
+                                                    <button onClick={() => j.id && handleDeleteJornada(j.id)} className="rounded p-1.5 text-muted-foreground transition-colors hover:text-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Trash2 size={14} /></button>
                                                 </div>
                                             </div>
                                         ))}
@@ -659,7 +666,7 @@ export default function ConfiguracionGeneral() {
                                     <button
                                         onClick={handleImportarFeriados}
                                         disabled={importando}
-                                        className="px-4 py-2 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
+                                        className="px-4 py-2 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                     >
                                         <i className={`pi ${importando ? 'pi-spin pi-spinner' : 'pi-download'} text-sm`} />
                                         {importando ? 'Importando…' : `Importar feriados nacionales ${new Date().getFullYear()}`}
@@ -686,7 +693,7 @@ export default function ConfiguracionGeneral() {
                                     />
                                     <button
                                         onClick={handleAddFeriado}
-                                        className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 font-semibold"
+                                        className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                     >
                                         Agregar
                                     </button>
@@ -706,12 +713,12 @@ export default function ConfiguracionGeneral() {
                                         <tbody>
                                             {feriados.map(f => (
                                                 <tr key={f.id} className="border-b border-border">
-                                                    <td className="py-2 text-foreground">{f.fecha}</td>
+                                                    <td className="py-2 font-mono tabular-nums text-foreground">{formatearFecha(f.fecha)}</td>
                                                     <td className="py-2 text-foreground">{f.nombre}</td>
                                                     <td className="py-2 text-right">
                                                         <button
                                                             onClick={() => handleDeleteFeriado(f.id)}
-                                                            className="text-error hover:opacity-80"
+                                                            className="rounded text-error transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                                         >
                                                             Eliminar
                                                         </button>
@@ -737,7 +744,7 @@ export default function ConfiguracionGeneral() {
                         <button
                             onClick={handleVerificarFeedback}
                             disabled={verificando}
-                            className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 font-semibold disabled:opacity-50"
+                            className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-semibold transition-opacity hover:opacity-90 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
                             {verificando ? 'Verificando...' : 'Ejecutar verificación'}
                         </button>
@@ -787,7 +794,7 @@ export default function ConfiguracionGeneral() {
                     <div className="relative bg-card w-full max-w-lg rounded-3xl border border-border shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center mb-6 pb-3 border-b border-border">
                             <h3 className="font-heading text-lg font-bold text-foreground">{isEditingLicencia ? 'Editar Regla de Licencia' : 'Nueva Regla'}</h3>
-                            <button onClick={() => setShowLicenciaModal(false)} className="text-muted-foreground hover:text-foreground"><X size={20} /></button>
+                            <button onClick={() => setShowLicenciaModal(false)} className="rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><X size={20} /></button>
                         </div>
                         <form onSubmit={handleSaveLicencia} className="space-y-4">
                             <div>
@@ -809,8 +816,8 @@ export default function ConfiguracionGeneral() {
                                 </datalist>
                             </div>
                             <div className="flex gap-3 pt-4">
-                                <button type="button" onClick={() => setShowLicenciaModal(false)} className="flex-1 py-2 bg-muted hover:bg-border rounded-xl text-sm font-bold">Cancelar</button>
-                                <button type="submit" className="flex-1 py-2 bg-primary hover:opacity-90 text-primary-foreground rounded-xl text-sm font-bold">Guardar</button>
+                                <button type="button" onClick={() => setShowLicenciaModal(false)} className="flex-1 py-2 bg-muted rounded-xl text-sm font-bold transition-colors hover:bg-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Cancelar</button>
+                                <button type="submit" className="flex-1 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-bold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Guardar</button>
                             </div>
                         </form>
                     </div>
@@ -824,7 +831,7 @@ export default function ConfiguracionGeneral() {
                     <div className="relative bg-card w-full max-w-lg rounded-3xl border border-border shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center mb-6 pb-3 border-b border-border">
                             <h3 className="font-heading text-lg font-bold text-foreground">{isEditingContract ? 'Editar Contrato' : 'Nuevo Tipo de Contrato'}</h3>
-                            <button onClick={() => setShowContractModal(false)} className="text-muted-foreground hover:text-foreground"><X size={20} /></button>
+                            <button onClick={() => setShowContractModal(false)} className="rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><X size={20} /></button>
                         </div>
                         <form onSubmit={handleSaveContract} className="space-y-4">
                             <div>
@@ -840,8 +847,8 @@ export default function ConfiguracionGeneral() {
                                 <textarea placeholder="Detalles de este tipo de régimen contractual" className="w-full px-3 py-2 border rounded-xl" rows={3} value={contractForm.descripcion} onChange={e => setContractForm({ ...contractForm, descripcion: e.target.value })} />
                             </div>
                             <div className="flex gap-3 pt-4">
-                                <button type="button" onClick={() => setShowContractModal(false)} className="flex-1 py-2 bg-muted hover:bg-border rounded-xl text-sm font-bold">Cancelar</button>
-                                <button type="submit" className="flex-1 py-2 bg-primary hover:opacity-90 text-primary-foreground rounded-xl text-sm font-bold">Guardar</button>
+                                <button type="button" onClick={() => setShowContractModal(false)} className="flex-1 py-2 bg-muted rounded-xl text-sm font-bold transition-colors hover:bg-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Cancelar</button>
+                                <button type="submit" className="flex-1 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-bold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Guardar</button>
                             </div>
                         </form>
                     </div>
@@ -855,7 +862,7 @@ export default function ConfiguracionGeneral() {
                     <div className="relative bg-card w-full max-w-lg rounded-3xl border border-border shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center mb-6 pb-3 border-b border-border">
                             <h3 className="font-heading text-lg font-bold text-foreground">{isEditingProfession ? 'Editar Profesión' : 'Nueva Profesión / Cargo'}</h3>
-                            <button onClick={() => setShowProfessionModal(false)} className="text-muted-foreground hover:text-foreground"><X size={20} /></button>
+                            <button onClick={() => setShowProfessionModal(false)} className="rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><X size={20} /></button>
                         </div>
                         <form onSubmit={handleSaveProfession} className="space-y-4">
                             <div>
@@ -867,8 +874,8 @@ export default function ConfiguracionGeneral() {
                                 <textarea placeholder="Breve descripción del alcance del cargo" className="w-full px-3 py-2 border rounded-xl" rows={3} value={professionForm.descripcion} onChange={e => setProfessionForm({ ...professionForm, descripcion: e.target.value })} />
                             </div>
                             <div className="flex gap-3 pt-4">
-                                <button type="button" onClick={() => setShowProfessionModal(false)} className="flex-1 py-2 bg-muted hover:bg-border rounded-xl text-sm font-bold">Cancelar</button>
-                                <button type="submit" className="flex-1 py-2 bg-primary hover:opacity-90 text-primary-foreground rounded-xl text-sm font-bold">Guardar</button>
+                                <button type="button" onClick={() => setShowProfessionModal(false)} className="flex-1 py-2 bg-muted rounded-xl text-sm font-bold transition-colors hover:bg-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Cancelar</button>
+                                <button type="submit" className="flex-1 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-bold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Guardar</button>
                             </div>
                         </form>
                     </div>
@@ -882,7 +889,7 @@ export default function ConfiguracionGeneral() {
                     <div className="relative bg-card w-full max-w-lg rounded-3xl border border-border shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center mb-6 pb-3 border-b border-border">
                             <h3 className="font-heading text-lg font-bold text-foreground">{isEditingJornada ? 'Editar Jornada Laboral' : 'Nueva Jornada Laboral'}</h3>
-                            <button onClick={() => setShowJornadaModal(false)} className="text-muted-foreground hover:text-foreground"><X size={20} /></button>
+                            <button onClick={() => setShowJornadaModal(false)} className="rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><X size={20} /></button>
                         </div>
                         <form onSubmit={handleSaveJornada} className="space-y-4">
                             <div>
@@ -915,8 +922,8 @@ export default function ConfiguracionGeneral() {
                                 </p>
                             </div>
                             <div className="flex gap-3 pt-4">
-                                <button type="button" onClick={() => setShowJornadaModal(false)} className="flex-1 py-2 bg-muted hover:bg-border rounded-xl text-sm font-bold">Cancelar</button>
-                                <button type="submit" className="flex-1 py-2 bg-primary hover:opacity-90 text-primary-foreground rounded-xl text-sm font-bold">Guardar</button>
+                                <button type="button" onClick={() => setShowJornadaModal(false)} className="flex-1 py-2 bg-muted rounded-xl text-sm font-bold transition-colors hover:bg-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Cancelar</button>
+                                <button type="submit" className="flex-1 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-bold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Guardar</button>
                             </div>
                         </form>
                     </div>
