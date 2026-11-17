@@ -186,7 +186,7 @@ export function CargaInicialPermisosPanel({ employeeId, onCerrar }: Props) {
                       aria-label={`Borrar la carga de ${fmtHoras(a.horasConsumidas)} del ${
                         a.cargadoEn ? a.cargadoEn.slice(0, 10) : "sin fecha"
                       }`}
-                      className="text-error hover:opacity-80 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="rounded text-error transition-opacity hover:opacity-80 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       Borrar
                     </button>
@@ -213,7 +213,7 @@ export function CargaInicialPermisosPanel({ employeeId, onCerrar }: Props) {
                 type="button"
                 onClick={agregar}
                 disabled={guardando || horasDecimales === null}
-                className="px-4 py-2 bg-primary hover:opacity-90 text-primary-foreground rounded-md text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-primary transition-opacity hover:opacity-90 text-primary-foreground rounded-md text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {guardando ? "Guardando…" : "Agregar"}
               </button>
@@ -229,7 +229,7 @@ export function CargaInicialPermisosPanel({ employeeId, onCerrar }: Props) {
               <button
                 type="button"
                 onClick={onCerrar}
-                className="flex-1 py-2 bg-muted hover:bg-border rounded-xl text-sm font-bold"
+                className="flex-1 py-2 bg-muted transition-colors hover:bg-border rounded-xl text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 Cerrar
               </button>

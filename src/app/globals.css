@@ -138,6 +138,51 @@
     cursor: not-allowed !important;
 }
 
+/* El override de arriba excluye a proposito los botones con severity: sin
+   esto, p-button-info/success/danger/secondary se quedan con los colores de
+   fabrica del tema de PrimeReact (celeste, verde, rojo, gris genericos) en
+   vez de los 3 colores de la paleta -- se nota mas en p-button-info, que sale
+   celeste puro, un cuarto color que no existe en el resto de la pantalla. No
+   hay "info" propio en una paleta de 3 colores, asi que se alinea con
+   --primary, igual que --color-info ya se alinea con success en los tokens
+   semanticos de arriba. */
+.p-button.p-button-info:not(.p-button-text):not(.p-button-outlined):not(.p-button-link):not(:disabled):not(.p-disabled) {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: var(--primary-foreground) !important;
+}
+.p-button.p-button-success:not(.p-button-text):not(.p-button-outlined):not(.p-button-link):not(:disabled):not(.p-disabled) {
+    background: var(--color-success) !important;
+    border-color: var(--color-success) !important;
+    color: var(--color-success-foreground) !important;
+}
+.p-button.p-button-danger:not(.p-button-text):not(.p-button-outlined):not(.p-button-link):not(:disabled):not(.p-disabled) {
+    background: var(--destructive) !important;
+    border-color: var(--destructive) !important;
+    color: var(--destructive-foreground) !important;
+}
+.p-button.p-button-warning:not(.p-button-text):not(.p-button-outlined):not(.p-button-link):not(:disabled):not(.p-disabled) {
+    background: var(--color-warning) !important;
+    border-color: var(--color-warning) !important;
+    color: var(--color-warning-foreground) !important;
+}
+.p-button.p-button-secondary:not(.p-button-text):not(.p-button-outlined):not(.p-button-link):not(:disabled):not(.p-disabled) {
+    background: var(--secondary) !important;
+    border-color: var(--secondary) !important;
+    color: var(--secondary-foreground) !important;
+}
+/* Las variantes outlined/text de severity usan el color como texto/borde, no
+   como fondo -- mismo criterio que el boton primario de arriba. */
+.p-button.p-button-info.p-button-outlined:not(:disabled):not(.p-disabled), .p-button.p-button-info.p-button-text:not(:disabled):not(.p-disabled) { color: var(--primary) !important; border-color: var(--primary) !important; }
+.p-button.p-button-success.p-button-outlined:not(:disabled):not(.p-disabled), .p-button.p-button-success.p-button-text:not(:disabled):not(.p-disabled) { color: var(--color-success) !important; border-color: var(--color-success) !important; }
+.p-button.p-button-danger.p-button-outlined:not(:disabled):not(.p-disabled), .p-button.p-button-danger.p-button-text:not(:disabled):not(.p-disabled) { color: var(--destructive) !important; border-color: var(--destructive) !important; }
+.p-button.p-button-warning.p-button-outlined:not(:disabled):not(.p-disabled), .p-button.p-button-warning.p-button-text:not(:disabled):not(.p-disabled) { color: var(--color-warning) !important; border-color: var(--color-warning) !important; }
+.p-button.p-button-secondary.p-button-outlined:not(:disabled):not(.p-disabled), .p-button.p-button-secondary.p-button-text:not(:disabled):not(.p-disabled) { color: var(--muted-foreground) !important; border-color: var(--border) !important; }
+.p-button.p-button-info:focus, .p-button.p-button-success:focus, .p-button.p-button-danger:focus,
+.p-button.p-button-warning:focus, .p-button.p-button-secondary:focus {
+    box-shadow: 0 0 0 .2rem var(--ring) !important;
+}
+
 /* Listas desplegables de PrimeReact. El tema pinta el item seleccionado con el
    color primario pero deja el texto en el color por defecto, asi que sobre el
    verde la etiqueta queda invisible. Se fija el par fondo/texto en los tres

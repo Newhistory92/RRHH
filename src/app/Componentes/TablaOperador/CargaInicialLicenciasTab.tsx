@@ -199,7 +199,7 @@ export const CargaInicialLicenciasTab = ({ employee }: { employee: Employee }) =
       <button
         onClick={guardar}
         disabled={guardando || aGuardar().length === 0}
-        className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+        className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <Save size={16} />
         {guardando ? "Guardando..." : "Guardar saldos"}

@@ -101,16 +101,16 @@ export function AlertasToleranciaTab({ employee }: Props) {
             <tbody>
               {dias.map((j) => (
                 <tr key={j.id} className="border-b border-border last:border-0">
-                  <td className="py-2 pr-4 text-foreground">{j.fecha.slice(0, 10)}</td>
+                  <td className="py-2 pr-4 font-mono tabular-nums text-foreground">{j.fecha.slice(0, 10)}</td>
                   <td
-                    className={`py-2 pr-4 ${
+                    className={`py-2 pr-4 font-mono tabular-nums ${
                       j.abusoEntrada ? "text-warning font-semibold" : ""
                     }`}
                   >
                     {j.entrada ? j.entrada.slice(11, 16) : "—"}
                   </td>
                   <td
-                    className={`py-2 pr-4 ${
+                    className={`py-2 pr-4 font-mono tabular-nums ${
                       j.abusoSalida ? "text-warning font-semibold" : ""
                     }`}
                   >

@@ -149,14 +149,14 @@ export function AsistenciaEmpleadoTab({ employee }: Props) {
             <tbody>
               {jornadas.map((j) => (
                 <tr key={j.id} className="border-b border-border last:border-0">
-                  <td className="py-2 pr-4 text-foreground">{j.fecha.slice(0, 10)}</td>
-                  <td className="py-2 pr-4">
+                  <td className="py-2 pr-4 font-mono tabular-nums text-foreground">{j.fecha.slice(0, 10)}</td>
+                  <td className="py-2 pr-4 font-mono tabular-nums">
                     {j.entrada ? j.entrada.slice(11, 16) : "—"}
                     {j.entradaManual && (
                       <span className="ml-1 text-xs text-muted-foreground">(m)</span>
                     )}
                   </td>
-                  <td className="py-2 pr-4">
+                  <td className="py-2 pr-4 font-mono tabular-nums">
                     {j.salida ? j.salida.slice(11, 16) : "—"}
                     {j.salidaManual && (
                       <span className="ml-1 text-xs text-muted-foreground">(m)</span>
@@ -179,10 +179,10 @@ export function AsistenciaEmpleadoTab({ employee }: Props) {
                       </span>
                     )}
                   </td>
-                  <td className="py-2 pr-4 text-right">{j.horasTrabajadas.toFixed(2)}</td>
-                  <td className="py-2 pr-4 text-right">{j.horasRequeridas.toFixed(2)}</td>
+                  <td className="py-2 pr-4 text-right font-mono tabular-nums">{j.horasTrabajadas.toFixed(2)}</td>
+                  <td className="py-2 pr-4 text-right font-mono tabular-nums">{j.horasRequeridas.toFixed(2)}</td>
                   <td
-                    className={`py-2 text-right ${
+                    className={`py-2 text-right font-mono tabular-nums ${
                       j.saldoDia < 0 ? "text-error" : j.saldoDia > 0 ? "text-success" : "text-muted-foreground"
                     }`}
                   >

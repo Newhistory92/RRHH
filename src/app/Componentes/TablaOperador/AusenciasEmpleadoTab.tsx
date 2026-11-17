@@ -224,7 +224,7 @@ export function AusenciasEmpleadoTab({ employee }: Props) {
             <tbody>
               {ausencias.map((a) => (
                 <tr key={a.fecha} className="border-b border-border last:border-0">
-                  <td className="py-2 pr-4 text-foreground">{a.fecha}</td>
+                  <td className="py-2 pr-4 font-mono tabular-nums text-foreground">{a.fecha}</td>
                   <td className="py-2 pr-4 text-muted-foreground">{diaDeSemana(a.fecha)}</td>
                   <td className="py-2 pr-4">
                     {a.estado === "justificada" ? (
@@ -246,7 +246,7 @@ export function AusenciasEmpleadoTab({ employee }: Props) {
                         onClick={() =>
                           descargar(a.justificacion!.documentoId, a.justificacion!.fileName)
                         }
-                        className="text-primary hover:underline"
+                        className="rounded text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         {a.justificacion.fileName}
                       </button>
@@ -258,14 +258,14 @@ export function AusenciasEmpleadoTab({ employee }: Props) {
                     {a.estado === "justificada" ? (
                       <button
                         onClick={() => anular(a.fecha)}
-                        className="px-3 py-1 rounded-lg bg-muted text-foreground text-xs hover:opacity-90"
+                        className="px-3 py-1 rounded-lg bg-muted text-foreground text-xs transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         Anular
                       </button>
                     ) : a.puedeJustificar ? (
                       <button
                         onClick={() => setJustificando(a.fecha)}
-                        className="px-3 py-1 rounded-lg bg-primary text-white text-xs hover:opacity-90"
+                        className="px-3 py-1 rounded-lg bg-primary text-primary-foreground text-xs transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         Justificar
                       </button>
@@ -288,7 +288,7 @@ export function AusenciasEmpleadoTab({ employee }: Props) {
       </div>
 
       {justificando && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-overlay flex items-center justify-center z-50 p-4">
           <div className="bg-card rounded-lg shadow-lg p-6 w-full max-w-md">
             <h3 className="font-heading text-lg text-foreground mb-1">Justificar ausencia</h3>
             <p className="text-sm text-muted-foreground mb-4">
@@ -323,14 +323,14 @@ export function AusenciasEmpleadoTab({ employee }: Props) {
                   setObservacion("");
                 }}
                 disabled={guardando}
-                className="px-4 py-2 rounded-lg bg-muted text-foreground text-sm disabled:opacity-50"
+                className="px-4 py-2 rounded-lg bg-muted text-foreground text-sm disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 Cancelar
               </button>
               <button
                 onClick={guardar}
                 disabled={!archivo || guardando}
-                className="px-4 py-2 rounded-lg bg-primary text-white text-sm disabled:opacity-50"
+                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {guardando ? "Guardando…" : "Justificar"}
               </button>

@@ -908,10 +908,21 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
                   <tr
                     key={lic.id}
                     onClick={() => onRowClick(lic)}
-                    className="cursor-pointer hover:bg-muted"
+                    className="cursor-pointer transition-colors hover:bg-muted"
                   >
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-foreground sm:pl-0">
-                      {lic.type}
+                    {/* El click en la fila sirve para el mouse, pero sin un
+                        boton real no hay forma de abrir el detalle con el
+                        teclado -- mismo ajuste que la tabla principal. */}
+                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-0">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onRowClick(lic);
+                        }}
+                        className="rounded text-left font-medium text-foreground underline-offset-4 hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        {lic.type}
+                      </button>
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                       {lic.startDate}
@@ -984,7 +995,7 @@ export const PermissionHistoryTab = ({
           <button
             type="button"
             onClick={() => setPanelAbierto(true)}
-            className="text-primary hover:bg-primary/10 border border-primary/30 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+            className="text-primary hover:bg-primary/10 border border-primary/30 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             Cargar horas ya consumidas
           </button>
@@ -1328,7 +1339,7 @@ export const DocumentsTab = ({ employee }: { employee: Employee }) => {
                       icon="pi pi-trash"
                       className="p-button-text p-button-sm"
                       onClick={() => handleDeleteDocument(doc)}
-                      style={{ color: "var(--error)" }}
+                      style={{ color: "var(--destructive)" }}
                     />
                   </td>
                 </tr>
