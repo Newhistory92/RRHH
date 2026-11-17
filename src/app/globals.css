@@ -330,6 +330,20 @@ body {
   font-family: var(--font-sans);
 }
 
+/* El preflight de Tailwind v4 pone cursor:default en <button> (antes era
+   pointer en v3) para calcar el comportamiento nativo del navegador. En esta
+   app casi todo elemento clickeable -- nombres de fila, badges de accion,
+   tabs -- es un <button>, asi que ese cambio dejaba sin cursor de mano a
+   cualquier boton que no lo pidiera a mano con la clase cursor-pointer. Se
+   restaura el comportamiento esperado una sola vez en vez de agregar
+   cursor-pointer boton por boton en cada componente. Los deshabilitados
+   quedan afuera a proposito: ahi el cursor correcto es not-allowed o default,
+   nunca el de "esto se puede apretar". */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
 :root {
   --primary-color: #1B3A2B;
   --primary-color-text: #FFFFFF;

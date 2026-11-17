@@ -7,11 +7,49 @@ import { AusenciasEmpleadoTab } from "./AusenciasEmpleadoTab"
 import { CargaInicialLicenciasTab } from "./CargaInicialLicenciasTab";
 import BajaModal from "./BajaModal";
 import {StatusBadge} from "@/app/util/UiRRHH"
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {  Employee, LicenseHistory} from '@/app/Interfas/Interfaces';
 import { Avatar } from 'primereact/avatar';
 import { Button } from 'primereact/button';
 import { leerPermisos, tienePermiso } from "@/app/util/permisos";
+
+const TABS: [string, string][] = [
+  ["perfil", "Perfil"],
+  ["licencias", "Historial de Licencias"],
+  ["permisos", "Historial de Permisos"],
+  ["documentos", "Documentos"],
+  ["feedback360", "Feedback 360°"],
+  ["asistencia", "Asistencia"],
+  ["alertas", "Alertas de tolerancia"],
+  ["ausencias", "Ausencias"],
+];
+
+// Antes eran 9 <button> con la misma clase repetida a mano, sin foco visible
+// para quien navega con teclado. Un solo lugar para el estilo y el
+// focus-visible que faltaba.
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      aria-current={active ? "page" : undefined}
+      className={`${
+        active
+          ? "border-primary text-primary"
+          : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+      } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-t`}
+    >
+      {children}
+    </button>
+  );
+}
 
 export interface EmployeeDetailViewProps {
   employee: Employee | null | undefined;
@@ -96,98 +134,23 @@ export const EmployeeDetailView = ({
           vive en la nav y el contenedor corta el eje vertical. */}
       <div className="no-print overflow-x-auto overflow-y-hidden">
         <nav className="flex space-x-6 min-w-max border-b border-border" aria-label="Tabs">
-          <button
-            onClick={() => setActiveTab("perfil")}
-            className={`${
-              activeTab === "perfil"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
-          >
-            Perfil
-          </button>
-          <button
-            onClick={() => setActiveTab("licencias")}
-            className={`${
-              activeTab === "licencias"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
-          >
-            Historial de Licencias
-          </button>
-          <button
-            onClick={() => setActiveTab("permisos")}
-            className={`${
-              activeTab === "permisos"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
-          >
-            Historial de Permisos
-          </button>
-          <button
-            onClick={() => setActiveTab("documentos")}
-            className={`${
-              activeTab === "documentos"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
-          >
-            Documentos
-          </button>
-          <button
-            onClick={() => setActiveTab("feedback360")}
-            className={`${
-              activeTab === "feedback360"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
-          >
-            Feedback 360°
-          </button>
-          <button
-            onClick={() => setActiveTab("asistencia")}
-            className={`${
-              activeTab === "asistencia"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
-          >
-            Asistencia
-          </button>
-          <button
-            onClick={() => setActiveTab("alertas")}
-            className={`${
-              activeTab === "alertas"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
-          >
-            Alertas de tolerancia
-          </button>
+          {TABS.map(([id, label]) => (
+            <TabButton
+              key={id}
+              active={activeTab === id}
+              onClick={() => setActiveTab(id)}
+            >
+              {label}
+            </TabButton>
+          ))}
           {puedeCargarSaldos && (
-            <button
+            <TabButton
+              active={activeTab === "cargaInicial"}
               onClick={() => setActiveTab("cargaInicial")}
-              className={`${
-                activeTab === "cargaInicial"
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-              } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
             >
               Carga inicial de saldos
-            </button>
+            </TabButton>
           )}
-          <button
-            onClick={() => setActiveTab("ausencias")}
-            className={`${
-              activeTab === "ausencias"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-            } whitespace-nowrap py-4 px-1 -mb-px border-b-2 font-medium text-sm`}
-          >
-            Ausencias
-          </button>
         </nav>
       </div>
       <div className="no-print">

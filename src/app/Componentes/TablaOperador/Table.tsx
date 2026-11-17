@@ -390,7 +390,7 @@ export const EmployeeTableView = ({
                             e.stopPropagation();
                             onSelectEmployee(employee.id);
                           }}
-                          className="rounded text-left font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="rounded text-left font-medium text-foreground underline-offset-4 hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
                           {employee.name}
                         </button>
@@ -413,7 +413,7 @@ export const EmployeeTableView = ({
                             e.stopPropagation();
                             onOpenPermissionModal(employee.id);
                           }}
-                          className="flex items-center gap-1.5 rounded font-medium text-primary transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="flex items-center gap-1.5 rounded font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
                           <LogOut size={16} /> Permiso de salida
                         </button>
