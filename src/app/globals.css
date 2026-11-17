@@ -183,6 +183,32 @@
     box-shadow: 0 0 0 .2rem var(--ring) !important;
 }
 
+/* El tema de PrimeReact pinta el texto escrito en inputs/dropdowns/calendario
+   con un gris propio del tema en vez de heredar --foreground, asi que el
+   valor que el usuario tipeo se ve mas apagado que el resto del texto de la
+   pantalla (notado en el CV, pero el tema afecta a toda la app). El
+   placeholder si se mantiene mas tenue a proposito, para distinguirlo de un
+   valor real. */
+.p-inputtext,
+.p-dropdown .p-dropdown-label,
+.p-multiselect .p-multiselect-label,
+.p-calendar .p-inputtext,
+.p-inputtextarea,
+.p-inputnumber-input {
+    color: var(--foreground) !important;
+}
+.p-inputtext::placeholder,
+.p-dropdown .p-dropdown-label.p-placeholder,
+.p-multiselect .p-multiselect-label.p-placeholder {
+    color: var(--muted-foreground) !important;
+}
+.p-inputtext:disabled,
+.p-inputtext.p-disabled,
+.p-dropdown.p-disabled .p-dropdown-label,
+.p-multiselect.p-disabled .p-multiselect-label {
+    color: var(--muted-foreground) !important;
+}
+
 /* Listas desplegables de PrimeReact. El tema pinta el item seleccionado con el
    color primario pero deja el texto en el color por defecto, asi que sobre el
    verde la etiqueta queda invisible. Se fija el par fondo/texto en los tres
