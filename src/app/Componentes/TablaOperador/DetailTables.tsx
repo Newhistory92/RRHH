@@ -770,7 +770,7 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
           onHide={() => setIsManualModalOpen(false)}
           footer={(
             <div className="flex justify-end gap-2 px-4 pb-4">
-              <Button label="Cancelar" icon="pi pi-times" className="p-button-text" onClick={() => setIsManualModalOpen(false)} />
+              <Button label="Cancelar" icon="pi pi-times" className="p-button-text p-button-secondary" onClick={() => setIsManualModalOpen(false)} />
               <Button label="Guardar y Aprobar" icon="pi pi-check" className="p-button-primary" onClick={handleManualSubmit} loading={isSubmitting} />
             </div>
           )}
