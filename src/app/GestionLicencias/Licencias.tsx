@@ -90,7 +90,6 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
   // no deberían bloquearse entre sí. El backend es la única fuente de
   // verdad para este chequeo y devuelve el 400 con el tipo específico.
   const [selectedRequest, setSelectedRequest] = useState<LicenseHistory | null>(null);
-  console.log("saldos", saldos);
   const pendientes = useMemo<SolicitudParsed[]>(() =>
     solicitudesPendientes.map(s => ({ ...s, desde: new Date(s.startDate), hasta: new Date(s.endDate) })),
     [solicitudesPendientes],
@@ -172,17 +171,17 @@ export default function ConteinerLicencia({ userData, saldos, misSolicitudes, so
         </div>
 
         {/* Nueva solicitud */}
-        <div className="bg-gradient-to-br from-primary to-warm-contrast rounded-xl p-5 flex flex-col items-center justify-center text-center text-primary-foreground shadow-sm">
-          <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center mb-3">
-            <Plus size={20} className="text-primary-foreground" />
+        <div className="bg-card border border-border rounded-xl p-5 flex flex-col items-center justify-center text-center shadow-sm">
+          <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center mb-3">
+            <Plus size={20} className="text-primary" />
           </div>
-          <h3 className="font-semibold text-sm mb-1">Nueva Solicitud</h3>
-          <p className="text-xs text-primary-foreground/80 mb-4">
+          <h3 className="font-semibold text-sm mb-1 text-foreground">Nueva Solicitud</h3>
+          <p className="text-xs text-muted-foreground mb-4">
             Iniciá tu solicitud de licencia
           </p>
           <button
             onClick={onNewRequest}
-            className="flex items-center gap-1.5 px-4 py-2 bg-card text-primary text-xs font-semibold rounded-full hover:bg-muted transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-card"
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-full hover:opacity-90 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send size={13} />
             Solicitar
