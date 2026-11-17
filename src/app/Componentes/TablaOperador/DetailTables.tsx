@@ -658,6 +658,18 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
       toast.current?.show({ severity: 'warn', summary: 'Faltan datos', detail: 'Complete todos los campos.' });
       return;
     }
+    // DateRangePicker ya muestra "Superaste el máximo..." cuando esto pasa,
+    // pero ese aviso es solo visual -- sin este chequeo, Guardar y Aprobar
+    // seguía mandando el pedido igual y quedaba una licencia aprobada por
+    // más días de los que el empleado tiene disponibles.
+    if (diasCalculados > maxDaysAvailable) {
+      toast.current?.show({
+        severity: 'warn',
+        summary: 'Supera el saldo disponible',
+        detail: `${typeKey} tiene ${maxDaysAvailable} día${maxDaysAvailable === 1 ? '' : 's'} disponible${maxDaysAvailable === 1 ? '' : 's'}. Ajustá el rango de fechas.`,
+      });
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -769,7 +781,7 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
             </div>
 
             <Section>
-              <StepLabel n={2} label="Tipo de licencia" />
+              <StepLabel n={1} label="Tipo de licencia" />
               <Dropdown
                 value={selectedType}
                 onChange={e => handleTypeChange(e.value)}
@@ -821,7 +833,7 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
               <label className="text-sm font-semibold text-foreground">Periodo de Licencia</label>
               <div className="border border-border rounded-lg p-2 bg-muted">
                 <Section>
-                  <StepLabel n={1} label="Rango de fechas" />
+                  <StepLabel n={2} label="Rango de fechas" />
                   {licenseMeta.mode === 'corrido' ? (
                     <div className="space-y-4">
                       <p className="text-xs text-warning bg-warning-soft p-2 rounded-lg border border-border flex items-center gap-2">
@@ -842,7 +854,7 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
                         <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl">
                           <p className="text-xs font-semibold text-primary">Período Calculado:</p>
                           <p className="text-sm text-primary font-bold">
-                            {startDate?.toLocaleDateString()} al {endDate.toLocaleDateString()}
+                            {formatearFecha(startDate)} al {formatearFecha(endDate)}
                           </p>
                           <p className="text-[10px] text-primary mt-1">90 días calendario automáticos.</p>
                         </div>

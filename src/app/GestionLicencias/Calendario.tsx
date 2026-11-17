@@ -157,7 +157,7 @@ export default function DateRangePicker({ onDateChange, maxDays, allowPastDates 
         {dates && (
           <button
             onClick={() => setDates(null)}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-muted-foreground bg-card border border-border rounded-full hover:bg-muted hover:border-border transition shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-muted-foreground bg-card border border-border rounded-full transition-colors hover:bg-muted hover:border-border shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <X className="w-3.5 h-3.5" />
             Limpiar
