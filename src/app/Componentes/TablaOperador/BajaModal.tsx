@@ -18,6 +18,7 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { apiClient } from "@/app/util/apiClient";
 import { BajaAbierta, MotivoBaja } from "@/app/Interfas/Interfaces";
+import { formatearFecha } from "@/app/lib/dates";
 
 const MOTIVOS: MotivoBaja[] = [
   "Jubilación",
@@ -177,7 +178,7 @@ export default function BajaModal({
               <p className="text-sm text-error-soft-foreground">
                 {baja.vigente
                   ? `¿Borrar la baja de ${employeeName}? Se borra como si nunca se hubiera cargado y recupera todos sus permisos. Si volvió a trabajar, lo que corresponde es reincorporarla.`
-                  : `¿Cancelar la baja programada de ${employeeName} para el ${baja.fechaBaja}? Se borra como si nunca se hubiera cargado.`}
+                  : `¿Cancelar la baja programada de ${employeeName} para el ${formatearFecha(baja.fechaBaja)}? Se borra como si nunca se hubiera cargado.`}
               </p>
             </div>
             <div className="flex flex-wrap gap-3 pt-2">
@@ -200,7 +201,7 @@ export default function BajaModal({
           <div className="space-y-4">
             <p className="text-sm text-foreground">
               <strong>{employeeName}</strong> tiene una baja programada por{" "}
-              <strong>{baja.motivo}</strong> para el {baja.fechaBaja}. Hasta
+              <strong>{baja.motivo}</strong> para el {formatearFecha(baja.fechaBaja)}. Hasta
               ese día sigue trabajando con todos sus permisos.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
@@ -229,7 +230,7 @@ export default function BajaModal({
             <p className="text-sm text-foreground">
               <strong>{employeeName}</strong> está de baja por{" "}
               <strong>{baja.motivo}</strong> desde el{" "}
-              {baja.fechaBaja}.
+              {formatearFecha(baja.fechaBaja)}.
             </p>
             <div>
               <label className="block text-sm font-semibold mb-1">

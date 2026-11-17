@@ -10,6 +10,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { apiClient } from "@/app/util/apiClient";
 import { EmpleadoBaja } from "@/app/Interfas/Interfaces";
+import { formatearFecha } from "@/app/lib/dates";
 
 interface Props {
   onVolver: () => void;
@@ -112,7 +113,7 @@ export default function BajasTable({ onVolver, onSelectEmployee }: Props) {
         </div>
         <button
           onClick={onVolver}
-          className="px-4 py-2 rounded-lg bg-muted text-foreground text-sm hover:opacity-90"
+          className="px-4 py-2 rounded-lg bg-muted text-foreground text-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           Volver al tablero
         </button>
@@ -131,7 +132,7 @@ export default function BajasTable({ onVolver, onSelectEmployee }: Props) {
                   key={motivo}
                   onClick={() => setMotivoFiltro(activo ? null : motivo)}
                   aria-pressed={activo}
-                  className={`w-full grid grid-cols-[11rem_1fr_2.5rem] items-center gap-3 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-muted ${
+                  className={`w-full grid grid-cols-[11rem_1fr_2.5rem] items-center gap-3 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                     activo ? "bg-muted" : ""
                   }`}
                 >
@@ -189,14 +190,27 @@ export default function BajasTable({ onVolver, onSelectEmployee }: Props) {
                 onClick={() => onSelectEmployee(b.employeeId)}
                 className="border-b border-border last:border-0 cursor-pointer transition-colors hover:bg-muted"
               >
-                <td className="py-3 px-4 text-foreground">{b.name}</td>
-                <td className="py-3 px-4 text-muted-foreground">{b.dni ?? "—"}</td>
+                {/* El click en la fila sirve para el mouse; el nombre es un
+                    boton real para que tambien se pueda abrir con teclado --
+                    mismo patron que la tabla principal. */}
+                <td className="py-3 px-4">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectEmployee(b.employeeId);
+                    }}
+                    className="rounded text-left font-medium text-foreground underline-offset-4 hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    {b.name}
+                  </button>
+                </td>
+                <td className="py-3 px-4 font-mono tabular-nums text-muted-foreground">{b.dni ?? "—"}</td>
                 <td className="py-3 px-4 text-muted-foreground">
                   {b.departamento ?? "—"}
                 </td>
                 <td className="py-3 px-4 text-foreground">{b.motivo}</td>
-                <td className="py-3 px-4 text-muted-foreground">
-                  {b.fechaBaja ?? "—"}
+                <td className="py-3 px-4 font-mono tabular-nums text-muted-foreground">
+                  {b.fechaBaja ? formatearFecha(b.fechaBaja) : "—"}
                 </td>
                 <td className="py-3 px-4 text-muted-foreground tabular-nums">
                   {b.antiguedadAnios !== null ? `${b.antiguedadAnios} años` : "—"}
@@ -204,7 +218,7 @@ export default function BajasTable({ onVolver, onSelectEmployee }: Props) {
                 <td className="py-3 px-4 text-muted-foreground">
                   {ETIQUETA_ESTADO[b.estado]}
                   {b.estado === "reincorporada" && b.fechaReingreso
-                    ? ` el ${b.fechaReingreso}`
+                    ? ` el ${formatearFecha(b.fechaReingreso)}`
                     : ""}
                 </td>
                 <td
