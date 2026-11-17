@@ -79,10 +79,22 @@ export default function PortalInicio({ employeeData }: PortalInicioProps) {
   const urgentes = feedCompleto.filter((p) => p.prioridad === 'Urgente' || p.fijada);
   const destacadas = feedCompleto.filter((p) => p.destacada && !urgentes.some((u) => u.id === p.id));
   const yaMostradas = new Set([...urgentes, ...destacadas].map((p) => p.id));
-  const secciones = CATEGORIAS_SECCION.map((categoria) => ({
+  const seccionesCrudas = CATEGORIAS_SECCION.map((categoria) => ({
     categoria,
     items: feedCompleto.filter((p) => p.categoria === categoria && !yaMostradas.has(p.id)),
-  })).filter((s) => s.items.length > 0);
+  }));
+  // Con hasta 9 categorias posibles, una publicacion suelta en cada una da
+  // nueve secciones de un solo item -- la pantalla "cargada" que se nota mas
+  // con pocos datos (pruebas) pero que igual puede pasar en produccion si una
+  // categoria casi no se usa. Las que no llegan a sentirse como una seccion
+  // propia (menos de 2 items) se juntan en una sola al final; la categoria de
+  // cada una sigue visible en su propia tarjeta, asi que no se pierde
+  // informacion.
+  const UMBRAL_SECCION_PROPIA = 2;
+  const secciones = seccionesCrudas.filter((s) => s.items.length >= UMBRAL_SECCION_PROPIA);
+  const otras = seccionesCrudas
+    .filter((s) => s.items.length > 0 && s.items.length < UMBRAL_SECCION_PROPIA)
+    .flatMap((s) => s.items);
 
   const ahora = new Date();
   const proximosEventos = feedCompleto
@@ -124,7 +136,7 @@ export default function PortalInicio({ employeeData }: PortalInicioProps) {
   const sidebar = (
     <div className="space-y-6 lg:sticky lg:top-8 lg:self-start">
       <CalendarWidget />
-      <UpcomingEventsWidget eventos={proximosEventos} />
+      <UpcomingEventsWidget eventos={proximosEventos} onSelect={setSeleccionada} />
     </div>
   );
 
@@ -207,6 +219,17 @@ export default function PortalInicio({ employeeData }: PortalInicioProps) {
                       </div>
                     </section>
                   ))}
+
+                  {otras.length > 0 && (
+                    <section>
+                      <h2 className="font-heading text-xl font-bold text-foreground mb-3">Otras novedades</h2>
+                      <div className="space-y-3">
+                        {otras.map((p) => (
+                          <PublicationCard key={p.id} publication={p} onClick={() => setSeleccionada(p)} />
+                        ))}
+                      </div>
+                    </section>
+                  )}
                 </>
               )}
             </div>

@@ -33,19 +33,19 @@ export function FeedFilterBar({ filtros, onChange, onLimpiar }: FeedFilterBarPro
           value={filtros.texto}
           onChange={(e) => onChange({ texto: e.target.value })}
           placeholder="Buscar por título o resumen…"
-          className="w-full pl-9 pr-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm"
+          className="w-full pl-9 pr-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
-      <select value={filtros.categoria} onChange={(e) => onChange({ categoria: e.target.value })} className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm">
+      <select value={filtros.categoria} onChange={(e) => onChange({ categoria: e.target.value })} className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary">
         <option value="">Todas las categorías</option>
         {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
       </select>
-      <select value={filtros.prioridad} onChange={(e) => onChange({ prioridad: e.target.value })} className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm">
+      <select value={filtros.prioridad} onChange={(e) => onChange({ prioridad: e.target.value })} className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary">
         <option value="">Toda prioridad</option>
         {PRIORIDADES.map((p) => <option key={p} value={p}>{p}</option>)}
       </select>
       {hayFiltros && (
-        <button onClick={onLimpiar} className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:bg-muted transition-colors duration-150">
+        <button onClick={onLimpiar} className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-border text-sm text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <X size={14} /> Limpiar
         </button>
       )}
