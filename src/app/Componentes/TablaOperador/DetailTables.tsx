@@ -8,6 +8,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
+import { formatearFecha } from '@/app/lib/dates';
 import { useRef } from 'react';
 import { InputMask } from 'primereact/inputmask';
 import { updateCondicionLaboral, updateHorario, timeStringToDecimal, decimalToTimeString } from './employeeApi';
@@ -924,11 +925,11 @@ export const LicenseHistoryTab = ({ licenses, employee, onRowClick, onRefresh }:
                         {lic.type}
                       </button>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
-                      {lic.startDate}
+                    <td className="whitespace-nowrap px-3 py-4 font-mono tabular-nums text-sm text-muted-foreground">
+                      {formatearFecha(lic.startDate)}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
-                      {lic.endDate}
+                    <td className="whitespace-nowrap px-3 py-4 font-mono tabular-nums text-sm text-muted-foreground">
+                      {formatearFecha(lic.endDate)}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                       {lic.duration} días

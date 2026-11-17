@@ -59,6 +59,32 @@ export const formatearFechaHora = (iso: string): string => {
 };
 
 /**
+ * "2026-07-14T10:50:08.101540" o "2026-07-14" -> "14/07/2026". Sin hora: para
+ * periodos de licencia, que son de dia completo y no necesitan mostrar una
+ * hora que ademas suele ser solo el momento en que se cargo el registro.
+ *
+ * "YYYY-MM-DD" sin hora se parsea a mano: new Date("2026-07-14") lo
+ * interpreta como medianoche UTC, y en Argentina (UTC-3) eso muestra el 13,
+ * un dia antes del que se guardo.
+ */
+export const formatearFecha = (iso: string | Date | null | undefined): string => {
+    if (!iso) return "";
+    if (typeof iso === "string") {
+        const soloFecha = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (soloFecha) {
+            const [, aaaa, mm, dd] = soloFecha;
+            return `${dd}/${mm}/${aaaa}`;
+        }
+    }
+    const fecha = typeof iso === "string" ? new Date(iso) : iso;
+    if (Number.isNaN(fecha.getTime())) return "";
+    const dd = String(fecha.getDate()).padStart(2, "0");
+    const mm = String(fecha.getMonth() + 1).padStart(2, "0");
+    const aaaa = fecha.getFullYear();
+    return `${dd}/${mm}/${aaaa}`;
+};
+
+/**
  * Procesa la lista de feriados de la API:
  * - Parsea las fechas con Temporal (sin bug de mes)
  * - Aplica traslados según MOVEABLE_DATES

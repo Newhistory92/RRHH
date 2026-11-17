@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiClient } from "@/app/util/apiClient";
 import { Employee, JornadaDiaria, ResumenAbuso } from "@/app/Interfas/Interfaces";
+import { formatearFecha } from "@/app/lib/dates";
 
 const fmtHoras = (h: number) => {
   const signo = h < 0 ? "-" : h > 0 ? "+" : "";
@@ -149,7 +150,7 @@ export function AsistenciaEmpleadoTab({ employee }: Props) {
             <tbody>
               {jornadas.map((j) => (
                 <tr key={j.id} className="border-b border-border last:border-0">
-                  <td className="py-2 pr-4 font-mono tabular-nums text-foreground">{j.fecha.slice(0, 10)}</td>
+                  <td className="py-2 pr-4 font-mono tabular-nums text-foreground">{formatearFecha(j.fecha)}</td>
                   <td className="py-2 pr-4 font-mono tabular-nums">
                     {j.entrada ? j.entrada.slice(11, 16) : "—"}
                     {j.entradaManual && (

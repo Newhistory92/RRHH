@@ -4,11 +4,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Toast } from "primereact/toast";
 import { apiClient } from "@/app/util/apiClient";
 import { AusenciaEmpleado, Employee } from "@/app/Interfas/Interfaces";
+import { formatearFecha } from "@/app/lib/dates";
 
 const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
+// .slice(0, 10) antes del split: si el backend manda la fecha con hora
+// ("2026-11-02T00:00:00"), el pedazo del dia arrastra el resto y Number()
+// da NaN.
 const diaDeSemana = (iso: string) => {
-  const [a, m, d] = iso.split("-").map(Number);
+  const [a, m, d] = iso.slice(0, 10).split("-").map(Number);
   return DIAS[new Date(a, m - 1, d).getDay()];
 };
 
@@ -101,7 +105,7 @@ export function AusenciasEmpleadoTab({ employee }: Props) {
   };
 
   const anular = async (fecha: string) => {
-    if (!confirm(`¿Anular la justificación del ${fecha}? El día vuelve a contar como ausencia.`)) {
+    if (!confirm(`¿Anular la justificación del ${formatearFecha(fecha)}? El día vuelve a contar como ausencia.`)) {
       return;
     }
     try {
@@ -224,7 +228,7 @@ export function AusenciasEmpleadoTab({ employee }: Props) {
             <tbody>
               {ausencias.map((a) => (
                 <tr key={a.fecha} className="border-b border-border last:border-0">
-                  <td className="py-2 pr-4 font-mono tabular-nums text-foreground">{a.fecha}</td>
+                  <td className="py-2 pr-4 font-mono tabular-nums text-foreground">{formatearFecha(a.fecha)}</td>
                   <td className="py-2 pr-4 text-muted-foreground">{diaDeSemana(a.fecha)}</td>
                   <td className="py-2 pr-4">
                     {a.estado === "justificada" ? (
@@ -292,7 +296,7 @@ export function AusenciasEmpleadoTab({ employee }: Props) {
           <div className="bg-card rounded-lg shadow-lg p-6 w-full max-w-md">
             <h3 className="font-heading text-lg text-foreground mb-1">Justificar ausencia</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              {employee.name} — {justificando}
+              {employee.name} — {formatearFecha(justificando)}
             </p>
 
             <label className="block text-sm font-medium text-muted-foreground mb-1">

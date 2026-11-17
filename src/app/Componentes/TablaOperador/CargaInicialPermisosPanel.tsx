@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiClient } from "@/app/util/apiClient";
 import { timeStringToDecimal } from "@/app/Componentes/TablaOperador/employeeApi";
+import { formatearFecha } from "@/app/lib/dates";
 
 interface Asiento {
   id: number;
@@ -174,7 +175,7 @@ export function CargaInicialPermisosPanel({ employeeId, onCerrar }: Props) {
                       {fmtHoras(a.horasConsumidas)}
                     </span>
                     <span className="text-xs text-muted-foreground flex-1">
-                      {a.cargadoEn ? a.cargadoEn.slice(0, 10) : "—"}
+                      {a.cargadoEn ? formatearFecha(a.cargadoEn) : "—"}
                       {a.cargadoPor !== null && ` · legajo ${a.cargadoPor}`}
                     </span>
                     <button
@@ -184,7 +185,7 @@ export function CargaInicialPermisosPanel({ employeeId, onCerrar }: Props) {
                       // Dos asientos pueden tener las mismas horas; la fecha
                       // es lo que distingue cuál se está por borrar.
                       aria-label={`Borrar la carga de ${fmtHoras(a.horasConsumidas)} del ${
-                        a.cargadoEn ? a.cargadoEn.slice(0, 10) : "sin fecha"
+                        a.cargadoEn ? formatearFecha(a.cargadoEn) : "sin fecha"
                       }`}
                       className="rounded text-error transition-opacity hover:opacity-80 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >

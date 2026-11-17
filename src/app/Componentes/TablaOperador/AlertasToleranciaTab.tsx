@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiClient } from "@/app/util/apiClient";
 import { Employee, JornadaDiaria, ResumenAbuso } from "@/app/Interfas/Interfaces";
+import { formatearFecha } from "@/app/lib/dates";
 
 const extremo = (j: JornadaDiaria) =>
   j.abusoEntrada && j.abusoSalida
@@ -101,7 +102,7 @@ export function AlertasToleranciaTab({ employee }: Props) {
             <tbody>
               {dias.map((j) => (
                 <tr key={j.id} className="border-b border-border last:border-0">
-                  <td className="py-2 pr-4 font-mono tabular-nums text-foreground">{j.fecha.slice(0, 10)}</td>
+                  <td className="py-2 pr-4 font-mono tabular-nums text-foreground">{formatearFecha(j.fecha)}</td>
                   <td
                     className={`py-2 pr-4 font-mono tabular-nums ${
                       j.abusoEntrada ? "text-warning font-semibold" : ""

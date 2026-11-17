@@ -9,6 +9,7 @@ import { InputMask } from 'primereact/inputmask';
 import { Button } from 'primereact/button';
 import { timeStringToDecimal } from '@/app/Componentes/TablaOperador/employeeApi';
 import { apiClient } from "@/app/util/apiClient";
+import { formatearFecha } from "@/app/lib/dates";
 interface LicenseDetailModalProps {
   license: LicenseHistory | null;
   onClose: () => void;
@@ -64,7 +65,7 @@ export const ApplyLicenseModal = ({
             </p>
             <p>
               <strong className="text-primary">Fechas:</strong> del{" "}
-              {message.startDate} al {message.endDate}
+              {formatearFecha(message.startDate)} al {formatearFecha(message.endDate)}
             </p>
           </div>
         </div>
@@ -340,15 +341,17 @@ export const LicenseDetailModal = ({ license, onClose }: LicenseDetailModalProps
 
               <div className="bg-muted p-4 rounded-lg border border-border">
                 <div className="flex items-center mb-2">
-                  <Calendar size={16} className="text-sage-strong mr-2" />
+                  <Calendar size={16} className="text-primary mr-2" />
                   <span className="text-sm font-medium text-muted-foreground">Período</span>
                 </div>
-                <p className="text-foreground font-semibold">{license.startDate} al {license.endDate}</p>
+                <p className="text-foreground font-semibold">
+                  {formatearFecha(license.startDate)} al {formatearFecha(license.endDate)}
+                </p>
               </div>
 
               <div className="bg-muted p-4 rounded-lg border border-border">
                 <div className="flex items-center mb-2">
-                  <Clock size={16} className="text-olive-strong mr-2" />
+                  <Clock size={16} className="text-primary mr-2" />
                   <span className="text-sm font-medium text-muted-foreground">Duración</span>
                 </div>
                 <p className="text-foreground font-semibold">{license.duration} días hábiles</p>
@@ -362,10 +365,11 @@ export const LicenseDetailModal = ({ license, onClose }: LicenseDetailModalProps
                   Respaldo de Aprobación
                 </h4>
                 <div className="bg-card p-3 rounded border border-border">
-                  <p className="text-sm text-foreground italic">{license.originalMessage}</p>
+                  <p className="text-sm text-foreground italic">{license.mensajeOriginal}</p>
                   {license.startDate && license.endDate && (
                     <p className="text-xs text-muted-foreground mt-2">
-                      <strong>Fechas solicitadas:</strong> {license.startDate} al {license.endDate}
+                      <strong>Fechas solicitadas:</strong>{" "}
+                      {formatearFecha(license.startDate)} al {formatearFecha(license.endDate)}
                     </p>
                   )}
                 </div>
