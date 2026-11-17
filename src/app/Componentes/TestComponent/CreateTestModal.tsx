@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, X as CloseIcon, Plus, Trash2, Wand2 } from 'lucide-react';
+import { AlertCircle, X as CloseIcon, Plus, Trash2, Wand2, Lightbulb } from 'lucide-react';
 import { Card } from 'primereact/card';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { InputText } from "primereact/inputtext";
@@ -47,8 +47,7 @@ export const CreateTestModal: React.FC<CreateTestModalProps> = ({
     },
   ]);
   const [scenario, setScenario] = useState("");
-console.log(  questions)
-// Hook para generación con IA
+  // Hook para generación con IA
   const { generateCaseStudy, isGenerating, setIsGenerating, error, clearError } = useCaseStudyGeneration();
 
   useEffect(() => {
@@ -217,7 +216,7 @@ console.log(  questions)
   ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+    <div className="fixed inset-0 bg-overlay z-50 flex justify-center items-center p-4">
       <div className="bg-card rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
         <div className="p-4 border-b border-border flex justify-between items-center">
           <h3 className="font-heading text-xl font-bold text-foreground">
@@ -225,7 +224,7 @@ console.log(  questions)
           </h3>
           <button
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground"
+            className="rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <CloseIcon size={24} />
           </button>
@@ -405,7 +404,7 @@ console.log(  questions)
                       <button
                         type="button"
                         onClick={clearError}
-                        className="ml-auto text-error hover:opacity-80"
+                        className="ml-auto rounded text-error transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         <CloseIcon size={14} />
                       </button>
@@ -424,9 +423,10 @@ console.log(  questions)
                   disabled={isGenerating}
                 />    
                 
-                <div className="bg-primary/15 p-3 rounded-lg">
+                <div className="bg-primary/15 p-3 rounded-lg flex items-start gap-2">
+                  <Lightbulb size={14} className="text-primary shrink-0 mt-0.5" aria-hidden="true" />
                   <p className="text-xs text-primary">
-                    💡 <strong>Tip:</strong> Completa la descripción del test y luego usa el botón &quot;Generar con IA&quot;
+                    <strong>Tip:</strong> Completa la descripción del test y luego usa el botón &quot;Generar con IA&quot;
                     para crear un caso de estudio personalizado para {profession}. La evaluación se realizará mediante IA.
                   </p>
                 </div>

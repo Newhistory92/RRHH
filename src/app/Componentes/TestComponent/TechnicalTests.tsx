@@ -13,7 +13,6 @@ interface TechnicalTestsProps {
   testsByProfession: TestsByProfession;
   professions: { [key: string]: number[] };
   selectedProfession: string;
-  argentinianDegrees: { [key: string]: number[] };
   onSelectedProfessionChange: (profession: string) => void;
   onAddProfession: (profession: { [key: string]: number[] }) => void;
   onSaveTest: (test: Test) => void;
@@ -151,9 +150,14 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
                   </div>
                   <div className="flex items-center gap-2 ml-4">
                     <span
+                      // olive-strong y sage-strong son el mismo verde desde que
+                      // la paleta colapso a 2 hues no-neutras: los dos tipos se
+                      // veian identicos. Multiple choice queda con el acento de
+                      // marca, caso de estudio neutro -- se distinguen sin
+                      // inventar un tercer color.
                       className={`px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${test.type === "multiple-choice"
-                        ? "bg-accent/15 text-olive-strong"
-                        : "bg-sage-strong/15 text-sage-strong"
+                        ? "bg-primary/15 text-primary"
+                        : "bg-muted text-muted-foreground"
                         }`}
                     >
                       {test.type === "multiple-choice"
@@ -194,7 +198,7 @@ export const TechnicalTests: React.FC<TechnicalTestsProps> = ({
         onHide={() => setIsAddProfessionOpen(false)}
         footer={
           <div className="flex justify-end gap-2">
-            <Button label="Cancelar" icon="pi pi-times" onClick={() => setIsAddProfessionOpen(false)} className="p-button-text" />
+            <Button label="Cancelar" icon="pi pi-times" onClick={() => setIsAddProfessionOpen(false)} className="p-button-text p-button-secondary" />
             <Button label="Añadir" icon="pi pi-check" onClick={handleAddNewProfession} disabled={!newProfessionSelection} autoFocus />
           </div>
         }

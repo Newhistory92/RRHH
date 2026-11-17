@@ -4,6 +4,7 @@ import { TechnicalTests } from '@/app/Componentes/TestComponent/TechnicalTests';
 import { Test, TestsByProfession, SoftSkill, AcademicTitleMapping } from "@/app/Interfas/Interfaces";
 import { apiClient } from '@/app/util/apiClient';
 import { ComoFuncionanTestsModal } from '@/app/Componentes/ModalRRHH/ComoFuncionanTestsModal';
+import { HelpCircle, Users, FlaskConical, Target } from 'lucide-react';
 
 type ActiveTab = "technical";
 
@@ -155,11 +156,11 @@ export default function TestPage(){
             <button
               type="button"
               onClick={() => setMostrarGuia(true)}
-              className="shrink-0 h-7 w-7 rounded-full bg-warning-soft text-warning border border-warning/40 flex items-center justify-center font-bold text-base hover:bg-warning hover:text-white transition-colors animate-heartbeat mb-2"
+              className="shrink-0 h-7 w-7 rounded-full bg-warning-soft text-warning border border-warning/40 flex items-center justify-center transition-colors hover:bg-warning hover:text-white animate-heartbeat mb-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="Cómo funciona Gestión de Tests"
               title="Cómo funciona Gestión de Tests"
             >
-              !
+              <HelpCircle size={16} />
             </button>
           </div>
           <p className="text-muted-foreground">
@@ -173,13 +174,13 @@ export default function TestPage(){
         <div className="flex border-b border-border mb-6">
           <button
             onClick={() => setActiveTab("technical")}
-            className={`px-4 py-2 font-semibold transition-colors duration-200 ${
+            className={`px-4 py-2 font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
               activeTab === "technical"
-                ? "border-b-2 border-primary text-primary  text-shadow-md"
-                : "text-muted-foreground hover:text-primary text-shadow-md"
+                ? "border-b-2 border-primary text-primary"
+                : "text-muted-foreground hover:text-primary"
             }`}
           >
-            🧪 Tests Técnicos
+            Tests Técnicos
           </button>
         </div>
 
@@ -213,18 +214,18 @@ export default function TestPage(){
               placeholder="Título académico (ej. Bachiller)"
               value={newTitulo}
               onChange={(e) => setNewTitulo(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-md border border-border bg-background text-foreground"
+              className="flex-1 px-3 py-2 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <input
               type="text"
               placeholder="Profesión (ej. Administración Pública)"
               value={newProfession}
               onChange={(e) => setNewProfession(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-md border border-border bg-background text-foreground"
+              className="flex-1 px-3 py-2 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <button
               onClick={handleAddTitleMapping}
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 font-semibold"
+              className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-semibold transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Agregar
             </button>
@@ -249,7 +250,7 @@ export default function TestPage(){
                     <td className="py-2 text-right">
                       <button
                         onClick={() => handleDeleteTitleMapping(m.id)}
-                        className="text-error hover:opacity-80"
+                        className="rounded text-error transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         Eliminar
                       </button>
@@ -273,8 +274,8 @@ export default function TestPage(){
                   {Object.keys(professions).length}
                 </p>
               </div>
-              <div className="bg-primary/15 p-3 rounded-full">
-                <span className="text-2xl">👥</span>
+              <div className="bg-muted p-3 rounded-full">
+                <Users size={22} className="text-muted-foreground" />
               </div>
             </div>
           </div>
@@ -289,8 +290,8 @@ export default function TestPage(){
                   {Object.values(testsByProfession).flat().length}
                 </p>
               </div>
-              <div className="bg-accent/15 p-3 rounded-full">
-                <span className="text-2xl">🧪</span>
+              <div className="bg-muted p-3 rounded-full">
+                <FlaskConical size={22} className="text-muted-foreground" />
               </div>
             </div>
           </div>
@@ -305,8 +306,8 @@ export default function TestPage(){
                   {softSkills.length}
                 </p>
               </div>
-              <div className="bg-sage-strong/15 p-3 rounded-full">
-                <span className="text-2xl">🎯</span>
+              <div className="bg-muted p-3 rounded-full">
+                <Target size={22} className="text-muted-foreground" />
               </div>
             </div>
           </div>
