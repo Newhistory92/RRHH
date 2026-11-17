@@ -844,20 +844,23 @@ export const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
+// El saldo es la cifra que RRHH escanea columna abajo, asi que va en mono con
+// cifras tabulares: sin eso cada digito tiene su propio ancho y los numeros no
+// se alinean entre filas.
 export const HoursDisplay = ({ hours }: { hours: number | null }) => {
   const h = hours ?? 0;
   return (
-    <span className={`font-semibold ${h >= 0 ? 'text-success' : 'text-error'}`}>
-      {h > 0 ? '+' : ''}{h.toFixed(2)}hs
+    <span className={`font-mono tabular-nums ${h >= 0 ? 'text-success' : 'text-error'}`}>
+      {h > 0 ? '+' : ''}{h.toFixed(2)} hs
     </span>
   );
 };
 
 export const InfoCard = ({ icon: Icon, title, children }: InfoCardProps) => (
-  <div className="bg-muted rounded-xl p-4 flex items-start gap-3 h-full shadow-sm border border-border">
+  <div className="bg-muted rounded-xl p-4 flex items-start gap-3 h-full border border-border">
     <Icon className="text-muted-foreground mt-0.5 flex-shrink-0" size={18} />
     <div className="flex-1 min-w-0">
-      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">{title}</h4>
+      <h4 className="text-xs font-medium text-muted-foreground mb-1">{title}</h4>
       <div className="text-foreground text-sm">{children}</div>
     </div>
   </div>

@@ -1,6 +1,6 @@
 "use client"
 import { useState, useMemo } from 'react';
-import { Search, AlertTriangle, Bell, LogOut, ChevronUpIcon, ChevronDownIcon } from 'lucide-react';
+import { Search, SearchX, Bell, LogOut, HelpCircle, ChevronUpIcon, ChevronDownIcon } from 'lucide-react';
 import { StatusBadge, HoursDisplay } from "@/app/util/UiRRHH"
 import { Pagination } from '@/app/Componentes/Pagination/pagination';
 import { Employee, SortDirection, } from '@/app/Interfas/Interfaces';
@@ -30,6 +30,8 @@ interface SortConfig {
 interface SortableHeaderProps {
   children: React.ReactNode;
   columnKey: keyof Employee;
+  /** Las columnas de cifras se alinean a la derecha, junto con sus valores. */
+  align?: 'left' | 'right';
 }
 export const EmployeeTableView = ({
   employees,
@@ -106,24 +108,43 @@ export const EmployeeTableView = ({
     return filtered;
   }, [employees, filters, sortConfig]);
 
-  const SortableHeader = ({ children, columnKey }: SortableHeaderProps) => {
+  // Antes era un <th onClick> sin padding propio: no se podia ordenar con el
+  // teclado y las columnas ordenables quedaban mas angostas que las fijas. El
+  // hueco del chevron se reserva siempre para que la etiqueta no se corra al
+  // alternar el orden.
+  const SortableHeader = ({ children, columnKey, align = 'left' }: SortableHeaderProps) => {
     const isSorted = sortConfig.key === columnKey;
 
     return (
       <th
-        className="cursor-pointer hover:bg-muted"
-        onClick={() => handleSort(columnKey)}
+        scope="col"
+        className="px-3 py-3.5"
+        aria-sort={
+          isSorted
+            ? sortConfig.direction === "ascending" ? "ascending" : "descending"
+            : "none"
+        }
       >
-        <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => handleSort(columnKey)}
+          className={`group flex w-full items-center gap-1.5 rounded text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+            align === 'right' ? 'justify-end' : ''
+          }`}
+        >
           {children}
-          {isSorted ? (
-            sortConfig.direction === "ascending" ? (
-              <ChevronUpIcon className="h-4 w-4" />
+          <span className="flex h-4 w-4 items-center justify-center">
+            {isSorted ? (
+              sortConfig.direction === "ascending" ? (
+                <ChevronUpIcon className="h-4 w-4" />
+              ) : (
+                <ChevronDownIcon className="h-4 w-4" />
+              )
             ) : (
-              <ChevronDownIcon className="h-4 w-4" />
-            )
-          ) : null}
-        </div>
+              <ChevronDownIcon className="h-4 w-4 opacity-0 transition-opacity group-hover:opacity-40" />
+            )}
+          </span>
+        </button>
       </th>
     );
   };
@@ -132,6 +153,21 @@ export const EmployeeTableView = ({
     (acc, curr) => acc + curr.messages.length,
     0
   );
+
+  // Las cifras describen el padron entero, no la vista filtrada: si cambiaran
+  // al tipear en el buscador no se podria leer un total, que es justo para lo
+  // que estan. El filtro acota la tabla de abajo, no el encabezado.
+  const resumen = useMemo(() => {
+    const ausentes = employees.filter(
+      (e) => e.status === "De licencia" || e.status === "Parte médico"
+    ).length;
+    return {
+      total: employees.length,
+      activos: employees.filter((e) => e.status === "Activo").length,
+      ausentes,
+      saldo: employees.reduce((acc, e) => acc + (e.horas ?? 0), 0),
+    };
+  }, [employees]);
 
   const paginatedEmployees = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -161,40 +197,38 @@ export const EmployeeTableView = ({
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="sm:flex sm:items-center sm:justify-between">
-        <div className="sm:flex-auto flex items-center gap-3">
-          <h1 className="font-heading text-2xl font-bold leading-6 text-foreground">
-            Lista de Empleados
+        <div className="sm:flex-auto flex items-center gap-2">
+          <h1 className="font-heading text-2xl font-semibold text-foreground">
+            Lista de empleados
           </h1>
+          {/* La guia es ayuda secundaria, no una alerta: antes latia en bucle
+              con los colores de warning y se llevaba la atencion que necesita
+              el padron. Queda como un icono quieto que se enciende al pasar. */}
           <button
             type="button"
             onClick={() => setMostrarGuiaLicencias(true)}
-            className="shrink-0 h-7 w-7 rounded-full bg-warning-soft text-warning border border-warning/40 flex items-center justify-center font-bold text-base hover:bg-warning hover:text-white transition-colors animate-heartbeat"
+            className="shrink-0 rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label="Cómo funcionan las licencias"
             title="Cómo funcionan las licencias"
           >
-            !
+            <HelpCircle size={18} />
           </button>
         </div>
         <div className="mt-4 flex items-center gap-2 sm:mt-0">
-          {/* Antes vivia en un div aparte arriba de este bloque, con
-              bg-muted sobre un fondo casi identico -- por eso quedaba flotando
-              solo y sin contraste. Ahora comparte fila con el otro botón y
-              lleva borde + texto en --primary para que se note que es
-              accionable. */}
           <button
             onClick={onShowBajas}
-            className="rounded-md border border-primary/50 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="whitespace-nowrap rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             Ver bajas
           </button>
           <button
             onClick={onShowMessages}
-            className="flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="flex items-center justify-center whitespace-nowrap rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Bell size={16} className="mr-2" />
-            Solicitudes de Licencias
+            Solicitudes de licencias
             {totalMessages > 0 && (
-              <span className="ml-2 bg-error text-error-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center">
+              <span className="ml-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-error px-1 font-mono text-xs tabular-nums text-error-foreground">
                 {totalMessages}
               </span>
             )}
@@ -202,17 +236,58 @@ export const EmployeeTableView = ({
         </div>
       </div>
 
+      {/* Como esta el padron hoy. Son cuatro cifras y ningun grafico: la tabla
+          de abajo es lo que se usa, el encabezado solo tiene que dar el total
+          de un vistazo. */}
+      <dl className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <dt className="text-sm text-muted-foreground">Empleados</dt>
+          <dd className="mt-2 whitespace-nowrap font-mono text-xl tabular-nums text-foreground sm:text-2xl">
+            {resumen.total}
+          </dd>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <dt className="text-sm text-muted-foreground">Activos</dt>
+          <dd className="mt-2 whitespace-nowrap font-mono text-xl tabular-nums text-foreground sm:text-2xl">
+            {resumen.activos}
+          </dd>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <dt className="text-sm text-muted-foreground">Ausentes hoy</dt>
+          <dd className="mt-2 whitespace-nowrap font-mono text-xl tabular-nums text-foreground sm:text-2xl">
+            {resumen.ausentes}
+          </dd>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Licencia y parte médico
+          </p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <dt className="text-sm text-muted-foreground">Saldo acumulado</dt>
+          <dd
+            className={`mt-2 whitespace-nowrap font-mono text-xl tabular-nums sm:text-2xl ${
+              resumen.saldo >= 0 ? "text-success" : "text-error"
+            }`}
+          >
+            {resumen.saldo > 0 ? "+" : ""}
+            {resumen.saldo.toFixed(2)} hs
+          </dd>
+        </div>
+      </dl>
+
       {/* Filtros */}
-      <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-6">
-        <div className="sm:col-span-3">
+      {/* 12 columnas y no 6: con sextos, el select de estado se quedaba en
+          1/6 del ancho y cortaba "Todos los estados" a media palabra. */}
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-12">
+        <div className="sm:col-span-5">
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <Search className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+              <Search className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
             </div>
             <input
               type="text"
-              placeholder="Buscar por nombre, DNI, departamento..."
-              className="block w-full rounded-md shadow-xl border-0 py-2 pl-10 text-foreground ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm"
+              placeholder="Buscar por nombre, DNI o departamento"
+              aria-label="Buscar empleados"
+              className="block h-10 w-full rounded-lg border-0 pl-9 pr-3 text-sm text-foreground ring-1 ring-inset ring-border transition-shadow placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
               value={filters.searchTerm}
               onChange={(e) => {
                 setFilters({ ...filters, searchTerm: e.target.value });
@@ -221,16 +296,17 @@ export const EmployeeTableView = ({
             />
           </div>
         </div>
-        <div className="sm:col-span-1">
+        <div className="sm:col-span-3">
           <select
-            className="block w-full px-3 rounded-md border-0 py-2.5 text-foreground shadow-xl ring-1 ring-inset ring-border focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm"
+            aria-label="Filtrar por estado"
+            className="block h-10 w-full rounded-lg border-0 px-3 text-sm text-foreground ring-1 ring-inset ring-border transition-shadow focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
             value={filters.estado}
             onChange={(e) => {
               setFilters({ ...filters, estado: e.target.value });
               setCurrentPage(1); // Resetear a primera página al filtrar
             }}
           >
-            <option value="">Todos los Estados</option>
+            <option value="">Todos los estados</option>
             {["Activo", "De licencia", "Parte médico"].map((e) => (
               <option key={e} value={e}>
                 {e}
@@ -238,16 +314,17 @@ export const EmployeeTableView = ({
             ))}
           </select>
         </div>
-        <div className="sm:col-span-2">
+        <div className="sm:col-span-4">
           <select
-            className="block w-full px-3 rounded-md border-0 py-2.5 text-foreground shadow-xl ring-1 ring-inset ring-border focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm"
+            aria-label="Filtrar por departamento"
+            className="block h-10 w-full rounded-lg border-0 px-3 text-sm text-foreground ring-1 ring-inset ring-border transition-shadow focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
             value={filters.departamento}
             onChange={(e) => {
               setFilters({ ...filters, departamento: e.target.value });
               setCurrentPage(1);
             }}
           >
-            <option value="">Todos los Departamentos</option>
+            <option value="">Todos los departamentos</option>
             {[...new Map(
               employees
                 .filter(e => e.department && e.department.nombre)
@@ -262,22 +339,24 @@ export const EmployeeTableView = ({
         </div>
       </div>
       {/* Tabla */}
-      <div className="mt-8 flow-root">
-        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-              <table className="min-w-full divide-y divide-border">
+      {/* El panel lleva el radio de panel (16px) y una hairline del token
+          --border. Antes era shadow + ring-black/5, que es un negro crudo
+          fuera de la paleta y no se adapta al tema oscuro. */}
+      <div className="mt-8">
+        <div className="overflow-hidden rounded-2xl border border-border">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-border">
                 <thead className="bg-muted">
                   <tr>
                     <th
                       scope="col"
-                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-foreground sm:pl-6"
+                      className="py-3.5 pl-4 pr-3 text-left text-sm font-medium text-muted-foreground sm:pl-6"
                     >
-                      Nombre Completo
+                      Nombre completo
                     </th>
                     <th
                       scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-foreground"
+                      className="px-3 py-3.5 text-left text-sm font-medium text-muted-foreground"
                     >
                       DNI
                     </th>
@@ -285,10 +364,12 @@ export const EmployeeTableView = ({
                     <SortableHeader columnKey="department">
                       Departamento
                     </SortableHeader>
-                    <SortableHeader columnKey="horas">Horas</SortableHeader>
+                    <SortableHeader columnKey="horas" align="right">
+                      Horas
+                    </SortableHeader>
                     <th
                       scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-foreground"
+                      className="px-3 py-3.5 text-left text-sm font-medium text-muted-foreground"
                     >
                       Acción
                     </th>
@@ -303,62 +384,74 @@ export const EmployeeTableView = ({
                       onClick={() => onSelectEmployee(employee.id)}
                       className="cursor-pointer transition-colors hover:bg-muted"
                     >
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-foreground sm:pl-6">
-                        {employee.name}
+                      {/* El nombre es un boton de verdad: el click en la fila
+                          sirve para el mouse, pero sin esto el legajo no se
+                          puede abrir con el teclado. */}
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectEmployee(employee.id);
+                          }}
+                          className="rounded text-left font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          {employee.name}
+                        </button>
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
+                      <td className="whitespace-nowrap px-3 py-4 font-mono text-sm tabular-nums text-muted-foreground">
                         {employee.dni}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
+                      <td className="whitespace-nowrap px-3 py-4 text-sm">
                         <StatusBadge status={employee.status} />
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
                         {getDepartmentName(employee.department)}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
+                      <td className="whitespace-nowrap px-3 py-4 text-right text-sm">
                         <HoursDisplay hours={employee.horas} />
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-muted-foreground">
+                      <td className="whitespace-nowrap px-3 py-4 text-sm">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             onOpenPermissionModal(employee.id);
                           }}
-                          className="flex items-center gap-1 font-medium text-primary hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+                          className="flex items-center gap-1.5 rounded font-medium text-primary transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
-                          <LogOut size={14} /> Permiso Salida
+                          <LogOut size={16} /> Permiso de salida
                         </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              {filteredAndSortedEmployees.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground bg-card">
-                  <AlertTriangle size={40} className="mx-auto text-muted-foreground" />
-                  <p className="mt-2 font-semibold">
-                    No se encontraron empleados
-                  </p>
-                  <p className="text-sm">
-                    Intente ajustar los filtros de búsqueda.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Paginación */}
-            {filteredAndSortedEmployees.length > 0 && (
-              <div className="mt-6">
-                <Pagination
-                  totalItems={filteredAndSortedEmployees.length}
-                  itemsPerPage={itemsPerPage}
-                  currentPage={currentPage}
-                  onPageChange={handlePageChange}
-                />
-              </div>
-            )}
           </div>
+          {/* Un filtro que no coincide no es una alerta: nada esta mal, solo
+              no hay coincidencias. Antes era un triangulo de advertencia. */}
+          {filteredAndSortedEmployees.length === 0 && (
+            <div className="bg-card py-12 text-center">
+              <SearchX size={32} className="mx-auto text-muted-foreground" aria-hidden="true" />
+              <p className="mt-3 text-sm font-medium text-foreground">
+                No se encontraron empleados
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Intente ajustar los filtros
+              </p>
+            </div>
+          )}
         </div>
+
+        {/* Paginación */}
+        {filteredAndSortedEmployees.length > 0 && (
+          <div className="mt-6">
+            <Pagination
+              totalItems={filteredAndSortedEmployees.length}
+              itemsPerPage={itemsPerPage}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
       </div>
 
       {mostrarGuiaLicencias && (
