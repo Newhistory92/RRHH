@@ -105,8 +105,6 @@ export default function EmployeeCV({ employeeData, globalSettings = {} }: Employ
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [softSkillsCatalog, setSoftSkillsCatalog] = useState<{ id: number; nombre: string; descripcion: string }[]>([]);
 
-  console.log(cvData)
-
   // Validar acceso: si no hay token O si se accede directamente por URL (sin employeeData),
   // redirigir a la pagina principal que maneja auth + carga de datos
   useEffect(() => {

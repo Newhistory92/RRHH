@@ -6,6 +6,14 @@ import { Accordion, AccordionTab } from 'primereact/accordion';
 import { ProfilePictureUploader } from '@/app/util/UiRRHH';
 import {Employee} from "@/app/Interfas/Interfaces"
 
+// Fuera de edicion, un input/select/calendario deshabilitado arrastra el
+// mismo borde y fondo apagado de un control que ya no se puede tocar, solo
+// para mostrar un dato de lectura -- de ahi la "pared de cajas grises" que
+// hacia tedioso el CV. Mismo criterio que DynamicSectionCv.tsx.
+const ReadValue = ({ children }: { children: React.ReactNode }) => (
+  <p className="text-sm text-foreground py-2 min-h-[2.5rem] flex items-center">{children}</p>
+);
+
 export interface CvProps {
   data: Employee;
   updateData: (updates: Partial<Employee>) => void;
@@ -83,12 +91,11 @@ export default function DatosPersonales({ data, updateData, isEditing, headerAct
             <label htmlFor="name" className="text-sm font-medium text-foreground">
               Nombre Completo
             </label>
-            <InputText
-              id="name"
-              value={data.name || ''}
-              disabled={!isEditing}
-              className="w-full"
-            />
+            {isEditing ? (
+              <InputText id="name" value={data.name || ''} className="w-full" />
+            ) : (
+              <ReadValue>{data.name || '—'}</ReadValue>
+            )}
           </div>
 
           {/* DNI */}
@@ -96,12 +103,11 @@ export default function DatosPersonales({ data, updateData, isEditing, headerAct
             <label htmlFor="dni" className="text-sm font-medium text-foreground">
               DNI
             </label>
-            <InputText
-              id="dni"
-              value={data.dni || ''}
-              disabled={!isEditing}
-              className="w-full"
-            />
+            {isEditing ? (
+              <InputText id="dni" value={data.dni || ''} className="w-full" />
+            ) : (
+              <ReadValue>{data.dni || '—'}</ReadValue>
+            )}
           </div>
 
           {/* Fecha de Nacimiento */}
@@ -120,12 +126,7 @@ export default function DatosPersonales({ data, updateData, isEditing, headerAct
                 placeholder="Seleccione fecha"
               />
             ) : (
-              <InputText
-                id="birthDate"
-                value={formatBirthDateForDisplay()}
-                disabled
-                className="w-full"
-              />
+              <ReadValue>{formatBirthDateForDisplay() || '—'}</ReadValue>
             )}
           </div>
           {/* Género */}
@@ -133,17 +134,20 @@ export default function DatosPersonales({ data, updateData, isEditing, headerAct
             <label htmlFor="gender" className="text-sm font-medium text-foreground">
               Género (opcional)
             </label>
-            <Dropdown
-              id="gender"
-              value={data.gender || ''}
-              options={genderOptions}
-              onChange={handleDropdownChange}
-              placeholder="Seleccione género"
-              disabled={!isEditing}
-              className="w-full"
-              optionLabel="label"
-              optionValue="value"
-            />
+            {isEditing ? (
+              <Dropdown
+                id="gender"
+                value={data.gender || ''}
+                options={genderOptions}
+                onChange={handleDropdownChange}
+                placeholder="Seleccione género"
+                className="w-full"
+                optionLabel="label"
+                optionValue="value"
+              />
+            ) : (
+              <ReadValue>{data.gender || '—'}</ReadValue>
+            )}
           </div>
 
           {/* Dirección */}
@@ -151,32 +155,38 @@ export default function DatosPersonales({ data, updateData, isEditing, headerAct
             <label htmlFor="address" className="text-sm font-medium text-foreground">
               Dirección
             </label>
-            <InputText
-              id="address"
-              value={data.address || ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
-                handleChange("address", e.target.value)
-              }
-              disabled={!isEditing}
-              className="w-full"
-            />
+            {isEditing ? (
+              <InputText
+                id="address"
+                value={data.address || ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleChange("address", e.target.value)
+                }
+                className="w-full"
+              />
+            ) : (
+              <ReadValue>{data.address || '—'}</ReadValue>
+            )}
           </div>
-          
+
           {/* Teléfono */}
           <div className="flex flex-col gap-2">
             <label htmlFor="phone" className="text-sm font-medium text-foreground">
               Teléfono
             </label>
-            <InputText
-              id="phone"
-              type="tel"
-              value={data.phone || ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
-                handleChange("phone", e.target.value)
-              }
-              disabled={!isEditing}
-              className="w-full"
-            />
+            {isEditing ? (
+              <InputText
+                id="phone"
+                type="tel"
+                value={data.phone || ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleChange("phone", e.target.value)
+                }
+                className="w-full"
+              />
+            ) : (
+              <ReadValue>{data.phone || '—'}</ReadValue>
+            )}
           </div>
 
           {/* Email */}
@@ -184,13 +194,11 @@ export default function DatosPersonales({ data, updateData, isEditing, headerAct
             <label htmlFor="email" className="text-sm font-medium text-foreground">
               Email
             </label>
-              <InputText
-              id="email"
-              type="email"
-              value={data.email || ''}
-              disabled={!isEditing}
-              className="w-full"
-            />
+            {isEditing ? (
+              <InputText id="email" type="email" value={data.email || ''} className="w-full" />
+            ) : (
+              <ReadValue>{data.email || '—'}</ReadValue>
+            )}
           </div>
         </div>
       </AccordionTab>

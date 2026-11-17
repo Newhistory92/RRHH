@@ -1,7 +1,8 @@
 import React from 'react';
-import { Plus, Star, Trash2 } from "lucide-react";
+import { Plus, Star, Trash2, Check } from "lucide-react";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from 'primereact/dropdown';
+import { formatearFecha } from '@/app/lib/dates';
 
 // Interfaces de TypeScript
 interface DynamicItem {
@@ -41,6 +42,16 @@ interface DynamicSectionProps {
   isEditing: boolean;
 }
 
+// Fuera de edicion, mostrar el dato como un input/select/checkbox
+// deshabilitado es la "pared de cajas grises" que hace tedioso el CV: cada
+// campo arrastra el mismo borde, padding y fondo apagado de un control que ya
+// no se puede tocar, aunque lo unico que se necesita ahi es leer el valor. En
+// vez de eso, fuera de edicion se muestra texto plano con el mismo ritmo que
+// ya usa el legajo de RRHH (DetailTables.tsx: InfoCard).
+const ReadValue = ({ children }: { children: React.ReactNode }) => (
+  <p className="text-sm text-foreground py-2 min-h-[2.5rem] flex items-center">{children}</p>
+);
+
 export const DynamicSection: React.FC<DynamicSectionProps> = ({
   items,
   onChange,
@@ -64,7 +75,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
         {isEditing && (
           <button
             onClick={onAdd}
-            className="flex items-center gap-2 px-4 py-2 border border-dashed border-border rounded-md text-sm font-medium text-foreground hover:bg-muted"
+            className="flex items-center gap-2 px-4 py-2 border border-dashed border-border rounded-md text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Plus className="w-4 h-4" /> Añadir nuevo registro
           </button>
@@ -94,6 +105,23 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                 const gridClass = field.grid || "md:col-span-1";
 
                 if (field.type === "checkbox") {
+                  if (!isEditing) {
+                    return (
+                      <div key={field.name} className={`${gridClass} flex items-end`}>
+                        {item[field.name] ? (
+                          <span className="inline-flex items-center gap-1.5 text-sm text-foreground py-2">
+                            <Check size={16} className="text-success" aria-hidden="true" />
+                            {field.label}
+                          </span>
+                        ) : (
+                          // Ausente y no "No": la info real ya esta en la fecha de
+                          // fin, repetir la negacion ademas del checkbox apagado
+                          // era ruido sin dato nuevo.
+                          <span />
+                        )}
+                      </div>
+                    );
+                  }
                   return (
                     <div key={field.name} className={`${gridClass} flex items-end`}>
                       <label className="flex items-center gap-2 text-sm font-medium text-foreground">
@@ -101,13 +129,10 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                           type="checkbox"
                           checked={!!item[field.name]}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            if (!isEditing) return;
                             onChange(item.id, field.name, e.target.checked);
                             if (e.target.checked) onChange(item.id, "endDate", "");
                           }}
-                          className={`h-4 w-4 rounded border-border text-primary focus:ring-primary ${!isEditing ? "cursor-not-allowed" : ""
-                            }`}
-                          disabled={!isEditing}
+                          className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                         />
                         {field.label}
                       </label>
@@ -116,57 +141,80 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                 }
 
                 if (field.type === "select") {
+                  const opcionActual = field.options?.find((o) => o.value === item[field.name]);
                   return (
                     <div key={field.name} className={`${gridClass} flex flex-col gap-2`}>
                       <label htmlFor={`${field.name}-${item.id}`} className="text-sm font-medium text-foreground">
                         {field.label}
                         {field.required && <span className="text-error ml-1">*</span>}
                       </label>
-                      <Dropdown
-                        id={`${field.name}-${item.id}`}
-                        value={item[field.name] || ''}
-                        options={field.options || []}
-                        onChange={(e: { value: string }) =>
-                          onChange(item.id, field.name, e.value)
-                        }
-                        placeholder={`Seleccionar ${field.label.toLowerCase()}`}
-                        disabled={!isEditing}
-                        className="w-full relative"
-                        optionLabel="label"
-                        optionValue="value"
-                        filter={(field.options?.length || 0) > 5}
-                        filterMatchMode="contains"
-                        filterPlaceholder="Buscar..."
-                        emptyFilterMessage="No hay resultados"
-                        pt={{
-                          wrapper: { className: "max-h-60" },
-                        }}
-                      />
+                      {isEditing ? (
+                        <Dropdown
+                          id={`${field.name}-${item.id}`}
+                          value={item[field.name] || ''}
+                          options={field.options || []}
+                          onChange={(e: { value: string }) =>
+                            onChange(item.id, field.name, e.value)
+                          }
+                          placeholder={`Seleccionar ${field.label.toLowerCase()}`}
+                          className="w-full relative"
+                          optionLabel="label"
+                          optionValue="value"
+                          filter={(field.options?.length || 0) > 5}
+                          filterMatchMode="contains"
+                          filterPlaceholder="Buscar..."
+                          emptyFilterMessage="No hay resultados"
+                          pt={{
+                            wrapper: { className: "max-h-60" },
+                          }}
+                        />
+                      ) : (
+                        <ReadValue>{opcionActual?.label || item[field.name] || '—'}</ReadValue>
+                      )}
                     </div>
                   );
                 }
 
                 if (field.type === "file") {
+                  const adjunto = item[field.name];
                   return (
                     <div key={field.name} className={`${gridClass} flex flex-col gap-2`}>
                       <label htmlFor={`${field.name}-${item.id}`} className="text-sm font-medium text-foreground">
                         {field.label}
                         {field.required && <span className="text-error ml-1">*</span>}
                       </label>
-                      <input
-                        id={`${field.name}-${item.id}`}
-                        type="file"
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          onChange(item.id, "attachment", e.target.files?.[0] || null)
-                        }
-                        accept={field.accept}
-                        disabled={!isEditing}
-                        className="w-full p-2 border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-muted disabled:cursor-not-allowed"
-                      />
+                      {isEditing ? (
+                        <input
+                          id={`${field.name}-${item.id}`}
+                          type="file"
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            onChange(item.id, "attachment", e.target.files?.[0] || null)
+                          }
+                          accept={field.accept}
+                          className="w-full p-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      ) : (
+                        <ReadValue>
+                          {adjunto instanceof File ? adjunto.name : adjunto || 'Sin archivo adjunto'}
+                        </ReadValue>
+                      )}
                     </div>
                   );
                 }
 
+                if (!isEditing) {
+                  const valor = item[field.name];
+                  return (
+                    <div key={field.name} className={`${gridClass} flex flex-col gap-2`}>
+                      <label className="text-sm font-medium text-foreground">{field.label}</label>
+                      <ReadValue>
+                        {field.type === 'date'
+                          ? (valor ? formatearFecha(valor) : (item.isCurrent && field.name === 'endDate' ? 'Actualmente' : '—'))
+                          : (valor || '—')}
+                      </ReadValue>
+                    </div>
+                  );
+                }
                 return (
                   <div key={field.name} className={`${gridClass} flex flex-col gap-2`}>
                     <label htmlFor={`${field.name}-${item.id}`} className="text-sm font-medium text-foreground">
@@ -180,9 +228,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         onChange(item.id, field.name, e.target.value)
                       }
-                      disabled={
-                        !isEditing || (field.name === "endDate" && item.isCurrent)
-                      }
+                      disabled={field.name === "endDate" && item.isCurrent}
                       className="w-full"
                       placeholder={field.label}
                     />
@@ -195,13 +241,13 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
               <div className="absolute top-3 right-3 flex flex-col gap-2">
                 {typeof item.isVerified !== 'undefined' && item.isVerified === true && (
                   <span className="p-1 px-2 text-xs font-bold bg-success-soft text-success-soft-foreground rounded shadow-sm flex items-center justify-center gap-1" title="Esta formación ha sido verificada.">
-                    ✓ Verificado
+                    <Check size={14} aria-hidden="true" /> Verificado
                   </span>
                 )}
                 {typeof item.isVerified !== 'undefined' && item.isVerified === false && onVerify && (
                   <button
                     onClick={() => onVerify(item)}
-                    className="p-1 text-primary hover:opacity-80 hover:bg-primary/10 rounded bg-card shadow-sm text-xs font-semibold px-2"
+                    className="p-1 text-primary rounded bg-card shadow-sm text-xs font-semibold px-2 transition-colors hover:opacity-80 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     title="Realizar test para validar esta formación"
                   >
                     Verificar
@@ -209,7 +255,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                 )}
                 <button
                   onClick={() => onRemove(item.id)}
-                  className="p-1 text-error hover:opacity-80 hover:bg-error-soft rounded-full flex items-center justify-center bg-card shadow-sm"
+                  className="p-1 text-error rounded-full flex items-center justify-center bg-card shadow-sm transition-colors hover:opacity-80 hover:bg-error-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   title="Eliminar registro"
                 >
                   <Trash2 className="w-5 h-5" />
