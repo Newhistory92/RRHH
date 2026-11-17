@@ -19,7 +19,7 @@ script recalcula el contraste WCAG de cada par texto/fondo del sistema y falla
 
 | Color | Hex | Proporción | Rol semántico |
 |---|---|---|---|
-| Crema Clásica | `#F1E8D8` | 60% | Superficies / `--background`, `--card` |
+| Crema Clásica | `#F8F3E8` | 60% | Superficies / `--background`, `--card` |
 | Verde Abeto | `#1B3A2B` | 30% | Texto, marca, navegación / `--foreground`, `--primary` |
 | Rojo Tomate | `#EE4129` | 10% | Reservado para atención / `--destructive`, `--color-error` — **nunca fondo de sección** |
 
@@ -67,7 +67,7 @@ real de `info` hoy es en `Login` (fuera de este pase).
    app**, no como "el 10% de atención". Si `--accent` fuera tomate, cada
    hover de cada menú de toda la aplicación se pondría rojo — lo opuesto a
    "el acento debe sentirse escaso" (regla 1 del pedido). Por eso `--accent`
-   quedó como un tinte neutro de crema/fir (`#DED8C8` claro / `#2A362F`
+   quedó como un tinte neutro de crema/fir (`#E4E2D7` claro / `#2A362F`
    oscuro) y el tomate vive únicamente en `--destructive` y
    `--color-error`/`-soft`, que son los lugares que ya significaban
    "atención" en este código antes del reemplazo.
@@ -85,18 +85,18 @@ cumplen AA, mínimo 4.5:1):
 
 | Par | Fondo | Texto | Ratio |
 |---|---|---|---|
-| claro/foreground | `#F1E8D8` | `#1B3A2B` | 10.24:1 |
-| claro/card-foreground | `#F7F2EA` | `#1B3A2B` | 11.17:1 |
-| claro/muted-foreground | `#E4DECE` | `#4A6051` | 5.07:1 |
+| claro/foreground | `#F8F3E8` | `#1B3A2B` | 11.25:1 |
+| claro/card-foreground | `#FBF8F2` | `#1B3A2B` | 11.75:1 |
+| claro/muted-foreground | `#EBE8DD` | `#4C6355` | 5.31:1 |
 | claro/primary | `#1B3A2B` | `#FFFFFF` | 12.45:1 |
-| claro/secondary | `#D7D3C3` | `#1B3A2B` | 8.30:1 |
-| claro/accent | `#DED8C8` | `#1B3A2B` | 8.75:1 |
+| claro/secondary | `#DDDDD1` | `#1B3A2B` | 9.09:1 |
+| claro/accent | `#E4E2D7` | `#1B3A2B` | 9.58:1 |
 | claro/destructive | `#EE4129` | `#130503` | 5.16:1 |
 | claro/warm-contrast | `#1B3A2B` | `#FFFFFF` | 12.45:1 |
-| claro/success-soft | `#E4DECE` | `#1B3A2B` | 9.27:1 |
-| claro/warning-soft | `#EEE4D2` | `#8A5A12` | 4.69:1 |
-| claro/error-soft | `#F1E3D3` | `#BA3320` | 4.65:1 |
-| claro/info-soft | `#E4DECE` | `#1B3A2B` | 9.27:1 |
+| claro/success-soft | `#EBE8DD` | `#1B3A2B` | 10.15:1 |
+| claro/warning-soft | `#F5EEE2` | `#8A5A12` | 5.13:1 |
+| claro/error-soft | `#F8EEE2` | `#BA3320` | 5.11:1 |
+| claro/info-soft | `#EBE8DD` | `#1B3A2B` | 10.15:1 |
 | oscuro/foreground | `#171F1B` | `#EDE8DC` | 13.76:1 |
 | oscuro/card-foreground | `#1E2822` | `#EDE8DC` | 12.43:1 |
 | oscuro/muted-foreground | `#232D27` | `#9CA79D` | 5.71:1 |
@@ -121,19 +121,19 @@ tokens, y no fue tocado en este pase. Migrarlo es trabajo pendiente.
 
 | Token | Claro | Oscuro |
 |---|---|---|
-| `--background` | `#F1E8D8` | `#171F1B` |
+| `--background` | `#F8F3E8` | `#171F1B` |
 | `--foreground` | `#1B3A2B` | `#EDE8DC` |
-| `--card` | `#F7F2EA` | `#1E2822` |
+| `--card` | `#FBF8F2` | `#1E2822` |
 | `--card-foreground` | `#1B3A2B` | `#EDE8DC` |
-| `--popover` | `#F7F2EA` | `#1E2822` |
+| `--popover` | `#FBF8F2` | `#1E2822` |
 | `--popover-foreground` | `#1B3A2B` | `#EDE8DC` |
 | `--primary` | `#1B3A2B` | `#5CA87D` |
 | `--primary-foreground` | `#FFFFFF` | `#0A140F` |
-| `--secondary` | `#D7D3C3` | `#2A362F` |
+| `--secondary` | `#DDDDD1` | `#2A362F` |
 | `--secondary-foreground` | `#1B3A2B` | `#EDE8DC` |
-| `--muted` | `#E4DECE` | `#232D27` |
-| `--muted-foreground` | `#4A6051` | `#9CA79D` |
-| `--accent` (neutro, no es el acento de marca) | `#DED8C8` | `#2A362F` |
+| `--muted` | `#EBE8DD` | `#232D27` |
+| `--muted-foreground` | `#4C6355` | `#9CA79D` |
+| `--accent` (neutro, no es el acento de marca) | `#E4E2D7` | `#2A362F` |
 | `--accent-foreground` | `#1B3A2B` | `#EDE8DC` |
 | `--destructive` | `#EE4129` | `#FF7A5C` |
 | `--destructive-foreground` | `#130503` | `#0A140F` |
@@ -149,13 +149,13 @@ tokens, y no fue tocado en este pase. Migrarlo es trabajo pendiente.
 | `--color-error-foreground` | `#130503` | `#0A140F` |
 | `--color-info` | `#1B3A2B` (= success) | `#5CA87D` (= success) |
 | `--color-info-foreground` | `#FFFFFF` | `#0A140F` |
-| `--color-success-soft` | `#E4DECE` | `#1E2D25` |
+| `--color-success-soft` | `#EBE8DD` | `#1E2D25` |
 | `--color-success-soft-foreground` | `#1B3A2B` | `#5CA87D` |
-| `--color-warning-soft` | `#EEE4D2` | `#272A1F` |
+| `--color-warning-soft` | `#F5EEE2` | `#272A1F` |
 | `--color-warning-soft-foreground` | `#8A5A12` | `#E2A54A` |
-| `--color-error-soft` | `#F1E3D3` | `#2A2620` |
+| `--color-error-soft` | `#F8EEE2` | `#2A2620` |
 | `--color-error-soft-foreground` | `#BA3320` | `#FF7A5C` |
-| `--color-info-soft` | `#E4DECE` (= success-soft) | `#1E2D25` (= success-soft) |
+| `--color-info-soft` | `#EBE8DD` (= success-soft) | `#1E2D25` (= success-soft) |
 
 > **Nota — `--warm-contrast` ahora es igual a `--primary` en los dos temas.**
 > En la paleta anterior tenía doble rol (charcoal en claro, oliva en

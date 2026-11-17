@@ -7,7 +7,7 @@
      texto, marca, navegacion. 10% Rojo Tomate: reservado para lo que pide
      atencion (badges de alerta, acciones destructivas) -- nunca fondo de
      seccion. Ver docs/paleta-colores.md. */
-  --brand-cream:  #F1E8D8;
+  --brand-cream:  #F8F3E8;
   --brand-fir:    #1B3A2B;
   --brand-tomato: #EE4129;
 
@@ -37,26 +37,26 @@
 
   --radius: 1rem;
 
-  --background: #F1E8D8;
-  --foreground: #1B3A2B;              /* 10.24:1 */
-  --card: #F7F2EA;
-  --card-foreground: #1B3A2B;         /* 11.17:1 */
-  --popover: #F7F2EA;
+  --background: #F8F3E8;
+  --foreground: #1B3A2B;              /* 11.25:1 */
+  --card: #FBF8F2;
+  --card-foreground: #1B3A2B;         /* 11.75:1 */
+  --popover: #FBF8F2;
   --popover-foreground: #1B3A2B;
 
   --primary: #1B3A2B;                 /* con blanco encima: 12.45:1 */
   --primary-foreground: #FFFFFF;
-  --secondary: #D7D3C3;               /* tinte fir sobre crema; con fir: 8.30:1 */
+  --secondary: #DDDDD1;               /* tinte fir sobre crema; con fir: 9.09:1 */
   --secondary-foreground: #1B3A2B;
-  --muted: #E4DECE;
-  --muted-foreground: #4A6051;        /* 5.07:1 sobre muted */
+  --muted: #EBE8DD;
+  --muted-foreground: #4C6355;        /* 5.31:1 sobre muted */
   /* --accent es el hover/seleccion NEUTRO que usan los componentes shadcn
      (dropdown, boton ghost, skeleton) en toda la app -- a proposito NO es
      el rojo tomate. Si lo fuera, cada hover de cada menu se pondria rojo,
      que es lo opuesto a "el acento debe sentirse escaso" (regla 1). El
      tomate vive solo en --destructive y en --color-error/-soft, que son
      los lugares que ya significan "atencion" en este codebase. */
-  --accent: #DED8C8;                  /* con fir encima: 8.75:1 */
+  --accent: #E4E2D7;                  /* con fir encima: 9.58:1 */
   --accent-foreground: #1B3A2B;
   --destructive: #EE4129;             /* con --brand-ink encima: 5.42:1 */
   --destructive-foreground: #130503;
@@ -93,13 +93,13 @@
   --color-info: #1B3A2B;
   --color-info-foreground: #FFFFFF;
 
-  --color-success-soft: #E4DECE;               /* + #1B3A2B = 9.27:1 */
+  --color-success-soft: #EBE8DD;               /* + #1B3A2B = 10.15:1 */
   --color-success-soft-foreground: #1B3A2B;
-  --color-warning-soft: #EEE4D2;               /* + #8A5A12 = 4.69:1 */
+  --color-warning-soft: #F5EEE2;               /* + #8A5A12 = 5.13:1 */
   --color-warning-soft-foreground: #8A5A12;
-  --color-error-soft: #F1E3D3;                 /* + #BA3320 = 4.65:1 */
+  --color-error-soft: #F8EEE2;                 /* + #BA3320 = 5.11:1 */
   --color-error-soft-foreground: #BA3320;
-  --color-info-soft: #E4DECE;                  /* = success-soft */
+  --color-info-soft: #EBE8DD;                  /* = success-soft */
   --color-info-soft-foreground: #1B3A2B;
 
   /* Rampa de 5 pasos para medidores de desempeño (fondo, siempre con texto

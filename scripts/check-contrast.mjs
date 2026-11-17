@@ -17,12 +17,12 @@ const ratio = (a, b) => {
 
 // [nombre, fondo, texto, mínimo exigido]
 const PARES = [
-  ["claro/foreground",        "#F1E8D8", "#1B3A2B", 4.5],
-  ["claro/card-foreground",   "#F7F2EA", "#1B3A2B", 4.5],
-  ["claro/muted-foreground",  "#E4DECE", "#4A6051", 4.5],
+  ["claro/foreground",        "#F8F3E8", "#1B3A2B", 4.5],
+  ["claro/card-foreground",   "#FBF8F2", "#1B3A2B", 4.5],
+  ["claro/muted-foreground",  "#EBE8DD", "#4C6355", 4.5],
   ["claro/primary",           "#1B3A2B", "#FFFFFF", 4.5],
-  ["claro/secondary",         "#D7D3C3", "#1B3A2B", 4.5],
-  ["claro/accent",            "#DED8C8", "#1B3A2B", 4.5],
+  ["claro/secondary",         "#DDDDD1", "#1B3A2B", 4.5],
+  ["claro/accent",            "#E4E2D7", "#1B3A2B", 4.5],
   ["claro/destructive",       "#EE4129", "#130503", 4.5],
   ["claro/warm-contrast",     "#1B3A2B", "#FFFFFF", 4.5],
   // Rellenos solidos de estado. El par correcto es -foreground, NO
@@ -30,16 +30,16 @@ const PARES = [
   // texto invisible (rojo sobre rojo).
   ["claro/btn-error",         "#EE4129", "#130503", 4.5],
   ["claro/btn-success",       "#1B3A2B", "#FFFFFF", 4.5],
-  ["claro/btn-disabled",      "#E4DECE", "#4A6051", 4.5],
+  ["claro/btn-disabled",      "#EBE8DD", "#4C6355", 4.5],
   // Acentos decorativos usados como color de texto/icono sobre card.
   // Fir y ocre colapsan oliva/sage/ambar del sistema anterior.
-  ["claro/olive-strong",      "#F7F2EA", "#1B3A2B", 4.5],
-  ["claro/sage-strong",       "#F7F2EA", "#1B3A2B", 4.5],
-  ["claro/amber-strong",      "#F7F2EA", "#8A5A12", 4.5],
-  ["claro/success-soft",      "#E4DECE", "#1B3A2B", 4.5],
-  ["claro/warning-soft",      "#EEE4D2", "#8A5A12", 4.5],
-  ["claro/error-soft",        "#F1E3D3", "#BA3320", 4.5],
-  ["claro/info-soft",         "#E4DECE", "#1B3A2B", 4.5],
+  ["claro/olive-strong",      "#FBF8F2", "#1B3A2B", 4.5],
+  ["claro/sage-strong",       "#FBF8F2", "#1B3A2B", 4.5],
+  ["claro/amber-strong",      "#FBF8F2", "#8A5A12", 4.5],
+  ["claro/success-soft",      "#EBE8DD", "#1B3A2B", 4.5],
+  ["claro/warning-soft",      "#F5EEE2", "#8A5A12", 4.5],
+  ["claro/error-soft",        "#F8EEE2", "#BA3320", 4.5],
+  ["claro/info-soft",         "#EBE8DD", "#1B3A2B", 4.5],
   ["oscuro/foreground",       "#171F1B", "#EDE8DC", 4.5],
   ["oscuro/card-foreground",  "#1E2822", "#EDE8DC", 4.5],
   ["oscuro/muted-foreground", "#232D27", "#9CA79D", 4.5],
