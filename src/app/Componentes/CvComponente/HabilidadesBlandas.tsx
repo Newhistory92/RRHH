@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {SoftSkill} from "@/app/Interfas/Interfaces"
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Sparkles } from 'lucide-react';
@@ -12,6 +12,13 @@ export interface CvFormacionProps {
   headerActions?: React.ReactNode;
 }
 export default function HabilidadesBlandas({ data, selectedSkills, softSkillsCatalog, updateData, isEditing, headerActions }: CvFormacionProps) {
+  // El acordeon arranca cerrado; si no se abre solo con "Editar" no se ve
+  // ningun cambio y parece que el boton no hace nada.
+  const [accordionIndex, setAccordionIndex] = useState<number | null>(null);
+  useEffect(() => {
+    if (isEditing) setAccordionIndex(0);
+  }, [isEditing]);
+
   const handleSoftSkillChange = (skillId:number) => {
     if (!isEditing) return;
     
@@ -24,7 +31,7 @@ export default function HabilidadesBlandas({ data, selectedSkills, softSkillsCat
 
   return (
 
-    <Accordion activeIndex={null}>
+    <Accordion activeIndex={accordionIndex} onTabChange={(e) => setAccordionIndex(e.index as number | null)}>
      <AccordionTab header={
         <div className="flex items-center justify-between w-full pr-2">
           <span>6. Habilidades Blandas</span>

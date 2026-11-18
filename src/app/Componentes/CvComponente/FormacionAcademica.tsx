@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { DynamicSection } from '@/app/Componentes/Perfil/DynamicSectionCv';
 import { AcademicFormation } from "@/app/Interfas/Interfaces"
@@ -16,6 +16,12 @@ export interface CvFormacionProps {
 }
 
 export default function FormacionAcademica({ data, updateData, isEditing, employeeId, headerActions }: CvFormacionProps) {
+  // El acordeon arranca cerrado; si no se abre solo con "Editar" no se ve
+  // ningun cambio y parece que el boton no hace nada.
+  const [accordionIndex, setAccordionIndex] = useState<number | null>(null);
+  useEffect(() => {
+    if (isEditing) setAccordionIndex(0);
+  }, [isEditing]);
 
   const handleChange = (id: string | number, field: string, value: string | number | boolean | File | null) => {
     const newData = data.map((item) => {
@@ -89,7 +95,7 @@ export default function FormacionAcademica({ data, updateData, isEditing, employ
   const safeData = Array.isArray(data) ? formatDataForRender(data) : [];
 
   return (
-    <Accordion activeIndex={null}>
+    <Accordion activeIndex={accordionIndex} onTabChange={(e) => setAccordionIndex(e.index as number | null)}>
       <AccordionTab header={
         <div className="flex items-center justify-between w-full pr-2">
           <span>2. Formacion Academica</span>

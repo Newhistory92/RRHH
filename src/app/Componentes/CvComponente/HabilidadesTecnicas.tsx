@@ -34,6 +34,12 @@ export default function HabilidadesTecnicas({
     const [skills, setSkills] = useState<Skill[]>([]);
     const [dbSkills, setDbSkills] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    // El acordeon arranca cerrado; si no se abre solo con "Editar" no se
+    // ve ningun cambio y parece que el boton no hace nada.
+    const [accordionIndex, setAccordionIndex] = useState<number | null>(null);
+    useEffect(() => {
+        if (isEditing) setAccordionIndex(0);
+    }, [isEditing]);
 
     // Estado para el TestModal (validacion con IA via API)
     const [testModalVisible, setTestModalVisible] = useState(false);
@@ -197,7 +203,7 @@ export default function HabilidadesTecnicas({
 
     return (
         <>
-            <Accordion activeIndex={null}>
+            <Accordion activeIndex={accordionIndex} onTabChange={(e) => setAccordionIndex(e.index as number | null)}>
                 <AccordionTab header={
                     <div className="flex items-center justify-between w-full pr-2">
                       <span>5. Habilidades Tecnicas</span>
