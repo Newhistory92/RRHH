@@ -34,7 +34,7 @@ const handleChange = (id:string | number,field: string, value: string | number |
 };
   return (
 
-    <Accordion activeIndex={0}>
+    <Accordion activeIndex={null}>
     <AccordionTab header={
         <div className="flex items-center justify-between w-full pr-2">
           <span>4. Idiomas</span>

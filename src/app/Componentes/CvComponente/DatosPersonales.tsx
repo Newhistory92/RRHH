@@ -92,7 +92,14 @@ export default function DatosPersonales({ data, updateData, isEditing, headerAct
               Nombre Completo
             </label>
             {isEditing ? (
-              <InputText id="name" value={data.name || ''} className="w-full" />
+              <InputText
+                id="name"
+                value={data.name || ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleChange("name", e.target.value)
+                }
+                className="w-full"
+              />
             ) : (
               <ReadValue>{data.name || '—'}</ReadValue>
             )}
@@ -104,7 +111,14 @@ export default function DatosPersonales({ data, updateData, isEditing, headerAct
               DNI
             </label>
             {isEditing ? (
-              <InputText id="dni" value={data.dni || ''} className="w-full" />
+              <InputText
+                id="dni"
+                value={data.dni || ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleChange("dni", e.target.value)
+                }
+                className="w-full"
+              />
             ) : (
               <ReadValue>{data.dni || '—'}</ReadValue>
             )}
@@ -132,7 +146,8 @@ export default function DatosPersonales({ data, updateData, isEditing, headerAct
           {/* Género */}
           <div className="flex flex-col gap-2">
             <label htmlFor="gender" className="text-sm font-medium text-foreground">
-              Género (opcional)
+              Género
+              {isEditing && <span className="text-error ml-1">*</span>}
             </label>
             {isEditing ? (
               <Dropdown
@@ -144,6 +159,7 @@ export default function DatosPersonales({ data, updateData, isEditing, headerAct
                 className="w-full"
                 optionLabel="label"
                 optionValue="value"
+                required
               />
             ) : (
               <ReadValue>{data.gender || '—'}</ReadValue>
@@ -195,7 +211,15 @@ export default function DatosPersonales({ data, updateData, isEditing, headerAct
               Email
             </label>
             {isEditing ? (
-              <InputText id="email" type="email" value={data.email || ''} className="w-full" />
+              <InputText
+                id="email"
+                type="email"
+                value={data.email || ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleChange("email", e.target.value)
+                }
+                className="w-full"
+              />
             ) : (
               <ReadValue>{data.email || '—'}</ReadValue>
             )}

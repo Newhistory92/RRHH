@@ -203,6 +203,34 @@
     box-shadow: 0 0 0 .2rem var(--ring) !important;
 }
 
+/* Mismo problema que los botones de severity: el Message de PrimeReact trae
+   el celeste de fabrica del tema para severity="info" (visto en Habilidades
+   Tecnicas), un cuarto color ajeno a la paleta. Mismo criterio ya documentado
+   arriba -- info se alinea con --primary, no hay "info" propio en 3 colores. */
+.p-inline-message.p-inline-message-info {
+    background: color-mix(in srgb, var(--primary) 12%, var(--card)) !important;
+    border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent) !important;
+    color: var(--primary) !important;
+}
+.p-inline-message.p-inline-message-info .p-inline-message-icon {
+    color: var(--primary) !important;
+}
+.p-inline-message.p-inline-message-success {
+    background: color-mix(in srgb, var(--color-success) 12%, var(--card)) !important;
+    border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent) !important;
+    color: var(--color-success) !important;
+}
+.p-inline-message.p-inline-message-warn {
+    background: color-mix(in srgb, var(--color-warning) 12%, var(--card)) !important;
+    border: 1px solid color-mix(in srgb, var(--color-warning) 30%, transparent) !important;
+    color: var(--color-warning) !important;
+}
+.p-inline-message.p-inline-message-error {
+    background: color-mix(in srgb, var(--destructive) 12%, var(--card)) !important;
+    border: 1px solid color-mix(in srgb, var(--destructive) 30%, transparent) !important;
+    color: var(--destructive) !important;
+}
+
 /* El tema de PrimeReact pinta el texto escrito en inputs/dropdowns/calendario
    con un gris propio del tema en vez de heredar --foreground, asi que el
    valor que el usuario tipeo se ve mas apagado que el resto del texto de la

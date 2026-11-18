@@ -132,7 +132,8 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                             onChange(item.id, field.name, e.target.checked);
                             if (e.target.checked) onChange(item.id, "endDate", "");
                           }}
-                          className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                          className="h-4 w-4 rounded border-border focus:ring-primary"
+                          style={{ accentColor: 'var(--primary)' }}
                         />
                         {field.label}
                       </label>
@@ -146,7 +147,11 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                     <div key={field.name} className={`${gridClass} flex flex-col gap-2`}>
                       <label htmlFor={`${field.name}-${item.id}`} className="text-sm font-medium text-foreground">
                         {field.label}
-                        {field.required && <span className="text-error ml-1">*</span>}
+                        {/* El asterisco de obligatorio solo importa mientras se puede
+                            actuar sobre el campo -- en modo lectura no aporta nada y
+                            antes quedaba inconsistente (solo los campos "select"
+                            lo mostraban ahi, texto/fecha no). */}
+                        {isEditing && field.required && <span className="text-error ml-1">*</span>}
                       </label>
                       {isEditing ? (
                         <Dropdown
@@ -181,7 +186,7 @@ export const DynamicSection: React.FC<DynamicSectionProps> = ({
                     <div key={field.name} className={`${gridClass} flex flex-col gap-2`}>
                       <label htmlFor={`${field.name}-${item.id}`} className="text-sm font-medium text-foreground">
                         {field.label}
-                        {field.required && <span className="text-error ml-1">*</span>}
+                        {isEditing && field.required && <span className="text-error ml-1">*</span>}
                       </label>
                       {isEditing ? (
                         <input

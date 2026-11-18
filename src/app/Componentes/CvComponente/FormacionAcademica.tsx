@@ -89,7 +89,7 @@ export default function FormacionAcademica({ data, updateData, isEditing, employ
   const safeData = Array.isArray(data) ? formatDataForRender(data) : [];
 
   return (
-    <Accordion activeIndex={0}>
+    <Accordion activeIndex={null}>
       <AccordionTab header={
         <div className="flex items-center justify-between w-full pr-2">
           <span>2. Formacion Academica</span>

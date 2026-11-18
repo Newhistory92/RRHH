@@ -24,7 +24,7 @@ export default function HabilidadesBlandas({ data, selectedSkills, softSkillsCat
 
   return (
 
-    <Accordion activeIndex={0}>
+    <Accordion activeIndex={null}>
      <AccordionTab header={
         <div className="flex items-center justify-between w-full pr-2">
           <span>6. Habilidades Blandas</span>
@@ -40,7 +40,8 @@ export default function HabilidadesBlandas({ data, selectedSkills, softSkillsCat
             >
               <input
                 type="checkbox"
-                className="h-5 w-5 rounded border-border text-primary focus:ring-primary mt-1"
+                className="h-5 w-5 rounded border-border focus:ring-primary mt-1"
+                style={{ accentColor: 'var(--primary)' }}
                 checked={selectedSkills.includes(skill.id)}
                 onChange={() => handleSoftSkillChange(skill.id)}
               />

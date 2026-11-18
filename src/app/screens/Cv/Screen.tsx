@@ -60,22 +60,23 @@ function SectionToolbar({ sectionKey, editingSection, isSaving, onEdit, onSave, 
       <div className="flex gap-1">
         <Button
           onClick={onCancel}
-          icon={<X className="w-3.5 h-3.5" />}
+          icon={<X className="w-4 h-4" />}
           severity="secondary"
           text
           rounded
           disabled={isSaving}
           aria-label="Cancelar"
-          className="!w-7 !h-7"
+          className="!w-8 !h-8"
         />
         <Button
           onClick={onSave}
-          icon={<Save className="w-3.5 h-3.5" />}
+          icon={<Save className="w-4 h-4" />}
+          severity="info"
           text
           rounded
           disabled={isSaving}
           aria-label={isSaving ? "Guardando..." : "Guardar"}
-          className="!w-7 !h-7"
+          className="!w-8 !h-8"
         />
       </div>
     );
@@ -84,13 +85,13 @@ function SectionToolbar({ sectionKey, editingSection, isSaving, onEdit, onSave, 
   return (
     <Button
       onClick={() => onEdit(sectionKey)}
-      icon={<Edit className="w-3.5 h-3.5" />}
+      icon={<Edit className="w-4 h-4" />}
       severity="secondary"
       text
       rounded
       disabled={isLocked}
       aria-label="Editar"
-      className="!w-7 !h-7"
+      className="!w-8 !h-8"
     />
   );
 }
@@ -185,6 +186,12 @@ export default function EmployeeCV({ employeeData, globalSettings = {} }: Employ
 
   const handleSaveSection = async () => {
     if (!cvData || !editingSection) return;
+
+    if (editingSection === 'datosPersonales' && !cvData.gender) {
+      showToast('Género es un campo obligatorio', 'error');
+      return;
+    }
+
     setIsSaving(true);
     try {
       const token = localStorage.getItem('token');

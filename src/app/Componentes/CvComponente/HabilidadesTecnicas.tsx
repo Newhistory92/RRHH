@@ -197,7 +197,7 @@ export default function HabilidadesTecnicas({
 
     return (
         <>
-            <Accordion activeIndex={0}>
+            <Accordion activeIndex={null}>
                 <AccordionTab header={
                     <div className="flex items-center justify-between w-full pr-2">
                       <span>5. Habilidades Tecnicas</span>
