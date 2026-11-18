@@ -78,7 +78,6 @@ export default function OrganigramaPage({ readOnly = false }: OrganigramaPagePro
     fetchDepartments();
   }, [refreshDepartments]);
 
-console.log('Departments Data:', departmentsData);
   const handleSelectDepartment = (department: Department) => {
     setSelectedDepartment(departmentsData.find((d) => d.id === department.id) || null);
   };

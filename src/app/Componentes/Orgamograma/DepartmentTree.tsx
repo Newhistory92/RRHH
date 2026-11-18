@@ -47,6 +47,7 @@ export const DepartmentTree: React.FC<DepartmentTreeProps> = ({
         <Button
           icon={<PlusCircle className="w-5 h-5" />}
           onClick={() => onOpenModal("department")}
+          severity="danger"
           className="p-button-rounded p-button-text"
           tooltip="Crear Nuevo Departamento"
         />

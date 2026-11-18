@@ -18,7 +18,10 @@ export const OrgLegend: React.FC<OrgLegendProps> = ({ levels,colorTheme }) => (
           const label = OrgChartUtils.getLevelLabel(level);
           return (
             <div key={level} className="flex items-center gap-2">
-              <div className={`w-4 h-4 ${colors.bg} rounded border`}></div>
+              <div
+                style={{ backgroundColor: colors.bg, borderColor: colors.border }}
+                className="w-4 h-4 rounded border"
+              ></div>
               <span className="text-xs text-muted-foreground">
                 Nivel {level} - {label}
               </span>

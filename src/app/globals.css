@@ -231,6 +231,30 @@
     color: var(--destructive) !important;
 }
 
+/* Mismo problema una vez mas, esta vez en Tag (visto en el organigrama: la
+   etiqueta "Nivel Jerarquico" salia turquesa, el mismo color de fabrica que
+   ya se piso en botones, inputs y el Message de arriba). */
+.p-tag.p-tag-info {
+    background: var(--primary) !important;
+    color: var(--primary-foreground) !important;
+}
+.p-tag.p-tag-success {
+    background: var(--color-success) !important;
+    color: var(--color-success-foreground) !important;
+}
+.p-tag.p-tag-warning {
+    background: var(--color-warning) !important;
+    color: var(--color-warning-foreground) !important;
+}
+.p-tag.p-tag-danger {
+    background: var(--destructive) !important;
+    color: var(--destructive-foreground) !important;
+}
+.p-tag.p-tag-secondary {
+    background: var(--secondary) !important;
+    color: var(--secondary-foreground) !important;
+}
+
 /* El tema de PrimeReact pinta el texto escrito en inputs/dropdowns/calendario
    con un gris propio del tema en vez de heredar --foreground, asi que el
    valor que el usuario tipeo se ve mas apagado que el resto del texto de la

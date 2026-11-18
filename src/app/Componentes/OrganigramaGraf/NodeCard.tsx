@@ -13,12 +13,12 @@ export const NodeCard: React.FC<NodeCardProps> = ({ node,colorTheme }) => {
   const levelLabel = OrgChartUtils.getLevelLabel(node.nivel_jerarquico);
 
   return (
-    <div className={`
-      ${colors.bg} ${colors.text} ${colors.border}
-      rounded-lg p-4 min-w-[200px] text-center shadow-lg border-2 
-      hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1
-      cursor-default mt-4
-    `}>
+    <div
+      style={{ backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }}
+      className="rounded-lg p-4 min-w-[200px] text-center shadow-lg border-2
+      hover:shadow-xl transition-[box-shadow,transform] duration-200 transform hover:-translate-y-1
+      cursor-default mt-4"
+    >
       <div className="flex items-center justify-center mb-2">
         <User size={20} className="mr-2" />
         <span className="font-bold text-sm">{levelLabel}</span>

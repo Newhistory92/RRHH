@@ -23,7 +23,6 @@ export const EntityFormModal: React.FC<EntityFormModalProps> = ({
  
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Formulario enviado:', formData);
     onSave(formData);
   };
 

@@ -15,7 +15,6 @@ export const SkillsField: React.FC<SkillsFieldProps> = ({
   availableSkills,
   setShowSkillDialog
 }) => {
-  console.log('Renderizando SkillsField con formData:', formData);
   return (
     <div>
       <div className="flex justify-between items-center mb-2">
@@ -33,10 +32,9 @@ export const SkillsField: React.FC<SkillsFieldProps> = ({
       </div>
       <MultiSelect
         value={formData.habilidades_requeridas}
-        onChange={(e: MultiSelectChangeEvent) => {
-          console.log('Habilidades cambiadas:', e.value);
-          setFormData(prev => ({ ...prev, habilidades_requeridas: e.value }));
-        }}
+        onChange={(e: MultiSelectChangeEvent) =>
+          setFormData(prev => ({ ...prev, habilidades_requeridas: e.value }))
+        }
         options={availableSkills}
         optionLabel="nombre"
         placeholder="Seleccionar habilidades"

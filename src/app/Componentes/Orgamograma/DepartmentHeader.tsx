@@ -32,6 +32,7 @@ export const DepartmentHeader: React.FC<DepartmentHeaderProps> = ({
       <Button
         icon={<Pencil className="w-4 h-4" />}
         link
+        severity="danger"
         label="Editar Departamento"
         onClick={() => onOpenModal("department", department)}
         className="p-button-text p-button-sm"
