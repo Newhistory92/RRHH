@@ -264,11 +264,18 @@ export default function AuthPage() {
 
         {/* Login Info */}
         <div className={`${styles.infoContent} ${styles.Login}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-osp-blanco.webp"
+            alt="OSP"
+            className={`${styles.infoLogo} ${styles.animation}`}
+            style={{ '--D': 0, '--S': 19 } as React.CSSProperties}
+          />
           <h2 className={styles.animation} style={{ '--D': 0, '--S': 20 } as React.CSSProperties}>
-            ¡BIENVENIDO DE NUEVO!
+            Portal de Recursos Humanos
           </h2>
           <p className={styles.animation} style={{ '--D': 1, '--S': 21 } as React.CSSProperties}>
-            Nos alegra tenerte con nosotros nuevamente. Si necesitas algo, estamos aquí para ayudar.
+            Gestioná licencias, asistencia y tu legajo desde un solo lugar.
           </p>
         </div>
 
@@ -362,11 +369,18 @@ export default function AuthPage() {
 
         {/* Register Info */}
         <div className={`${styles.infoContent} ${styles.Register}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-osp-blanco.webp"
+            alt="OSP"
+            className={`${styles.infoLogo} ${styles.animation}`}
+            style={{ '--li': 16, '--S': -1 } as React.CSSProperties}
+          />
           <h2 className={styles.animation} style={{ '--li': 17, '--S': 0 } as React.CSSProperties}>
-            ¡BIENVENIDO!
+            Alta de cuentas
           </h2>
           <p className={styles.animation} style={{ '--li': 18, '--S': 1 } as React.CSSProperties}>
-            Nos complace tenerle aquí. Si necesita cualquier tipo de ayuda, no dude en contactarnos.
+            Las cuentas las crea el área de Sistemas. Pedí el alta a tu referente de RRHH.
           </p>
         </div>
       </div>

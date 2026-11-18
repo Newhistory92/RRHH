@@ -2,16 +2,20 @@
 
 /* Paleta local del Login. Es una pantalla de marca con fondo oscuro fijo:
    no conmuta con el modo claro/oscuro de la app, por eso no usa los tokens
-   globales. Contrastes verificados sobre el panel #2A2930. */
+   globales -- pero toma los mismos tres colores de marca que ya usa el
+   resto de RRHH (crema/verde abeto/tomate) en vez de un verde oliva neon
+   sin relacion. --login-accent es el verde abeto atenuado que el tema
+   oscuro de la app ya usa como texto/acento (ver --brand-fir-text en
+   globals.css). Contrastes verificados sobre el panel #1A211C. */
 .pageContainer {
-  --login-bg:      #24232A;
-  --login-panel:   #2A2930;
-  --login-brand:   #1E5561;  /* forma curva; con blanco encima 8.31:1 */
-  --login-accent:  #C3D184;  /* foco, links, labels activos; 8.76:1 */
+  --login-bg:      #11150F;
+  --login-panel:   #1A211C;
+  --login-brand:   #1B3A2B;  /* forma curva; = --brand-fir */
+  --login-accent:  #5CA87D;  /* foco; mismo verde que --brand-fir-text en oscuro */
   --login-text:    #FFFFFF;  /* 14.40:1 */
-  --login-muted:   #A3A1AC;
+  --login-muted:   #9CA79D;
   --login-error:   #F87171;  /* 5.21:1 — el #EF4444 base queda corto */
-  --login-border:  rgba(255, 255, 255, 0.28);
+  --login-border:  rgba(255, 255, 255, 0.16);
 
   display: flex;
   justify-content: center;
@@ -25,8 +29,9 @@
   position: relative;
   width: 750px;
   height: 450px;
-  border: 2px solid var(--login-accent);
-  box-shadow: 0 0 25px var(--login-accent);
+  border-radius: 20px;
+  border: 1px solid var(--login-border);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
   overflow: hidden;
 }
 
@@ -67,19 +72,18 @@
   transform: translateX(120%);
   transition: 0.7s ease;
   opacity: 0;
-  filter: blur(10px);
   transition-delay: calc(0.1s * var(--S));
 }
 
 .container.active .formBox.Register .animation {
   transform: translateX(0%);
   opacity: 1;
-  filter: blur(0px);
   transition-delay: calc(0.1s * var(--li));
 }
 
 .formBox h2 {
-  font-size: 32px;
+  font-size: 28px;
+  font-weight: 500;
   text-align: center;
   color: var(--login-text);
 }
@@ -87,8 +91,8 @@
 .inputBox {
   position: relative;
   width: 100%;
-  height: 50px;
-  margin-top: 25px;
+  height: 48px;
+  margin-top: 24px;
 }
 
 .inputBox input {
@@ -99,15 +103,15 @@
   outline: none;
   font-size: 16px;
   color: var(--login-text);
-  font-weight: 600;
-  border-bottom: 2px solid var(--login-border);
-  padding-right: 23px;
-  transition: 0.5s;
+  font-weight: 500;
+  border-bottom: 1px solid var(--login-border);
+  padding-right: 24px;
+  transition: border-color 0.2s;
 }
 
 .inputBox input:focus,
 .inputBox input:valid {
-  border-bottom: 2px solid var(--login-accent);
+  border-bottom: 1px solid var(--login-accent);
 }
 
 /* Edge agrega su propio icono nativo de "mostrar contraseña" (y de "borrar")
@@ -144,30 +148,27 @@
   transform: translateY(-50%);
   font-size: 16px;
   color: var(--login-muted);
-  transition: 0.5s;
+  transition: top 0.2s, color 0.2s;
   pointer-events: none;
 }
 
 .inputBox input:focus ~ label,
 .inputBox input:valid ~ label {
-  top: -5px;
+  top: -4px;
   color: var(--login-accent);
 }
 
+/* El icono de cada campo es decoracion fija, no un indicador de estado --
+   se queda en el color muted siempre, en vez de cambiar junto con el foco
+   (asi el unico lugar donde aparece el acento es el borde y la etiqueta). */
 .icon {
   position: absolute;
   top: 50%;
   right: 0;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   transform: translateY(-50%);
-  transition: 0.5s;
   color: var(--login-muted);
-}
-
-.inputBox input:focus ~ .icon,
-.inputBox input:valid ~ .icon {
-  fill: var(--login-accent);
 }
 
 .toggleEye {
@@ -203,45 +204,33 @@
   padding-right: 48px;
 }
 
+/* Primario sobre fondo oscuro: relleno crema con texto oscuro en vez del
+   borde-con-barrido-de-gradiente anterior -- un solo tono solido, sin
+   animacion de color, igual de deliberado y sin pisar el acento. */
 .btn {
-  position: relative;
   width: 100%;
   height: 45px;
-  background: transparent;
-  border-radius: 40px;
+  background: var(--login-text);
+  border-radius: 23px;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 600;
-  border: 2px solid var(--login-accent);
-  overflow: hidden;
-  z-index: 1;
-  color: var(--login-text);
-  transition: 0.3s;
+  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  color: var(--login-panel);
+  transition: opacity 0.15s;
 }
 
-.btn::before {
-  content: "";
-  position: absolute;
-  height: 300%;
-  width: 100%;
-  background: linear-gradient(var(--login-panel), var(--login-accent), var(--login-panel), var(--login-accent));
-  top: -100%;
-  left: 0;
-  z-index: -1;
-  transition: 0.5s;
+.btn:hover {
+  opacity: 0.88;
 }
 
-.btn:hover::before {
-  top: 0;
+.btn:active {
+  opacity: 0.78;
 }
 
 .btn:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: not-allowed;
-}
-
-.btn:disabled:hover::before {
-  top: -100%;
 }
 
 .btn:focus-visible,
@@ -253,12 +242,12 @@
 .regiLink {
   font-size: 14px;
   text-align: center;
-  margin: 20px 0 10px;
-  color: var(--login-text);
+  margin: 20px 0 8px;
+  color: var(--login-muted);
 }
 
 .regiLink p {
-  color: var(--login-text);
+  color: var(--login-muted);
 }
 
 .regiLink a {
@@ -275,20 +264,25 @@
   text-decoration: underline;
 }
 
+/* justify-content:center en un flex column centra el BLOQUE de contenido,
+   pero si crece (como al sumarle el logo) y supera la altura del panel,
+   el primer hijo arranca por encima del borde superior y el contenedor
+   -- con overflow:hidden -- lo recorta. flex-start con un padding-top fijo
+   da un resultado predecible sin ese riesgo. */
 .infoContent {
   position: absolute;
   top: 0;
   height: 100%;
   width: 50%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   flex-direction: column;
 }
 
 .infoContent.Login {
   right: 0;
   text-align: right;
-  padding: 0 40px 60px 150px;
+  padding: 64px 40px 60px 150px;
 }
 
 .infoContent.Login .animation {
@@ -296,20 +290,18 @@
   transition: 0.7s ease;
   transition-delay: calc(0.1s * var(--S));
   opacity: 1;
-  filter: blur(0px);
 }
 
 .container.active .infoContent.Login .animation {
   transform: translateX(120%);
   opacity: 0;
-  filter: blur(10px);
   transition-delay: calc(0.1s * var(--D));
 }
 
 .infoContent.Register {
   left: 0;
   text-align: left;
-  padding: 0 150px 60px 38px;
+  padding: 64px 150px 60px 38px;
   pointer-events: none;
 }
 
@@ -317,27 +309,51 @@
   transform: translateX(-120%);
   transition: 0.7s ease;
   opacity: 0;
-  filter: blur(10px);
   transition-delay: calc(0.1s * var(--S));
 }
 
 .container.active .infoContent.Register .animation {
   transform: translateX(0%);
   opacity: 1;
-  filter: blur(0);
   transition-delay: calc(0.1s * var(--li));
 }
 
+/* .infoContent es un flex container en columna: sin align-self, el logo
+   hereda el stretch por defecto del eje cruzado y se estira para llenar el
+   ancho del panel en vez de mantener su proporcion (90x56 real). Cada panel
+   lo alinea hacia su propio borde, el mismo lado que ya usa su texto. */
+/* El logo no necesita sumarse al fade/slide del texto -- aparece o
+   desaparece de golpe con el panel en vez de animar su propia opacidad.
+   Evita un cuelgue de pintado visto en Chromium cuando una imagen
+   transiciona opacity junto con transform en el mismo elemento. */
+.infoLogo {
+  height: 72px;
+  width: auto;
+  margin-bottom: 20px;
+  align-self: flex-start;
+  transition: none !important;
+}
+
+.infoContent.Login .infoLogo {
+  align-self: flex-end;
+}
+
 .infoContent h2 {
-  text-transform: uppercase;
-  font-size: 36px;
+  font-size: 24px;
+  font-weight: 500;
   line-height: 1.3;
   color: var(--login-text);
 }
 
 .infoContent p {
-  font-size: 16px;
-  color: var(--login-text);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--login-muted);
+  max-width: 30ch;
+}
+
+.infoContent.Login p {
+  margin-left: auto;
 }
 
 .curvedShape {
@@ -365,7 +381,7 @@
   height: 700px;
   width: 850px;
   background: var(--login-panel);
-  border-top: 3px solid var(--login-accent);
+  border-top: 1px solid var(--login-border);
   transform: rotate(0deg) skewY(0deg);
   transform-origin: bottom left;
   transition: 1.5s ease;
@@ -467,13 +483,10 @@
   .curvedShape,
   .curvedShape2,
   .btn,
-  .btn::before,
   .inputBox input,
-  .inputBox label,
-  .icon {
+  .inputBox label {
     transition: none !important;
     animation: none !important;
-    filter: none !important;
     transition-delay: 0s !important;
   }
 }
