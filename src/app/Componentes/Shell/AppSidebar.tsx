@@ -136,7 +136,7 @@ export function AppSidebar({
                           : "text-foreground hover:bg-surface-muted"
                       } ${colapsado ? "justify-center" : ""}`}
                     >
-                      <IconComponent size={18} className="flex-shrink-0" />
+                      <IconComponent size={18} className="flex-shrink-0 text-error" />
                       {!colapsado && <span className="ml-3 truncate">{item.label}</span>}
                     </a>
                   );
