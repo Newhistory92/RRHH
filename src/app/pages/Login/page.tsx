@@ -19,6 +19,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [verPassLogin, setVerPassLogin] = useState(false);
   const [verPassRegistro, setVerPassRegistro] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{
     usuario?: string;
     email?: string;
@@ -100,6 +101,8 @@ export default function AuthPage() {
 
   const handleLoginSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (isLoggingIn) return;
+    setIsLoggingIn(true);
 
     try {
       // 🔥 Llamamos la función centralizada
@@ -137,6 +140,7 @@ export default function AuthPage() {
             : "No se pudo conectar con el servidor",
         life: 3000,
       });
+      setIsLoggingIn(false);
     }
   };
 
@@ -250,7 +254,10 @@ export default function AuthPage() {
             </div>
 
             <div className={`${styles.inputBox} ${styles.animation}`} style={{ '--D': 3, '--S': 24 } as React.CSSProperties}>
-              <button className={styles.btn} type="submit">Acceso</button>
+              <button className={styles.btn} type="submit" disabled={isLoggingIn} aria-busy={isLoggingIn}>
+                {isLoggingIn && <span className={styles.spinner} aria-hidden="true" />}
+                {isLoggingIn ? 'Accediendo…' : 'Acceso'}
+              </button>
             </div>
 
             <div className={`${styles.regiLink} ${styles.animation}`} style={{ '--D': 4, '--S': 25 } as React.CSSProperties}>

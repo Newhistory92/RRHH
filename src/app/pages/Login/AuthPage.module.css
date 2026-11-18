@@ -210,6 +210,10 @@
 .btn {
   width: 100%;
   height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   background: var(--login-text);
   border-radius: 23px;
   cursor: pointer;
@@ -231,6 +235,28 @@
 .btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* Mientras se procesa el login el boton sigue deshabilitado (no se puede
+   reenviar el formulario) pero se mantiene legible en vez de caer al mismo
+   0.4 opaco de "Regístrate" deshabilitado -- ese opaco lee como "no
+   disponible", lo que se busca ahora es "trabajando". */
+.btn:disabled[aria-busy="true"] {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--login-panel) 30%, transparent);
+  border-top-color: var(--login-panel);
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .btn:focus-visible,
