@@ -110,6 +110,33 @@
   border-bottom: 2px solid var(--login-accent);
 }
 
+/* Edge agrega su propio icono nativo de "mostrar contraseña" (y de "borrar")
+   dentro de cualquier input[type=password]/[type=search] con contenido --
+   se superpone con el boton de ojo propio y es lo que hace que el campo
+   "cambie y se vea feo" al alternar visibilidad. Se oculta para dejar un
+   solo control, el nuestro. */
+.inputBox input::-ms-reveal,
+.inputBox input::-ms-clear {
+  display: none;
+}
+
+/* El autofill del navegador pinta el campo con su propio fondo (tipico
+   amarillo palido) y texto negro, ignorando el tema oscuro del login -- de
+   ahi que el texto tipeado/autocompletado no se vea "lindo" comparado con
+   el resto de la pantalla. El truco del box-shadow interno simula el fondo
+   transparente que ya usa el input (no se puede pisar background-color de
+   autofill directamente), y -webkit-text-fill-color fuerza el color de
+   texto de la marca. */
+.inputBox input:-webkit-autofill,
+.inputBox input:-webkit-autofill:hover,
+.inputBox input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--login-text);
+  -webkit-box-shadow: 0 0 0px 1000px var(--login-panel) inset;
+  box-shadow: 0 0 0px 1000px var(--login-panel) inset;
+  transition: background-color 9999s ease-in-out 0s;
+  caret-color: var(--login-text);
+}
+
 .inputBox label {
   position: absolute;
   top: 50%;
