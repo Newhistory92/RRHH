@@ -160,7 +160,7 @@ const handleSave = async (formData: EntityFormData): Promise<void> => {
       : "text-muted-foreground hover:text-primary text-shadow-md"
   }`}
 >
-  <LayoutGrid className="h-5 w-5 mr-2" />
+  <LayoutGrid className="h-5 w-5 mr-2 text-error" />
   Gestión de Departamentos
 </button>
             <button
@@ -171,7 +171,7 @@ const handleSave = async (formData: EntityFormData): Promise<void> => {
       : "text-muted-foreground hover:text-primary text-shadow-md"
   }`}
             >
-              <Sparkles className="mr-2 h-5 w-5" />
+              <Sparkles className="mr-2 h-5 w-5 text-error" />
               Organigrama
             </button>
           </nav>
