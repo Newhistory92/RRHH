@@ -45,10 +45,9 @@ export const DepartmentTree: React.FC<DepartmentTreeProps> = ({
       <div className="flex justify-between items-center mb-4">
         <h2 className="font-heading text-xl font-bold text-foreground">Departamentos</h2>
         <Button
-          icon={<PlusCircle className="w-5 h-5" />}
+          icon={<PlusCircle className="w-5 h-5 text-error" />}
           onClick={() => onOpenModal("department")}
-          severity="danger"
-          className="p-button-rounded p-button-text"
+          className="p-button-text"
           tooltip="Crear Nuevo Departamento"
         />
       </div>

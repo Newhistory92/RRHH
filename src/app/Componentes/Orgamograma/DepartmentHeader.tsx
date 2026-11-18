@@ -30,7 +30,7 @@ export const DepartmentHeader: React.FC<DepartmentHeaderProps> = ({
         </div>
       </div>
       <Button
-        icon={<Pencil className="w-4 h-4" />}
+        icon={<Pencil className="w-4 h-4 text-error" />}
         link
         severity="danger"
         label="Editar Departamento"

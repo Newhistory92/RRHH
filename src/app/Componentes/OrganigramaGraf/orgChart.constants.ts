@@ -1,33 +1,47 @@
 import { NodeColors } from '@/app/Interfas/Interfaces';
 
 // El organigrama es la excepcion deliberada a "un solo acento": el usuario
-// pidio colores llamativos ac + propositos para poder distinguir los 5
-// niveles jerarquicos de un vistazo, en vez de la paleta habitual de la
-// app (que ademas colapsaba Nivel 1 y 2 al mismo verde porque
-// --warm-contrast = --primary en el tema claro). Son hex fijos, no tokens
-// de la app, a proposito: esta pantalla no debe seguir la disciplina de
-// "un solo acento" del resto de RRHH.
+// pidio colores llamativos aca para distinguir los 5 niveles jerarquicos de
+// un vistazo, en vez de la paleta 60/30/10 habitual de la app. Son hex
+// fijos, no tokens de la app, a proposito.
+//
+// Paleta pastel (azul/mostaza/coral/rosa/violeta) tomada de una referencia
+// que el usuario mostro y confirmo como la que le gusta para este grafico
+// en particular -- no son los 5 colores "llamativos" saturados de un
+// primer intento (que el usuario encontro feo), son el tono pastel mas
+// suave de la imagen de referencia.
+const HUES = {
+  azul:    { bg: '#A4C5EF', text: '#2C5282' },
+  mostaza: { bg: '#F3CE8B', text: '#8A5A12' },
+  coral:   { bg: '#F0AD80', text: '#9C4A1D' },
+  rosa:    { bg: '#EA98AC', text: '#9C3A52' },
+  violeta: { bg: '#C89FE3', text: '#5B3B8C' },
+};
+
 export const NODE_COLORS: Record<number, NodeColors> = {
-  1: { bg: '#1B3A2B', text: '#FFFFFF', border: '#0F2A1C' }, // Direccion -- fir, ancla de marca
-  2: { bg: '#EE4129', text: '#FFFFFF', border: '#BA3320' }, // Gerencia -- tomate
-  3: { bg: '#D9A72E', text: '#2A1D00', border: '#A97F1E' }, // Supervision -- ambar
-  4: { bg: '#2563EB', text: '#FFFFFF', border: '#1D4ED8' }, // Coordinacion -- azul
-  5: { bg: '#7C3AED', text: '#FFFFFF', border: '#6D28D9' }, // Operativo -- violeta
+  1: { bg: HUES.azul.bg,    text: HUES.azul.text,    border: HUES.azul.text },    // Direccion
+  2: { bg: HUES.mostaza.bg, text: HUES.mostaza.text, border: HUES.mostaza.text }, // Gerencia
+  3: { bg: HUES.coral.bg,   text: HUES.coral.text,   border: HUES.coral.text },   // Supervision
+  4: { bg: HUES.rosa.bg,    text: HUES.rosa.text,    border: HUES.rosa.text },    // Coordinacion
+  5: { bg: HUES.violeta.bg, text: HUES.violeta.text, border: HUES.violeta.text }, // Operativo
 };
 
 export const DEFAULT_NODE_COLOR: NodeColors = {
-  bg: '#6B7280',
-  text: '#FFFFFF',
-  border: '#4B5563',
+  bg: '#D1D5DB',
+  text: '#374151',
+  border: '#374151',
 };
 
-// Variante "Claro": mismo hue por nivel, en tinte pastel con texto oscuro.
+// Variante "Claro": mismo hue, tinte mas palido con el color de texto como
+// borde para que el nivel se siga reconociendo de un vistazo.
+const tint = (hex: string) => `color-mix(in srgb, ${hex} 40%, white)`;
+
 export const NODE_COLORS2: Record<number, NodeColors> = {
-  1: { bg: '#E3EDE6', text: '#1B3A2B', border: '#1B3A2B' },
-  2: { bg: '#FCE4E1', text: '#BA3320', border: '#EE4129' },
-  3: { bg: '#FBF0D9', text: '#7A5A12', border: '#D9A72E' },
-  4: { bg: '#DCE8FD', text: '#1D4ED8', border: '#2563EB' },
-  5: { bg: '#EDE3FB', text: '#6D28D9', border: '#7C3AED' },
+  1: { bg: tint(HUES.azul.bg),    text: HUES.azul.text,    border: HUES.azul.text },
+  2: { bg: tint(HUES.mostaza.bg), text: HUES.mostaza.text, border: HUES.mostaza.text },
+  3: { bg: tint(HUES.coral.bg),   text: HUES.coral.text,   border: HUES.coral.text },
+  4: { bg: tint(HUES.rosa.bg),    text: HUES.rosa.text,    border: HUES.rosa.text },
+  5: { bg: tint(HUES.violeta.bg), text: HUES.violeta.text, border: HUES.violeta.text },
 };
 
 export const DEFAULT_NODE_COLOR2: NodeColors = {
