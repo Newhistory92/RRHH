@@ -12,6 +12,7 @@ import DateRangePicker from './Calendario';
 import { apiClient } from '@/app/util/apiClient';
 import { getAvailableLicenses } from '@/app/util/licenseFilters';
 import { generarPlantillaVacaciones } from '@/app/util/plantillaVacaciones';
+import { generarPlantillaLicenciaContrato } from '@/app/util/plantillaLicenciaContrato';
 
 // Solo para mostrar: el dato real sigue siendo "Vacaciones" en toda la app.
 const nombreMostradoTipo = (tipo: string) => tipo === 'Vacaciones' ? 'Licencia por vacaciones' : tipo;
@@ -74,6 +75,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [diasCalculados, setDiasCalculados] = useState(0);
   const [supervisorData, setSupervisorData] = useState<{ id: number, name: string } | null>(null);
+  const [jefeSuperiorData, setJefeSuperiorData] = useState<{ id: number, name: string, area: string } | null>(null);
   const [selectedType, setSelectedType] = useState<{ name: string } | null>(null);
   const [error, setError] = useState('');
   const [tiposLicencia, setTiposLicencia] = useState<{ name: string }[]>([]);
@@ -113,6 +115,29 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
       }
     }
   }, [userData]);
+
+  // Para Personal Contratado la nota va dirigida al jefe superior -- el que
+  // está más arriba del jefe inmediato, no el aprobador que el sistema
+  // asigna automáticamente. Se reconsulta el mismo endpoint pasándole el id
+  // del supervisor directo, que devuelve a SU supervisor.
+  useEffect(() => {
+    const esContratado = userData.condicionLaboral?.tipoContrato
+      ?.toLowerCase()
+      .includes('contrat');
+    if (!esContratado || !supervisorData) return;
+
+    apiClient.get<{ supervisor: { id: number, name: string } }>('/licenses/supervisor?employee_id=' + supervisorData.id)
+      .then(res => {
+        if (!res.supervisor) return;
+        const usuarioJefe = supervisores.find(s => s.id === res.supervisor.id || s.employee_id === res.supervisor.id);
+        setJefeSuperiorData({
+          id: res.supervisor.id,
+          name: res.supervisor.name,
+          area: usuarioJefe?.department || '',
+        });
+      })
+      .catch(err => console.error("Error cargando jefe superior del supervisor", err));
+  }, [userData, supervisorData, supervisores]);
 
   // Cargar tipos de licencia dinámicamente desde el backend (triple-join)
   useEffect(() => {
@@ -282,6 +307,28 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
       return;
     }
 
+    const isContratado = userData.condicionLaboral?.tipoContrato
+      ?.toLowerCase()
+      .includes('contrat');
+
+    if (isContratado && jefeSuperiorData) {
+      setMensaje(
+        generarPlantillaLicenciaContrato({
+          empleado: userData.name,
+          dni: userData.dni,
+          oficina: userData.office?.nombre || userData.department?.nombre || '',
+          jefeSuperior: jefeSuperiorData.name,
+          areaJefeSuperior: jefeSuperiorData.area,
+          desde: startDate,
+          hasta: endDate,
+          dias: diasCalculados,
+          tipoLicencia: selectedType?.name ?? '',
+        })
+      );
+
+      return;
+    }
+
     // 🔹 Mensaje genérico
     const detalle = Object.entries(solicitudDias)
       .flatMap(([anio, tipos]) =>
@@ -299,6 +346,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
     startDate,
     endDate,
     supervisorData,
+    jefeSuperiorData,
     diasCalculados,
     solicitudDias,
     userData,
