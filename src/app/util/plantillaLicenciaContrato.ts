@@ -14,7 +14,7 @@ export interface PlantillaLicenciaContratoParams {
   desde: Date;
   hasta: Date;
   dias: number;
-  tipoLicencia: string; // 'Particular' hace que la nota diga "particular" en vez de "licencia"
+  tipoLicencia: string; // nombre del tipo elegido (ej. "Lic por Examen"), tal cual va en la nota
 }
 
 const MESES = [
@@ -103,8 +103,9 @@ export function generarPlantillaLicenciaContrato({
   const mesHoy = MESES[hoy.getMonth()];
   const anioHoy = hoy.getFullYear();
 
-  const esParticular = tipoLicencia.toLowerCase().includes('particular');
-  const motivo = esParticular ? 'particular' : 'licencia';
+  // El tipo real elegido (ej. "Lic por Examen", "Vacaciones"), no un
+  // genérico "licencia" -- la nota tiene que decir qué licencia es.
+  const motivo = tipoLicencia.trim() || 'licencia';
 
   const anioLicencia = desde.getFullYear();
   const esAnioCorriente = anioLicencia === anioHoy;
