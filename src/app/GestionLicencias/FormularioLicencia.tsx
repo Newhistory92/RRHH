@@ -124,6 +124,12 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
   // en ese caso el jefe superior es la misma persona. Se trepa la cadena
   // reconsultando el mismo endpoint hasta que ya no haya más jefe cargado,
   // y se usa el último que se encontró.
+  //
+  // El "id" que devuelve /licenses/supervisor es el id de User (UUID, ver
+  // prisma/schema.prisma), no el id numérico de Employee que ese mismo
+  // endpoint espera como employee_id -- pasárselo tal cual en el siguiente
+  // salto tira 422. Hay que resolverlo contra `supervisores` (que trae
+  // ambos: `.id` de Usuario y `.employee_id`) antes de cada reconsulta.
   useEffect(() => {
     const esContratado = userData.condicionLaboral?.tipoContrato
       ?.toLowerCase()
@@ -133,11 +139,15 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
     let cancelado = false;
 
     (async () => {
-      let tope = supervisorData;
+      let tope: { id: number | string, name: string } = supervisorData;
       const MAX_SALTOS = 5; // resguardo ante un ciclo mal cargado en la jerarquía
       for (let i = 0; i < MAX_SALTOS; i++) {
+        const usuarioTope = supervisores.find(s => s.id === tope.id || s.employee_id === tope.id);
+        const employeeIdTope = usuarioTope?.employee_id;
+        if (!employeeIdTope) break; // no hay forma de identificarlo como empleado para seguir subiendo
+
         try {
-          const res = await apiClient.get<{ supervisor: { id: number, name: string } | null }>('/licenses/supervisor?employee_id=' + tope.id);
+          const res = await apiClient.get<{ supervisor: { id: string, name: string } | null }>('/licenses/supervisor?employee_id=' + employeeIdTope);
           if (!res.supervisor) break; // llegamos al tope de la cadena
           tope = res.supervisor;
         } catch (err) {
@@ -149,7 +159,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
 
       const usuarioJefe = supervisores.find(s => s.id === tope.id || s.employee_id === tope.id);
       setJefeSuperiorData({
-        id: tope.id,
+        id: usuarioJefe?.employee_id ?? 0,
         name: tope.name,
         area: usuarioJefe?.department || '',
       });
