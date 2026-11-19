@@ -60,8 +60,13 @@ const nombreMostrado = (tipo: string) => tipo === 'Vacaciones' ? 'Licencia por v
 
 const fmt = (d: string | Date) => new Date(d).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
 
+const STATUS_DESCONOCIDO = { cls: 'bg-muted text-muted-foreground border-border', label: 'Estado desconocido' };
+
 const StatusChip = ({ status, observacion }: { status: LicenseStatus; observacion?: string }) => {
-  const s = STATUS[status];
+  // El status en la base es un String libre (sin enum, ver prisma/schema.prisma),
+  // así que puede traer un valor que esta tabla todavía no conoce -- sin este
+  // fallback, una sola solicitud así tira abajo toda la pantalla.
+  const s = STATUS[status] ?? { ...STATUS_DESCONOCIDO, label: status || STATUS_DESCONOCIDO.label };
   return (
     <span title={observacion} className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border ${s.cls}`}>
       {s.label}
