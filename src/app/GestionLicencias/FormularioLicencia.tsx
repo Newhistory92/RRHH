@@ -76,6 +76,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
   const [diasCalculados, setDiasCalculados] = useState(0);
   const [supervisorData, setSupervisorData] = useState<{ id: number, name: string } | null>(null);
   const [jefeSuperiorData, setJefeSuperiorData] = useState<{ id: number, name: string, area: string } | null>(null);
+  const [jefeSuperiorError, setJefeSuperiorError] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<{ name: string } | null>(null);
   const [error, setError] = useState('');
   const [tiposLicencia, setTiposLicencia] = useState<{ name: string }[]>([]);
@@ -126,9 +127,13 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
       .includes('contrat');
     if (!esContratado || !supervisorData) return;
 
+    setJefeSuperiorError(null);
     apiClient.get<{ supervisor: { id: number, name: string } }>('/licenses/supervisor?employee_id=' + supervisorData.id)
       .then(res => {
-        if (!res.supervisor) return;
+        if (!res.supervisor) {
+          setJefeSuperiorError(`${supervisorData.name} no tiene un jefe superior cargado en el sistema.`);
+          return;
+        }
         const usuarioJefe = supervisores.find(s => s.id === res.supervisor.id || s.employee_id === res.supervisor.id);
         setJefeSuperiorData({
           id: res.supervisor.id,
@@ -136,7 +141,10 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
           area: usuarioJefe?.department || '',
         });
       })
-      .catch(err => console.error("Error cargando jefe superior del supervisor", err));
+      .catch(err => {
+        console.error("Error cargando jefe superior del supervisor", err);
+        setJefeSuperiorError(`No se pudo obtener el jefe superior de ${supervisorData.name}.`);
+      });
   }, [userData, supervisorData, supervisores]);
 
   // Cargar tipos de licencia dinámicamente desde el backend (triple-join)
@@ -329,6 +337,14 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
       return;
     }
 
+    // Si es Contratado, nunca mostrar el mensaje genérico en su lugar --
+    // mejor dejar la vista previa vacía (el banner de error ya explica por
+    // qué) que mandar una nota con el formato equivocado.
+    if (isContratado) {
+      setMensaje('');
+      return;
+    }
+
     // 🔹 Mensaje genérico
     const detalle = Object.entries(solicitudDias)
       .flatMap(([anio, tipos]) =>
@@ -359,6 +375,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
     if (!startDate || !endDate) return setError('Seleccioná las fechas.');
     if (!supervisorData) return setError('No tenés un supervisor válido asignado.');
     if (totalDiasSolicitados <= 0) return setError('Asigná al menos un día.');
+    if (!mensaje.trim()) return setError(jefeSuperiorError || 'No se pudo armar la nota.');
 
     if (selectedType?.name.toLowerCase().includes('vacaciones')) {
       const month = startDate.getMonth() + 1;
@@ -538,6 +555,12 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
 
         <Section className="lg:col-span-2">
           <StepLabel n={4} label="Vista previa de la nota" />
+          {jefeSuperiorError && (
+            <div className="flex items-center gap-2 p-3 mb-3 bg-error-soft border border-error rounded-xl text-sm text-error-soft-foreground">
+              <AlertCircle size={16} className="flex-shrink-0" />
+              {jefeSuperiorError} Revisá en Organigrama que tenga un jefe asignado por encima.
+            </div>
+          )}
           <InputTextarea
             value={mensaje}
             onChange={(e) => setMensaje(e.target.value)}
