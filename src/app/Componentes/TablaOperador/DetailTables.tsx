@@ -338,7 +338,7 @@ export const ProfileTab = ({ employee, onSave }: { employee: Employee; onSave?: 
                   className="p-button-text p-button-sm"
                   onClick={() => handleEdit('condicionLaboral')}
                   disabled={editingSection !== null}
-                  style={{ color: 'var(--primary)' }}
+                  style={{ color: 'var(--destructive)' }}
                 />
               )}
             </div>
@@ -444,7 +444,7 @@ export const ProfileTab = ({ employee, onSave }: { employee: Employee; onSave?: 
                   className="p-button-text p-button-sm"
                   onClick={() => handleEdit('detallesAdicionales')}
                   disabled={editingSection !== null}
-                  style={{ color: 'var(--primary)' }}
+                  style={{ color: 'var(--destructive)' }}
                 />
               )}
             </div>

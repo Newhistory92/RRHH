@@ -858,7 +858,7 @@ export const HoursDisplay = ({ hours }: { hours: number | null }) => {
 
 export const InfoCard = ({ icon: Icon, title, children }: InfoCardProps) => (
   <div className="bg-muted rounded-xl p-4 flex items-start gap-3 h-full border border-border">
-    <Icon className="text-muted-foreground mt-0.5 flex-shrink-0" size={18} />
+    <Icon className="text-error mt-0.5 flex-shrink-0" size={18} />
     <div className="flex-1 min-w-0">
       <h4 className="text-xs font-medium text-muted-foreground mb-1">{title}</h4>
       <div className="text-foreground text-sm">{children}</div>
