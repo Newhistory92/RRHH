@@ -53,6 +53,40 @@ function rangoFechas(desde: Date, hasta: Date): string {
     : `desde el ${desde.getDate()} de ${MESES[desde.getMonth()]} hasta el ${hasta.getDate()} de ${MESES[hasta.getMonth()]}`;
 }
 
+// Género de la primera palabra del nombre de la oficina/área, para el
+// artículo ("la Gerencia Médica" / "el Departamento de Sistemas"). Los
+// nombres de este tipo de unidades no siguen la regla general de "termina
+// en A = femenino" de forma confiable (ej. "Área" es femenina pero usa
+// "el" por la a tónica), así que primero se busca por palabra conocida y
+// recién después se cae a la heurística.
+const GENERO_POR_PALABRA: Record<string, 'el' | 'la'> = {
+  gerencia: 'la',
+  subgerencia: 'la',
+  oficina: 'la',
+  direccion: 'la',
+  division: 'la',
+  unidad: 'la',
+  jefatura: 'la',
+  coordinacion: 'la',
+  secretaria: 'la',
+  area: 'el',
+  departamento: 'el',
+  sector: 'el',
+  servicio: 'el',
+  programa: 'el',
+};
+
+function articuloPara(nombre: string): 'el' | 'la' {
+  const primeraPalabra = nombre
+    .trim()
+    .split(/\s+/)[0]
+    ?.toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
+  if (primeraPalabra && GENERO_POR_PALABRA[primeraPalabra]) return GENERO_POR_PALABRA[primeraPalabra];
+  return nombre.trim().toLowerCase().endsWith('a') ? 'la' : 'el';
+}
+
 export function generarPlantillaLicenciaContrato({
   empleado,
   dni,
@@ -91,7 +125,11 @@ export function generarPlantillaLicenciaContrato({
 ${jefeSuperior}
 ${areaJefeSuperior}
 
-Quien suscribe; ${empleado}, DNI: ${dni}, que se desempeña en el ${oficina} como Personal Contratado solicita la autorización de ${dias} días de ${motivo} correspondiente al año ${anioLicencia} ${tramoFechas} del ${esAnioCorriente ? 'corriente' : 'siguiente'} año.
+Quien suscribe; ${empleado}, DNI: ${dni}, que se desempeña en ${articuloPara(oficina)} ${oficina} como Personal Contratado, solicita la autorización de ${dias} días de ${motivo} correspondiente al año ${anioLicencia} ${tramoFechas} del ${esAnioCorriente ? 'corriente' : 'siguiente'} año.
 
-Sin otro particular, la saluda atentamente.-`;
+Sin otro particular, la saluda atentamente.-
+
+
+
+${empleado}`;
 }
