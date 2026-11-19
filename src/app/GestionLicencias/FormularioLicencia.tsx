@@ -76,7 +76,6 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
   const [diasCalculados, setDiasCalculados] = useState(0);
   const [supervisorData, setSupervisorData] = useState<{ id: number, name: string } | null>(null);
   const [jefeSuperiorData, setJefeSuperiorData] = useState<{ id: number, name: string, area: string } | null>(null);
-  const [jefeSuperiorError, setJefeSuperiorError] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<{ name: string } | null>(null);
   const [error, setError] = useState('');
   const [tiposLicencia, setTiposLicencia] = useState<{ name: string }[]>([]);
@@ -117,34 +116,46 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
     }
   }, [userData]);
 
-  // Para Personal Contratado la nota va dirigida al jefe superior -- el que
-  // está más arriba del jefe inmediato, no el aprobador que el sistema
-  // asigna automáticamente. Se reconsulta el mismo endpoint pasándole el id
-  // del supervisor directo, que devuelve a SU supervisor.
+  // Para Personal Contratado la nota va dirigida al jefe superior -- el tope
+  // de la cadena de mando, que según la jerarquía puede estar uno, dos o más
+  // niveles arriba del jefe inmediato (el nivel 1 casi no se usa como jefe
+  // de nadie, así que en la práctica el tope suele ser nivel 2). No es
+  // siempre "el jefe del jefe": a veces el jefe inmediato YA es el tope, y
+  // en ese caso el jefe superior es la misma persona. Se trepa la cadena
+  // reconsultando el mismo endpoint hasta que ya no haya más jefe cargado,
+  // y se usa el último que se encontró.
   useEffect(() => {
     const esContratado = userData.condicionLaboral?.tipoContrato
       ?.toLowerCase()
       .includes('contrat');
     if (!esContratado || !supervisorData) return;
 
-    setJefeSuperiorError(null);
-    apiClient.get<{ supervisor: { id: number, name: string } }>('/licenses/supervisor?employee_id=' + supervisorData.id)
-      .then(res => {
-        if (!res.supervisor) {
-          setJefeSuperiorError(`${supervisorData.name} no tiene un jefe superior cargado en el sistema.`);
-          return;
+    let cancelado = false;
+
+    (async () => {
+      let tope = supervisorData;
+      const MAX_SALTOS = 5; // resguardo ante un ciclo mal cargado en la jerarquía
+      for (let i = 0; i < MAX_SALTOS; i++) {
+        try {
+          const res = await apiClient.get<{ supervisor: { id: number, name: string } | null }>('/licenses/supervisor?employee_id=' + tope.id);
+          if (!res.supervisor) break; // llegamos al tope de la cadena
+          tope = res.supervisor;
+        } catch (err) {
+          console.warn("No se pudo seguir subiendo la cadena de jefes, se usa el último encontrado", err);
+          break;
         }
-        const usuarioJefe = supervisores.find(s => s.id === res.supervisor.id || s.employee_id === res.supervisor.id);
-        setJefeSuperiorData({
-          id: res.supervisor.id,
-          name: res.supervisor.name,
-          area: usuarioJefe?.department || '',
-        });
-      })
-      .catch(err => {
-        console.error("Error cargando jefe superior del supervisor", err);
-        setJefeSuperiorError(`No se pudo obtener el jefe superior de ${supervisorData.name}.`);
+      }
+      if (cancelado) return;
+
+      const usuarioJefe = supervisores.find(s => s.id === tope.id || s.employee_id === tope.id);
+      setJefeSuperiorData({
+        id: tope.id,
+        name: tope.name,
+        area: usuarioJefe?.department || '',
       });
+    })();
+
+    return () => { cancelado = true; };
   }, [userData, supervisorData, supervisores]);
 
   // Cargar tipos de licencia dinámicamente desde el backend (triple-join)
@@ -375,7 +386,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
     if (!startDate || !endDate) return setError('Seleccioná las fechas.');
     if (!supervisorData) return setError('No tenés un supervisor válido asignado.');
     if (totalDiasSolicitados <= 0) return setError('Asigná al menos un día.');
-    if (!mensaje.trim()) return setError(jefeSuperiorError || 'No se pudo armar la nota.');
+    if (!mensaje.trim()) return setError('No se pudo armar la nota.');
 
     if (selectedType?.name.toLowerCase().includes('vacaciones')) {
       const month = startDate.getMonth() + 1;
@@ -555,12 +566,6 @@ const RequestForm: React.FC<RequestFormProps> = ({ saldos, supervisores, userDat
 
         <Section className="lg:col-span-2">
           <StepLabel n={4} label="Vista previa de la nota" />
-          {jefeSuperiorError && (
-            <div className="flex items-center gap-2 p-3 mb-3 bg-error-soft border border-error rounded-xl text-sm text-error-soft-foreground">
-              <AlertCircle size={16} className="flex-shrink-0" />
-              {jefeSuperiorError} Revisá en Organigrama que tenga un jefe asignado por encima.
-            </div>
-          )}
           <InputTextarea
             value={mensaje}
             onChange={(e) => setMensaje(e.target.value)}
