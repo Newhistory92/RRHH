@@ -23,8 +23,20 @@ export const LICENSE_MAX_CONSTRAINTS: Record<string, number> = {
  * basándose en el nivel de acceso del componente, tipo de contrato y 
  * antigüedad en años.
  */
+// Las claves cortas (ej. "lar") son códigos exactos, no fragmentos --
+// un simple `includes` hace que "particular" cuente como "LAR" porque la
+// substring está ahí en el medio de la palabra. Para esas se exige borde
+// de palabra; las frases largas ya son lo bastante específicas como para
+// seguir usando substring.
+function nombreCoincideExclusivo(nameLower: string, keyword: string): boolean {
+  if (keyword.length <= 4) {
+    return new RegExp(`\\b${keyword}\\b`).test(nameLower);
+  }
+  return nameLower.includes(keyword);
+}
+
 export function getAvailableLicenses(
-  allLicenses: any[], 
+  allLicenses: any[],
   isRRHHComponent: boolean,
   userContract: string,
   seniority: number
@@ -36,10 +48,10 @@ export function getAvailableLicenses(
     return { ...lic };
   }).filter(lic => {
     const nameLower = lic.nombre.toLowerCase();
-    
+
     // 1. Filtrado de grupo (Estándar vs RRHH Exclusivo)
     if (!isRRHHComponent) {
-      const isExclusive = RRHH_EXCLUSIVE_LICENSES.some(rrhhLic => nameLower.includes(rrhhLic));
+      const isExclusive = RRHH_EXCLUSIVE_LICENSES.some(rrhhLic => nombreCoincideExclusivo(nameLower, rrhhLic));
       if (isExclusive) return false;
     }
 
