@@ -70,7 +70,7 @@ function SectionToolbar({ sectionKey, editingSection, isSaving, onEdit, onSave, 
         />
         <Button
           onClick={onSave}
-          icon={<Save className="w-4 h-4" />}
+          icon={<Save className="w-4 h-4 text-error" />}
           severity="info"
           text
           rounded
@@ -85,7 +85,7 @@ function SectionToolbar({ sectionKey, editingSection, isSaving, onEdit, onSave, 
   return (
     <Button
       onClick={() => onEdit(sectionKey)}
-      icon={<Edit className="w-4 h-4" />}
+      icon={<Edit className="w-4 h-4 text-error" />}
       severity="secondary"
       text
       rounded
