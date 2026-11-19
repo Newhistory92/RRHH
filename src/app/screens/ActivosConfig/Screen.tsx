@@ -51,7 +51,7 @@ export default function ActivosConfig() {
         tab === id ? 'border-primary text-primary bg-primary/10' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
       }`}
     >
-      <Icon size={16} /> {label}
+      <Icon size={16} className="text-error" /> {label}
     </button>
   );
 

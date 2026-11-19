@@ -248,7 +248,7 @@ export default function ConfiguracionGeneral() {
                     : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
             }`}
         >
-            <Icon size={16} />
+            <Icon size={16} className="text-error" />
             {label}
         </button>
     );

@@ -866,10 +866,19 @@ export const InfoCard = ({ icon: Icon, title, children }: InfoCardProps) => (
   </div>
 );
 
+// El verde abeto de severity="info" se veia muy oscuro para una lista de
+// tags de habilidades -- se reemplaza por el azul pastel de la paleta
+// llamativa del organigrama (ver orgChart.constants.ts), mismo criterio de
+// "colores atractivos" que el usuario ya aprobo ahi, sin tocar el amarillo/
+// mostaza que pidio explicitamente dejar afuera.
 export const SkillsDisplay = ({ selectedDepartment }: { selectedDepartment?: Department }) => (
   <div className="flex flex-wrap gap-2">
     {selectedDepartment?.habilidades_requeridas?.map((skill) => (
-      <Tag key={skill.id} value={`${skill.nombre} (${skill.level})`} severity="info" />
+      <Tag
+        key={skill.id}
+        value={`${skill.nombre} (${skill.level})`}
+        style={{ backgroundColor: '#A4C5EF', color: '#2C5282' }}
+      />
     ))}
   </div>
 );

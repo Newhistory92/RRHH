@@ -275,7 +275,7 @@ export default function TestPage(){
                 </p>
               </div>
               <div className="bg-muted p-3 rounded-full">
-                <Users size={22} className="text-muted-foreground" />
+                <Users size={22} className="text-error" />
               </div>
             </div>
           </div>
@@ -291,7 +291,7 @@ export default function TestPage(){
                 </p>
               </div>
               <div className="bg-muted p-3 rounded-full">
-                <FlaskConical size={22} className="text-muted-foreground" />
+                <FlaskConical size={22} className="text-error" />
               </div>
             </div>
           </div>
@@ -307,7 +307,7 @@ export default function TestPage(){
                 </p>
               </div>
               <div className="bg-muted p-3 rounded-full">
-                <Target size={22} className="text-muted-foreground" />
+                <Target size={22} className="text-error" />
               </div>
             </div>
           </div>

@@ -24,7 +24,7 @@ export const OfficeCard: React.FC<OfficeCardProps> = ({ office, onEdit, employee
       <div className="flex justify-between items-start">
         <div>
           <h4 className="font-bold text-lg text-foreground flex items-center gap-2">
-            <Briefcase className="w-5 h-5 mr-2 text-primary" />
+            <Briefcase className="w-5 h-5 mr-2 text-error" />
             {office.nombre}
             <CapacityBadge asignados={office.asignados} capacidadRequerida={office.capacidadRequerida} />
           </h4>
