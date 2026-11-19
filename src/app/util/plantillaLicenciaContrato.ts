@@ -118,7 +118,7 @@ export function generarPlantillaLicenciaContrato({
     ? listarDias(habiles)
     : rangoFechas(desde, hasta);
 
-  return `                                                       SAN JUAN ${diaHoy} DE ${mesHoy.toUpperCase()} DEL ${anioHoy}.-
+  return `SAN JUAN ${diaHoy} DE ${mesHoy.toUpperCase()} DEL ${anioHoy}.-
 
 
 
