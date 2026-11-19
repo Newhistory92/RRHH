@@ -35,7 +35,10 @@ export const GlobalStats: React.FC<GlobalStatsProps> = ({ data, isLoading, error
   }
 
   const { bestDepartment, lowEfficiencyActivities, avgAbsences, avgLateness, statusDistribution, departmentProductivity } = data;
-  const PIE_COLORS = ['var(--primary)', 'var(--accent)', 'var(--warm-contrast)', 'var(--secondary)'];
+  // Paleta pastel del mapeo de Organigrama (azul/coral/rosa/violeta): --warm-contrast
+  // es igual a --primary en el tema claro, así que los 4 segmentos del pie
+  // colapsaban a 2 colores. Sin amarillo/mostaza por pedido explícito.
+  const PIE_COLORS = ['#A4C5EF', '#F0AD80', '#EA98AC', '#C89FE3'];
   const departmentProductivityData = departmentProductivity;
   const tooltipStyle = { backgroundColor: 'var(--popover)', border: 'none', borderRadius: '0.5rem', color: 'var(--popover-foreground)' };
   const tooltipTextStyle = { color: 'var(--popover-foreground)' };
